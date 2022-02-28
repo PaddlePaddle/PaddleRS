@@ -7,7 +7,9 @@ PaddleRS是基于飞桨的遥感影像处理平台，支持遥感图像分类，
 - [ ] 多光谱、高光谱、SAR、无人机RGBD
 - [ ] 数据切分、合并、通道提取等功能
 - [ ] 支持任意通道数据增强策略
-  
+- [ ] 支持多种遥感影像格式  
+遥感影像的格式多种多样，不同传感器产生的数据格式也可能不同。PaddleRS现已兼容6+种格式图片读取：`tif`, `png`, `jpeg`, `bmp`, `img`, `npy`.
+
 ### 算法模型
 - [ ] 分类（ResNet，MobileNet，HRNet）
 - [ ] 检测（PP-YOLO，Faster-RCNN，S2ANet）
