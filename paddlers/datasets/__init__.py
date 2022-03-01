@@ -1,0 +1,1 @@
+from .voc import VOCDetection
