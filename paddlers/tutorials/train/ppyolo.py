@@ -43,7 +43,7 @@ print(train_dataset[0])
 # 初始化模型，并进行训练
 # 可使用VisualDL查看训练指标，参考https://github.com/PaddlePaddle/PaddleX/blob/develop/docs/visualdl.md
 num_classes = len(train_dataset.labels)
-model = pdrs.models.det.PPYOLO(num_classes=num_classes, backbone='ResNet50_vd_dcn')
+model = pdrs.tasks.det.PPYOLO(num_classes=num_classes, backbone='ResNet50_vd_dcn')
 
 # API说明：https://github.com/PaddlePaddle/PaddleX/blob/develop/docs/apis/models/detection.md
 # 各参数介绍与调整说明：https://github.com/PaddlePaddle/PaddleX/blob/develop/docs/parameters.md
