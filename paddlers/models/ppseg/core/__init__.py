@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import models, datasets, transforms
+from .train import train
+from .val import evaluate
+from .predict import predict
+from . import infer
 
-__version__ = 'develop'
+__all__ = ['train', 'evaluate', 'predict']
