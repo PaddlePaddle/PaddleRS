@@ -300,7 +300,7 @@ class BaseModel:
             vdl_logdir = osp.join(save_dir, 'vdl_log')
             log_writer = LogWriter(vdl_logdir)
 
-        # task_id: refer to paddlex
+        # task_id: refer to paddlers
         task_id = getattr(paddlers, "task_id", "")
 
         thresh = .0001

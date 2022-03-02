@@ -867,7 +867,7 @@ class RandomExpand(Transform):
         label_padding_value(int, optional): Filling value for the mask. Defaults to 255.
 
     See Also:
-        paddlex.transforms.Padding
+        paddlers.transforms.Padding
     """
 
     def __init__(self,

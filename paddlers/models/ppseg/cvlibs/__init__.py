@@ -12,6 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import models, datasets, transforms
-
-__version__ = 'develop'
+from . import manager
+from . import param_init
+from .config import Config
