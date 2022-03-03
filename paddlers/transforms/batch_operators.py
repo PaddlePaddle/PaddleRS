@@ -69,7 +69,7 @@ class BatchRandomResize(Transform):
     """
     Resize a batch of input to random sizes.
 
-    Attention：If interp is 'RANDOM', the interpolation method will be chose randomly.
+    Attention: If interp is 'RANDOM', the interpolation method will be chose randomly.
 
     Args:
         target_sizes (List[int], List[list or tuple] or Tuple[list or tuple]):
@@ -108,7 +108,7 @@ class BatchRandomResize(Transform):
 class BatchRandomResizeByShort(Transform):
     """Resize a batch of input to random sizes with keeping the aspect ratio.
 
-    Attention：If interp is 'RANDOM', the interpolation method will be chose randomly.
+    Attention: If interp is 'RANDOM', the interpolation method will be chose randomly.
 
     Args:
         short_sizes (List[int], Tuple[int]): Target sizes of the shorter side of the image(s).
