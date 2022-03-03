@@ -1,4 +1,4 @@
-# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserved.
+# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import sys
 
 import cv2
 import paddle
-import paddleseg
 
 IS_WINDOWS = sys.platform == 'win32'
 
@@ -117,7 +116,6 @@ def get_sys_env():
     except:
         pass
 
-    env_info['PaddleSeg'] = paddleseg.__version__
     env_info['PaddlePaddle'] = paddle.__version__
     env_info['OpenCV'] = cv2.__version__
 
