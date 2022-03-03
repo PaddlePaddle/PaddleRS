@@ -16,6 +16,8 @@ import numpy as np
 import cv2
 import copy
 import random
+import imghdr
+import os
 from PIL import Image
 import paddlers
 
@@ -146,9 +148,39 @@ class Decode(Transform):
         super(Decode, self).__init__()
         self.to_rgb = to_rgb
 
-    def read_img(self, img_path):
-        return cv2.imread(img_path, cv2.IMREAD_ANYDEPTH | cv2.IMREAD_ANYCOLOR |
-                          cv2.IMREAD_COLOR)
+    def read_img(self, img_path, input_channel=3):
+        img_format = imghdr.what(img_path)
+        name, ext = os.path.splitext(img_path)
+        if img_format == 'tiff' or ext == '.img':
+            try:
+                import gdal
+            except:
+                try:
+                    from osgeo import gdal
+                except:
+                    raise Exception(
+                        "Failed to import gdal! You can try use conda to install gdal"
+                    )
+                    six.reraise(*sys.exc_info())
+
+            dataset = gdal.Open(img_path)
+            if dataset == None:
+                raise Exception('Can not open', img_path)
+            im_data = dataset.ReadAsArray()
+            if im_data.ndim == 3:
+                im_data.transpose((1, 2, 0))
+            return im_data
+        elif img_format in ['jpeg', 'bmp', 'png', 'jpg']:
+            if input_channel == 3:
+                return cv2.imread(img_path, cv2.IMREAD_ANYDEPTH |
+                                  cv2.IMREAD_ANYCOLOR | cv2.IMREAD_COLOR)
+            else:
+                return cv2.imread(im_file, cv2.IMREAD_ANYDEPTH |
+                                  cv2.IMREAD_ANYCOLOR)
+        elif ext == '.npy':
+            return np.load(img_path)
+        else:
+            raise Exception('Image format {} is not supported!'.format(ext))
 
     def apply_im(self, im_path):
         if isinstance(im_path, str):
