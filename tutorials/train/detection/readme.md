@@ -1,7 +1,12 @@
-Run the detection training demo:
+The detection training demo:
+* dataset: AIR-SARShip-1.0 
+* target: ship
+* model: faster_rcnn
 
-1, Install PaddleRS
 
+Run the demo:
+
+1. Install PaddleRS
 ```
 git clone https://github.com/PaddleCV-SIG/PaddleRS.git
 cd PaddleRS
@@ -9,9 +14,7 @@ pip install -r requirements.txt
 python setup.py install
 ```
 
-
 2. Run the demo
-
 ```
 cd tutorials/train/detection/
 
