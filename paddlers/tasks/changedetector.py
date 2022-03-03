@@ -29,7 +29,7 @@ from .base import BaseModel
 from .utils import seg_metrics as metrics
 from paddlers.utils.checkpoint import seg_pretrain_weights_dict
 from paddlers.transforms import Decode, Resize
-from paddlers.models.ppcd import CDNet
+from paddlers.models.ppcd import CDNet as _CDNet
 
 __all__ = ["CDNet"]
 
@@ -59,7 +59,7 @@ class BaseChangeDetector(BaseModel):
 
     def build_net(self, **params):
         # TODO: add other model
-        net = CDNet(num_classes=self.num_classes, **params)
+        net = _CDNet(num_classes=self.num_classes, **params)
         return net
 
     def _fix_transforms_shape(self, image_shape):
@@ -174,14 +174,7 @@ class BaseChangeDetector(BaseModel):
                 paddleseg.models.MixedLoss(
                     losses=losses, coef=list(coef))
             ]
-        if self.model_name == 'FastSCNN':
-            loss_type *= 2
-            loss_coef = [1.0, 0.4]
-        elif self.model_name == 'BiSeNetV2':
-            loss_type *= 5
-            loss_coef = [1.0] * 5
-        else:
-            loss_coef = [1.0]
+        loss_coef = [1.0]
         losses = {'types': loss_type, 'coef': loss_coef}
         return losses
 
@@ -584,7 +577,7 @@ class BaseChangeDetector(BaseModel):
         return batch_restore_list
 
     def _postprocess(self, batch_pred, batch_origin_shape, transforms):
-        batch_restore_list = BaseSegmenter.get_transforms_shape_info(
+        batch_restore_list = BaseChangeDetector.get_transforms_shape_info(
             batch_origin_shape, transforms)
         if isinstance(batch_pred, (tuple, list)) and self.status == 'Infer':
             return self._infer_postprocess(
@@ -665,7 +658,7 @@ class CDNet(BaseChangeDetector):
                  **params):
         params.update({'in_channels': in_channels})
         super(CDNet, self).__init__(
-            model_name='UNet',
+            model_name='CDNet',
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
             **params)

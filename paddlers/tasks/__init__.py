@@ -14,4 +14,5 @@
 
 from . import det
 from .segmenter import *
+from .changedetector import *
 from .load_model import load_model

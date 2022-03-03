@@ -128,3 +128,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# testdata
+tutorials/train/change_detection/DataSet/

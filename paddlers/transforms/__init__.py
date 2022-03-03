@@ -25,7 +25,7 @@ def arrange_transforms(model_type, transforms, mode='train'):
         else:
             transforms.apply_im_only = False
         arrange_transform = ArrangeSegmenter(mode)
-    elif model_type == 'changedetctor':
+    elif model_type == 'changedetector':
         if mode == 'eval':
             transforms.apply_im_only = True
         else:
