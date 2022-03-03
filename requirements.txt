@@ -14,3 +14,4 @@ motmetrics
 matplotlib
 chardet
 openpyxl
+gdal
