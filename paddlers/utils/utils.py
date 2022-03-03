@@ -74,7 +74,7 @@ def path_normalization(path):
 
 
 def is_pic(img_name):
-    valid_suffix = ['JPEG', 'jpeg', 'JPG', 'jpg', 'BMP', 'bmp', 'PNG', 'png']
+    valid_suffix = ['JPEG', 'jpeg', 'JPG', 'jpg', 'BMP', 'bmp', 'PNG', 'png', 'tiff']
     suffix = img_name.split('.')[-1]
     if suffix not in valid_suffix:
         return False
