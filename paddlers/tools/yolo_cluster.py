@@ -99,7 +99,7 @@ class YOLOAnchorCluster(BaseAnchorCluster):
             num_anchors (int): number of clusters
             dataset (DataSet): DataSet instance, VOC or COCO
             image_size (list or int): [h, w], being an int means image height and image width are the same.
-            cache (bool): whether using cache。 Defaults to True.
+            cache (bool): whether using cache. Defaults to True.
             cache_path (str or None, optional): cache directory path. If None, use `data_dir` of dataset. Defaults to None.
             iters (int, optional): iters of kmeans algorithm. Defaults to 300.
             gen_iters (int, optional): iters of genetic algorithm. Defaults to 1000.
