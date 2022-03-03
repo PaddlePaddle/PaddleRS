@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from operator import mod
 from .operators import *
 from .batch_operators import BatchRandomResize, BatchRandomResizeByShort, _BatchPadding
 from paddlers import transforms as T
@@ -25,6 +26,12 @@ def arrange_transforms(model_type, transforms, mode='train'):
         else:
             transforms.apply_im_only = False
         arrange_transform = ArrangeSegmenter(mode)
+    elif model_type == 'changedetctor':
+        if mode == 'eval':
+            transforms.apply_im_only = True
+        else:
+            transforms.apply_im_only = False
+        arrange_transform = ArrangeChangeDetector(mode)
     elif model_type == 'classifier':
         arrange_transform = ArrangeClassifier(mode)
     elif model_type == 'detector':

@@ -1370,6 +1370,32 @@ class ArrangeSegmenter(Transform):
             return image,
 
 
+class ArrangeChangeDetector(Transform):
+    def __init__(self, mode):
+        super(ArrangeChangeDetector, self).__init__()
+        if mode not in ['train', 'eval', 'test', 'quant']:
+            raise ValueError(
+                "mode should be defined as one of ['train', 'eval', 'test', 'quant']!"
+            )
+        self.mode = mode
+
+    def apply(self, sample):
+        if 'mask' in sample:
+            mask = sample['mask']
+
+        image_t1 = permute(sample['image_t1'], False)
+        image_t2 = permute(sample['image_t2'], False)
+        if self.mode == 'train':
+            mask = mask.astype('int64')
+            return image_t1, image_t2, mask
+        if self.mode == 'eval':
+            mask = np.asarray(Image.open(mask))
+            mask = mask[np.newaxis, :, :].astype('int64')
+            return image_t1, image_t2, mask
+        if self.mode == 'test':
+            return image_t1, image_t2,
+
+
 class ArrangeClassifier(Transform):
     def __init__(self, mode):
         super(ArrangeClassifier, self).__init__()

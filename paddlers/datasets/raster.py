@@ -42,7 +42,7 @@ class Raster:
             self.path = path
             self.__src_data = np.load(path) if path.split(".")[-1] == "npy" \
                                             else gdal.Open(path)
-            self.__getInfo()
+            self._getInfo()
             self.to_uint8 = to_uint8
             self.setBands(band_list)
         else:
@@ -78,16 +78,16 @@ class Raster:
             np.ndarray: data's ndarray.
         """
         if start_loc is None:
-            return self.__getAarray()
+            return self._getAarray()
         else:
-            return self.__getBlock(start_loc, block_size)
+            return self._getBlock(start_loc, block_size)
 
-    def __getInfo(self) -> None:
+    def _getInfo(self) -> None:
         self.bands = self.__src_data.RasterCount
         self.width = self.__src_data.RasterXSize
         self.height = self.__src_data.RasterYSize
 
-    def __getAarray(self, window: Union[None, List[int], Tuple[int]]=None) -> np.ndarray:
+    def _getAarray(self, window: Union[None, List[int], Tuple[int]]=None) -> np.ndarray:
         if window is not None:
             xoff, yoff, xsize, ysize = window
         if self.band_list is None:
@@ -114,7 +114,7 @@ class Raster:
             ima = raster2uint8(ima)
         return ima
 
-    def __getBlock(self,
+    def _getBlock(self,
                    start_loc: Union[List[int], Tuple[int]], 
                    block_size: Union[List[int], Tuple[int]]=[512, 512]) -> np.ndarray:
         if len(start_loc) != 2 or len(block_size) != 2:
@@ -128,7 +128,7 @@ class Raster:
             xsize = self.width - xoff
         if yoff + ysize > self.height:
             ysize = self.height - yoff
-        ima = self.__getAarray([int(xoff), int(yoff), int(xsize), int(ysize)])
+        ima = self._getAarray([int(xoff), int(yoff), int(xsize), int(ysize)])
         h, w = ima.shape[:2] if len(ima.shape) == 3 else ima.shape
         if self.bands != 1:
             tmp = np.zeros((block_size[0], block_size[1], self.bands), dtype=ima.dtype)

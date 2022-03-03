@@ -14,4 +14,4 @@ motmetrics
 matplotlib
 chardet
 openpyxl
-GDAL >= 3.2.2
+GDAL >= 3.1.3
