@@ -204,9 +204,9 @@ class Resize(Transform):
     """
     Resize input.
 
-    - If target_size is an int，resize the image(s) to (target_size, target_size).
+    - If target_size is an int, resize the image(s) to (target_size, target_size).
     - If target_size is a list or tuple, resize the image(s) to target_size.
-    Attention：If interp is 'RANDOM', the interpolation method will be chose randomly.
+    Attention: If interp is 'RANDOM', the interpolation method will be chose randomly.
 
     Args:
         target_size (int, List[int] or Tuple[int]): Target size. If int, the height and width share the same target_size.
@@ -315,7 +315,7 @@ class RandomResize(Transform):
     """
     Resize input to random sizes.
 
-    Attention：If interp is 'RANDOM', the interpolation method will be chose randomly.
+    Attention: If interp is 'RANDOM', the interpolation method will be chose randomly.
 
     Args:
         target_sizes (List[int], List[list or tuple] or Tuple[list or tuple]):
@@ -356,7 +356,7 @@ class ResizeByShort(Transform):
     """
     Resize input with keeping the aspect ratio.
 
-    Attention：If interp is 'RANDOM', the interpolation method will be chose randomly.
+    Attention: If interp is 'RANDOM', the interpolation method will be chose randomly.
 
     Args:
         short_size (int): Target size of the shorter side of the image(s).
@@ -395,7 +395,7 @@ class RandomResizeByShort(Transform):
     """
     Resize input to random sizes with keeping the aspect ratio.
 
-    Attention：If interp is 'RANDOM', the interpolation method will be chose randomly.
+    Attention: If interp is 'RANDOM', the interpolation method will be chose randomly.
 
     Args:
         short_sizes (List[int]): Target size of the shorter side of the image(s).
@@ -833,8 +833,8 @@ class RandomCrop(Transform):
 class RandomScaleAspect(Transform):
     """
     Crop input image(s) and resize back to original sizes.
-    Args：
-        min_scale (float)：Minimum ratio between the cropped region and the original image.
+    Args: 
+        min_scale (float): Minimum ratio between the cropped region and the original image.
             If 0, image(s) will not be cropped. Defaults to .5.
         aspect_ratio (float): Aspect ratio of cropped region. Defaults to .33.
     """
@@ -1230,7 +1230,7 @@ class RandomBlur(Transform):
     """
     Randomly blur input image(s).
 
-    Args：
+    Args: 
         prob (float): Probability of blurring.
     """
 

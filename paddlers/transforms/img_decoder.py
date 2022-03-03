@@ -1,5 +1,3 @@
-
-   
 # copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +19,7 @@ import copy
 import random
 import imghdr
 from PIL import Image
+
 try:
     from collections.abc import Sequence
 except Exception:
@@ -103,7 +102,7 @@ class ImgDecode(Transform):
                 return cv2.imread(img_path, cv2.IMREAD_ANYDEPTH |
                                   cv2.IMREAD_ANYCOLOR | cv2.IMREAD_COLOR)
             else:
-                return cv2.imread(im_file, cv2.IMREAD_ANYDEPTH |
+                return cv2.imread(img_path, cv2.IMREAD_ANYDEPTH |
                                   cv2.IMREAD_ANYCOLOR)
         elif ext == '.npy':
             return np.load(img_path)

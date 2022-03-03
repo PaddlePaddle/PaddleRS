@@ -39,7 +39,7 @@ def raster2uint8(image: np.ndarray) -> np.ndarray:
 # 2% linear stretch
 def _two_percentLinear(image: np.ndarray, max_out: int=255, min_out: int=0) -> np.ndarray:
     def _gray_process(gray, maxout=max_out, minout=min_out):
-        # Get the corresponding gray level at 98% histogram
+        # get the corresponding gray level at 98% histogram
         high_value = np.percentile(gray, 98)
         low_value = np.percentile(gray, 2)
         truncated_gray = np.clip(gray, a_min=low_value, a_max=high_value)
@@ -55,7 +55,7 @@ def _two_percentLinear(image: np.ndarray, max_out: int=255, min_out: int=0) -> n
     return np.uint8(result)
 
 
-# Simple image standardization
+# simple image standardization
 def _sample_norm(image: np.ndarray, NUMS: int=65536) -> np.ndarray:
     stretches = []
     if len(image.shape) == 3:
@@ -69,14 +69,14 @@ def _sample_norm(image: np.ndarray, NUMS: int=65536) -> np.ndarray:
     return np.uint8(stretched_img * 255)
 
 
-# Histogram equalization
+# histogram equalization
 def _stretch(ima: np.ndarray, NUMS: int) -> np.ndarray:
     hist = _histogram(ima, NUMS)
     lut = []
     for bt in range(0, len(hist), NUMS):
-        # Step size
+        # step size
         step = reduce(operator.add, hist[bt : bt + NUMS]) / (NUMS - 1)
-        # Create balanced lookup table
+        # create balanced lookup table
         n = 0
         for i in range(NUMS):
             lut.append(n / step)
@@ -85,7 +85,7 @@ def _stretch(ima: np.ndarray, NUMS: int) -> np.ndarray:
         return ima
 
 
-# Calculate histogram
+# calculate histogram
 def _histogram(ima: np.ndarray, NUMS: int) -> np.ndarray:
     bins = list(range(0, NUMS))
     flat = ima.flat

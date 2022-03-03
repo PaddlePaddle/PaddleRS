@@ -27,25 +27,23 @@ class Raster:
     def __init__(self, 
                  path: str,
                  band_list: Union[List[int], Tuple[int], None]=None, 
-                 is_sar: bool=False,  # TODO: Remove this param
-                 is_src: bool=False) -> None:
+                 to_uint8: bool=False) -> None:
         """ Class of read raster.
 
         Args:
             path (str): The path of raster.
             band_list (Union[List[int], Tuple[int], None], optional): 
                 band list (start with 1) or None (all of bands). Defaults to None.
-            is_sar (bool, optional): The raster is SAR or not. Defaults to False.
-            is_src (bool, optional): 
-                Return raw data or not (convert uint8/float32). Defaults to False.
+            to_uint8 (bool, optional): 
+                Convert uint8 or return raw data. Defaults to False.
         """
         super(Raster, self).__init__()
         if osp.exists(path):
             self.path = path
-            self.__src_data = gdal.Open(path)
+            self.__src_data = np.load(path) if path.split(".")[-1] == "npy" \
+                                            else gdal.Open(path)
             self.__getInfo()
-            self.is_sar = is_sar
-            self.is_src = is_src
+            self.to_uint8 = to_uint8
             self.setBands(band_list)
         else:
             raise ValueError("The path {0} not exists.".format(path))
@@ -107,11 +105,12 @@ class Raster:
                 band_array.append(band_i)
             ima = np.stack(band_array, axis=0)
         if self.bands == 1:
-            if self.is_sar:
+            # the type is complex means this is a SAR data
+            if isinstance(type(ima[0, 0]), complex):
                 ima = abs(ima)
         else:
             ima = ima.transpose((1, 2, 0))
-        if self.is_src is False:
+        if self.to_uint8 is True:
             ima = raster2uint8(ima)
         return ima
 

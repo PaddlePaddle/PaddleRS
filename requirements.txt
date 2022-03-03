@@ -8,9 +8,10 @@ paddleslim == 2.2.1
 shapely
 paddlepaddle-gpu >= 2.2.0
 opencv-python
-scikit-learn==0.20.3
+scikit-learn == 0.20.3
 lap
 motmetrics
 matplotlib
 chardet
 openpyxl
+GDAL >= 3.2.2
