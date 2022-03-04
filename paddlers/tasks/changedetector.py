@@ -203,7 +203,7 @@ class BaseChangeDetector(BaseModel):
               save_interval_epochs=1,
               log_interval_steps=2,
               save_dir='output',
-              pretrain_weights='CITYSCAPES',
+              pretrain_weights=None,
               learning_rate=0.01,
               lr_decay_power=0.9,
               early_stop=False,
@@ -224,7 +224,7 @@ class BaseChangeDetector(BaseModel):
             log_interval_steps(int, optional): Step interval for printing training information. Defaults to 10.
             save_dir(str, optional): Directory to save the model. Defaults to 'output'.
             pretrain_weights(str or None, optional):
-                None or name/path of pretrained weights. If None, no pretrained weights will be loaded. Defaults to 'CITYSCAPES'.
+                None or name/path of pretrained weights. If None, no pretrained weights will be loaded. Defaults to None.
             learning_rate(float, optional): Learning rate for training. Defaults to .025.
             lr_decay_power(float, optional): Learning decay power. Defaults to .9.
             early_stop(bool, optional): Whether to adopt early stop strategy. Defaults to False.
