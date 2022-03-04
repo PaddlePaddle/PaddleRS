@@ -30,7 +30,7 @@ from .utils import seg_metrics as metrics
 from paddlers.utils.checkpoint import seg_pretrain_weights_dict
 from paddlers.transforms import Decode, Resize
 
-__all__ = ["UNet", "DeepLabV3P", "FastSCNN", "HRNet", "BiSeNetV2"]
+__all__ = ["UNet", "DeepLabV3P", "FastSCNN", "HRNet", "BiSeNetV2", "FarSeg"]
 
 
 class BaseSegmenter(BaseModel):
@@ -43,7 +43,8 @@ class BaseSegmenter(BaseModel):
         if 'with_net' in self.init_params:
             del self.init_params['with_net']
         super(BaseSegmenter, self).__init__('segmenter')
-        if not hasattr(paddleseg.models, model_name):
+        if not hasattr(paddleseg.models, model_name) and \
+           not hasattr(paddleseg.rs_models, model_name):
             raise Exception("ERROR: There's no model named {}.".format(
                 model_name))
         self.model_name = model_name
@@ -59,7 +60,7 @@ class BaseSegmenter(BaseModel):
     def build_net(self, **params):
         # TODO: when using paddle.utils.unique_name.guard,
         # DeepLabv3p and HRNet will raise a error
-        net = paddleseg.models.__dict__[self.model_name](
+        net = dict(paddleseg.models.__dict__, **paddleseg.rs_models.__dict__)[self.model_name](
             num_classes=self.num_classes, **params)
         return net
 
@@ -763,6 +764,18 @@ class BiSeNetV2(BaseSegmenter):
         params.update({'align_corners': align_corners})
         super(BiSeNetV2, self).__init__(
             model_name='BiSeNetV2',
+            num_classes=num_classes,
+            use_mixed_loss=use_mixed_loss,
+            **params)
+
+
+class FarSeg(BaseSegmenter):
+    def __init__(self,
+                 num_classes=2,
+                 use_mixed_loss=False,
+                 **params):
+        super(FarSeg, self).__init__(
+            model_name='FarSeg',
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
             **params)

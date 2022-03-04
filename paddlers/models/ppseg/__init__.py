@@ -13,5 +13,6 @@
 # limitations under the License.
 
 from . import models, datasets, transforms
+from . import rs_models
 
 __version__ = 'develop'
