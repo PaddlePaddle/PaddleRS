@@ -19,6 +19,12 @@ import paddle
 from . import logging
 from .download import download_and_decompress
 
+cls_pretrain_weights_dict = {
+    'ResNet50_vd': ['IMAGENET'],
+    'MobileNetV3_small_x1_0': ['IMAGENET'],
+    'HRNet_W18_C': ['IMAGENET'],
+}
+
 seg_pretrain_weights_dict = {
     'UNet': ['CITYSCAPES'],
     'DeepLabV3P': ['CITYSCAPES', 'PascalVOC', 'IMAGENET'],
