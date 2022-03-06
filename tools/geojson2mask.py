@@ -1,0 +1,91 @@
+import os
+import os.path as osp
+import shutil
+import cv2
+import numpy as np
+import json
+import argparse
+import glob
+from tqdm import tqdm
+from PIL import Image
+from collections import defaultdict
+
+
+def _mkdir_p(path):
+    if not osp.exists(path):
+        os.makedirs(path)
+
+
+def _save_palette(label, save_path):
+    bin_colormap = np.ones((256, 3)) * 255
+    bin_colormap[0, :] = [0, 0, 0]
+    bin_colormap = bin_colormap.astype(np.uint8)
+    visualimg  = Image.fromarray(label, "P")
+    palette = bin_colormap
+    visualimg.putpalette(palette) 
+    visualimg.save(save_path, format='PNG')
+
+
+def _save_mask(annotation, image, save_path):
+    if isinstance(image, str):
+        image = cv2.imread(image)
+    mask = np.zeros(image.shape[:2], dtype=np.int32)
+    for contour_points in annotation:
+        contour_points = np.array(contour_points).reshape((-1, 2))
+        contour_points = np.round(contour_points).astype(np.int32)[np.newaxis, :]
+        cv2.fillPoly(mask, contour_points, 1)
+    _save_palette(mask.astype("uint8"), save_path)
+
+
+def _read_geojson(json_path):
+    with open(json_path, "r") as f:
+        jsoner = json.load(f)
+        imgs = jsoner["images"]
+        images = defaultdict(list)
+        for img in imgs:
+            images[img["id"]] = img["file_name"]
+        anns = jsoner["annotations"]
+        annotations = defaultdict(list)
+        for ann in anns:
+            annotations[images[ann["image_id"]]].append(ann["segmentation"])
+        return annotations
+
+
+def convertData(raw_folder, end_folder):
+    print("-- Initializing --")
+    img_folder = osp.join(raw_folder, "images")
+    save_img_folder = osp.join(end_folder, "img")
+    save_lab_folder = osp.join(end_folder, "gt")
+    _mkdir_p(save_img_folder)
+    _mkdir_p(save_lab_folder)
+    names = os.listdir(img_folder)
+    print("-- Loading annotations --")
+    anns = {}
+    jsons = glob.glob(osp.join(raw_folder, "*.json"))
+    for json in jsons:
+        anns.update(_read_geojson(json))
+    print("-- Converting datas --")
+    for k in tqdm(names):
+    # for k in tqdm(anns.keys()):
+        img_path = osp.join(img_folder, k)
+        img_save_path = osp.join(save_img_folder, k)
+        ext = "." + k.split(".")[-1]
+        lab_save_path = osp.join(save_lab_folder, k.replace(ext, ".png"))
+        shutil.copy(img_path, img_save_path)
+        if k in anns.keys():
+            _save_mask(anns[k], img_path, lab_save_path)
+        else:  # have not anns
+            _save_palette(np.zeros(cv2.imread(img_path).shape[:2], dtype="uint8"), \
+                          lab_save_path)
+
+
+parser = argparse.ArgumentParser(description="input parameters")
+parser.add_argument("--raw_folder", type=str, required=True, \
+                    help="The folder path about original data, where `images` saves the original image, `annotation.json` saves the corresponding annotation information.")
+parser.add_argument("--save_folder", type=str, required=True, \
+                    help="The folder path to save the results, where `img` saves the image and `gt` saves the label")
+
+
+if __name__ == "__main__":
+    args = parser.parse_args()
+    convertData(args.raw_folder, args.save_folder)
