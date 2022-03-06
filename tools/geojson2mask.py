@@ -65,7 +65,7 @@ def _read_geojson(json_path):
         return annotations, sizes
 
 
-def convertData(raw_folder, end_folder):
+def convert_data(raw_folder, end_folder):
     print("-- Initializing --")
     img_folder = osp.join(raw_folder, "images")
     save_img_folder = osp.join(end_folder, "img")
@@ -105,4 +105,4 @@ parser.add_argument("--save_folder", type=str, required=True, \
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    convertData(args.raw_folder, args.save_folder)
+    convert_data(args.raw_folder, args.save_folder)

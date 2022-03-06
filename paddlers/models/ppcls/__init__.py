@@ -12,12 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# TODO: add ppcls module
 import sys
-sys.path.append("paddlers/models")
+import os.path as osp
+sys.path.insert(0, osp.dirname(osp.dirname(osp.realpath(__file__))))
 
 from . import optimizer
-
 from .arch import *
 from .optimizer import *
 from .data import *
