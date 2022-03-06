@@ -6,6 +6,9 @@
 |------|--------|---------|
 |object_detection/ppyolo.py | 目标检测PPYOLO | 昆虫检测 |
 |semantic_segmentation/deeplabv3p_resnet50_vd.py | 语义分割DeepLabV3 | 视盘分割 |
+|semantic_segmentation/farseg_test.py | 语义分割FarSeg | 遥感建筑分割 |
+|change_detection/cdnet_build.py | 变化检测CDNet | 遥感变化检测 |
+|classification/resnet50_vd_rs.py | 图像分类ResNet50_vd | 遥感场景分类 |
 
 <!-- 可参考API接口说明了解示例代码中的API：
 * [数据集读取API](../../docs/apis/datasets.md)
