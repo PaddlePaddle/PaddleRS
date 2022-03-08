@@ -44,7 +44,7 @@ parser = argparse.ArgumentParser(description="input parameters")
 parser.add_argument("--image_path", type=str, required=True, \
                     help="The path of big image data.")
 parser.add_argument("--block_size", type=int, default=512, \
-                    help="The size of image block.")
+                    help="The size of image block, `512` is the default.")
 parser.add_argument("--save_folder", type=str, default="output", \
                     help="The folder path to save the results, `output` is the default.")
 
