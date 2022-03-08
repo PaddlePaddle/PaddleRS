@@ -28,7 +28,7 @@ import paddlers.utils.logging as logging
 from .base import BaseModel
 from .utils import seg_metrics as metrics
 from paddlers.utils.checkpoint import seg_pretrain_weights_dict
-from paddlers.transforms import Decode, Resize
+from paddlers.transforms import ImgDecoder, Resize
 
 __all__ = ["UNet", "DeepLabV3P", "FastSCNN", "HRNet", "BiSeNetV2", "FarSeg"]
 
@@ -525,7 +525,7 @@ class BaseSegmenter(BaseModel):
         for im in images:
             sample = {'image': im}
             if isinstance(sample['image'], str):
-                sample = Decode(to_rgb=False)(sample)
+                sample = ImgDecode(to_rgb=False)(sample)
             ori_shape = sample['image'].shape[:2]
             im = transforms(sample)[0]
             batch_im.append(im)
@@ -679,6 +679,7 @@ class UNet(BaseSegmenter):
 
 class DeepLabV3P(BaseSegmenter):
     def __init__(self,
+                 input_channel=3,
                  num_classes=2,
                  backbone='ResNet50_vd',
                  use_mixed_loss=False,
@@ -696,6 +697,7 @@ class DeepLabV3P(BaseSegmenter):
         if params.get('with_net', True):
             with DisablePrint():
                 backbone = getattr(paddleseg.models, backbone)(
+                    input_channel=input_channel,
                     output_stride=output_stride)
         else:
             backbone = None

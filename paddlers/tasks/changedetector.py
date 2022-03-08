@@ -28,7 +28,7 @@ import paddlers.utils.logging as logging
 from .base import BaseModel
 from .utils import seg_metrics as metrics
 from paddlers.utils.checkpoint import seg_pretrain_weights_dict
-from paddlers.transforms import Decode, Resize
+from paddlers.transforms import ImgDecoder, Resize
 from paddlers.models.ppcd import CDNet as _CDNet
 
 __all__ = ["CDNet"]
@@ -516,7 +516,7 @@ class BaseChangeDetector(BaseModel):
         for im in images:
             sample = {'image': im}
             if isinstance(sample['image'], str):
-                sample = Decode(to_rgb=False)(sample)
+                sample = ImgDecoder(to_rgb=False)(sample)
             ori_shape = sample['image'].shape[:2]
             im = transforms(sample)[0]
             batch_im.append(im)
