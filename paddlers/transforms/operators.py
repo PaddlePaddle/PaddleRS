@@ -31,7 +31,7 @@ from .functions import normalize, horizontal_flip, permute, vertical_flip, cente
     crop_rle, expand_poly, expand_rle, resize_poly, resize_rle
 
 __all__ = [
-    "Compose", "Decode", "Resize", "RandomResize", "ResizeByShort",
+    "Compose", "ImgDecoder", "Resize", "RandomResize", "ResizeByShort",
     "RandomResizeByShort", "ResizeByLong", "RandomHorizontalFlip",
     "RandomVerticalFlip", "Normalize", "CenterCrop", "RandomCrop",
     "RandomScaleAspect", "RandomExpand", "Padding", "MixupImage",
@@ -90,66 +90,15 @@ class Transform(object):
         return sample
 
 
-class Compose(Transform):
-    """
-    Apply a series of data augmentation to the input.
-    All input images are in Height-Width-Channel ([H, W, C]) format.
-
-    Args:
-        transforms (List[paddlers.transforms.Transform]): List of data preprocess or augmentations.
-    Raises:
-        TypeError: Invalid type of transforms.
-        ValueError: Invalid length of transforms.
-    """
-
-    def __init__(self, transforms):
-        super(Compose, self).__init__()
-        if not isinstance(transforms, list):
-            raise TypeError(
-                'Type of transforms is invalid. Must be List, but received is {}'
-                .format(type(transforms)))
-        if len(transforms) < 1:
-            raise ValueError(
-                'Length of transforms must not be less than 1, but received is {}'
-                .format(len(transforms)))
-        self.transforms = transforms
-        self.decode_image = Decode()
-        self.arrange_outputs = None
-        self.apply_im_only = False
-
-    def __call__(self, sample):
-        if self.apply_im_only and 'mask' in sample:
-            mask_backup = copy.deepcopy(sample['mask'])
-            del sample['mask']
-
-        sample = self.decode_image(sample)
-
-        for op in self.transforms:
-            # skip batch transforms amd mixup
-            if isinstance(op, (paddlers.transforms.BatchRandomResize,
-                               paddlers.transforms.BatchRandomResizeByShort,
-                               MixupImage)):
-                continue
-            sample = op(sample)
-
-        if self.arrange_outputs is not None:
-            if self.apply_im_only:
-                sample['mask'] = mask_backup
-            sample = self.arrange_outputs(sample)
-
-        return sample
-
-
-class Decode(Transform):
+class ImgDecoder(Transform):
     """
     Decode image(s) in input.
-
     Args:
         to_rgb (bool, optional): If True, convert input images from BGR format to RGB format. Defaults to True.
     """
 
     def __init__(self, to_rgb=True):
-        super(Decode, self).__init__()
+        super(ImgDecoder, self).__init__()
         self.to_rgb = to_rgb
 
     def read_img(self, img_path, input_channel=3):
@@ -172,7 +121,7 @@ class Decode(Transform):
                 raise Exception('Can not open', img_path)
             im_data = dataset.ReadAsArray()
             if im_data.ndim == 3:
-                im_data.transpose((1, 2, 0))
+                im_data = im_data.transpose((1, 2, 0))
             return im_data
         elif img_format in ['jpeg', 'bmp', 'png', 'jpg']:
             if input_channel == 3:
@@ -196,7 +145,7 @@ class Decode(Transform):
         else:
             image = im_path
 
-        if self.to_rgb:
+        if self.to_rgb and image.shape[-1] == 3:
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
         return image
@@ -214,13 +163,10 @@ class Decode(Transform):
 
     def apply(self, sample):
         """
-
         Args:
             sample (dict): Input sample, containing 'image' at least.
-
         Returns:
             dict: Decoded sample.
-
         """
         if 'image' in sample:
             sample['image'] = self.apply_im(sample['image'])
@@ -234,9 +180,60 @@ class Decode(Transform):
             if im_height != se_height or im_width != se_width:
                 raise Exception(
                     "The height or width of the im is not same as the mask")
+
         sample['im_shape'] = np.array(
             sample['image'].shape[:2], dtype=np.float32)
         sample['scale_factor'] = np.array([1., 1.], dtype=np.float32)
+        return sample
+
+
+class Compose(Transform):
+    """
+    Apply a series of data augmentation to the input.
+    All input images are in Height-Width-Channel ([H, W, C]) format.
+
+    Args:
+        transforms (List[paddlers.transforms.Transform]): List of data preprocess or augmentations.
+    Raises:
+        TypeError: Invalid type of transforms.
+        ValueError: Invalid length of transforms.
+    """
+
+    def __init__(self, transforms):
+        super(Compose, self).__init__()
+        if not isinstance(transforms, list):
+            raise TypeError(
+                'Type of transforms is invalid. Must be List, but received is {}'
+                .format(type(transforms)))
+        if len(transforms) < 1:
+            raise ValueError(
+                'Length of transforms must not be less than 1, but received is {}'
+                .format(len(transforms)))
+        self.transforms = transforms
+        self.decode_image = ImgDecoder()
+        self.arrange_outputs = None
+        self.apply_im_only = False
+
+    def __call__(self, sample):
+        if self.apply_im_only and 'mask' in sample:
+            mask_backup = copy.deepcopy(sample['mask'])
+            del sample['mask']
+
+        sample = self.decode_image(sample)
+
+        for op in self.transforms:
+            # skip batch transforms amd mixup
+            if isinstance(op, (paddlers.transforms.BatchRandomResize,
+                               paddlers.transforms.BatchRandomResizeByShort,
+                               MixupImage)):
+                continue
+            sample = op(sample)
+
+        if self.arrange_outputs is not None:
+            if self.apply_im_only:
+                sample['mask'] = mask_backup
+            sample = self.arrange_outputs(sample)
+
         return sample
 
 
@@ -618,10 +615,16 @@ class Normalize(Transform):
     def __init__(self,
                  mean=[0.485, 0.456, 0.406],
                  std=[0.229, 0.224, 0.225],
-                 min_val=[0, 0, 0],
-                 max_val=[255., 255., 255.],
+                 min_val=None,
+                 max_val=None,
                  is_scale=True):
         super(Normalize, self).__init__()
+        channel = len(mean)
+        if min_val is None:
+            min_val = [0] * channel
+        if max_val is None:
+            max_val = [255.] * channel
+
         from functools import reduce
         if reduce(lambda x, y: x * y, std) == 0:
             raise ValueError(
@@ -633,7 +636,6 @@ class Normalize(Transform):
                     '(max_val - min_val) should not have 0, but received is {}'.
                     format((np.asarray(max_val) - np.asarray(min_val)).tolist(
                     )))
-
         self.mean = mean
         self.std = std
         self.min_val = min_val

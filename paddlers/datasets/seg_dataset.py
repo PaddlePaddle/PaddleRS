@@ -64,10 +64,10 @@ class SegDataset(Dataset):
                         " file_list[{}] has a space in the image or label path.".format(line, file_list))
                 items[0] = path_normalization(items[0])
                 items[1] = path_normalization(items[1])
-                if not is_pic(items[0]) or not is_pic(items[1]):
-                    continue
                 full_path_im = osp.join(data_dir, items[0])
                 full_path_label = osp.join(data_dir, items[1])
+                if not is_pic(full_path_im) or not is_pic(full_path_label):
+                    continue
                 if not osp.exists(full_path_im):
                     raise IOError('Image file {} does not exist!'.format(
                         full_path_im))

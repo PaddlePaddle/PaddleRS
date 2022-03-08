@@ -29,7 +29,7 @@ from paddlers.models.ppcls.metric import build_metrics
 from paddlers.models.ppcls.loss import build_loss
 from paddlers.models.ppcls.data.postprocess import build_postprocess
 from paddlers.utils.checkpoint import cls_pretrain_weights_dict
-from paddlers.transforms import Decode, Resize
+from paddlers.transforms import ImgDecoder, Resize
 
 __all__ = ["ResNet50_vd", "MobileNetV3_small_x1_0", "HRNet_W18_C"]
 
@@ -433,7 +433,7 @@ class BaseClassifier(BaseModel):
         for im in images:
             sample = {'image': im}
             if isinstance(sample['image'], str):
-                sample = Decode(to_rgb=False)(sample)
+                sample = ImgDecoder(to_rgb=False)(sample)
             ori_shape = sample['image'].shape[:2]
             im = transforms(sample)[0]
             batch_im.append(im)

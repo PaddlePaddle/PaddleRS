@@ -14,8 +14,10 @@
 
 import sys
 import os
+import os.path as osp
 import time
 import math
+import imghdr
 import chardet
 import json
 import numpy as np
@@ -73,12 +75,16 @@ def path_normalization(path):
     return path
 
 
-def is_pic(img_name):
-    valid_suffix = ['JPEG', 'jpeg', 'JPG', 'jpg', 'BMP', 'bmp', 'PNG', 'png', 'tiff']
-    suffix = img_name.split('.')[-1]
-    if suffix not in valid_suffix:
-        return False
-    return True
+def is_pic(img_path):
+    valid_suffix = ['JPEG', 'jpeg', 'JPG', 'jpg', 'BMP', 'bmp', 'PNG', 'png', '.npy']
+    suffix = img_path.split('.')[-1]
+    if suffix in valid_suffix:
+        return True
+    img_format = imghdr.what(img_path)
+    _, ext = osp.splitext(img_path)
+    if img_format == 'tiff' or ext == '.img':
+        return True
+    return False
 
 
 class MyEncoder(json.JSONEncoder):

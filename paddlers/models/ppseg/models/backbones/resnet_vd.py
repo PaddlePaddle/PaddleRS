@@ -211,13 +211,14 @@ class ResNet_vd(nn.Layer):
     """
 
     def __init__(self,
+                 input_channel=3,
                  layers=50,
                  output_stride=8,
                  multi_grid=(1, 1, 1),
                  pretrained=None,
                  data_format='NCHW'):
         super(ResNet_vd, self).__init__()
-
+        
         self.data_format = data_format
         self.conv1_logit = None  # for gscnn shape stream
         self.layers = layers
@@ -251,7 +252,7 @@ class ResNet_vd(nn.Layer):
             dilation_dict = {3: 2}
 
         self.conv1_1 = ConvBNLayer(
-            in_channels=3,
+            in_channels=input_channel,
             out_channels=32,
             kernel_size=3,
             stride=2,
