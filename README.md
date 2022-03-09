@@ -46,8 +46,8 @@ PaddleRS是xxx、xxx、xxx等遥感科研院所共同基于飞桨开发的遥感
 
 ## 技术交流 <img src="./docs/images/chat.png" width="30"/>
 
-* 如果你发现任何PaddleSeg存在的问题或者是建议, 欢迎通过[GitHub Issues](https://github.com/PaddlePaddle/PaddleSeg/issues)给我们提issues。
-* 欢迎加入PaddleRSeg 微信群
+* 如果你发现任何PaddleRS存在的问题或者是建议, 欢迎通过[GitHub Issues](https://github.com/PaddleCV-SIG/PaddleRS/issues)给我们提issues。
+* 欢迎加入PaddleRS 微信群
 <div align="center">
 <img src="./docs/images/wechat.png"  width = "200" />  
 </div>
