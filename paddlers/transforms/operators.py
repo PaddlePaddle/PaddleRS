@@ -927,7 +927,7 @@ class RandomExpand(Transform):
     def __init__(self,
                  upper_ratio=4.,
                  prob=.5,
-                 im_padding_value=(127.5, 127.5, 127.5),
+                 im_padding_value=127.5,
                  label_padding_value=255):
         super(RandomExpand, self).__init__()
         assert upper_ratio > 1.01, "expand ratio must be larger than 1.01"
@@ -935,10 +935,6 @@ class RandomExpand(Transform):
         self.prob = prob
         assert isinstance(im_padding_value, (Number, Sequence)), \
             "fill value must be either float or sequence"
-        if isinstance(im_padding_value, Number):
-            im_padding_value = (im_padding_value, ) * 3
-        if not isinstance(im_padding_value, tuple):
-            im_padding_value = tuple(im_padding_value)
         self.im_padding_value = im_padding_value
         self.label_padding_value = label_padding_value
 
@@ -967,7 +963,7 @@ class Padding(Transform):
                  target_size=None,
                  pad_mode=0,
                  offsets=None,
-                 im_padding_value=(127.5, 127.5, 127.5),
+                 im_padding_value=127.5,
                  label_padding_value=255,
                  size_divisor=32):
         """
@@ -1005,9 +1001,9 @@ class Padding(Transform):
 
     def apply_im(self, image, offsets, target_size):
         x, y = offsets
-        im_h, im_w = image.shape[:2]
+        im_h, im_w, channel = image.shape[:3]
         h, w = target_size
-        canvas = np.ones((h, w, 3), dtype=np.float32)
+        canvas = np.ones((h, w, channel), dtype=np.float32)
         canvas *= np.array(self.im_padding_value, dtype=np.float32)
         canvas[y:y + im_h, x:x + im_w, :] = image.astype(np.float32)
         return canvas

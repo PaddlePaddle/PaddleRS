@@ -13,6 +13,10 @@ channel = 10
 train_transforms = T.Compose([
     T.Resize(target_size=512),
     T.RandomHorizontalFlip(),
+    T.RandomBlur(1),
+    T.Padding(768),
+    T.RandomExpand(1.5, prob=1),
+    T.Resize(target_size=512),
     T.Normalize(
         mean=[0.5] * channel, std=[0.5] * channel),
 ])
@@ -43,12 +47,13 @@ eval_dataset = pdrs.datasets.SegDataset(
 # 初始化模型，并进行训练
 # 可使用VisualDL查看训练指标
 num_classes = len(train_dataset.labels)
-model = pdrs.tasks.DeepLabV3P(input_channel=channel, num_classes=num_classes, backbone='ResNet50_vd')
+model = pdrs.tasks.UNet(input_channel=channel, num_classes=num_classes)
 
 model.train(
-    num_epochs=10,
+    num_epochs=20,
     train_dataset=train_dataset,
     train_batch_size=4,
     eval_dataset=eval_dataset,
     learning_rate=0.01,
-    save_dir='output/deeplabv3p_r50vd')
+    save_dir='output/unet',
+    use_vdl=True)
