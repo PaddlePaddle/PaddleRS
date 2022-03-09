@@ -1,6 +1,5 @@
-import sys
-
-sys.path.append("E:/dataFiles/github/PaddleRS")
+import os
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 import paddlers as pdrs
 from paddlers import transforms as T

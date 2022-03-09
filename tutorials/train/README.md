@@ -22,14 +22,9 @@
 - [PaddlePaddle安装](https://www.paddlepaddle.org.cn/install/quick)
 * 版本要求：PaddlePaddle>=2.1.0
 
-<!-- - [PaddleRS安装](../../docs/install.md) -->
+- [PaddleRS安装](../../docs/install.md)
 
 ## 开始训练
-* 修改tutorials/train/semantic_segmentation/deeplabv3p_resnet50_multi_channel.py中sys.path路径
-```
-sys.path.append("your/PaddleRS/path")
-```
-
 * 在安装PaddleRS后，使用如下命令开始训练，代码会自动下载训练数据, 并均使用单张GPU卡进行训练。
 
 ```commandline
