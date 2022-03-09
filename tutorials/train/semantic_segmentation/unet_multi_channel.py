@@ -13,10 +13,6 @@ channel = 10
 train_transforms = T.Compose([
     T.Resize(target_size=512),
     T.RandomHorizontalFlip(),
-    T.RandomBlur(1),
-    T.Padding(768),
-    T.RandomExpand(1.5, prob=1),
-    T.Resize(target_size=512),
     T.Normalize(
         mean=[0.5] * channel, std=[0.5] * channel),
 ])
