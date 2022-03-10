@@ -14,7 +14,7 @@
 
 from paddle import nn
 import paddle.nn.functional as F
-from ppseg.rs_models.utils import (
+from seg.models.utils import (
     ConvReLU, kaiming_normal_init, constant_init
 )
 

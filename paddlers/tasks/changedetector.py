@@ -29,7 +29,7 @@ from .base import BaseModel
 from .utils import seg_metrics as metrics
 from paddlers.utils.checkpoint import seg_pretrain_weights_dict
 from paddlers.transforms import ImgDecoder, Resize
-from paddlers.models.ppcd import CDNet as _CDNet
+import paddlers.models.cd as cd
 
 __all__ = ["CDNet"]
 
@@ -59,7 +59,8 @@ class BaseChangeDetector(BaseModel):
 
     def build_net(self, **params):
         # TODO: add other model
-        net = _CDNet(num_classes=self.num_classes, **params)
+        net = cd.models.__dict__[self.model_name](
+            num_classes=self.num_classes, **params)
         return net
 
     def _fix_transforms_shape(self, image_shape):
