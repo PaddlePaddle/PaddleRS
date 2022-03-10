@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from unittest import result
 import cv2
 import numpy as np
 
@@ -194,7 +195,7 @@ def resize_rle(rle, im_h, im_w, im_scale_x, im_scale_y, interp):
 
 
 def matching(im1, im2):
-    """ Match two images, used change detection.
+    """ Match two images, used change detection. (Just RGB)
 
     Args:
         im1 (np.ndarray): The image of time 1
@@ -218,3 +219,50 @@ def matching(im1, im2):
     H, _ = cv2.findHomography(src_automatic_points, den_automatic_points, cv2.RANSAC, 5.0)
     im1_t = cv2.warpPerspective(im1, H, (im2.shape[1], im2.shape[0]))
     return im1_t, im2
+
+
+def de_haze(im, gamma=False):
+    """ Priori defogging of dark channel. (Just RGB)
+
+    Args:
+        im (np.ndarray): Image.
+        gamma (bool, optional): Use gamma correction or not. Defaults to False.
+    """
+    def guided_filter(I, p, r, eps):
+        m_I = cv2.boxFilter(I, -1, (r, r))
+        m_p = cv2.boxFilter(p, -1, (r, r))
+        m_Ip = cv2.boxFilter(I * p, -1, (r, r))
+        cov_Ip = m_Ip - m_I * m_p
+        m_II = cv2.boxFilter(I * I, -1, (r, r))
+        var_I = m_II - m_I * m_I
+        a = cov_Ip / (var_I + eps)
+        b = m_p - a * m_I
+        m_a = cv2.boxFilter(a, -1, (r, r))
+        m_b = cv2.boxFilter(b, -1, (r, r))
+        return m_a * I + m_b
+
+    def de_fog(im, r, w, maxatmo_mask, eps):
+        # im is RGB and range[0, 1]
+        atmo_mask = np.min(im, 2)
+        dark_channel = cv2.erode(atmo_mask, np.ones((15, 15)))
+        atmo_mask = guided_filter(atmo_mask, dark_channel, r, eps)
+        bins = 2000
+        ht = np.histogram(atmo_mask, bins)
+        d = np.cumsum(ht[0]) / float(atmo_mask.size)
+        for lmax in range(bins - 1, 0, -1):
+            if d[lmax] <= 0.999:
+                break
+        atmo_illum = np.mean(im, 2)[atmo_mask >= ht[1][lmax]].max()
+        atmo_mask = np.minimum(atmo_mask * w, maxatmo_mask)
+        return atmo_mask, atmo_illum
+        
+    if np.max(im) > 1:
+        im = im / 255.
+    result = np.zeros(im.shape)
+    mask_img, atmo_illum = de_fog(im, r=81, w=0.95, maxatmo_mask=0.80, eps=1e-8)
+    for k in range(3):
+        result[:, :, k] = (im[:, :, k] - mask_img) / (1 - mask_img / atmo_illum)
+    result = np.clip(result, 0, 1)
+    if gamma:
+        result = result ** (np.log(0.5) / np.log(result.mean()))
+    return (result * 255).astype("uint8")
