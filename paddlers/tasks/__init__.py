@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import det
+from .object_detector import *
 from .segmenter import *
 from .changedetector import *
 from .classifier import *

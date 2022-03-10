@@ -11,7 +11,7 @@ if not os.path.exists(data_dir):
 # define transforms
 train_transforms = T.Compose([
     T.RandomDistort(),
-    T.RandomExpand(im_padding_value=[123.675, 116.28, 103.53]),
+    T.RandomExpand(),
     T.RandomCrop(),
     T.RandomHorizontalFlip(),
     T.BatchRandomResize(
@@ -21,9 +21,9 @@ train_transforms = T.Compose([
 ])
 
 eval_transforms = T.Compose([
-    T.Resize(
-        target_size=608, interp='CUBIC'), T.Normalize(
-            mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    T.Resize(target_size=608, interp='CUBIC'),
+    T.Normalize(
+        mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
 
 # define dataset
@@ -46,7 +46,7 @@ eval_dataset = pdrs.datasets.VOCDetection(
 
 # define models
 num_classes = len(train_dataset.labels)
-model = pdrs.tasks.det.FasterRCNN(num_classes=num_classes)
+model = pdrs.tasks.FasterRCNN(num_classes=num_classes)
 
 # train
 model.train(
