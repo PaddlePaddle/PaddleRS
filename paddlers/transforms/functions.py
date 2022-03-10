@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from unittest import result
 import cv2
 import numpy as np
 
 import shapely.ops
 from shapely.geometry import Polygon, MultiPolygon, GeometryCollection
 import copy
+from sklearn.decomposition import PCA
 
 
 def normalize(im, mean, std, min_value=[0, 0, 0], max_value=[255, 255, 255]):
@@ -198,12 +198,12 @@ def matching(im1, im2):
     """ Match two images, used change detection. (Just RGB)
 
     Args:
-        im1 (np.ndarray): The image of time 1
-        im2 (np.ndarray): The image of time 2
+        im1 (np.ndarray): The image of time 1.
+        im2 (np.ndarray): The image of time 2.
 
     Returns:
-        np.ndarray: The image of time 1 after matched
-        np.ndarray: The image of time 2
+        np.ndarray: The image of time 1 after matched.
+        np.ndarray: The image of time 2.
     """
     orb = cv2.AKAZE_create()
     kp1, des1 = orb.detectAndCompute(im1, None)
@@ -225,8 +225,11 @@ def de_haze(im, gamma=False):
     """ Priori defogging of dark channel. (Just RGB)
 
     Args:
-        im (np.ndarray): Image.
+        im (np.ndarray): The image.
         gamma (bool, optional): Use gamma correction or not. Defaults to False.
+
+    Returns:
+        np.ndarray: The image after defogged.
     """
     def guided_filter(I, p, r, eps):
         m_I = cv2.boxFilter(I, -1, (r, r))
@@ -265,4 +268,24 @@ def de_haze(im, gamma=False):
     result = np.clip(result, 0, 1)
     if gamma:
         result = result ** (np.log(0.5) / np.log(result.mean()))
+    return (result * 255).astype("uint8")
+
+
+def pca(im, dim=3, whiten=True):
+    """ Dimensionality reduction of PCA. 
+
+    Args:
+        im (np.ndarray): The image.
+        dim (int, optional): Reserved dimensions. Defaults to 3.
+        whiten (bool, optional): PCA whiten or not. Defaults to True.
+
+    Returns:
+        np.ndarray: The image after PCA.
+    """
+    H, W, C = im.shape
+    n_im = np.reshape(im, (-1, C))
+    pca = PCA(n_components=dim, whiten=whiten)
+    im_pca = pca.fit_transform(n_im)
+    result = np.reshape(im_pca, (H, W, dim))
+    result = np.clip(result, 0, 1)
     return (result * 255).astype("uint8")
