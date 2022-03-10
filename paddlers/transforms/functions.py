@@ -191,3 +191,30 @@ def resize_rle(rle, im_h, im_w, im_scale_x, im_scale_y, interp):
         mask, None, None, fx=im_scale_x, fy=im_scale_y, interpolation=interp)
     rle = mask_util.encode(np.array(mask, order='F', dtype=np.uint8))
     return rle
+
+
+def matching(im1, im2):
+    """ Match two images, used change detection.
+
+    Args:
+        im1 (np.ndarray): The image of time 1
+        im2 (np.ndarray): The image of time 2
+
+    Returns:
+        np.ndarray: The image of time 1 after matched
+        np.ndarray: The image of time 2
+    """
+    orb = cv2.AKAZE_create()
+    kp1, des1 = orb.detectAndCompute(im1, None)
+    kp2, des2 = orb.detectAndCompute(im2, None)
+    bf = cv2.BFMatcher()
+    mathces = bf.knnMatch(des1, des2, k=2)
+    good_matches = []
+    for m, n in mathces:
+        if m.distance < 0.75 * n.distance:
+            good_matches.append([m])
+    src_automatic_points = np.float32([kp1[m[0].queryIdx].pt for m in good_matches]).reshape(-1, 1, 2)
+    den_automatic_points = np.float32([kp2[m[0].trainIdx].pt for m in good_matches]).reshape(-1, 1, 2)
+    H, _ = cv2.findHomography(src_automatic_points, den_automatic_points, cv2.RANSAC, 5.0)
+    im1_t = cv2.warpPerspective(im1, H, (im2.shape[1], im2.shape[0]))
+    return im1_t, im2
