@@ -100,7 +100,7 @@ parser = argparse.ArgumentParser(description="input parameters")
 parser.add_argument("--raw_folder", type=str, required=True, \
                     help="The folder path about original data, where `images` saves the original image, `annotation.json` saves the corresponding annotation information.")
 parser.add_argument("--save_folder", type=str, required=True, \
-                    help="The folder path to save the results, where `img` saves the image and `gt` saves the label")
+                    help="The folder path to save the results, where `img` saves the image and `gt` saves the label.")
 
 
 if __name__ == "__main__":

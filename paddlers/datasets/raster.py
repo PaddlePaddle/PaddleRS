@@ -40,8 +40,16 @@ class Raster:
         super(Raster, self).__init__()
         if osp.exists(path):
             self.path = path
-            self.__src_data = np.load(path) if path.split(".")[-1] == "npy" \
-                                            else gdal.Open(path)
+            self.ext_type = path.split(".")[-1]
+            if self.ext_type.lower() in ["npy", "npz"]:
+                self._src_data = None
+            else:
+                try:
+                    # raster format support in GDAL: 
+                    # https://www.osgeo.cn/gdal/drivers/raster/index.html
+                    self._src_data = gdal.Open(path)
+                except:
+                    raise TypeError("Unsupported data format: `{}`".format(self.ext_type))
             self._getInfo()
             self.to_uint8 = to_uint8
             self.setBands(band_list)
@@ -77,31 +85,57 @@ class Raster:
         Returns:
             np.ndarray: data's ndarray.
         """
-        if start_loc is None:
-            return self._getAarray()
+        if self._src_data is not None:
+            if start_loc is None:
+                return self._getAarray()
+            else:
+                return self._getBlock(start_loc, block_size)
         else:
-            return self._getBlock(start_loc, block_size)
+            print("Numpy doesn't support blocking temporarily.")
+            return self._getNumpy()
 
     def _getInfo(self) -> None:
-        self.bands = self.__src_data.RasterCount
-        self.width = self.__src_data.RasterXSize
-        self.height = self.__src_data.RasterYSize
+        if self._src_data is not None:
+            self.bands = self._src_data.RasterCount
+            self.width = self._src_data.RasterXSize
+            self.height = self._src_data.RasterYSize
+            self.geot = self._src_data.GetGeoTransform()
+            self.proj = self._src_data.GetProjection()
+        else:
+            d_shape = self._getNumpy().shape
+            if len(d_shape) == 3:
+                self.height, self.width, self.bands = d_shape
+            else:
+                self.height, self.width = d_shape
+                self.bands = 1
+            self.geot = None
+            self.proj = None
+
+    def _getNumpy(self):
+        ima = np.load(self.path)
+        if self.band_list is not None:
+            band_array = []
+            for b in self.band_list:
+                band_i = ima[:, :, b - 1]
+                band_array.append(band_i)
+            ima = np.stack(band_array, axis=0)
+        return ima
 
     def _getAarray(self, window: Union[None, List[int], Tuple[int]]=None) -> np.ndarray:
         if window is not None:
             xoff, yoff, xsize, ysize = window
         if self.band_list is None:
             if window is None:
-                ima = self.__src_data.ReadAsArray()
+                ima = self._src_data.ReadAsArray()
             else:
-                ima = self.__src_data.ReadAsArray(xoff, yoff, xsize, ysize)
+                ima = self._src_data.ReadAsArray(xoff, yoff, xsize, ysize)
         else:
             band_array = []
             for b in self.band_list:
                 if window is None:
-                    band_i = self.__src_data.GetRasterBand(b).ReadAsArray()
+                    band_i = self._src_data.GetRasterBand(b).ReadAsArray()
                 else:
-                    band_i = self.__src_data.GetRasterBand(b).ReadAsArray(xoff, yoff, xsize, ysize)
+                    band_i = self._src_data.GetRasterBand(b).ReadAsArray(xoff, yoff, xsize, ysize)
                 band_array.append(band_i)
             ima = np.stack(band_array, axis=0)
         if self.bands == 1:
