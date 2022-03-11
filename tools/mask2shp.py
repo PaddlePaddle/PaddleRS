@@ -12,15 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
-import os.path as osp
-sys.path.insert(0, osp.abspath(".."))  # add workspace
-
 import os
+import os.path as osp
 import numpy as np
 import argparse
 from PIL import Image
-from paddlers.datasets.raster import Raster
+from utils import Raster
 
 try:
     from osgeo import gdal, ogr, osr

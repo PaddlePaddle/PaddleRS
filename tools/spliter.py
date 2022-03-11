@@ -12,15 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
-import os.path as osp
-sys.path.insert(0, osp.abspath(".."))  # add workspace
-
 import os
+import os.path as osp
 import argparse
 from math import ceil
 from PIL import Image
-from paddlers.datasets.raster import Raster
+from utils import Raster
 
 
 def split_data(image_path, block_size, save_folder):

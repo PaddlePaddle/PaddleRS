@@ -15,7 +15,7 @@
 import os.path as osp
 import numpy as np
 from typing import List, Tuple, Union
-from paddlers.utils import raster2uint8
+from paddlers.transforms.functions import to_uint8 as raster2uint8
 
 try:
     from osgeo import gdal
