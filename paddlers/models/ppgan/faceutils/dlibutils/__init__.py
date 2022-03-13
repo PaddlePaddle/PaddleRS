@@ -12,4 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .version import ppgan_version as __version__
+from .dlib_utils import detect, crop, landmarks, crop_from_array
+from .face_align import align_crop

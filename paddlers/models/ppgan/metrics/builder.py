@@ -12,4 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .version import ppgan_version as __version__
+import copy
+import paddle
+
+from ..utils.registry import Registry
+
+METRICS = Registry("METRIC")
+
+
+def build_metric(cfg):
+    cfg_ = cfg.copy()
+    name = cfg_.pop('name', None)
+    metric = METRICS.get(name)(**cfg_)
+    return metric

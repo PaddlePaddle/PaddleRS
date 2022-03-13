@@ -12,4 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .version import ppgan_version as __version__
+import copy
+import paddle
+
+from .builder import OPTIMIZERS
+
+OPTIMIZERS.register(paddle.optimizer.Adam)
+OPTIMIZERS.register(paddle.optimizer.SGD)
+OPTIMIZERS.register(paddle.optimizer.Momentum)
+OPTIMIZERS.register(paddle.optimizer.RMSProp)

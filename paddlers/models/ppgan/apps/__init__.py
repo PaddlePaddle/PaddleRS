@@ -12,4 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .version import ppgan_version as __version__
+from .realsr_predictor import RealSRPredictor
+from .mpr_predictor import MPRPredictor
