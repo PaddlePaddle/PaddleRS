@@ -16,3 +16,4 @@ from .cdnet import CDNet
 from .unet_ef import UNetEarlyFusion
 from .unet_siamconc import UNetSiamConc
 from .unet_siamdiff import UNetSiamDiff
+from .stanet import STANet

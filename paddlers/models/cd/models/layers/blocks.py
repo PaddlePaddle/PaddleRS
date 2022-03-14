@@ -19,7 +19,8 @@ __all__ = [
     'BasicConv', 'Conv1x1', 'Conv3x3', 'Conv7x7', 
     'MaxPool2x2', 'MaxUnPool2x2', 
     'ConvTransposed3x3',
-    'Identity'
+    'Identity',
+    'get_norm_layer', 'get_act_layer'
 ]
 
 
