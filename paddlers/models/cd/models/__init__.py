@@ -13,3 +13,4 @@
 # limitations under the License.
 
 from .cdnet import CDNet
+from .unet_ef import UNetEarlyFusion

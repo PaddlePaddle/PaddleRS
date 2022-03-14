@@ -31,7 +31,7 @@ from paddlers.utils.checkpoint import seg_pretrain_weights_dict
 from paddlers.transforms import ImgDecoder, Resize
 import paddlers.models.cd as cd
 
-__all__ = ["CDNet"]
+__all__ = ["CDNet", "UNetEarlyFusion"]
 
 
 class BaseChangeDetector(BaseModel):
@@ -660,6 +660,24 @@ class CDNet(BaseChangeDetector):
         params.update({'in_channels': in_channels})
         super(CDNet, self).__init__(
             model_name='CDNet',
+            num_classes=num_classes,
+            use_mixed_loss=use_mixed_loss,
+            **params)
+
+
+class UNetEarlyFusion(BaseChangeDetector):
+    def __init__(self,
+                 num_classes=2,
+                 use_mixed_loss=False,
+                 in_channels=6,
+                 use_dropout=False,
+                 **params):
+        params.update({
+            'in_channels': in_channels,
+            'use_dropout': use_dropout
+        })
+        super(UNetEarlyFusion, self).__init__(
+            model_name='UNetEarlyFusion',
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
             **params)
