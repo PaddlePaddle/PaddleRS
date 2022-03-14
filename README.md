@@ -88,6 +88,7 @@ PaddleRS是xxx、xxx、xxx等遥感科研院所共同基于飞桨开发的遥感
 *  重要模块说明
     * [数据增强](./docs/module/data/data_cn.md)
     * [Loss说明](./docs/module/loss/losses_cn.md)
+    * [工具箱使用](./docs/tools.md)
 *  二次开发教程
     * [配置文件详解](./docs/design/use/use_cn.md)
     * [如何创造自己的模型](./docs/design/create/add_new_model_cn.md)
