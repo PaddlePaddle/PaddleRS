@@ -31,7 +31,7 @@ from paddlers.utils.checkpoint import seg_pretrain_weights_dict
 from paddlers.transforms import ImgDecoder, Resize
 import paddlers.models.cd as cd
 
-__all__ = ["CDNet", "UNetEarlyFusion", "UNetSiamConc", "UNetSiamDiff", "STANet"]
+__all__ = ["CDNet", "UNetEarlyFusion", "UNetSiamConc", "UNetSiamDiff", "STANet", "BIT"]
 
 
 class BaseChangeDetector(BaseModel):
@@ -734,6 +734,44 @@ class STANet(BaseChangeDetector):
         })
         super(STANet, self).__init__(
             model_name='STANet',
+            num_classes=num_classes,
+            use_mixed_loss=use_mixed_loss,
+            **params)
+
+
+class BIT(BaseChangeDetector):
+    def __init__(self,
+                 num_classes=2,
+                 use_mixed_loss=False,
+                 in_channels=3,
+                 backbone='resnet18', 
+                 n_stages=4, 
+                 use_tokenizer=True, 
+                 token_len=4, 
+                 pool_mode='max', 
+                 pool_size=2,
+                 enc_with_pos=True, 
+                 enc_depth=1, 
+                 enc_head_dim=64, 
+                 dec_depth=8, 
+                 dec_head_dim=8,
+                 **params):
+        params.update({
+            'in_channels': in_channels,
+            'backbone': backbone,
+            'n_stages': n_stages,
+            'use_tokenizer': use_tokenizer,
+            'token_len': token_len,
+            'pool_mode': pool_mode,
+            'pool_size': pool_size,
+            'enc_with_pos': enc_with_pos,
+            'enc_depth': enc_depth,
+            'enc_head_dim': enc_head_dim,
+            'dec_depth': dec_depth,
+            'dec_head_dim': dec_head_dim
+        })
+        super(BIT, self).__init__(
+            model_name='BIT',
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
             **params)
