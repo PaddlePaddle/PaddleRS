@@ -16,3 +16,8 @@ matplotlib
 chardet
 openpyxl
 # GDAL >= 3.1.3  # install through https://www.lfd.uci.edu/~gohlke/pythonlibs/#gdal under windows
+scikit-image>=0.14.0
+numba==0.53.1
+easydict
+munch
+natsort
