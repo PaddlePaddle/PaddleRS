@@ -31,7 +31,7 @@ from paddlers.utils.checkpoint import seg_pretrain_weights_dict
 from paddlers.transforms import ImgDecoder, Resize
 import paddlers.models.cd as cd
 
-__all__ = ["CDNet", "UNetEarlyFusion"]
+__all__ = ["CDNet", "UNetEarlyFusion", "UNetSiamConc", "UNetSiamDiff"]
 
 
 class BaseChangeDetector(BaseModel):
@@ -678,6 +678,42 @@ class UNetEarlyFusion(BaseChangeDetector):
         })
         super(UNetEarlyFusion, self).__init__(
             model_name='UNetEarlyFusion',
+            num_classes=num_classes,
+            use_mixed_loss=use_mixed_loss,
+            **params)
+
+
+class UNetSiamConc(BaseChangeDetector):
+    def __init__(self,
+                 num_classes=2,
+                 use_mixed_loss=False,
+                 in_channels=3,
+                 use_dropout=False,
+                 **params):
+        params.update({
+            'in_channels': in_channels,
+            'use_dropout': use_dropout
+        })
+        super(UNetSiamConc, self).__init__(
+            model_name='UNetSiamConc',
+            num_classes=num_classes,
+            use_mixed_loss=use_mixed_loss,
+            **params)
+
+
+class UNetSiamDiff(BaseChangeDetector):
+    def __init__(self,
+                 num_classes=2,
+                 use_mixed_loss=False,
+                 in_channels=3,
+                 use_dropout=False,
+                 **params):
+        params.update({
+            'in_channels': in_channels,
+            'use_dropout': use_dropout
+        })
+        super(UNetSiamDiff, self).__init__(
+            model_name='UNetSiamDiff',
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
             **params)
