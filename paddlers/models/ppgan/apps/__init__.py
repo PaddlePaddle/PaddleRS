@@ -14,3 +14,4 @@
 
 from .realsr_predictor import RealSRPredictor
 from .mpr_predictor import MPRPredictor
+from .drn_predictor import DRNPredictor
