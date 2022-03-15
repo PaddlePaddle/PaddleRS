@@ -20,3 +20,4 @@ from .stanet import STANet
 from .bit import BIT
 from .snunet import SNUNet
 from .dsifn import DSIFN
+from .dsamnet import DSAMNet

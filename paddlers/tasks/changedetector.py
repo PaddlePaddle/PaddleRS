@@ -31,7 +31,7 @@ from paddlers.utils.checkpoint import seg_pretrain_weights_dict
 from paddlers.transforms import ImgDecoder, Resize
 import paddlers.models.cd as cd
 
-__all__ = ["CDNet", "UNetEarlyFusion", "UNetSiamConc", "UNetSiamDiff", "STANet", "BIT", "SNUNet", "DSIFN"]
+__all__ = ["CDNet", "UNetEarlyFusion", "UNetSiamConc", "UNetSiamDiff", "STANet", "BIT", "SNUNet", "DSIFN", "DSAMNet"]
 
 
 class BaseChangeDetector(BaseModel):
@@ -817,4 +817,36 @@ class DSIFN(BaseChangeDetector):
                 # XXX: make sure the shallow copy works correctly here.
                 'types': [paddleseg.models.CrossEntropyLoss()]*5,
                 'coef': [1.0]*5
+            }
+
+
+class DSAMNet(BaseChangeDetector):
+    def __init__(self,
+                 num_classes=2,
+                 use_mixed_loss=None,
+                 in_channels=3,
+                 ca_ratio=8,
+                 sa_kernel=7,
+                 **params):
+        params.update({
+            'in_channels': in_channels,
+            'ca_ratio': ca_ratio,
+            'sa_kernel': sa_kernel
+        })
+        super(DSAMNet, self).__init__(
+            model_name='DSAMNet',
+            num_classes=num_classes,
+            use_mixed_loss=use_mixed_loss,
+            **params)
+        # HACK: currently the only legal value of `use_mixed_loss` is None, in which case the loss specifications are
+        # constructed automatically.
+        assert use_mixed_loss is None
+        if use_mixed_loss is None:
+            self.losses = {
+                'types': [
+                    paddleseg.models.CrossEntropyLoss(), 
+                    paddleseg.models.DiceLoss(), 
+                    paddleseg.models.DiceLoss()
+                ],
+                'coef': [1.0, 0.05, 0.05]
             }

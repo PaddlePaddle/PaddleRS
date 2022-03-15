@@ -90,4 +90,4 @@ class CBAM(nn.Layer):
     def forward(self, x):
         y = self.ca(x) * x
         y = self.sa(y) * y
-        return 
+        return y
