@@ -122,7 +122,7 @@ class BIT(nn.Layer):
         )
 
     def _get_semantic_tokens(self, x):
-        b, c = x.shape[:2]
+        b, c = paddle.shape(x)[:2]
         att_map = self.conv_att(x)
         att_map = att_map.reshape((b,self.token_len,1,-1))
         att_map = F.softmax(att_map, axis=-1)
@@ -147,7 +147,7 @@ class BIT(nn.Layer):
         return x
 
     def decode(self, x, m):
-        b, c, h, w = x.shape
+        b, c, h, w = paddle.shape(x)
         x = x.transpose((0,2,3,1)).flatten(1,2)
         x = self.decoder(x, m)
         x = x.transpose((0,2,1)).reshape((b,c,h,w))
@@ -257,7 +257,7 @@ class CrossAttention(nn.Layer):
         )
 
     def forward(self, x, ref):
-        b, n = x.shape[:2]
+        b, n = paddle.shape(x)[:2]
         h = self.n_heads
 
         q = self.fc_q(x)
@@ -265,8 +265,8 @@ class CrossAttention(nn.Layer):
         v = self.fc_v(ref)
 
         q = q.reshape((b,n,h,-1)).transpose((0,2,1,3))
-        k = k.reshape((b,ref.shape[1],h,-1)).transpose((0,2,1,3))
-        v = v.reshape((b,ref.shape[1],h,-1)).transpose((0,2,1,3))
+        k = k.reshape((b,paddle.shape(ref)[1],h,-1)).transpose((0,2,1,3))
+        v = v.reshape((b,paddle.shape(ref)[1],h,-1)).transpose((0,2,1,3))
 
         mult = paddle.matmul(q, k, transpose_y=True) * self.scale
 
