@@ -20,6 +20,8 @@ import shapely.ops
 from shapely.geometry import Polygon, MultiPolygon, GeometryCollection
 from functools import reduce
 from sklearn.decomposition import PCA
+from sklearn.linear_model import LinearRegression
+from skimage import exposure
 
 
 def normalize(im, mean, std, min_value=[0, 0, 0], max_value=[255, 255, 255]):
@@ -379,3 +381,64 @@ def pca(im, dim=3, whiten=True):
     result = np.reshape(im_pca, (H, W, dim))
     result = np.clip(result, 0, 1)
     return (result * 255).astype("uint8")
+
+
+def match_histograms(im, ref):
+    """
+    Match the cumulative histogram of one image to another.
+
+    Args:
+        im (np.ndarray): The input image.
+        ref (np.ndarray): The reference image to match histogram of. `ref` must have the same number of channels as `im`.
+
+    Returns:
+        np.ndarray: The transformed input image.
+
+    Raises:
+        ValueError: When the number of channels of `ref` differs from that of im`.
+    """
+    # TODO: Check the data types of the inputs to see if they are supported by skimage
+    return exposure.match_histograms(im, ref, channel_axis=-1 if im.ndim>2 else None)
+
+
+def match_by_regression(im, ref, pif_loc=None):
+    """
+    Match the brightness values of two images using a linear regression method.
+
+    Args:
+        im (np.ndarray): The input image.
+        ref (np.ndarray): The reference image to match. `ref` must have the same shape as `im`.
+        pif_loc (tuple|None, optional): The spatial locations where pseudo-invariant features (PIFs) are obtained. If 
+            `pif_loc` is set to None, all pixels in the image will be used as training samples for the regression model. 
+            In other cases, `pif_loc` should be a tuple of np.ndarrays. Default: None.
+
+    Returns:
+        np.ndarray: The transformed input image.
+
+    Raises:
+        ValueError: When the shape of `ref` differs from that of `im`.
+    """
+    def _linear_regress(im, ref, loc):
+        regressor = LinearRegression()
+        if loc is not None:
+            x, y = im[loc], ref[loc]
+        else:
+            x, y = im, ref
+        x, y = x.reshape(-1,1), y.ravel()
+        regressor.fit(x, y)
+        matched = regressor.predict(im.reshape(-1,1))
+        return matched.reshape(im.shape)
+
+    if im.shape != ref.shape:
+        raise  ValueError("Image and Reference must have the same shape!")
+
+    if im.ndim > 2:
+        # Multiple channels
+        matched = np.empty(im.shape, dtype=im.dtype)
+        for ch in range(im.shape[-1]):
+            matched[..., ch] = _linear_regress(im[..., ch], ref[..., ch], pif_loc)
+    else:
+        # Single channel
+        matched = _linear_regress(im, ref, pif_loc).astype(im.dtype)
+    
+    return matched
