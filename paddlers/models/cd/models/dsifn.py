@@ -88,6 +88,8 @@ class DSIFN(nn.Layer):
         self.bn_sa5 = make_norm(16)
         self.o5_conv4 = Conv1x1(16, num_classes)
 
+        self.init_weight()
+
     def forward(self, t1, t2):
         # Extract bi-temporal features.
         with paddle.no_grad():
@@ -172,6 +174,10 @@ class DSIFN(nn.Layer):
         out5 = self.o5_conv4(x)
 
         return out5, out4, out3, out2, out1
+
+    def init_weight(self):
+        # Do nothing
+        pass
 
 
 class VGG16FeaturePicker(nn.Layer):
