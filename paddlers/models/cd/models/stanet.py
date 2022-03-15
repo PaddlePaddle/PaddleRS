@@ -27,8 +27,8 @@ class STANet(nn.Layer):
     The STANet implementation based on PaddlePaddle.
 
     The original article refers to
-    H. Chen and Z. Shi, "A Spatial-Temporal Attention-Based Method and a New Dataset for Remote Sensing Image Change Detection"
-    (https://www.mdpi.com/2072-4292/12/10/1662)
+        H. Chen and Z. Shi, "A Spatial-Temporal Attention-Based Method and a New Dataset for Remote Sensing Image Change Detection"
+        (https://www.mdpi.com/2072-4292/12/10/1662).
 
     Note that this implementation differs from the original work in two aspects:
     1. We do not use multiple dilation rates in layer 4 of the ResNet backbone.
@@ -45,6 +45,7 @@ class STANet(nn.Layer):
     Raises:
         ValueError: When `att_type` has an illeagal value (unsupported attention type).
     """
+    
     def __init__(
         self, 
         in_channels, 

@@ -25,13 +25,14 @@ class ChannelAttention(nn.Layer):
     The channel attention module implementation based on PaddlePaddle.
 
     The original article refers to 
-    Sanghyun Woo, et al., "CBAM: Convolutional Block Attention Module"
-    (https://arxiv.org/abs/1807.06521)
+        Sanghyun Woo, et al., "CBAM: Convolutional Block Attention Module"
+        (https://arxiv.org/abs/1807.06521).
 
     Args:
         in_ch (int): The number of channels of the input features.
         ratio (int, optional): The channel reduction ratio. Default: 8.
     """
+
     def __init__(self, in_ch, ratio=8):
         super().__init__()
         self.avg_pool = nn.AdaptiveAvgPool2D(1)
@@ -51,12 +52,13 @@ class SpatialAttention(nn.Layer):
     The spatial attention module implementation based on PaddlePaddle.
 
     The original article refers to 
-    Sanghyun Woo, et al., "CBAM: Convolutional Block Attention Module"
-    (https://arxiv.org/abs/1807.06521)
+        Sanghyun Woo, et al., "CBAM: Convolutional Block Attention Module"
+        (https://arxiv.org/abs/1807.06521).
 
     Args:
         kernel_size (int, optional): The size of the convolutional kernel. Default: 7.
     """
+
     def __init__(self, kernel_size=7):
         super().__init__()
         self.conv = BasicConv(2, 1, kernel_size, bias=False)
@@ -74,14 +76,15 @@ class CBAM(nn.Layer):
     The CBAM implementation based on PaddlePaddle.
 
     The original article refers to 
-    Sanghyun Woo, et al., "CBAM: Convolutional Block Attention Module"
-    (https://arxiv.org/abs/1807.06521)
+        Sanghyun Woo, et al., "CBAM: Convolutional Block Attention Module"
+        (https://arxiv.org/abs/1807.06521).
 
     Args:
         in_ch (int): The number of channels of the input features.
         ratio (int, optional): The channel reduction ratio for the channel attention module. Default: 8.
         kernel_size (int, optional): The size of the convolutional kernel used in the spatial attention module. Default: 7.
     """
+    
     def __init__(self, in_ch, ratio=8, kernel_size=7):
         super().__init__()
         self.ca = ChannelAttention(in_ch, ratio=ratio)

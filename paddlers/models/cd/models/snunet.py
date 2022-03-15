@@ -27,8 +27,8 @@ class SNUNet(nn.Layer, KaimingInitMixin):
     The SNUNet implementation based on PaddlePaddle.
 
     The original article refers to
-    S. Fang, et al., "SNUNet-CD: A Densely Connected Siamese Network for Change Detection of VHR Images"
-    (https://ieeexplore.ieee.org/document/9355573)
+        S. Fang, et al., "SNUNet-CD: A Densely Connected Siamese Network for Change Detection of VHR Images"
+        (https://ieeexplore.ieee.org/document/9355573).
 
     Note that bilinear interpolation is adopted as the upsampling method, which is different from the paper.
 
@@ -37,6 +37,7 @@ class SNUNet(nn.Layer, KaimingInitMixin):
         num_classes (int): The number of target classes.
         width (int, optional): The output channels of the first convolutional layer. Default: 32.
     """
+    
     def __init__(self, in_channels, num_classes, width=32):
         super().__init__()
 

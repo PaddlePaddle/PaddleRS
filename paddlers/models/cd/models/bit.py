@@ -28,8 +28,8 @@ class BIT(nn.Layer):
     The BIT implementation based on PaddlePaddle.
 
     The original article refers to
-    H. Chen, et al., "Remote Sensing Image Change Detection With Transformers"
-    (https://arxiv.org/abs/2103.00208)
+        H. Chen, et al., "Remote Sensing Image Change Detection With Transformers"
+        (https://arxiv.org/abs/2103.00208).
 
     This implementation adopts pretrained encoders, as opposed to the original work where weights are randomly initialized.
 
@@ -56,6 +56,7 @@ class BIT(nn.Layer):
     Raises:
         ValueError: When an unsupported backbone type is specified, or the number of backbone stages is not 3, 4, or 5.
     """
+    
     def __init__(
         self, in_channels, num_classes,
         backbone='resnet18', n_stages=4, 

@@ -26,6 +26,7 @@ def normal_init(param, *args, **kwargs):
     Returns:
         The initialized parameters.
     """
+    
     return nn.initializer.Normal(*args, **kwargs)(param)
 
 
@@ -34,7 +35,7 @@ def kaiming_normal_init(param, *args, **kwargs):
     Initialize parameters with the Kaiming normal distribution.
 
     For more information about the Kaiming initialization method, please refer to
-    https://arxiv.org/abs/1502.01852
+        https://arxiv.org/abs/1502.01852
 
     Args:
         param (Tensor): The tensor that needs to be initialized.
@@ -42,6 +43,7 @@ def kaiming_normal_init(param, *args, **kwargs):
     Returns:
         The initialized parameters.
     """
+
     return nn.initializer.KaimingNormal(*args, **kwargs)(param)
 
 
@@ -55,6 +57,7 @@ def constant_init(param, *args, **kwargs):
     Returns:
         The initialized parameters.
     """
+
     return nn.initializer.Constant(*args, **kwargs)(param)
 
 
@@ -73,6 +76,7 @@ class KaimingInitMixin:
                 self.bn = nn.BatchNorm2D(num_classes)
                 self.init_weight()
     """
+
     def init_weight(self):
         for layer in self.sublayers():
             if isinstance(layer, nn.Conv2D):
