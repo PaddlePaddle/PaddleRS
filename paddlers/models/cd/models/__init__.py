@@ -18,3 +18,4 @@ from .unet_siamconc import UNetSiamConc
 from .unet_siamdiff import UNetSiamDiff
 from .stanet import STANet
 from .bit import BIT
+from .snunet import SNUNet

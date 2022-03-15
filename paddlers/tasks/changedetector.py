@@ -31,7 +31,7 @@ from paddlers.utils.checkpoint import seg_pretrain_weights_dict
 from paddlers.transforms import ImgDecoder, Resize
 import paddlers.models.cd as cd
 
-__all__ = ["CDNet", "UNetEarlyFusion", "UNetSiamConc", "UNetSiamDiff", "STANet", "BIT"]
+__all__ = ["CDNet", "UNetEarlyFusion", "UNetSiamConc", "UNetSiamDiff", "STANet", "BIT", "SNUNet"]
 
 
 class BaseChangeDetector(BaseModel):
@@ -772,6 +772,24 @@ class BIT(BaseChangeDetector):
         })
         super(BIT, self).__init__(
             model_name='BIT',
+            num_classes=num_classes,
+            use_mixed_loss=use_mixed_loss,
+            **params)
+
+
+class SNUNet(BaseChangeDetector):
+    def __init__(self,
+                 num_classes=2,
+                 use_mixed_loss=False,
+                 in_channels=3,
+                 width=32,
+                 **params):
+        params.update({
+            'in_channels': in_channels,
+            'width': width
+        })
+        super(SNUNet, self).__init__(
+            model_name='SNUNet',
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
             **params)

@@ -20,7 +20,8 @@ __all__ = [
     'MaxPool2x2', 'MaxUnPool2x2', 
     'ConvTransposed3x3',
     'Identity',
-    'get_norm_layer', 'get_act_layer'
+    'get_norm_layer', 'get_act_layer', 
+    'make_norm', 'make_act'
 ]
 
 
