@@ -31,7 +31,7 @@ from paddlers.utils.checkpoint import seg_pretrain_weights_dict
 from paddlers.transforms import ImgDecoder, Resize
 import paddlers.models.cd as cd
 
-__all__ = ["CDNet"]
+__all__ = ["CDNet", "UNetEarlyFusion", "UNetSiamConc", "UNetSiamDiff", "STANet", "BIT", "SNUNet", "DSIFN", "DSAMNet"]
 
 
 class BaseChangeDetector(BaseModel):
@@ -663,3 +663,190 @@ class CDNet(BaseChangeDetector):
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
             **params)
+
+
+class UNetEarlyFusion(BaseChangeDetector):
+    def __init__(self,
+                 num_classes=2,
+                 use_mixed_loss=False,
+                 in_channels=6,
+                 use_dropout=False,
+                 **params):
+        params.update({
+            'in_channels': in_channels,
+            'use_dropout': use_dropout
+        })
+        super(UNetEarlyFusion, self).__init__(
+            model_name='UNetEarlyFusion',
+            num_classes=num_classes,
+            use_mixed_loss=use_mixed_loss,
+            **params)
+
+
+class UNetSiamConc(BaseChangeDetector):
+    def __init__(self,
+                 num_classes=2,
+                 use_mixed_loss=False,
+                 in_channels=3,
+                 use_dropout=False,
+                 **params):
+        params.update({
+            'in_channels': in_channels,
+            'use_dropout': use_dropout
+        })
+        super(UNetSiamConc, self).__init__(
+            model_name='UNetSiamConc',
+            num_classes=num_classes,
+            use_mixed_loss=use_mixed_loss,
+            **params)
+
+
+class UNetSiamDiff(BaseChangeDetector):
+    def __init__(self,
+                 num_classes=2,
+                 use_mixed_loss=False,
+                 in_channels=3,
+                 use_dropout=False,
+                 **params):
+        params.update({
+            'in_channels': in_channels,
+            'use_dropout': use_dropout
+        })
+        super(UNetSiamDiff, self).__init__(
+            model_name='UNetSiamDiff',
+            num_classes=num_classes,
+            use_mixed_loss=use_mixed_loss,
+            **params)
+
+
+class STANet(BaseChangeDetector):
+    def __init__(self,
+                 num_classes=2,
+                 use_mixed_loss=False,
+                 in_channels=3,
+                 att_type='BAM',
+                 ds_factor=1,
+                 **params):
+        params.update({
+            'in_channels': in_channels,
+            'att_type': att_type,
+            'ds_factor': ds_factor
+        })
+        super(STANet, self).__init__(
+            model_name='STANet',
+            num_classes=num_classes,
+            use_mixed_loss=use_mixed_loss,
+            **params)
+
+
+class BIT(BaseChangeDetector):
+    def __init__(self,
+                 num_classes=2,
+                 use_mixed_loss=False,
+                 in_channels=3,
+                 backbone='resnet18', 
+                 n_stages=4, 
+                 use_tokenizer=True, 
+                 token_len=4, 
+                 pool_mode='max', 
+                 pool_size=2,
+                 enc_with_pos=True, 
+                 enc_depth=1, 
+                 enc_head_dim=64, 
+                 dec_depth=8, 
+                 dec_head_dim=8,
+                 **params):
+        params.update({
+            'in_channels': in_channels,
+            'backbone': backbone,
+            'n_stages': n_stages,
+            'use_tokenizer': use_tokenizer,
+            'token_len': token_len,
+            'pool_mode': pool_mode,
+            'pool_size': pool_size,
+            'enc_with_pos': enc_with_pos,
+            'enc_depth': enc_depth,
+            'enc_head_dim': enc_head_dim,
+            'dec_depth': dec_depth,
+            'dec_head_dim': dec_head_dim
+        })
+        super(BIT, self).__init__(
+            model_name='BIT',
+            num_classes=num_classes,
+            use_mixed_loss=use_mixed_loss,
+            **params)
+
+
+class SNUNet(BaseChangeDetector):
+    def __init__(self,
+                 num_classes=2,
+                 use_mixed_loss=False,
+                 in_channels=3,
+                 width=32,
+                 **params):
+        params.update({
+            'in_channels': in_channels,
+            'width': width
+        })
+        super(SNUNet, self).__init__(
+            model_name='SNUNet',
+            num_classes=num_classes,
+            use_mixed_loss=use_mixed_loss,
+            **params)
+
+
+class DSIFN(BaseChangeDetector):
+    def __init__(self,
+                 num_classes=2,
+                 use_mixed_loss=None,
+                 use_dropout=False,
+                 **params):
+        params.update({
+            'use_dropout': use_dropout
+        })
+        super(DSIFN, self).__init__(
+            model_name='DSIFN',
+            num_classes=num_classes,
+            use_mixed_loss=use_mixed_loss,
+            **params)
+        # HACK: currently the only legal value of `use_mixed_loss` is None, in which case the loss specifications are
+        # constructed automatically.
+        assert use_mixed_loss is None
+        if use_mixed_loss is None:
+            self.losses = {
+                # XXX: make sure the shallow copy works correctly here.
+                'types': [paddleseg.models.CrossEntropyLoss()]*5,
+                'coef': [1.0]*5
+            }
+
+
+class DSAMNet(BaseChangeDetector):
+    def __init__(self,
+                 num_classes=2,
+                 use_mixed_loss=None,
+                 in_channels=3,
+                 ca_ratio=8,
+                 sa_kernel=7,
+                 **params):
+        params.update({
+            'in_channels': in_channels,
+            'ca_ratio': ca_ratio,
+            'sa_kernel': sa_kernel
+        })
+        super(DSAMNet, self).__init__(
+            model_name='DSAMNet',
+            num_classes=num_classes,
+            use_mixed_loss=use_mixed_loss,
+            **params)
+        # HACK: currently the only legal value of `use_mixed_loss` is None, in which case the loss specifications are
+        # constructed automatically.
+        assert use_mixed_loss is None
+        if use_mixed_loss is None:
+            self.losses = {
+                'types': [
+                    paddleseg.models.CrossEntropyLoss(), 
+                    paddleseg.models.DiceLoss(), 
+                    paddleseg.models.DiceLoss()
+                ],
+                'coef': [1.0, 0.05, 0.05]
+            }
