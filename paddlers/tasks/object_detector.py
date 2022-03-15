@@ -29,8 +29,8 @@ from paddlers.transforms.operators import _NormalizeBox, _PadBox, _BboxXYXY2XYWH
 from paddlers.transforms.batch_operators import BatchCompose, BatchRandomResize, BatchRandomResizeByShort, \
     _BatchPadding, _Gt2YoloTarget
 from paddlers.transforms import arrange_transforms
-from ..base import BaseModel
-from ..utils.det_metrics import VOCMetric, COCOMetric
+from .base import BaseModel
+from .utils.det_metrics import VOCMetric, COCOMetric
 from paddlers.models.ppdet.optimizer import ModelEMA
 from paddlers.utils.checkpoint import det_pretrain_weights_dict
 

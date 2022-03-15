@@ -120,7 +120,9 @@ class ImgDecoder(Transform):
             if dataset == None:
                 raise Exception('Can not open', img_path)
             im_data = dataset.ReadAsArray()
-            if im_data.ndim == 3:
+            if im_data.ndim == 2:
+                im_data = im_data[:, :, np.newaxis]
+            elif im_data.ndim == 3:
                 im_data = im_data.transpose((1, 2, 0))
             return im_data
         elif img_format in ['jpeg', 'bmp', 'png', 'jpg']:
@@ -277,7 +279,10 @@ class Resize(Transform):
         self.keep_ratio = keep_ratio
 
     def apply_im(self, image, interp, target_size):
+        flag = image.shape[2] == 1
         image = cv2.resize(image, target_size, interpolation=interp)
+        if flag:
+            image = image[:, :, np.newaxis]
         return image
 
     def apply_mask(self, mask, target_size):
@@ -346,7 +351,6 @@ class Resize(Transform):
             sample['scale_factor'] = np.asarray(
                 [scale_factor[0] * im_scale_y, scale_factor[1] * im_scale_x],
                 dtype=np.float32)
-
         return sample
 
 
@@ -1001,8 +1005,8 @@ class Padding(Transform):
 
     def apply_im(self, image, offsets, target_size):
         x, y = offsets
-        im_h, im_w, channel = image.shape[:3]
         h, w = target_size
+        im_h, im_w, channel = image.shape[:3]
         canvas = np.ones((h, w, channel), dtype=np.float32)
         canvas *= np.array(self.im_padding_value, dtype=np.float32)
         canvas[y:y + im_h, x:x + im_w, :] = image.astype(np.float32)
@@ -1204,7 +1208,6 @@ class RandomDistort(Transform):
         if np.random.uniform(0., 1.) < self.hue_prob:
             return image
 
-        image = image.astype(np.float32)
         # it works, but result differ from HSV version
         delta = np.random.uniform(low, high)
         u = np.cos(delta * np.pi)
@@ -1215,22 +1218,45 @@ class RandomDistort(Transform):
         ityiq = np.array([[1.0, 0.956, 0.621], [1.0, -0.272, -0.647],
                           [1.0, -1.107, 1.705]])
         t = np.dot(np.dot(ityiq, bt), tyiq).T
-        image = np.dot(image, t)
-        return image
+
+        res_list = []
+        channel = image.shape[2]
+        for i in range(channel // 3):
+            sub_img = image[:, :, 3*i : 3*(i+1)]
+            sub_img = sub_img.astype(np.float32)
+            sub_img = np.dot(image, t)
+            res_list.append(sub_img)
+
+        if channel % 3 != 0:
+            i = channel % 3
+            res_list.append(image[:, :, -i:])
+
+        return np.concatenate(res_list, axis=2)
 
     def apply_saturation(self, image):
         low, high = self.saturation_range
+        delta = np.random.uniform(low, high)
         if np.random.uniform(0., 1.) < self.saturation_prob:
             return image
-        delta = np.random.uniform(low, high)
-        image = image.astype(np.float32)
-        # it works, but result differ from HSV version
-        gray = image * np.array([[[0.299, 0.587, 0.114]]], dtype=np.float32)
-        gray = gray.sum(axis=2, keepdims=True)
-        gray *= (1.0 - delta)
-        image *= delta
-        image += gray
-        return image
+
+        res_list = []
+        channel = image.shape[2]
+        for i in range(channel // 3):
+            sub_img = image[:, :, 3*i : 3*(i+1)]
+            sub_img = sub_img.astype(np.float32)
+            # it works, but result differ from HSV version
+            gray = sub_img * np.array([[[0.299, 0.587, 0.114]]], dtype=np.float32)
+            gray = gray.sum(axis=2, keepdims=True)
+            gray *= (1.0 - delta)
+            sub_img *= delta
+            sub_img += gray
+            res_list.append(sub_img)
+
+        if channel % 3 != 0:
+            i = channel % 3
+            res_list.append(image[:, :, -i:])
+
+        return np.concatenate(res_list, axis=2)
 
     def apply_contrast(self, image):
         low, high = self.contrast_range
