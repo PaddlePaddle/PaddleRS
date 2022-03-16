@@ -50,9 +50,9 @@ class Raster:
                     self._src_data = gdal.Open(path)
                 except:
                     raise TypeError("Unsupported data format: `{}`".format(self.ext_type))
-            self._getInfo()
             self.to_uint8 = to_uint8
             self.setBands(band_list)
+            self._getInfo()
         else:
             raise ValueError("The path {0} not exists.".format(path))
 
@@ -101,8 +101,11 @@ class Raster:
             self.height = self._src_data.RasterYSize
             self.geot = self._src_data.GetGeoTransform()
             self.proj = self._src_data.GetProjection()
+            d_name = self._getBlock([0, 0], [1, 1]).dtype.name
         else:
-            d_shape = self._getNumpy().shape
+            d_img = self._getNumpy()
+            d_shape = d_img.shape
+            d_name = d_img.dtype.name
             if len(d_shape) == 3:
                 self.height, self.width, self.bands = d_shape
             else:
@@ -110,6 +113,12 @@ class Raster:
                 self.bands = 1
             self.geot = None
             self.proj = None
+        if "int8" in d_name:
+            self.datatype = gdal.GDT_Byte
+        elif "int16" in d_name:
+            self.datatype = gdal.GDT_UInt16
+        else:
+            self.datatype = gdal.GDT_Float32
 
     def _getNumpy(self):
         ima = np.load(self.path)

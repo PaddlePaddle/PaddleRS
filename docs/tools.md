@@ -51,25 +51,19 @@ python mask2shp.py --srcimg_path xxx.tif --mask_path xxx.png [--save_path output
 ` matcher`的主要功能是在进行变化检测的推理前，匹配两期影像的位置，并将转换后的`im2`图像保存在原地址下，命名为`im2_M.tif`。使用代码如下：
 
 ```shell
-python geojson2mask.py --raw_folder xxx --save_folder xxx
-```
-
-### spliter
-
-`geojson2mask`的主要功能是将图像以及对应json格式的分割标签转换为图像与png格式的标签，结果会分别存放在`img`和`gt`两个文件夹中。相关的数据样例可以参考[中国典型城市建筑物实例数据集](https://www.scidb.cn/detail?dataSetId=806674532768153600&dataSetType=journal)。使用代码如下：
-
-```shell
-python matcher.py --im1_path xxx.tif --im2_path xxx.xxx
+python matcher.py --im1_path xxx.tif --im2_path xxx.xxx [--im1_bands 1 2 3] [--im2_bands 1 2 3]
 ```
 
 其中：
 
 - `im1_path`：时段一的图像路径，该图像需要存在地理信息，且以该图像为基准图像。
 - `im2_path`：时段二的图像路径，该图像可以为非遥感格式的图像，该图像为带匹配图像。
+- `im1_bands`：时段一图像所用于配准的波段，为RGB或单通道，默认为[1, 2, 3]。
+- `im2_bands`：时段二图像所用于配准的波段，为RGB或单通道，默认为[1, 2, 3]。
 
 ### spliter
 
-` spliter`的主要功能是在划分大的遥感图像为图像块，便于进行训练。使用代码如下：
+`spliter`的主要功能是在划分大的遥感图像为图像块，便于进行训练。使用代码如下：
 
 ```shell
 python spliter.py --image_path xxx.tif [--block_size 512] [--save_folder output]

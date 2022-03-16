@@ -57,21 +57,21 @@ def _get_match_img(raster, bands):
         band_i = raster.GetRasterBand(b).ReadAsArray()
         band_array.append(band_i)
     if len(band_array) == 1:
-        ima = raster2uint8(band_array)
+        ima = raster2uint8(band_array[0])
     else:
         ima = raster2uint8(np.stack(band_array, axis=-1))
         ima = cv2.cvtColor(ima, cv2.COLOR_RGB2GRAY)
     return ima
 
 
-def _img2tif(ima, save_path, proj, geot):
+def _img2tif(ima, save_path, proj, geot, dtype):
     if len(ima.shape) == 3:
         row, columns, bands = ima.shape
     else:
         row, columns = ima.shape
         bands = 1
     driver = gdal.GetDriverByName("GTiff")
-    dst_ds = driver.Create(save_path, columns, row, bands, gdal.GDT_UInt16)
+    dst_ds = driver.Create(save_path, columns, row, bands, dtype)
     dst_ds.SetGeoTransform(geot)
     dst_ds.SetProjection(proj)
     if bands != 1:
@@ -94,19 +94,23 @@ def matching(im1_path, im2_path, im1_bands=[1, 2, 3], im2_bands=[1, 2, 3]):
     # cv2.imwrite("B_M.png", cv2.cvtColor(im2_t, cv2.COLOR_RGB2BGR))
     im2_arr_t = cv2.warpPerspective(im2_ras.getArray(), H, (im1_ras.width, im1_ras.height))
     save_path = im2_ras.path.replace(("." + im2_ras.ext_type), "_M.tif")
-    _img2tif(im2_arr_t, save_path, im1_ras.proj, im1_ras.geot)
+    _img2tif(im2_arr_t, save_path, im1_ras.proj, im1_ras.geot, im1_ras.datatype)
     
 
 parser = argparse.ArgumentParser(description="input parameters")
 parser.add_argument("--im1_path", type=str, required=True, \
                     help="The path of time1 image (with geoinfo).")
 parser.add_argument("--im2_path", type=str, required=True, \
-                    help="The path of time1 image.")
+                    help="The path of time2 image.")
+parser.add_argument("--im1_bands", type=int, nargs="+", default=[1, 2, 3], \
+                    help="The time1 image's band used for matching, RGB or monochrome, `[1, 2, 3]` is the default.")
+parser.add_argument("--im2_bands", type=int, nargs="+", default=[1, 2, 3], \
+                    help="The time2 image's band used for matching, RGB or monochrome, `[1, 2, 3]` is the default.")
 
 
 if __name__ == "__main__":
     args = parser.parse_args()
     start_time = time.time()
-    matching(args.im1_path, args.im2_path)
+    matching(args.im1_path, args.im2_path, args.im1_bands, args.im2_bands)
     end_time = time.time()
     print("Total time:", (end_time - start_time))
