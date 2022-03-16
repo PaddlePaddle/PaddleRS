@@ -29,7 +29,7 @@ from .base import BaseModel
 from .utils import seg_metrics as metrics
 from paddlers.utils.checkpoint import seg_pretrain_weights_dict
 from paddlers.transforms import ImgDecoder, Resize
-import paddlers.models.cd as cd
+import paddlers.custom_models.cd as cd
 
 __all__ = ["CDNet", "UNetEarlyFusion", "UNetSiamConc", "UNetSiamDiff", "STANet", "BIT", "SNUNet", "DSIFN", "DSAMNet"]
 
