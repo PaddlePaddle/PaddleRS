@@ -60,7 +60,7 @@ PaddleRS是xxx、xxx、xxx等遥感科研院所共同基于飞桨开发的遥感
 * [环境安装](./docs/install_cn.md)
 * [快速上手PaddleRS](./docs/whole_process_cn.md)
 *  准备数据集
-   * [遥感数据](./docs/data/marker/marker_cn.md)
+   * [遥感数据](./docs/data/rs_data_cn.md)
    * [数据集说明](./docs/data/marker/marker_cn.md)
    * [智能标注工具EISeg](./docs/data/transform/transform_cn.md)
 
