@@ -67,7 +67,7 @@ class KaimingInitMixin:
 
     Examples:
 
-        from paddlers.models.cd.models.param_init import KaimingInitMixin
+        from paddlers.custom_models.cd.models.param_init import KaimingInitMixin
 
         class CustomNet(nn.Layer, KaimingInitMixin):
             def __init__(self, num_channels, num_classes):

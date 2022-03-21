@@ -21,7 +21,7 @@ import paddle
 import paddle.nn.functional as F
 from paddle.static import InputSpec
 import paddlers.models.ppseg as paddleseg
-import paddlers.models.seg as seg
+import paddlers.custom_models.seg as seg
 import paddlers
 from paddlers.transforms import arrange_transforms
 from paddlers.utils import get_single_card_bs, DisablePrint
