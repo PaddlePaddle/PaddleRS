@@ -49,7 +49,7 @@ PaddleRS是xxx、xxx、xxx等遥感科研院所共同基于飞桨开发的遥感
 * 如果你发现任何PaddleRS存在的问题或者是建议, 欢迎通过[GitHub Issues](https://github.com/PaddleCV-SIG/PaddleRS/issues)给我们提issues。
 * 欢迎加入PaddleRS 微信群
 <div align="center">
-<img src="./docs/images/wechat.png"  width = "200" />  
+<img src="./docs/images/wechat.jpg"  width = "200" />  
 </div>
 
 
@@ -57,54 +57,10 @@ PaddleRS是xxx、xxx、xxx等遥感科研院所共同基于飞桨开发的遥感
 
 ## 使用教程 <img src="./docs/images/teach.png" width="30"/>
 
-* [环境安装](./docs/install_cn.md)
-* [快速上手PaddleRS](./docs/whole_process_cn.md)
+* [快速上手PaddleRS](./tutorials/train/README.md)
 *  准备数据集
    * [遥感数据](./docs/data/rs_data_cn.md)
-   * [数据集说明](./docs/data/marker/marker_cn.md)
-   * [智能标注工具EISeg](./docs/data/transform/transform_cn.md)
-
-* [模型训练与评估](/docs/train/train_cn.md)
-* [预测与可视化](./docs/predict/predict_cn.md)
-
-* 模型导出
-    * [导出预测模型](./docs/model_export_cn.md)
-    * [导出ONNX模型](./docs/model_export_onnx_cn.md)
-
-* 模型压缩
-    * [量化](./docs/slim/quant/quant_cn.md)
-    * [蒸馏](./docs/slim/distill/distill_cn.md)
-    * [裁剪](./docs/slim/prune/prune_cn.md)
-
-* 模型部署
-    * [Paddle Inference部署(Python)](./docs/deployment/inference/python_inference_cn.md)
-    * [Paddle Inference部署(C++)](./docs/deployment/inference/cpp_inference_cn.md)
-    * [Paddle Lite部署](./docs/deployment/lite/lite_cn.md)
-
-
-
-*  API使用教程
-    * [API文档说明](./docs/apis/README_CN.md)
-    * [API应用案例](./docs/api_example_cn.md)
-*  重要模块说明
-    * [数据增强](./docs/module/data/data_cn.md)
-    * [Loss说明](./docs/module/loss/losses_cn.md)
-    * [工具箱使用](./docs/tools.md)
-*  二次开发教程
-    * [配置文件详解](./docs/design/use/use_cn.md)
-    * [如何创造自己的模型](./docs/design/create/add_new_model_cn.md)
-*  模型贡献
-    * [提交PR说明](./docs/pr/pr/pr_cn.md)
-    * [模型PR规范](./docs/pr/pr/style_cn.md)
-
-* [常见问题汇总](./docs/faq/faq/faq_cn.md)
-
-## 实践案例 <img src="./docs/images/anli.png" width="20"/>
-
-- [地块分割](./EISeg)
-- [舰船检测](./contrib/Matting)
-- [农作物增长预测](./contrib/PP-HumanSeg)
-- [城区变化检测](./contrib/CityscapesSOTA)
+   * [智能标注工具EISeg](https://github.com/PaddlePaddle/PaddleSeg/tree/release/2.4/EISeg)
 
 
 
