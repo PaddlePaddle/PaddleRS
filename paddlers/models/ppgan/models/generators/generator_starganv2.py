@@ -9,9 +9,8 @@ from .builder import GENERATORS
 import numpy as np
 import math
 
-from ppgan.modules.wing import CoordConvTh, ConvBlock, HourGlass, preprocess
-
-from ppgan.utils.download import get_path_from_url
+from ...modules.wing import CoordConvTh, ConvBlock, HourGlass, preprocess
+from ...utils.download import get_path_from_url
 
 FAN_WEIGHT_URL = "https://paddlegan.bj.bcebos.com/models/wing.pdparams"
 
