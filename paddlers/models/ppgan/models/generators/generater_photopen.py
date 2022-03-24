@@ -18,7 +18,7 @@ import paddle.nn as nn
 import paddle.nn.functional as F
 from paddle.nn.utils import spectral_norm
 
-from ppgan.utils.photopen import build_norm_layer, simam, Dict
+from ...utils.photopen import build_norm_layer, simam, Dict
 from .builder import GENERATORS
 
 class SPADE(nn.Layer):
