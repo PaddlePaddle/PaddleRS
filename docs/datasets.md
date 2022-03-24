@@ -23,8 +23,9 @@
 |4|land|grey|
 
 <p align="center">
- <img src="./images/dataset.png" align="middle"
+ <img src="./images/dataset.jpg" align="middle"
 </p>
+
 
 <p align='center'>
  L8 SPARCS数据集示例

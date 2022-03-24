@@ -17,18 +17,18 @@
 
 
 
-## 最新动态 <img src="./docs/images/seg_news_icon.png" width="40"/>
+## 最新动态 <img src="docs/images/seg_news_icon.png" width="30"/>
 
 * [2022-03-30] PaddleRS alpha版本发布！详细发版信息请参考[Release Note](https://github.com/PaddleCV-SIG)。
 
-
 ## 简介
+
 PaddleRS是xxx、xxx、xxx等遥感科研院所共同基于飞桨开发的遥感处理平台，支持遥感图像分类，目标检测，图像分割，以及变化检测等常用遥感任务，帮助开发者更便捷地完成从训练到部署全流程遥感深度学习应用。
 
-
 <div align="center">
-<img src="docs/images/whole_image.png"  width = "2000" />  
+<img src="docs/images/whole_image.jpg"  width = "2000" />  
 </div>
+
 
 
 ----------------
@@ -52,24 +52,23 @@ PaddleRS是xxx、xxx、xxx等遥感科研院所共同基于飞桨开发的遥感
 <img src="./docs/images/wechat.jpg"  width = "200" />  
 </div>
 
-
-
-
 ## 使用教程 <img src="./docs/images/teach.png" width="30"/>
 
 * [快速上手PaddleRS](./tutorials/train/README.md)
-*  准备数据集
+* 准备数据集
    * [遥感数据](./docs/data/rs_data_cn.md)
    * [智能标注工具EISeg](https://github.com/PaddlePaddle/PaddleSeg/tree/release/2.4/EISeg)
 
+   * [遥感数据处理脚本](./docs/tools.md)
 
 
 ## 许可证书
+
 本项目的发布受Apache 2.0 license许可认证。
 
-## 贡献说明 <img src="./docs/images/love.png" width="20"/>
-本项目的发布受Apache 2.0 license许可认证。
+## 贡献说明 <img src="./docs/images/love.png" width="30"/>
 
+本项目的发布受Apache 2.0 license许可认证。
 
 ## 学术引用 <img src="./docs/images/yinyong.png" width="30"/>
 
