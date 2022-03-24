@@ -17,9 +17,9 @@
 import paddle
 import paddle.nn as nn
 import math
-from ppgan.models.generators import StyleGANv2Generator
-from ppgan.models.discriminators.discriminator_styleganv2 import ConvLayer
-from ppgan.modules.equalized import EqualLinear
+from ...models.generators import StyleGANv2Generator
+from ...models.discriminators.discriminator_styleganv2 import ConvLayer
+from ...modules.equalized import EqualLinear
 
 class GPEN(nn.Layer):
     def __init__(
