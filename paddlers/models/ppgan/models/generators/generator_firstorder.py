@@ -7,13 +7,13 @@ import paddle
 import paddle.nn.functional as F
 from paddle import nn
 
-from ppgan.models.generators.builder import GENERATORS
+from ...models.generators.builder import GENERATORS
 from .occlusion_aware import OcclusionAwareGenerator
 from ...modules.first_order import make_coordinate_grid, ImagePyramide, detach_kp
 from ...modules.keypoint_detector import KPDetector
 
 import paddle.vision.models.vgg as vgg
-from ppgan.utils.download import get_path_from_url
+from ...utils.download import get_path_from_url
 
 
 @GENERATORS.register()
