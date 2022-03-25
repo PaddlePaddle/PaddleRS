@@ -16,7 +16,6 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-
 from .layers import Conv3x3, MaxPool2x2, ConvTransposed3x3, Identity
 from .param_init import normal_init, constant_init
 
@@ -207,7 +206,7 @@ class UNetSiamDiff(nn.Layer):
         x12d = self.do12d(self.conv12d(x1d))
         x11d = self.conv11d(x12d)
 
-        return x11d,
+        return [x11d]
 
     def init_weight(self):
         for sublayer in self.sublayers():

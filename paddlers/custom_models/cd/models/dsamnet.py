@@ -16,7 +16,6 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-
 from .layers import make_norm, Conv3x3, CBAM
 from .stanet import Backbone, Decoder
 
@@ -76,10 +75,12 @@ class DSAMNet(nn.Layer):
         out = F.interpolate(out, size=paddle.shape(t1)[2:], mode='bilinear', align_corners=True)
         pred = self.conv_out(out)
 
-        ds2 = self.dsl2(paddle.abs(f1[0]-f2[0]))
-        ds3 = self.dsl3(paddle.abs(f1[1]-f2[1]))
-
-        return pred, ds2, ds3
+        if not self.training:
+            return [pred]
+        else:
+            ds2 = self.dsl2(paddle.abs(f1[0]-f2[0]))
+            ds3 = self.dsl3(paddle.abs(f1[1]-f2[1]))
+            return [pred, ds2, ds3]
 
     def init_weight(self):
         pass

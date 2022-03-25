@@ -17,7 +17,6 @@ import paddle.nn as nn
 import paddle.nn.functional as F
 from paddle.nn.initializer import Normal
 
-
 from .backbones import resnet
 from .layers import Conv3x3, Conv1x1, get_norm_layer, Identity
 from .param_init import KaimingInitMixin
@@ -182,7 +181,7 @@ class BIT(nn.Layer):
 
         # Classifier forward
         pred = self.conv_out(y)
-        return pred,
+        return [pred]
 
     def init_weight(self):
         # Use the default initialization method.

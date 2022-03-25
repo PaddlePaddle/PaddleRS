@@ -12,11 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
-
 
 from .layers import Conv1x1, MaxPool2x2, make_norm, ChannelAttention
 from .param_init import KaimingInitMixin
@@ -116,7 +114,7 @@ class SNUNet(nn.Layer, KaimingInitMixin):
         out = self.ca_inter(out) * (out + paddle.tile(m_intra, (1,4,1,1)))
 
         pred = self.conv_out(out)
-        return pred,
+        return [pred]
 
 
 class ConvBlockNested(nn.Layer):

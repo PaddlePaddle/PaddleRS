@@ -16,7 +16,6 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-
 from .backbones import resnet
 from .layers import Conv1x1, Conv3x3, get_norm_layer, Identity
 from .param_init import KaimingInitMixin
@@ -76,7 +75,7 @@ class STANet(nn.Layer):
         y = F.interpolate(y, size=paddle.shape(t1)[2:], mode='bilinear', align_corners=True)
 
         pred = self.conv_out(y)
-        return pred,
+        return [pred]
 
     def init_weight(self):
         # Do nothing here as the encoder and decoder weights have already been initialized.

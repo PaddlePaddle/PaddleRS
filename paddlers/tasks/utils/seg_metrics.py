@@ -26,6 +26,17 @@ def loss_computation(logits_list, labels, losses):
     return loss_list
 
 
+def multitask_loss_computation(logits_list, labels_list, losses):
+    loss_list = []
+    for i in range(len(logits_list)):
+        logits = logits_list[i]
+        labels = labels_list[i]
+        loss_i = losses['types'][i]
+        loss_list.append(losses['coef'][i] * loss_i(logits, labels))
+
+    return loss_list
+
+
 def f1_score(intersect_area, pred_area, label_area):
     intersect_area = intersect_area.numpy()
     pred_area = pred_area.numpy()

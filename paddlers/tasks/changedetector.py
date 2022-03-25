@@ -14,24 +14,38 @@
 
 import math
 import os.path as osp
-import numpy as np
-import cv2
 from collections import OrderedDict
+from operator import attrgetter
+
+import cv2
+import numpy as np
 import paddle
 import paddle.nn.functional as F
 from paddle.static import InputSpec
-import paddlers.models.ppseg as paddleseg
+
 import paddlers
-from paddlers.transforms import arrange_transforms
-from paddlers.utils import get_single_card_bs, DisablePrint
+import paddlers.custom_models.cd as cd
 import paddlers.utils.logging as logging
+import paddlers.models.ppseg as paddleseg
+from paddlers.transforms import arrange_transforms
+from paddlers.transforms import ImgDecoder, Resize
+from paddlers.utils import get_single_card_bs, DisablePrint
+from paddlers.utils.checkpoint import seg_pretrain_weights_dict
 from .base import BaseModel
 from .utils import seg_metrics as metrics
-from paddlers.utils.checkpoint import seg_pretrain_weights_dict
-from paddlers.transforms import ImgDecoder, Resize
-import paddlers.custom_models.cd as cd
 
-__all__ = ["CDNet", "UNetEarlyFusion", "UNetSiamConc", "UNetSiamDiff", "STANet", "BIT", "SNUNet", "DSIFN", "DSAMNet"]
+
+__all__ = [
+    "CDNet", 
+    "UNetEarlyFusion", 
+    "UNetSiamConc", 
+    "UNetSiamDiff", 
+    "STANet", 
+    "BIT", 
+    "SNUNet", 
+    "DSIFN", 
+    "DSAMNet"
+]
 
 
 class BaseChangeDetector(BaseModel):
@@ -143,8 +157,16 @@ class BaseChangeDetector(BaseModel):
             outputs['conf_mat'] = metrics.confusion_matrix(pred, label,
                                                            self.num_classes)
         if mode == 'train':
-            loss_list = metrics.loss_computation(
-                logits_list=net_out, labels=inputs[2], losses=self.losses)
+            if hasattr(net, 'USE_MULTITASK_DECODER') and net.USE_MULTITASK_DECODER is True:
+                # CD+Seg
+                if len(inputs) != 5:
+                    raise ValueError("Cannot perform loss computation with {} inputs.".format(len(inputs)))
+                labels_list = [inputs[2+idx] for idx in map(attrgetter('value'), net.OUT_TYPES)]
+                loss_list = metrics.multitask_loss_computation(
+                    logits_list=net_out, labels_list=labels_list, losses=self.losses)
+            else:
+                loss_list = metrics.loss_computation(
+                    logits_list=net_out, labels=inputs[2], losses=self.losses)
             loss = sum(loss_list)
             outputs['loss'] = loss
         return outputs
@@ -798,7 +820,7 @@ class SNUNet(BaseChangeDetector):
 class DSIFN(BaseChangeDetector):
     def __init__(self,
                  num_classes=2,
-                 use_mixed_loss=None,
+                 use_mixed_loss=False,
                  use_dropout=False,
                  **params):
         params.update({
@@ -809,21 +831,22 @@ class DSIFN(BaseChangeDetector):
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
             **params)
-        # HACK: currently the only legal value of `use_mixed_loss` is None, in which case the loss specifications are
-        # constructed automatically.
-        assert use_mixed_loss is None
-        if use_mixed_loss is None:
-            self.losses = {
+
+    def default_loss(self):
+        if self.use_mixed_loss is False:
+            return {
                 # XXX: make sure the shallow copy works correctly here.
                 'types': [paddleseg.models.CrossEntropyLoss()]*5,
                 'coef': [1.0]*5
             }
+        else:
+            return super().default_loss()
 
 
 class DSAMNet(BaseChangeDetector):
     def __init__(self,
                  num_classes=2,
-                 use_mixed_loss=None,
+                 use_mixed_loss=False,
                  in_channels=3,
                  ca_ratio=8,
                  sa_kernel=7,
@@ -838,11 +861,10 @@ class DSAMNet(BaseChangeDetector):
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
             **params)
-        # HACK: currently the only legal value of `use_mixed_loss` is None, in which case the loss specifications are
-        # constructed automatically.
-        assert use_mixed_loss is None
-        if use_mixed_loss is None:
-            self.losses = {
+
+    def default_loss(self):
+        if self.use_mixed_loss is False:
+            return {
                 'types': [
                     paddleseg.models.CrossEntropyLoss(), 
                     paddleseg.models.DiceLoss(), 
@@ -850,3 +872,5 @@ class DSAMNet(BaseChangeDetector):
                 ],
                 'coef': [1.0, 0.05, 0.05]
             }
+        else:
+            return super().default_loss()

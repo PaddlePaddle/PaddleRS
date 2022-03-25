@@ -16,7 +16,6 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-
 from .blocks import Conv1x1, BasicConv
 
 
