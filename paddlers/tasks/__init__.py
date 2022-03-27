@@ -17,3 +17,4 @@ from .segmenter import *
 from .changedetector import *
 from .classifier import *
 from .load_model import load_model
+from .imagerestorer import *
