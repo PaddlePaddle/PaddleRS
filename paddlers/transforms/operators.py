@@ -39,7 +39,9 @@ __all__ = [
     "RandomResizeByShort", "ResizeByLong", "RandomHorizontalFlip",
     "RandomVerticalFlip", "Normalize", "CenterCrop", "RandomCrop",
     "RandomScaleAspect", "RandomExpand", "Padding", "MixupImage",
-    "RandomDistort", "RandomBlur", "ArrangeSegmenter", "ArrangeChangeDetector", 
+    "RandomDistort", "RandomBlur", 
+    "RandomSwap",
+    "ArrangeSegmenter", "ArrangeChangeDetector", 
     "ArrangeClassifier", "ArrangeDetector"
 ]
 
@@ -1461,6 +1463,26 @@ class _Permute(Transform):
         sample['image'] = permute(sample['image'], False)
         if 'image2' in sample:
             sample['image2'] = permute(sample['image2'], False)
+        return sample
+        
+
+class RandomSwap(Transform):
+    """
+    Randomly swap multi-temporal images.
+
+    Args:
+        prob (float, optional): Probability of swapping the input images. Default: 0.2.
+    """
+
+    def __init__(self, prob=0.2):
+        super(RandomSwap, self).__init__()
+        self.prob = prob
+
+    def apply(self, sample):
+        if 'image2' not in sample:
+            raise ValueError('image2 is not found in the sample.')
+        if random.random() < self.prob:
+            sample['image'], sample['image2'] = sample['image2'], sample['image']
         return sample
 
 
