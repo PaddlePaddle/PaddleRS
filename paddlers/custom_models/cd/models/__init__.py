@@ -18,6 +18,7 @@ from .dsifn import DSIFN
 from .stanet import STANet
 from .snunet import SNUNet
 from .dsamnet import DSAMNet
+from .changestar import ChangeStar
 from .unet_ef import UNetEarlyFusion
 from .unet_siamconc import UNetSiamConc
 from .unet_siamdiff import UNetSiamDiff

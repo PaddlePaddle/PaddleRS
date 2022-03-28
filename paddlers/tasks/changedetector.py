@@ -44,6 +44,8 @@ __all__ = [
     "BIT", 
     "SNUNet", 
     "DSIFN", 
+    "DSAMNet", 
+    "ChangeStar"
     "DSAMNet"
 ]
 
@@ -871,6 +873,38 @@ class DSAMNet(BaseChangeDetector):
                     paddleseg.models.DiceLoss()
                 ],
                 'coef': [1.0, 0.05, 0.05]
+            }
+        else:
+            return super().default_loss()
+
+
+class ChangeStar(BaseChangeDetector):
+    def __init__(self,
+                 num_classes=2,
+                 use_mixed_loss=False,
+                 mid_channels=256,
+                 inner_channels=16,
+                 num_convs=4,
+                 scale_factor=4.0,
+                 **params):
+        params.update({
+            'mid_channels': mid_channels,
+            'inner_channels': inner_channels,
+            'num_convs': num_convs,
+            'scale_factor': scale_factor
+        })
+        super(ChangeStar, self).__init__(
+            model_name='ChangeStar',
+            num_classes=num_classes,
+            use_mixed_loss=use_mixed_loss,
+            **params)
+
+    def default_loss(self):
+        if self.use_mixed_loss is False:
+            return {
+                # XXX: make sure the shallow copy works correctly here.
+                'types': [paddleseg.models.CrossEntropyLoss()]*4,
+                'coef': [1.0]*4
             }
         else:
             return super().default_loss()
