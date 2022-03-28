@@ -116,7 +116,7 @@ class MPRPredictor(BasePredictor):
         for image_file in tqdm(image_files):
             img = self.read_image(image_file)
             image_name = os.path.basename(image_file)
-            img.save(os.path.join(task_path, image_name))
+            # img.save(os.path.join(task_path, image_name))
             tmps = image_name.split('.')
             assert len(
                 tmps) == 2, f'Invalid image name: {image_name}, too much "."'
