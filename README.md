@@ -1,4 +1,4 @@
-# PaddleRS
+简体中文 | [English](README_EN.md)
 
 <div align="center">
 
@@ -29,9 +29,6 @@ PaddleRS是xxx、xxx、xxx等遥感科研院所共同基于飞桨开发的遥感
 <img src="docs/images/whole_image.jpg"  width = "2000" />  
 </div>
 
-
-
-----------------
 ## 特性 <img src="./docs/images/feature.png" width="30"/>
 
 
@@ -42,8 +39,6 @@ PaddleRS是xxx、xxx、xxx等遥感科研院所共同基于飞桨开发的遥感
 
 * <img src="./docs/images/f3.png" width="20"/> **高性能**：支持多进程异步I/O、多卡并行训练、评估等加速策略，结合飞桨核心框架的显存优化功能，可大幅度减少分割模型的训练开销，让开发者更低成本、更高效地完成图像遥感图像的开发和训练。
 
-----------
-
 ## 技术交流 <img src="./docs/images/chat.png" width="30"/>
 
 * 如果你发现任何PaddleRS存在的问题或者是建议, 欢迎通过[GitHub Issues](https://github.com/PaddleCV-SIG/PaddleRS/issues)给我们提issues。
@@ -52,15 +47,41 @@ PaddleRS是xxx、xxx、xxx等遥感科研院所共同基于飞桨开发的遥感
 <img src="./docs/images/wechat.jpg"  width = "200" />  
 </div>
 
+## 产品总览<img src="./docs/images/model.png" width="30"/>
+
+### 代码结构
+
+这部分将展示PaddleRS的文件结构全貌。文件树如下：
+
+```
+├── deploy               # 部署相关的文档和脚本
+├── docs                 # 整个项目文档及图片
+├── paddlers  
+│     ├── custom_models  # 自定义网络模型代码
+│     ├── datasets       # 数据加载相关代码
+│     ├── models         # 套件网络模型代码
+│     ├── tasks          # 相关任务代码
+│     ├── tools          # 相关脚本
+│     ├── transforms     # 数据处理及增强相关代码
+│     └── utils          # 各种实用程序文件
+├── tools                # 用于处理遥感数据的脚本
+└── tutorials
+      └── train          # 训练教程
+```
+
 ## 使用教程 <img src="./docs/images/teach.png" width="30"/>
 
 * [快速上手PaddleRS](./tutorials/train/README.md)
 * 准备数据集
    * [遥感数据](./docs/data/rs_data_cn.md)
    * [智能标注工具EISeg](https://github.com/PaddlePaddle/PaddleSeg/tree/release/2.4/EISeg)
-
-   * [遥感数据处理脚本](./docs/tools.md)
-
+   * [遥感数据处理脚本](./docs/data/tools.md)
+* APIs
+   * [模型库](./docs/apis/model_zoo.md)
+   * [数据增强](./docs/apis/transforms.md)
+* 模型训练
+* 推理部署
+* 应用案例
 
 ## 许可证书
 
@@ -68,26 +89,17 @@ PaddleRS是xxx、xxx、xxx等遥感科研院所共同基于飞桨开发的遥感
 
 ## 贡献说明 <img src="./docs/images/love.png" width="30"/>
 
-本项目的发布受Apache 2.0 license许可认证。
+我们非常欢迎你可以为PaddleRS提供代码，也十分感谢你的反馈。代码注释规范请参考[PaddleRS代码注释规范](https://github.com/PaddleCV-SIG/PaddleRS/wiki/PaddleRS代码注释规范)。
 
 ## 学术引用 <img src="./docs/images/yinyong.png" width="30"/>
 
 如果我们的项目在学术上帮助到你，请考虑以下引用：
 
 ```latex
-@misc{liu2021paddleseg,
-      title={PaddleSeg: A High-Efficient Development Toolkit for Image Segmentation},
-      author={Yi Liu and Lutao Chu and Guowei Chen and Zewu Wu and Zeyu Chen and Baohua Lai and Yuying Hao},
-      year={2021},
-      eprint={2101.06175},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV}
-}
-
-@misc{paddleseg2019,
-    title={PaddleSeg, End-to-end image segmentation kit based on PaddlePaddle},
+@misc{paddlers2022,
+    title={PaddleRS, Awesome Remote Sensing Toolkit based on PaddlePaddle},
     author={PaddlePaddle Authors},
-    howpublished = {\url{https://github.com/PaddlePaddle/PaddleSeg}},
-    year={2019}
+    howpublished = {\url{https://github.com/PaddleCV-SIG/PaddleRS}},
+    year={2022}
 }
 ```
