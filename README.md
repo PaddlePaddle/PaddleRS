@@ -32,22 +32,143 @@ PaddleRS是xxx、xxx、xxx等遥感科研院所共同基于飞桨开发的遥感
 ## 特性 <img src="./docs/images/feature.png" width="30"/>
 
 
-* <img src="./docs/images/f1.png" width="20"/> **特有的遥感数据处理模块**：针对遥感行业数据特点，提供了大尺幅数据切片与拼接，支持读取`tif`, `png`, `jpeg`, `bmp`, `img`, `npy`.
-等格式，支持地理信息保存和超分辨率。
+* <img src="./docs/images/f1.png" width="20"/> **特有的遥感数据处理模块**：针对遥感行业数据特点，提供了大尺幅数据切片与拼接，支持读取`tif`、`png`、 `jpeg`、 `bmp`、 `img`以及 `npy`等格式，支持地理信息保存和超分辨率。
 
 * <img src="./docs/images/f2.png" width="20"/> **覆盖任务广**：支持目标检测、图像分割、变化检测、参数反演等多种任务
 
 * <img src="./docs/images/f3.png" width="20"/> **高性能**：支持多进程异步I/O、多卡并行训练、评估等加速策略，结合飞桨核心框架的显存优化功能，可大幅度减少分割模型的训练开销，让开发者更低成本、更高效地完成图像遥感图像的开发和训练。
 
-## 技术交流 <img src="./docs/images/chat.png" width="30"/>
+## 产品矩阵<img src="./docs/images/model.png" width="30"/>
 
-* 如果你发现任何PaddleRS存在的问题或者是建议, 欢迎通过[GitHub Issues](https://github.com/PaddleCV-SIG/PaddleRS/issues)给我们提issues。
-* 欢迎加入PaddleRS 微信群
-<div align="center">
-<img src="./docs/images/wechat.jpg"  width = "200" />  
-</div>
-
-## 产品总览<img src="./docs/images/model.png" width="30"/>
+<table align="center">
+  <tbody>
+    <tr align="center" valign="bottom">
+      <td>
+        <b>模型总览</b>
+      </td>
+      <td>
+        <b>数据增强</b>
+      </td>
+      <td>
+        <b>遥感工具</b>
+      </td>
+      <td>
+        <b>实践案例</b>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td>
+        <b>场景分类</b><br>
+        <ul>
+          <li>ResNet</li>
+          <li>MobileNet</li>
+          <li>PPLCNet</li>
+          <li>...</li>
+        </ul>
+        <b>语义分割</b><br>
+        <ul>
+          <li>OCRNet</li>
+          <li>U-Net</li>
+          <li>SegFormer</li>
+          <li>...</li>
+        </ul>
+        <b>目标检测</b><br>
+        <ul>
+          <li>PP-YOLO</li>
+          <li>Faster RCNN</li>
+          <li>FCOS</li>
+          <li>...</li>
+        </ul>
+        <b>超分/去噪</b><br>
+        <ul>
+          <li>RealSR</li>
+          <li>ESRGAN</li>
+          <li>LESRCNN</li>
+          <li>...</li>
+        </ul>
+        <b>变化检测与自定义</b><br>
+        <ul>
+          <li>FarSeg</li>
+          <li>BIT</li>
+          <li>DSIFN</li>
+          <li>STANet</li>
+          <li>SNUNet</li>
+          <li>DSAMNet</li>
+          <li>UNetSiamDiff</li>
+          <li>...</li>
+        </ul>
+      </td>
+      <td>
+        <b>数据增强</b><br>
+        <ul>
+          <li>Resize</li>  
+          <li>RandomResize</li>  
+          <li>ResizeByShort</li>
+          <li>RandomResizeByShort</li>
+          <li>ResizeByLong</li>  
+          <li>RandomHorizontalFlip</li>  
+          <li>RandomVerticalFlip</li>
+          <li>Normalize</li>
+          <li>CenterCrop</li>
+          <li>RandomCrop</li>
+          <li>RandomScaleAspect</li>  
+          <li>RandomExpand</li>
+          <li>Padding</li>
+          <li>MixupImage</li>  
+          <li>RandomDistort</li>  
+          <li>RandomBlur</li>  
+          <li>Defogging</li>  
+          <li>DimReducing</li>  
+          <li>BandSelecting</li>  
+          <li>RandomSwap</li>
+          <li>...</li>
+        </ul>  
+      </td>
+      <td>
+        <b>数据格式转换</b><br>
+        <ul>
+          <li>geojson to mask</li>
+          <li>mask to shpfile</li>
+          <li>...</li>
+        </ul>
+        <b>数据预处理</b><br>
+        <ul>
+          <li>data split</li>
+          <li>images match</li>
+          <li>bands select</li>
+          <li>...</li>
+        </ul>
+      </td>>
+      <td>
+        <b>遥感场景分类</b><br>
+        <ul>
+          <li>待更</li>
+          <li>...</li>
+        </ul>
+        <b>遥感语义分割</b><br>
+        <ul>
+          <li>待更</li>
+          <li>...</li>
+        </ul>
+        <b>遥感目标检测</b><br>
+        <ul>
+          <li>待更</li>
+          <li>...</li>
+        </ul>
+        <b>遥感变化检测</b><br>
+        <ul>
+          <li>待更</li>
+          <li>...</li>
+        </ul>
+        <b>遥感影像超分</b><br>
+        <ul>
+          <li>待更</li>
+          <li>...</li>
+        </ul>
+      </td>  
+    </tr>
+  </tbody>
+</table>
 
 ### 代码结构
 
@@ -69,6 +190,13 @@ PaddleRS是xxx、xxx、xxx等遥感科研院所共同基于飞桨开发的遥感
       └── train          # 训练教程
 ```
 
+## 技术交流 <img src="./docs/images/chat.png" width="30"/>
+
+* 如果你发现任何PaddleRS存在的问题或者是建议, 欢迎通过[GitHub Issues](https://github.com/PaddleCV-SIG/PaddleRS/issues)给我们提issues。
+* 欢迎加入PaddleRS 微信群
+<div align="center">
+<img src="./docs/images/wechat.jpg"  width = "200" />  
+</div>
 ## 使用教程 <img src="./docs/images/teach.png" width="30"/>
 
 * [快速上手PaddleRS](./tutorials/train/README.md)
