@@ -206,6 +206,7 @@ def to_uint8(im):
     Returns:
         np.ndarray: Image on uint8.
     """
+
     # 2% linear stretch
     def _two_percentLinear(image, max_out=255, min_out=0):
         def _gray_process(gray, maxout=max_out, minout=min_out):
@@ -216,6 +217,7 @@ def to_uint8(im):
             processed_gray = ((truncated_gray - low_value) / (high_value - low_value)) * \
                              (maxout - minout)
             return processed_gray
+
         if len(image.shape) == 3:
             processes = []
             for b in range(image.shape[-1]):
@@ -244,7 +246,7 @@ def to_uint8(im):
         lut = []
         for bt in range(0, len(hist), NUMS):
             # step size
-            step = reduce(operator.add, hist[bt : bt + NUMS]) / (NUMS - 1)
+            step = reduce(operator.add, hist[bt:bt + NUMS]) / (NUMS - 1)
             # create balanced lookup table
             n = 0
             for i in range(NUMS):
@@ -301,14 +303,18 @@ def select_bands(im, band_list=[1, 2, 3]):
     Returns:
         np.ndarray: The image after band selected.
     """
+    if len(im.shape) == 2:  # just have one channel
+        return im
+    if not isinstance(band_list, list) or len(band_list) == 0:
+        raise TypeError("band_list must be non empty list.")
     total_band = im.shape[-1]
     result = []
     for band in band_list:
         band = int(band - 1)
         if band < 0 or band >= total_band:
-            raise ValueError(
-                "The element in band_list must > 1 and <= {}.".format(str(total_band)))
-        result.append()
+            raise ValueError("The element in band_list must > 1 and <= {}.".
+                             format(str(total_band)))
+        result.append(im[:, :, band])
     ima = np.stack(result, axis=0)
     return ima
 
@@ -323,6 +329,7 @@ def de_haze(im, gamma=False):
     Returns:
         np.ndarray: The image after defogged.
     """
+
     def _guided_filter(I, p, r, eps):
         m_I = cv2.boxFilter(I, -1, (r, r))
         m_p = cv2.boxFilter(p, -1, (r, r))
@@ -350,16 +357,17 @@ def de_haze(im, gamma=False):
         atmo_illum = np.mean(im, 2)[atmo_mask >= ht[1][lmax]].max()
         atmo_mask = np.minimum(atmo_mask * w, maxatmo_mask)
         return atmo_mask, atmo_illum
-        
+
     if np.max(im) > 1:
         im = im / 255.
     result = np.zeros(im.shape)
-    mask_img, atmo_illum = _de_fog(im, r=81, w=0.95, maxatmo_mask=0.80, eps=1e-8)
+    mask_img, atmo_illum = _de_fog(
+        im, r=81, w=0.95, maxatmo_mask=0.80, eps=1e-8)
     for k in range(3):
         result[:, :, k] = (im[:, :, k] - mask_img) / (1 - mask_img / atmo_illum)
     result = np.clip(result, 0, 1)
     if gamma:
-        result = result ** (np.log(0.5) / np.log(result.mean()))
+        result = result**(np.log(0.5) / np.log(result.mean()))
     return (result * 255).astype("uint8")
 
 
@@ -398,7 +406,8 @@ def match_histograms(im, ref):
         ValueError: When the number of channels of `ref` differs from that of im`.
     """
     # TODO: Check the data types of the inputs to see if they are supported by skimage
-    return exposure.match_histograms(im, ref, channel_axis=-1 if im.ndim>2 else None)
+    return exposure.match_histograms(
+        im, ref, channel_axis=-1 if im.ndim > 2 else None)
 
 
 def match_by_regression(im, ref, pif_loc=None):
@@ -418,27 +427,29 @@ def match_by_regression(im, ref, pif_loc=None):
     Raises:
         ValueError: When the shape of `ref` differs from that of `im`.
     """
+
     def _linear_regress(im, ref, loc):
         regressor = LinearRegression()
         if loc is not None:
             x, y = im[loc], ref[loc]
         else:
             x, y = im, ref
-        x, y = x.reshape(-1,1), y.ravel()
+        x, y = x.reshape(-1, 1), y.ravel()
         regressor.fit(x, y)
-        matched = regressor.predict(im.reshape(-1,1))
+        matched = regressor.predict(im.reshape(-1, 1))
         return matched.reshape(im.shape)
 
     if im.shape != ref.shape:
-        raise  ValueError("Image and Reference must have the same shape!")
+        raise ValueError("Image and Reference must have the same shape!")
 
     if im.ndim > 2:
         # Multiple channels
         matched = np.empty(im.shape, dtype=im.dtype)
         for ch in range(im.shape[-1]):
-            matched[..., ch] = _linear_regress(im[..., ch], ref[..., ch], pif_loc)
+            matched[..., ch] = _linear_regress(im[..., ch], ref[..., ch],
+                                               pif_loc)
     else:
         # Single channel
         matched = _linear_regress(im, ref, pif_loc).astype(im.dtype)
-    
+
     return matched
