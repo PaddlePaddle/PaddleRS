@@ -1,21 +1,18 @@
 简体中文 | [English](README_EN.md)
 
 <div align="center">
-
-<p align="center">
-  <img src="./docs/images/logo.png" align="middle" width = "500" />
-</p>
+  <p align="center">
+    <img src="./docs/images/logo.png" align="middle" width = "500" />
+  </p>
+</div>
 
 **飞桨高性能遥感图像处理开发套件，端到端地完成从训练到部署的全流程遥感深度学习应用。**
 
-<!-- [![Build Status](https://travis-ci.org/PaddlePaddle/PaddleSeg.svg?branch=release/2.1)](https://travis-ci.org/PaddlePaddle/PaddleSeg) -->
-<!-- [![Version](https://img.shields.io/github/release/PaddlePaddle/PaddleSeg.svg)](https://github.com/PaddlePaddle/PaddleSeg/releases) -->
+<!-- [![Build Status](https://travis-ci.org/PaddleCV-SIG/PaddleRS.svg?branch=release/0.1)](https://travis-ci.org/PaddleCV-SIG/PaddleRS) -->
+<!-- [![Version](https://img.shields.io/github/release/PaddleCV-SIG/PaddleRS.svg)](https://github.com/PaddleCV-SIG/PaddleRS/releases) -->
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](LICENSE)
 ![python version](https://img.shields.io/badge/python-3.6+-orange.svg)
 ![support os](https://img.shields.io/badge/os-linux%2C%20win%2C%20mac-yellow.svg)
-</div>
-
-
 
 ## 最新动态 <img src="docs/images/seg_news_icon.png" width="30"/>
 
@@ -30,7 +27,6 @@ PaddleRS是xxx、xxx、xxx等遥感科研院所共同基于飞桨开发的遥感
 </div>
 
 ## 特性 <img src="./docs/images/feature.png" width="30"/>
-
 
 * <img src="./docs/images/f1.png" width="20"/> **特有的遥感数据处理模块**：针对遥感行业数据特点，提供了大尺幅数据切片与拼接，支持读取`tif`、`png`、 `jpeg`、 `bmp`、 `img`以及 `npy`等格式，支持地理信息保存和超分辨率。
 
@@ -138,7 +134,7 @@ PaddleRS是xxx、xxx、xxx等遥感科研院所共同基于飞桨开发的遥感
           <li>bands select</li>
           <li>...</li>
         </ul>
-      </td>>
+      </td>
       <td>
         <b>遥感场景分类</b><br>
         <ul>
@@ -197,6 +193,7 @@ PaddleRS是xxx、xxx、xxx等遥感科研院所共同基于飞桨开发的遥感
 <div align="center">
 <img src="./docs/images/wechat.jpg"  width = "200" />  
 </div>
+
 ## 使用教程 <img src="./docs/images/teach.png" width="30"/>
 
 * [快速上手PaddleRS](./tutorials/train/README.md)
