@@ -59,39 +59,30 @@ PaddleRS是xxx、xxx、xxx等遥感科研院所共同基于飞桨开发的遥感
           <li>ResNet</li>
           <li>MobileNet</li>
           <li>PPLCNet</li>
-          <li>...</li>
         </ul>
         <b>语义分割</b><br>
         <ul>
           <li>OCRNet</li>
-          <li>U-Net</li>
+          <li>FarSeg</li>
           <li>SegFormer</li>
-          <li>...</li>
         </ul>
         <b>目标检测</b><br>
         <ul>
           <li>PP-YOLO</li>
           <li>Faster RCNN</li>
           <li>FCOS</li>
-          <li>...</li>
         </ul>
         <b>超分/去噪</b><br>
         <ul>
           <li>RealSR</li>
           <li>ESRGAN</li>
           <li>LESRCNN</li>
-          <li>...</li>
         </ul>
-        <b>变化检测与自定义</b><br>
+        <b>变化检测</b><br>
         <ul>
-          <li>FarSeg</li>
-          <li>BIT</li>
           <li>DSIFN</li>
           <li>STANet</li>
-          <li>SNUNet</li>
-          <li>DSAMNet</li>
           <li>UNetSiamDiff</li>
-          <li>...</li>
         </ul>
       </td>
       <td>
@@ -117,7 +108,6 @@ PaddleRS是xxx、xxx、xxx等遥感科研院所共同基于飞桨开发的遥感
           <li>DimReducing</li>  
           <li>BandSelecting</li>  
           <li>RandomSwap</li>
-          <li>...</li>
         </ul>  
       </td>
       <td>
@@ -125,46 +115,40 @@ PaddleRS是xxx、xxx、xxx等遥感科研院所共同基于飞桨开发的遥感
         <ul>
           <li>geojson to mask</li>
           <li>mask to shpfile</li>
-          <li>...</li>
         </ul>
         <b>数据预处理</b><br>
         <ul>
           <li>data split</li>
           <li>images match</li>
           <li>bands select</li>
-          <li>...</li>
         </ul>
       </td>
       <td>
         <b>遥感场景分类</b><br>
         <ul>
           <li>待更</li>
-          <li>...</li>
         </ul>
         <b>遥感语义分割</b><br>
         <ul>
           <li>待更</li>
-          <li>...</li>
         </ul>
         <b>遥感目标检测</b><br>
         <ul>
           <li>待更</li>
-          <li>...</li>
         </ul>
         <b>遥感变化检测</b><br>
         <ul>
           <li>待更</li>
-          <li>...</li>
         </ul>
         <b>遥感影像超分</b><br>
         <ul>
           <li>待更</li>
-          <li>...</li>
         </ul>
       </td>  
     </tr>
   </tbody>
 </table>
+
 
 ### 代码结构
 
