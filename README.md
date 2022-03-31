@@ -58,25 +58,25 @@ PaddleRS是xxx、xxx、xxx等遥感科研院所共同基于飞桨开发的遥感
         <ul>
           <li>ResNet</li>
           <li>MobileNet</li>
-          <li>PPLCNet</li>
+          <li>HRNet</li>
         </ul>
         <b>语义分割</b><br>
         <ul>
-          <li>OCRNet</li>
+          <li>UNet</li>
           <li>FarSeg</li>
-          <li>SegFormer</li>
+          <li>DeepLabV3P</li>
         </ul>
         <b>目标检测</b><br>
         <ul>
           <li>PP-YOLO</li>
           <li>Faster RCNN</li>
-          <li>FCOS</li>
+          <li>PicoDet</li>
         </ul>
         <b>超分/去噪</b><br>
         <ul>
-          <li>RealSR</li>
-          <li>ESRGAN</li>
-          <li>LESRCNN</li>
+          <li>DRNet</li>
+          <li>LESRCNNet</li>
+          <li>ESRGANet</li>
         </ul>
         <b>变化检测</b><br>
         <ul>
