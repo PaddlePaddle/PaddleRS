@@ -12,9 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
-import os.path as osp
-sys.path.insert(0, osp.abspath(".."))  # add workspace
+import time
 
-from .raster import Raster, raster2uint8
-from .timer import Timer
+
+class Timer(object):
+    def __init__(self, func):
+        self.func = func
+
+    def __call__(self, *args, **kwds):
+        start_time = time.time()
+        func_t = self.func(*args, **kwds)
+        print("Total time: {0}.".format(time.time() - start_time))
+        return func_t

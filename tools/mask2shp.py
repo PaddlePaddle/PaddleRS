@@ -17,7 +17,7 @@ import os.path as osp
 import numpy as np
 import argparse
 from PIL import Image
-from utils import Raster
+from utils import Raster, Timer
 
 try:
     from osgeo import gdal, ogr, osr
@@ -54,7 +54,8 @@ def _polygonize_raster(mask_path, shp_save_path, proj, geot, ignore_index):
         os.remove(shp_save_path)
     dst_ds = drv.CreateDataSource(shp_save_path)
     prosrs = osr.SpatialReference(wkt=ds.GetProjection())
-    dst_layer = dst_ds.CreateLayer("Building boundary", geom_type=ogr.wkbPolygon, srs=prosrs)
+    dst_layer = dst_ds.CreateLayer(
+        "Building boundary", geom_type=ogr.wkbPolygon, srs=prosrs)
     dst_fieldname = "DN"
     fd = ogr.FieldDefn(dst_fieldname, ogr.OFTInteger)
     dst_layer.CreateField(fd)
@@ -68,6 +69,7 @@ def _polygonize_raster(mask_path, shp_save_path, proj, geot, ignore_index):
     os.remove(tmp_path)
 
 
+@Timer
 def raster2shp(srcimg_path, mask_path, save_path, ignore_index=255):
     src = Raster(srcimg_path)
     _polygonize_raster(mask_path, save_path, src.proj, src.geot, ignore_index)
@@ -84,7 +86,7 @@ parser.add_argument("--save_path", type=str, default="output", \
 parser.add_argument("--ignore_index", type=int, default=255, \
                     help="It will not be converted to the value of SHP, `255` is the default.")
 
-
 if __name__ == "__main__":
     args = parser.parse_args()
-    raster2shp(args.srcimg_path, args.mask_path, args.save_path, args.ignore_index)
+    raster2shp(args.srcimg_path, args.mask_path, args.save_path,
+               args.ignore_index)

@@ -23,6 +23,7 @@ import glob
 from tqdm import tqdm
 from PIL import Image
 from collections import defaultdict
+from utils import Timer
 
 
 def _mkdir_p(path):
@@ -34,9 +35,9 @@ def _save_palette(label, save_path):
     bin_colormap = np.ones((256, 3)) * 255
     bin_colormap[0, :] = [0, 0, 0]
     bin_colormap = bin_colormap.astype(np.uint8)
-    visualimg  = Image.fromarray(label, "P")
+    visualimg = Image.fromarray(label, "P")
     palette = bin_colormap
-    visualimg.putpalette(palette) 
+    visualimg.putpalette(palette)
     visualimg.save(save_path, format='PNG')
 
 
@@ -44,7 +45,8 @@ def _save_mask(annotation, image_size, save_path):
     mask = np.zeros(image_size, dtype=np.int32)
     for contour_points in annotation:
         contour_points = np.array(contour_points).reshape((-1, 2))
-        contour_points = np.round(contour_points).astype(np.int32)[np.newaxis, :]
+        contour_points = np.round(contour_points).astype(np.int32)[
+            np.newaxis, :]
         cv2.fillPoly(mask, contour_points, 1)
     _save_palette(mask.astype("uint8"), save_path)
 
@@ -65,6 +67,7 @@ def _read_geojson(json_path):
         return annotations, sizes
 
 
+@Timer
 def convert_data(raw_folder, end_folder):
     print("-- Initializing --")
     img_folder = osp.join(raw_folder, "images")
@@ -83,7 +86,7 @@ def convert_data(raw_folder, end_folder):
         sizes.update(j_size)
     print("-- Converting datas --")
     for k in tqdm(names):
-    # for k in tqdm(anns.keys()):
+        # for k in tqdm(anns.keys()):
         img_path = osp.join(img_folder, k)
         img_save_path = osp.join(save_img_folder, k)
         ext = "." + k.split(".")[-1]
@@ -101,7 +104,6 @@ parser.add_argument("--raw_folder", type=str, required=True, \
                     help="The folder path about original data, where `images` saves the original image, `annotation.json` saves the corresponding annotation information.")
 parser.add_argument("--save_folder", type=str, required=True, \
                     help="The folder path to save the results, where `img` saves the image and `gt` saves the label.")
-
 
 if __name__ == "__main__":
     args = parser.parse_args()
