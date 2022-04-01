@@ -75,8 +75,8 @@ class PKSampler(DistributedBatchSampler):
                 logger.error("PKSampler prob list error")
             else:
                 logger.info(
-                    "PKSampler: sum of prob list not equal to 1, diff is {}, change the last prob".format(diff)
-                )
+                    "PKSampler: sum of prob list not equal to 1, diff is {}, change the last prob".
+                    format(diff))
 
     def __iter__(self):
         label_per_batch = self.batch_size // self.sample_per_label

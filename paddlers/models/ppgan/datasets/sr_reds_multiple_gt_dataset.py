@@ -43,6 +43,7 @@ class SRREDSMultipleGTDataset(Dataset):
         test_mode (bool): Store `True` when building test dataset.
             Default: `False`.
     """
+
     def __init__(self,
                  mode,
                  lq_folder,
@@ -130,10 +131,11 @@ class SRREDSMultipleGTDataset(Dataset):
                         mode='train'):
         video_name = item.split('_')[0]
         frame_name = item.split('_')[1]
-        frame_idxs = self.get_neighbor_frames(frame_name,
-                                              number_frames=number_frames,
-                                              interval_list=interval_list,
-                                              random_reverse=random_reverse)
+        frame_idxs = self.get_neighbor_frames(
+            frame_name,
+            number_frames=number_frames,
+            interval_list=interval_list,
+            random_reverse=random_reverse)
 
         frame_list = []
         gt_list = []
@@ -157,8 +159,8 @@ class SRREDSMultipleGTDataset(Dataset):
             ]
             rnd_h_HR, rnd_w_HR = int(rnd_h * scale), int(rnd_w * scale)
             gt_list = [
-                v[rnd_h_HR:rnd_h_HR + crop_size,
-                  rnd_w_HR:rnd_w_HR + crop_size, :] for v in gt_list
+                v[rnd_h_HR:rnd_h_HR + crop_size, rnd_w_HR:rnd_w_HR +
+                  crop_size, :] for v in gt_list
             ]
 
         # add random flip and rotation

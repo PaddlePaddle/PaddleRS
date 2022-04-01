@@ -81,8 +81,7 @@ class HungarianMatcher(nn.Layer):
         # We flatten to compute the cost matrices in a batch
         # [batch_size * num_queries, num_classes]
         out_prob = F.sigmoid(logits.flatten(
-            0, 1)) if self.use_focal_loss else F.softmax(
-                logits.flatten(0, 1))
+            0, 1)) if self.use_focal_loss else F.softmax(logits.flatten(0, 1))
         # [batch_size * num_queries, 4]
         out_bbox = boxes.flatten(0, 1)
 

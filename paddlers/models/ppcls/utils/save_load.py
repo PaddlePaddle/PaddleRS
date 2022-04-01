@@ -76,8 +76,7 @@ def load_distillation_model(model, pretrained_model):
     student = model.student if hasattr(model,
                                        "student") else model._layers.student
     load_dygraph_pretrain(teacher, path=pretrained_model[0])
-    logger.info("Finish initing teacher model from {}".format(
-        pretrained_model))
+    logger.info("Finish initing teacher model from {}".format(pretrained_model))
     # load student model
     if len(pretrained_model) >= 2:
         load_dygraph_pretrain(student, path=pretrained_model[1])

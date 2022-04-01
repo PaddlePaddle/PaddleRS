@@ -1,4 +1,4 @@
-# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -98,11 +98,7 @@ class ConvBNLayer(Layer):
 
 
 class InvertedResidual(Layer):
-    def __init__(self,
-                 in_channels,
-                 out_channels,
-                 stride,
-                 act="relu",
+    def __init__(self, in_channels, out_channels, stride, act="relu",
                  name=None):
         super(InvertedResidual, self).__init__()
         self._conv_pw = ConvBNLayer(
@@ -146,11 +142,7 @@ class InvertedResidual(Layer):
 
 
 class InvertedResidualDS(Layer):
-    def __init__(self,
-                 in_channels,
-                 out_channels,
-                 stride,
-                 act="relu",
+    def __init__(self, in_channels, out_channels, stride, act="relu",
                  name=None):
         super(InvertedResidualDS, self).__init__()
 

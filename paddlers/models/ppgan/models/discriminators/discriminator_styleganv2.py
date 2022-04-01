@@ -29,15 +29,14 @@ from ...modules.upfirdn2d import Upfirdn2dBlur
 
 class ConvLayer(nn.Sequential):
     def __init__(
-        self,
-        in_channel,
-        out_channel,
-        kernel_size,
-        downsample=False,
-        blur_kernel=[1, 3, 3, 1],
-        bias=True,
-        activate=True,
-    ):
+            self,
+            in_channel,
+            out_channel,
+            kernel_size,
+            downsample=False,
+            blur_kernel=[1, 3, 3, 1],
+            bias=True,
+            activate=True, ):
         layers = []
 
         if downsample:
@@ -62,8 +61,7 @@ class ConvLayer(nn.Sequential):
                 kernel_size,
                 padding=self.padding,
                 stride=stride,
-                bias=bias and not activate,
-            ))
+                bias=bias and not activate, ))
 
         if activate:
             layers.append(FusedLeakyReLU(out_channel, bias=bias))
@@ -78,12 +76,13 @@ class ResBlock(nn.Layer):
         self.conv1 = ConvLayer(in_channel, in_channel, 3)
         self.conv2 = ConvLayer(in_channel, out_channel, 3, downsample=True)
 
-        self.skip = ConvLayer(in_channel,
-                              out_channel,
-                              1,
-                              downsample=True,
-                              activate=False,
-                              bias=False)
+        self.skip = ConvLayer(
+            in_channel,
+            out_channel,
+            1,
+            downsample=True,
+            activate=False,
+            bias=False)
 
     def forward(self, input):
         out = self.conv1(input)
@@ -147,11 +146,9 @@ class StyleGANv2Discriminator(nn.Layer):
 
         self.final_conv = ConvLayer(in_channel + 1, channels[4], 3)
         self.final_linear = nn.Sequential(
-            EqualLinear(channels[4] * 4 * 4,
-                        channels[4],
-                        activation="fused_lrelu"),
-            EqualLinear(channels[4], 1),
-        )
+            EqualLinear(
+                channels[4] * 4 * 4, channels[4], activation="fused_lrelu"),
+            EqualLinear(channels[4], 1), )
 
     def forward(self, input):
         out = self.convs(input)

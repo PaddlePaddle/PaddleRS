@@ -26,7 +26,7 @@ def normal_init(param, *args, **kwargs):
     Returns:
         The initialized parameters.
     """
-    
+
     return nn.initializer.Normal(*args, **kwargs)(param)
 
 

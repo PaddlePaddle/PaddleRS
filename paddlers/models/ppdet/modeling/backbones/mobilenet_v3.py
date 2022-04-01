@@ -321,8 +321,7 @@ class MobileNetV3(nn.Layer):
                 [3, 184, 80, False, "hard_swish", 1],
                 [3, 480, 112, True, "hard_swish", 1],
                 [3, 672, 112, True, "hard_swish", 1],  # YOLOv3 output
-                [5, 672, 160, True, "hard_swish",
-                 2],  # SSD/SSDLite/RCNN output
+                [5, 672, 160, True, "hard_swish", 2],  # SSD/SSDLite/RCNN output
                 [5, 960, 160, True, "hard_swish", 1],
                 [5, 960, 160, True, "hard_swish", 1],  # YOLOv3 output
             ]
@@ -429,8 +428,8 @@ class MobileNetV3(nn.Layer):
             self._update_out_channels(extra_out_c, i + 1, feature_maps)
 
             for j, block_filter in enumerate(self.extra_block_filters):
-                in_c = extra_out_c if j == 0 else self.extra_block_filters[
-                    j - 1][1]
+                in_c = extra_out_c if j == 0 else self.extra_block_filters[j -
+                                                                           1][1]
                 conv_extra = self.add_sublayer(
                     "conv" + str(i + 2),
                     sublayer=ExtraBlockDW(

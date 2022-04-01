@@ -147,8 +147,7 @@ class BBoxPostProcess(nn.Layer):
         keep_mask = paddle.unsqueeze(keep_mask, [1])
         pred_label = paddle.where(keep_mask, pred_label,
                                   paddle.ones_like(pred_label) * -1)
-        pred_result = paddle.concat(
-            [pred_label, pred_score, pred_bbox], axis=1)
+        pred_result = paddle.concat([pred_label, pred_score, pred_bbox], axis=1)
         return pred_result
 
     def get_origin_shape(self, ):
@@ -251,8 +250,7 @@ class S2ANetBBoxPostProcess(nn.Layer):
     __shared__ = ['num_classes']
     __inject__ = ['nms']
 
-    def __init__(self, num_classes=15, nms_pre=2000, min_bbox_size=0,
-                 nms=None):
+    def __init__(self, num_classes=15, nms_pre=2000, min_bbox_size=0, nms=None):
         super(S2ANetBBoxPostProcess, self).__init__()
         self.num_classes = num_classes
         self.nms_pre = paddle.to_tensor(nms_pre)
@@ -648,11 +646,9 @@ class SparsePostProcess(object):
             scores = scores_all[i]
 
             boxes[:, 0::2] = paddle.clip(
-                boxes[:, 0::2], min=0,
-                max=img_wh[i][0]) / scale_factor_wh[i][0]
+                boxes[:, 0::2], min=0, max=img_wh[i][0]) / scale_factor_wh[i][0]
             boxes[:, 1::2] = paddle.clip(
-                boxes[:, 1::2], min=0,
-                max=img_wh[i][1]) / scale_factor_wh[i][1]
+                boxes[:, 1::2], min=0, max=img_wh[i][1]) / scale_factor_wh[i][1]
             boxes_w, boxes_h = (boxes[:, 2] - boxes[:, 0]).numpy(), (
                 boxes[:, 3] - boxes[:, 1]).numpy()
 

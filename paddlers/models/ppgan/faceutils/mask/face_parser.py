@@ -2,7 +2,6 @@
 # MIT License 
 # Copyright (c) 2020 Wentao Jiang
 
-
 import os.path as osp
 
 import numpy as np

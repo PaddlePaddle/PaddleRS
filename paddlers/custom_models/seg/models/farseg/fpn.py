@@ -14,9 +14,7 @@
 
 from paddle import nn
 import paddle.nn.functional as F
-from ..utils import (
-    ConvReLU, kaiming_normal_init, constant_init
-)
+from ..utils import (ConvReLU, kaiming_normal_init, constant_init)
 
 
 class FPN(nn.Layer):
@@ -25,12 +23,12 @@ class FPN(nn.Layer):
     The feature maps are currently supposed to be in increasing depth
     order, and must be consecutive
     """
+
     def __init__(self,
                  in_channels_list,
                  out_channels,
                  conv_block=ConvReLU,
-                 top_blocks=None
-                 ):
+                 top_blocks=None):
         super(FPN, self).__init__()
         self.inner_blocks = []
         self.layer_blocks = []
@@ -55,10 +53,12 @@ class FPN(nn.Layer):
         last_inner = getattr(self, self.inner_blocks[-1])(x[-1])
         results = [getattr(self, self.layer_blocks[-1])(last_inner)]
         for feature, inner_block, layer_block in zip(
-                x[:-1][::-1], self.inner_blocks[:-1][::-1], self.layer_blocks[:-1][::-1]):
+                x[:-1][::-1], self.inner_blocks[:-1][::-1],
+                self.layer_blocks[:-1][::-1]):
             if not inner_block:
                 continue
-            inner_top_down = F.interpolate(last_inner, scale_factor=2, mode="nearest")
+            inner_top_down = F.interpolate(
+                last_inner, scale_factor=2, mode="nearest")
             inner_lateral = getattr(self, inner_block)(feature)
             last_inner = inner_lateral + inner_top_down
             results.insert(0, getattr(self, layer_block)(last_inner))
@@ -80,6 +80,7 @@ class LastLevelP6P7(nn.Layer):
     """
     This module is used in RetinaNet to generate extra layers, P6 and P7.
     """
+
     def __init__(self, in_channels, out_channels):
         super(LastLevelP6P7, self).__init__()
         self.p6 = nn.Conv2D(in_channels, out_channels, 3, 2, 1)

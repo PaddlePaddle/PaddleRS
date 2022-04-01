@@ -45,6 +45,7 @@ class VSRVimeo90KDataset(BaseDataset):
         ann_file (str): Path to the annotation file.
         preprocess (list[dict|callable]): A list functions of data transformations.
     """
+
     def __init__(self, lq_folder, gt_folder, ann_file, preprocess):
         super().__init__(preprocess)
 

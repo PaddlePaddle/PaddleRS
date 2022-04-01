@@ -245,8 +245,7 @@ class FCOSHead(nn.Layer):
         if not is_training:
             locations_list = []
             for fpn_stride, feature in zip(self.fpn_stride, fpn_feats):
-                location = self._compute_locations_by_level(fpn_stride,
-                                                            feature)
+                location = self._compute_locations_by_level(fpn_stride, feature)
                 locations_list.append(location)
 
             return locations_list, cls_logits_list, bboxes_reg_list, centerness_list

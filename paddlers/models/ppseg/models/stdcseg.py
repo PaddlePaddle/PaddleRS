@@ -1,4 +1,4 @@
-# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -80,7 +80,8 @@ class STDCSeg(nn.Layer):
 
             logit_list = [feat_out, feat_out8, feat_out16]
             logit_list = [
-                F.interpolate(x, x_hw, mode='bilinear', align_corners=True)
+                F.interpolate(
+                    x, x_hw, mode='bilinear', align_corners=True)
                 for x in logit_list
             ]
 

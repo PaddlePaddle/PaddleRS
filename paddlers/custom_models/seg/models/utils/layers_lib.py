@@ -117,6 +117,7 @@ class Activation(nn.Layer):
         # 'tanh', 'hardtanh', 'prelu', 'relu', 'relu6', 'selu', 'leakyrelu', 'sigmoid', 'softmax',
         # 'softplus', 'softshrink', 'softsign', 'tanhshrink', 'logsigmoid', 'logsoftmax', 'hsigmoid'])"
     """
+
     def __init__(self, act=None):
         super(Activation, self).__init__()
         self._act = act
@@ -126,8 +127,8 @@ class Activation(nn.Layer):
         if act is not None:
             if act in act_dict.keys():
                 act_name = act_dict[act]
-                self.act_func = eval(
-                    "nn.layer.activation.{}()".format(act_name))
+                self.act_func = eval("nn.layer.activation.{}()".format(
+                    act_name))
             else:
                 raise KeyError("{} does not exist in the current {}".format(
                     act, act_dict.keys()))

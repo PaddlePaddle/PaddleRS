@@ -65,10 +65,8 @@ class ATSSAssigner(nn.Layer):
                                      paddle.zeros_like(topk_idxs))
             is_in_topk = F.one_hot(topk_idxs, num_anchors).sum(axis=-2)
             is_in_topk = paddle.where(is_in_topk > 1,
-                                      paddle.zeros_like(is_in_topk),
-                                      is_in_topk)
-            is_in_topk_list.append(
-                is_in_topk.astype(gt2anchor_distances.dtype))
+                                      paddle.zeros_like(is_in_topk), is_in_topk)
+            is_in_topk_list.append(is_in_topk.astype(gt2anchor_distances.dtype))
         is_in_topk_list = paddle.concat(is_in_topk_list, axis=-1)
         topk_idxs_list = paddle.concat(topk_idxs_list, axis=-1)
         return is_in_topk_list, topk_idxs_list

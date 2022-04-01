@@ -91,9 +91,8 @@ class COCODataSet(DetDataset):
 
         if 'annotations' not in coco.dataset:
             self.load_image_only = True
-            logger.warning(
-                'Annotation file: {} does not contains ground truth '
-                'and load image information only.'.format(anno_path))
+            logger.warning('Annotation file: {} does not contains ground truth '
+                           'and load image information only.'.format(anno_path))
 
         for img_id in img_ids:
             img_anno = coco.loadImgs([img_id])[0]
@@ -110,9 +109,9 @@ class COCODataSet(DetDataset):
                 continue
 
             if im_w < 0 or im_h < 0:
-                logger.warning(
-                    'Illegal width: {} or height: {} in annotation, '
-                    'and im_id: {} will be ignored'.format(im_w, im_h, img_id))
+                logger.warning('Illegal width: {} or height: {} in annotation, '
+                               'and im_id: {} will be ignored'.format(
+                                   im_w, im_h, img_id))
                 continue
 
             coco_rec = {
@@ -124,8 +123,7 @@ class COCODataSet(DetDataset):
 
             if not self.load_image_only:
                 ins_anno_ids = coco.getAnnIds(
-                    imgIds=[img_id],
-                    iscrowd=None if self.load_crowd else False)
+                    imgIds=[img_id], iscrowd=None if self.load_crowd else False)
                 instances = coco.loadAnns(ins_anno_ids)
 
                 bboxes = []

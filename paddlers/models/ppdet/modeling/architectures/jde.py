@@ -100,9 +100,8 @@ class JDE(BaseArch):
                 return pred_dets, pred_embs
 
             else:
-                raise ValueError(
-                    "Unknown metric {} for multi object tracking.".format(
-                        self.metric))
+                raise ValueError("Unknown metric {} for multi object tracking.".
+                                 format(self.metric))
 
     def get_loss(self):
         return self._forward()

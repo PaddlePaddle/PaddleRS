@@ -185,8 +185,8 @@ class HrHRNetPostProcess(object):
         inds_np = inds_k[0].cpu().detach().numpy()
         y = inds_np // W
         x = inds_np % W
-        tags = tagmap[np.arange(J)[None, :].repeat(self.max_num_people), y.
-                      flatten(), x.flatten()].reshape(J, -1, tagmap.shape[-1])
+        tags = tagmap[np.arange(J)[None, :].repeat(self.max_num_people),
+                      y.flatten(), x.flatten()].reshape(J, -1, tagmap.shape[-1])
         coords = np.stack((y, x), axis=2)
         # threshold
         mask = heats > self.heat_thresh

@@ -14,13 +14,9 @@
 
 import paddle.nn as nn
 
-
 __all__ = [
-    'BasicConv', 'Conv1x1', 'Conv3x3', 'Conv7x7', 
-    'MaxPool2x2', 'MaxUnPool2x2', 
-    'ConvTransposed3x3',
-    'Identity',
-    'get_norm_layer', 'get_act_layer', 
+    'BasicConv', 'Conv1x1', 'Conv3x3', 'Conv7x7', 'MaxPool2x2', 'MaxUnPool2x2',
+    'ConvTransposed3x3', 'Identity', 'get_norm_layer', 'get_act_layer',
     'make_norm', 'make_act'
 ]
 
@@ -46,24 +42,28 @@ def make_act(*args, **kwargs):
 
 
 class BasicConv(nn.Layer):
-    def __init__(
-        self, in_ch, out_ch, 
-        kernel_size, pad_mode='constant', 
-        bias='auto', norm=False, act=False, 
-        **kwargs
-    ):
+    def __init__(self,
+                 in_ch,
+                 out_ch,
+                 kernel_size,
+                 pad_mode='constant',
+                 bias='auto',
+                 norm=False,
+                 act=False,
+                 **kwargs):
         super().__init__()
         seq = []
         if kernel_size >= 2:
-            seq.append(nn.Pad2D(kernel_size//2, mode=pad_mode))
+            seq.append(nn.Pad2D(kernel_size // 2, mode=pad_mode))
         seq.append(
             nn.Conv2D(
-                in_ch, out_ch, kernel_size,
-                stride=1, padding=0,
-                bias_attr=(False if norm else None) if bias=='auto' else bias,
-                **kwargs
-            )
-        )
+                in_ch,
+                out_ch,
+                kernel_size,
+                stride=1,
+                padding=0,
+                bias_attr=(False if norm else None) if bias == 'auto' else bias,
+                **kwargs))
         if norm:
             if norm is True:
                 norm = make_norm(out_ch)
@@ -79,46 +79,94 @@ class BasicConv(nn.Layer):
 
 
 class Conv1x1(BasicConv):
-    def __init__(self, in_ch, out_ch, pad_mode='constant', bias='auto', norm=False, act=False, **kwargs):
-        super().__init__(in_ch, out_ch, 1, pad_mode=pad_mode, bias=bias, norm=norm, act=act, **kwargs)
+    def __init__(self,
+                 in_ch,
+                 out_ch,
+                 pad_mode='constant',
+                 bias='auto',
+                 norm=False,
+                 act=False,
+                 **kwargs):
+        super().__init__(
+            in_ch,
+            out_ch,
+            1,
+            pad_mode=pad_mode,
+            bias=bias,
+            norm=norm,
+            act=act,
+            **kwargs)
 
 
 class Conv3x3(BasicConv):
-    def __init__(self, in_ch, out_ch, pad_mode='constant', bias='auto', norm=False, act=False, **kwargs):
-        super().__init__(in_ch, out_ch, 3, pad_mode=pad_mode, bias=bias, norm=norm, act=act, **kwargs)
+    def __init__(self,
+                 in_ch,
+                 out_ch,
+                 pad_mode='constant',
+                 bias='auto',
+                 norm=False,
+                 act=False,
+                 **kwargs):
+        super().__init__(
+            in_ch,
+            out_ch,
+            3,
+            pad_mode=pad_mode,
+            bias=bias,
+            norm=norm,
+            act=act,
+            **kwargs)
 
 
 class Conv7x7(BasicConv):
-    def __init__(self, in_ch, out_ch, pad_mode='constant', bias='auto', norm=False, act=False, **kwargs):
-        super().__init__(in_ch, out_ch, 7, pad_mode=pad_mode, bias=bias, norm=norm, act=act, **kwargs)
+    def __init__(self,
+                 in_ch,
+                 out_ch,
+                 pad_mode='constant',
+                 bias='auto',
+                 norm=False,
+                 act=False,
+                 **kwargs):
+        super().__init__(
+            in_ch,
+            out_ch,
+            7,
+            pad_mode=pad_mode,
+            bias=bias,
+            norm=norm,
+            act=act,
+            **kwargs)
 
 
 class MaxPool2x2(nn.MaxPool2D):
     def __init__(self, **kwargs):
-        super().__init__(kernel_size=2, stride=(2,2), padding=(0,0), **kwargs)
+        super().__init__(kernel_size=2, stride=(2, 2), padding=(0, 0), **kwargs)
 
 
 class MaxUnPool2x2(nn.MaxUnPool2D):
     def __init__(self, **kwargs):
-        super().__init__(kernel_size=2, stride=(2,2), padding=(0,0), **kwargs)
+        super().__init__(kernel_size=2, stride=(2, 2), padding=(0, 0), **kwargs)
 
 
 class ConvTransposed3x3(nn.Layer):
-    def __init__(
-        self, in_ch, out_ch,
-        bias='auto', norm=False, act=False, 
-        **kwargs
-    ):
+    def __init__(self,
+                 in_ch,
+                 out_ch,
+                 bias='auto',
+                 norm=False,
+                 act=False,
+                 **kwargs):
         super().__init__()
         seq = []
         seq.append(
             nn.Conv2DTranspose(
-                in_ch, out_ch, 3,
-                stride=2, padding=1,
-                bias_attr=(False if norm else None) if bias=='auto' else bias,
-                **kwargs
-            )
-        )
+                in_ch,
+                out_ch,
+                3,
+                stride=2,
+                padding=1,
+                bias_attr=(False if norm else None) if bias == 'auto' else bias,
+                **kwargs))
         if norm:
             if norm is True:
                 norm = make_norm(out_ch)
@@ -135,8 +183,9 @@ class ConvTransposed3x3(nn.Layer):
 
 class Identity(nn.Layer):
     """A placeholder identity operator that accepts exactly one argument."""
+
     def __init__(self, *args, **kwargs):
         super().__init__()
-    
+
     def forward(self, x):
         return x

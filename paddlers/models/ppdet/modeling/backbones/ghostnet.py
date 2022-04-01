@@ -419,8 +419,8 @@ class GhostNet(nn.Layer):
             self._update_out_channels(extra_out_c, idx + 1, feature_maps)
 
             for j, block_filter in enumerate(self.extra_block_filters):
-                in_c = extra_out_c if j == 0 else self.extra_block_filters[
-                    j - 1][1]
+                in_c = extra_out_c if j == 0 else self.extra_block_filters[j -
+                                                                           1][1]
                 conv_extra = self.add_sublayer(
                     "conv" + str(idx + 2),
                     sublayer=ExtraBlockDW(

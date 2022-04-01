@@ -96,8 +96,7 @@ class CascadeRCNN(BaseArch):
             bbox_targets = self.bbox_head.get_assigned_targets()
             if self.with_mask:
                 mask_loss = self.mask_head(body_feats, rois, rois_num,
-                                           self.inputs, bbox_targets,
-                                           bbox_feat)
+                                           self.inputs, bbox_targets, bbox_feat)
                 return rpn_loss, bbox_loss, mask_loss
             else:
                 return rpn_loss, bbox_loss, {}

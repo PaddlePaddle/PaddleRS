@@ -37,7 +37,6 @@ def prune_model(config, model):
         model.pruner = None
 
 
-
 def _prune_model(config, model):
     from paddleslim.analysis import dygraph_flops as flops
     logger.info("FLOPs before pruning: {}GFLOPs".format(

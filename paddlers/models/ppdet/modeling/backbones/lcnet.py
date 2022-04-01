@@ -233,8 +233,7 @@ class LCNet(nn.Layer):
         out_channels.append(
             make_divisible(NET_CONFIG["blocks6"][-1][2] * scale))
         self._out_channels = [
-            ch for idx, ch in enumerate(out_channels)
-            if idx + 2 in feature_maps
+            ch for idx, ch in enumerate(out_channels) if idx + 2 in feature_maps
         ]
 
     def forward(self, inputs):

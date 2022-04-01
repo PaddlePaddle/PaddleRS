@@ -528,8 +528,7 @@ class PatchEmbed(nn.Layer):
         norm_layer (nn.Layer, optional): Normalization layer. Default: None
     """
 
-    def __init__(self, patch_size=4, in_chans=3, embed_dim=96,
-                 norm_layer=None):
+    def __init__(self, patch_size=4, in_chans=3, embed_dim=96, norm_layer=None):
         super().__init__()
         patch_size = to_2tuple(patch_size)
         self.patch_size = patch_size
@@ -548,11 +547,9 @@ class PatchEmbed(nn.Layer):
         B, C, H, W = x.shape
         # assert [H, W] == self.img_size[:2], "Input image size ({H}*{W}) doesn't match model ({}*{}).".format(H, W, self.img_size[0], self.img_size[1])
         if W % self.patch_size[1] != 0:
-            x = F.pad(x,
-                      [0, self.patch_size[1] - W % self.patch_size[1], 0, 0])
+            x = F.pad(x, [0, self.patch_size[1] - W % self.patch_size[1], 0, 0])
         if H % self.patch_size[0] != 0:
-            x = F.pad(x,
-                      [0, 0, 0, self.patch_size[0] - H % self.patch_size[0]])
+            x = F.pad(x, [0, 0, 0, self.patch_size[0] - H % self.patch_size[0]])
 
         x = self.proj(x)
         if self.norm is not None:
@@ -732,8 +729,8 @@ class SwinTransformer(nn.Layer):
             if i in self.out_indices:
                 norm_layer = getattr(self, f'norm{i}')
                 x_out = norm_layer(x_out)
-                out = x_out.reshape(
-                    (-1, H, W, self.num_features[i])).transpose((0, 3, 1, 2))
+                out = x_out.reshape((-1, H, W, self.num_features[i])).transpose(
+                    (0, 3, 1, 2))
                 outs.append(out)
 
         return tuple(outs)

@@ -1,4 +1,4 @@
-# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -175,8 +175,7 @@ def DeiT_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def DeiT_tiny_distilled_patch16_224(pretrained=False, use_ssld=False,
-                                    **kwargs):
+def DeiT_tiny_distilled_patch16_224(pretrained=False, use_ssld=False, **kwargs):
     model = DistilledVisionTransformer(
         patch_size=16,
         embed_dim=192,
@@ -194,8 +193,7 @@ def DeiT_tiny_distilled_patch16_224(pretrained=False, use_ssld=False,
     return model
 
 
-def DeiT_small_distilled_patch16_224(pretrained=False,
-                                     use_ssld=False,
+def DeiT_small_distilled_patch16_224(pretrained=False, use_ssld=False,
                                      **kwargs):
     model = DistilledVisionTransformer(
         patch_size=16,
@@ -214,8 +212,7 @@ def DeiT_small_distilled_patch16_224(pretrained=False,
     return model
 
 
-def DeiT_base_distilled_patch16_224(pretrained=False, use_ssld=False,
-                                    **kwargs):
+def DeiT_base_distilled_patch16_224(pretrained=False, use_ssld=False, **kwargs):
     model = DistilledVisionTransformer(
         patch_size=16,
         embed_dim=768,
@@ -252,8 +249,7 @@ def DeiT_base_patch16_384(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def DeiT_base_distilled_patch16_384(pretrained=False, use_ssld=False,
-                                    **kwargs):
+def DeiT_base_distilled_patch16_384(pretrained=False, use_ssld=False, **kwargs):
     model = DistilledVisionTransformer(
         img_size=384,
         patch_size=16,

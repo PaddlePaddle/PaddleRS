@@ -1,4 +1,4 @@
-# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -291,8 +291,7 @@ class DLA(nn.Layer):
             nn.BatchNorm2D(channels[0]),
             nn.ReLU())
 
-        self.level0 = self._make_conv_level(channels[0], channels[0],
-                                            levels[0])
+        self.level0 = self._make_conv_level(channels[0], channels[0], levels[0])
         self.level1 = self._make_conv_level(
             channels[0], channels[1], levels[1], stride=2)
 

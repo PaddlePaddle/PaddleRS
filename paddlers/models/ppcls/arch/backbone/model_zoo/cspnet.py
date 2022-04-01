@@ -1,4 +1,4 @@
-# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -40,8 +40,7 @@ MODEL_CFGS = {
             down_growth=True, ))
 }
 
-__all__ = ['CSPDarkNet53'
-           ]  # model_registry will add each entrypoint fn to this
+__all__ = ['CSPDarkNet53']  # model_registry will add each entrypoint fn to this
 
 
 class ConvBnAct(nn.Layer):
@@ -341,10 +340,7 @@ class CSPNet(nn.Layer):
         self.pool = nn.AdaptiveAvgPool2D(1)
         self.flatten = nn.Flatten(1)
         self.fc = nn.Linear(
-            prev_chs,
-            class_num,
-            weight_attr=ParamAttr(),
-            bias_attr=ParamAttr())
+            prev_chs, class_num, weight_attr=ParamAttr(), bias_attr=ParamAttr())
 
     def forward(self, x):
         x = self.stem(x)

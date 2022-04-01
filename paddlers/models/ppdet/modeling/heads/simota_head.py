@@ -125,8 +125,8 @@ class OTAHead(GFLHead):
 
         decode_bbox_preds = []
         center_and_strides = []
-        for featmap_size, stride, bbox_pred in zip(
-                featmap_sizes, self.fpn_stride, bbox_preds):
+        for featmap_size, stride, bbox_pred in zip(featmap_sizes,
+                                                   self.fpn_stride, bbox_preds):
 
             # center in origin image
             yy, xx = self.get_single_level_center_point(featmap_size, stride,
@@ -204,8 +204,7 @@ class OTAHead(GFLHead):
             score = np.zeros(labels.shape)
 
             if len(pos_inds) > 0:
-                pos_bbox_targets = paddle.gather(
-                    bbox_targets, pos_inds, axis=0)
+                pos_bbox_targets = paddle.gather(bbox_targets, pos_inds, axis=0)
                 pos_bbox_pred = paddle.gather(bbox_pred, pos_inds, axis=0)
                 pos_centers = paddle.gather(
                     center_and_strides[:, :-2], pos_inds, axis=0) / stride
@@ -213,8 +212,7 @@ class OTAHead(GFLHead):
                 weight_targets = F.sigmoid(cls_score.detach())
                 weight_targets = paddle.gather(
                     weight_targets.max(axis=1, keepdim=True), pos_inds, axis=0)
-                pos_bbox_pred_corners = self.distribution_project(
-                    pos_bbox_pred)
+                pos_bbox_pred_corners = self.distribution_project(pos_bbox_pred)
                 pos_decode_bbox_pred = distance2bbox(pos_centers,
                                                      pos_bbox_pred_corners)
                 pos_decode_bbox_targets = pos_bbox_targets / stride
@@ -263,12 +261,10 @@ class OTAHead(GFLHead):
         except:
             avg_factor = max(avg_factor.item(), 1)
         if avg_factor <= 0:
-            loss_qfl = paddle.to_tensor(
-                0, dtype='float32', stop_gradient=False)
+            loss_qfl = paddle.to_tensor(0, dtype='float32', stop_gradient=False)
             loss_bbox = paddle.to_tensor(
                 0, dtype='float32', stop_gradient=False)
-            loss_dfl = paddle.to_tensor(
-                0, dtype='float32', stop_gradient=False)
+            loss_dfl = paddle.to_tensor(0, dtype='float32', stop_gradient=False)
         else:
             losses_bbox = list(map(lambda x: x / avg_factor, loss_bbox_list))
             losses_dfl = list(map(lambda x: x / avg_factor, loss_dfl_list))
@@ -347,8 +343,8 @@ class OTAVFLHead(OTAHead):
 
         decode_bbox_preds = []
         center_and_strides = []
-        for featmap_size, stride, bbox_pred in zip(
-                featmap_sizes, self.fpn_stride, bbox_preds):
+        for featmap_size, stride, bbox_pred in zip(featmap_sizes,
+                                                   self.fpn_stride, bbox_preds):
             # center in origin image
             yy, xx = self.get_single_level_center_point(featmap_size, stride,
                                                         self.cell_offset)
@@ -425,8 +421,7 @@ class OTAVFLHead(OTAHead):
             vfl_score = np.zeros(cls_score.shape)
 
             if len(pos_inds) > 0:
-                pos_bbox_targets = paddle.gather(
-                    bbox_targets, pos_inds, axis=0)
+                pos_bbox_targets = paddle.gather(bbox_targets, pos_inds, axis=0)
                 pos_bbox_pred = paddle.gather(bbox_pred, pos_inds, axis=0)
                 pos_centers = paddle.gather(
                     center_and_strides[:, :-2], pos_inds, axis=0) / stride
@@ -434,8 +429,7 @@ class OTAVFLHead(OTAHead):
                 weight_targets = F.sigmoid(cls_score.detach())
                 weight_targets = paddle.gather(
                     weight_targets.max(axis=1, keepdim=True), pos_inds, axis=0)
-                pos_bbox_pred_corners = self.distribution_project(
-                    pos_bbox_pred)
+                pos_bbox_pred_corners = self.distribution_project(pos_bbox_pred)
                 pos_decode_bbox_pred = distance2bbox(pos_centers,
                                                      pos_bbox_pred_corners)
                 pos_decode_bbox_targets = pos_bbox_targets / stride
@@ -487,12 +481,10 @@ class OTAVFLHead(OTAHead):
         except:
             avg_factor = max(avg_factor.item(), 1)
         if avg_factor <= 0:
-            loss_vfl = paddle.to_tensor(
-                0, dtype='float32', stop_gradient=False)
+            loss_vfl = paddle.to_tensor(0, dtype='float32', stop_gradient=False)
             loss_bbox = paddle.to_tensor(
                 0, dtype='float32', stop_gradient=False)
-            loss_dfl = paddle.to_tensor(
-                0, dtype='float32', stop_gradient=False)
+            loss_dfl = paddle.to_tensor(0, dtype='float32', stop_gradient=False)
         else:
             losses_bbox = list(map(lambda x: x / avg_factor, loss_bbox_list))
             losses_dfl = list(map(lambda x: x / avg_factor, loss_dfl_list))

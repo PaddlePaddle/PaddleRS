@@ -100,8 +100,7 @@ def gather_topk_anchors(metrics, topk, largest=True, topk_mask=None, eps=1e-9):
     if topk_mask is None:
         topk_mask = (topk_metrics.max(axis=-1, keepdim=True) > eps).tile(
             [1, 1, topk])
-    topk_idxs = paddle.where(topk_mask, topk_idxs,
-                             paddle.zeros_like(topk_idxs))
+    topk_idxs = paddle.where(topk_mask, topk_idxs, paddle.zeros_like(topk_idxs))
     is_in_topk = F.one_hot(topk_idxs, num_anchors).sum(axis=-2)
     is_in_topk = paddle.where(is_in_topk > 1,
                               paddle.zeros_like(is_in_topk), is_in_topk)

@@ -1,4 +1,4 @@
-# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -344,8 +344,7 @@ def run(dataloader,
     for k in fetchs:
         metric_dict[k] = fetchs[k][1]
 
-    metric_dict["batch_time"] = AverageMeter(
-        'batch_cost', '.5f', postfix=" s,")
+    metric_dict["batch_time"] = AverageMeter('batch_cost', '.5f', postfix=" s,")
     metric_dict["reader_time"] = AverageMeter(
         'reader_cost', '.5f', postfix=" s,")
 

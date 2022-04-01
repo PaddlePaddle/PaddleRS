@@ -254,8 +254,8 @@ class BiFPN(nn.Layer):
             for i in range(self.num_extra_levels):
                 if i == 0:
                     self.extra_convs.append(
-                        ConvNormLayer(self.in_channels[-1], self.out_channel,
-                                      3, 2))
+                        ConvNormLayer(self.in_channels[-1], self.out_channel, 3,
+                                      2))
                 else:
                     self.extra_convs.append(nn.MaxPool2D(3, 2, 1))
 

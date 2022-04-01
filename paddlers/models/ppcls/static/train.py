@@ -1,4 +1,4 @@
-# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -69,8 +69,8 @@ def main(args):
 
     mode = "train"
 
-    log_file = os.path.join(global_config['output_dir'],
-                            config["Arch"]["name"], f"{mode}.log")
+    log_file = os.path.join(global_config['output_dir'], config["Arch"]["name"],
+                            f"{mode}.log")
     init_logger(name='root', log_file=log_file)
     print_config(config)
 

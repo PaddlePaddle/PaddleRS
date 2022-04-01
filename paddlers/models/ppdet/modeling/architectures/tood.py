@@ -62,8 +62,7 @@ class TOOD(BaseArch):
         head_outs = self.head(fpn_feats)
         if not self.training:
             bboxes, bbox_num = self.head.post_process(
-                head_outs, self.inputs['im_shape'],
-                self.inputs['scale_factor'])
+                head_outs, self.inputs['im_shape'], self.inputs['scale_factor'])
             return bboxes, bbox_num
         else:
             loss = self.head.get_loss(head_outs, self.inputs)

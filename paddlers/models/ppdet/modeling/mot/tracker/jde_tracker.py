@@ -298,19 +298,15 @@ class JDETracker(object):
                 if t.state == TrackState.Tracked
             ]
             self.tracked_tracks_dict[cls_id] = joint_stracks(
-                self.tracked_tracks_dict[cls_id],
-                activated_tracks_dict[cls_id])
+                self.tracked_tracks_dict[cls_id], activated_tracks_dict[cls_id])
             self.tracked_tracks_dict[cls_id] = joint_stracks(
                 self.tracked_tracks_dict[cls_id], refined_tracks_dict[cls_id])
             self.lost_tracks_dict[cls_id] = sub_stracks(
-                self.lost_tracks_dict[cls_id],
-                self.tracked_tracks_dict[cls_id])
+                self.lost_tracks_dict[cls_id], self.tracked_tracks_dict[cls_id])
             self.lost_tracks_dict[cls_id].extend(lost_tracks_dict[cls_id])
             self.lost_tracks_dict[cls_id] = sub_stracks(
-                self.lost_tracks_dict[cls_id],
-                self.removed_tracks_dict[cls_id])
-            self.removed_tracks_dict[cls_id].extend(removed_tracks_dict[
-                cls_id])
+                self.lost_tracks_dict[cls_id], self.removed_tracks_dict[cls_id])
+            self.removed_tracks_dict[cls_id].extend(removed_tracks_dict[cls_id])
             self.tracked_tracks_dict[cls_id], self.lost_tracks_dict[
                 cls_id] = remove_duplicate_stracks(
                     self.tracked_tracks_dict[cls_id],

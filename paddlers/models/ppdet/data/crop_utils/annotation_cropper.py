@@ -143,8 +143,7 @@ class AnnoCropper(object):
             self.chip_records.extend(cur_image_records)
         return self.chip_records
 
-    def _add_to_cur_im_chips(self, chips, pos_chip2boxes_idx,
-                             neg_chip2box_num):
+    def _add_to_cur_im_chips(self, chips, pos_chip2boxes_idx, neg_chip2box_num):
         for pos_chipid, boxes_idx in pos_chip2boxes_idx.items():
             chip = np.array(chips[pos_chipid])  # copy chips slice
             self._cur_im_pos_chips.append((chip, boxes_idx))
@@ -324,8 +323,8 @@ class AnnoCropper(object):
         high = valid_ratio_range[1] if valid_ratio_range[1] > 0 else np.finfo(
             np.float).max
 
-        valid_boxes_idx = np.nonzero((low <= box_ratio) & (box_ratio < high) &
-                                     (target_mins >= 2))[0]
+        valid_boxes_idx = np.nonzero((low <= box_ratio) & (box_ratio < high) & (
+            target_mins >= 2))[0]
         valid_boxes = gt_boxes[valid_boxes_idx]
         return valid_boxes, valid_boxes_idx
 
@@ -406,9 +405,7 @@ class AnnoCropper(object):
         neg_boxes = valid_props[non_overlap_props_idx]
         return neg_boxes
 
-    def _find_neg_chips(self,
-                        chips: 'Cx4',
-                        pos_chip_ids: 'D',
+    def _find_neg_chips(self, chips: 'Cx4', pos_chip_ids: 'D',
                         neg_boxes: 'Nx4'):
         """
         :return: neg_chip2box_num, dict: chipid->neg_box_num
@@ -453,8 +450,7 @@ class AnnoCropper(object):
                 self._get_current_scale_parameters(scale_i, r)
                 # Cx4
                 chips = self._create_chips(r['h'], r['w'], self._cur_scale)
-                cur_img_chip_record = self._get_chips_records(r, chips,
-                                                              scale_i)
+                cur_img_chip_record = self._get_chips_records(r, chips, scale_i)
                 self.chip_records.extend(cur_img_chip_record)
 
         return self.chip_records
@@ -579,7 +575,6 @@ class AnnoCropper(object):
                 # np.array of shape [N, 6], 6 is [label, score, x1, y1, x2, y2]
                 bbox = img_id2bbox[img_id]
                 bbox_num = np.array([len(bbox)])
-            res = dict(
-                im_id=np.array([[img_id]]), bbox=bbox, bbox_num=bbox_num)
+            res = dict(im_id=np.array([[img_id]]), bbox=bbox, bbox_num=bbox_num)
             results.append(res)
         return results

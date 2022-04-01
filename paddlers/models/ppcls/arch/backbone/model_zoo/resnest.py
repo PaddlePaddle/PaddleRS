@@ -1,4 +1,4 @@
-# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -515,8 +515,7 @@ class ResNeSt(nn.Layer):
         self.max_pool2d = MaxPool2D(kernel_size=3, stride=2, padding=1)
 
         self.layer1 = ResNeStLayer(
-            inplanes=self.stem_width * 2
-            if self.deep_stem else self.stem_width,
+            inplanes=self.stem_width * 2 if self.deep_stem else self.stem_width,
             planes=64,
             blocks=self.layers[0],
             radix=radix,

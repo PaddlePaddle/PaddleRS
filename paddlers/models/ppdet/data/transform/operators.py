@@ -46,9 +46,9 @@ from ..reader import Compose
 
 from .op_helper import (satisfy_sample_constraint, filter_and_process,
                         generate_sample_bbox, clip_bbox, data_anchor_sampling,
-                        satisfy_sample_constraint_coverage,
-                        crop_image_sampling, generate_sample_bbox_square,
-                        bbox_area_sampling, is_poly, get_border)
+                        satisfy_sample_constraint_coverage, crop_image_sampling,
+                        generate_sample_bbox_square, bbox_area_sampling,
+                        is_poly, get_border)
 
 from paddlers.models.ppdet.utils.logger import setup_logger
 from paddlers.models.ppdet.modeling.keypoint_utils import get_affine_transform, affine_transform
@@ -62,8 +62,7 @@ def register_op(cls):
     if not hasattr(BaseOperator, cls.__name__):
         setattr(BaseOperator, cls.__name__, cls)
     else:
-        raise KeyError("The {} class has been registered.".format(
-            cls.__name__))
+        raise KeyError("The {} class has been registered.".format(cls.__name__))
     return serializable(cls)
 
 
@@ -247,8 +246,7 @@ class SniperDecodeCrop(BaseOperator):
 
         im = sample['image']
         data = np.frombuffer(im, dtype='uint8')
-        im = cv2.imdecode(data,
-                          cv2.IMREAD_COLOR)  # BGR mode, but need RGB mode
+        im = cv2.imdecode(data, cv2.IMREAD_COLOR)  # BGR mode, but need RGB mode
         if 'keep_ori_im' in sample and sample['keep_ori_im']:
             sample['ori_image'] = im
         im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
@@ -359,9 +357,7 @@ class RandomErasingImage(BaseOperator):
 
 @register_op
 class NormalizeImage(BaseOperator):
-    def __init__(self,
-                 mean=[0.485, 0.456, 0.406],
-                 std=[1, 1, 1],
+    def __init__(self, mean=[0.485, 0.456, 0.406], std=[1, 1, 1],
                  is_scale=True):
         """
         Args:
@@ -445,8 +441,7 @@ class GridMask(BaseOperator):
             upper_iter=upper_iter)
 
     def apply(self, sample, context=None):
-        sample['image'] = self.gridmask_op(sample['image'],
-                                           sample['curr_iter'])
+        sample['image'] = self.gridmask_op(sample['image'], sample['curr_iter'])
         return sample
 
 
@@ -638,8 +633,7 @@ class RandomFlip(BaseOperator):
         for segm in segms:
             if is_poly(segm):
                 # Polygon format
-                flipped_segms.append(
-                    [_flip_poly(poly, width) for poly in segm])
+                flipped_segms.append([_flip_poly(poly, width) for poly in segm])
             else:
                 # RLE format
                 import pycocotools.mask as mask_util
@@ -707,8 +701,8 @@ class RandomFlip(BaseOperator):
                 sample['gt_segm'] = sample['gt_segm'][:, :, ::-1]
 
             if 'gt_rbox2poly' in sample and sample['gt_rbox2poly'].any():
-                sample['gt_rbox2poly'] = self.apply_rbox(
-                    sample['gt_rbox2poly'], width)
+                sample['gt_rbox2poly'] = self.apply_rbox(sample['gt_rbox2poly'],
+                                                         width)
 
             sample['flipped'] = True
             sample['image'] = im
@@ -859,8 +853,8 @@ class Resize(BaseOperator):
 
         # apply polygon
         if 'gt_poly' in sample and len(sample['gt_poly']) > 0:
-            sample['gt_poly'] = self.apply_segm(
-                sample['gt_poly'], im_shape[:2], [im_scale_x, im_scale_y])
+            sample['gt_poly'] = self.apply_segm(sample['gt_poly'], im_shape[:2],
+                                                [im_scale_x, im_scale_y])
 
         # apply semantic
         if 'semantic' in sample and sample['semantic']:
@@ -1366,15 +1360,14 @@ class RandomCrop(BaseOperator):
                             if not isinstance(part, Polygon):
                                 continue
                             part = np.squeeze(
-                                np.array(part.exterior.coords[:-1]).reshape(
-                                    1, -1))
+                                np.array(part.exterior.coords[:-1]).reshape(1,
+                                                                            -1))
                             part[0::2] -= xmin
                             part[1::2] -= ymin
                             crop_segm.append(part.tolist())
                     elif isinstance(inter, Polygon):
                         crop_poly = np.squeeze(
-                            np.array(inter.exterior.coords[:-1]).reshape(1,
-                                                                         -1))
+                            np.array(inter.exterior.coords[:-1]).reshape(1, -1))
                         crop_poly[0::2] -= xmin
                         crop_poly[1::2] -= ymin
                         crop_segm.append(crop_poly.tolist())
@@ -1934,9 +1927,7 @@ class DebugVisibleImage(BaseOperator):
                     x1 = round(keypoint[2 * j]).astype(np.int32)
                     y1 = round(keypoint[2 * j + 1]).astype(np.int32)
                     draw.ellipse(
-                        (x1, y1, x1 + 5, y1 + 5),
-                        fill='green',
-                        outline='green')
+                        (x1, y1, x1 + 5, y1 + 5), fill='green', outline='green')
         save_path = os.path.join(self.output_dir, out_file_name)
         image.save(save_path, quality=95)
         return sample
@@ -2446,8 +2437,8 @@ class RandomResizeCrop(BaseOperator):
 
         # apply polygon
         if 'gt_poly' in sample and len(sample['gt_poly']) > 0:
-            sample['gt_poly'] = self.apply_segm(
-                sample['gt_poly'], im_shape[:2], [im_scale_x, im_scale_y])
+            sample['gt_poly'] = self.apply_segm(sample['gt_poly'], im_shape[:2],
+                                                [im_scale_x, im_scale_y])
 
         # apply semantic
         if 'semantic' in sample and sample['semantic']:
@@ -2567,8 +2558,8 @@ class RandomShortSideResize(BaseOperator):
         if len(im.shape) != 3:
             raise ImageError('{}: image is not 3-dimensional.'.format(self))
 
-        target_size = self.get_size_with_aspect_ratio(im.shape[:2],
-                                                      target_size, max_size)
+        target_size = self.get_size_with_aspect_ratio(im.shape[:2], target_size,
+                                                      max_size)
         im_scale_y, im_scale_x = target_size[1] / im.shape[0], target_size[
             0] / im.shape[1]
 
@@ -2589,8 +2580,8 @@ class RandomShortSideResize(BaseOperator):
                 sample['gt_bbox'], [im_scale_x, im_scale_y], target_size)
         # apply polygon
         if 'gt_poly' in sample and len(sample['gt_poly']) > 0:
-            sample['gt_poly'] = self.apply_segm(
-                sample['gt_poly'], im.shape[:2], [im_scale_x, im_scale_y])
+            sample['gt_poly'] = self.apply_segm(sample['gt_poly'], im.shape[:2],
+                                                [im_scale_x, im_scale_y])
         # apply semantic
         if 'semantic' in sample and sample['semantic']:
             semantic = sample['semantic']
@@ -2784,15 +2775,14 @@ class RandomSizeCrop(BaseOperator):
                             if not isinstance(part, Polygon):
                                 continue
                             part = np.squeeze(
-                                np.array(part.exterior.coords[:-1]).reshape(
-                                    1, -1))
+                                np.array(part.exterior.coords[:-1]).reshape(1,
+                                                                            -1))
                             part[0::2] -= xmin
                             part[1::2] -= ymin
                             crop_segm.append(part.tolist())
                     elif isinstance(inter, Polygon):
                         crop_poly = np.squeeze(
-                            np.array(inter.exterior.coords[:-1]).reshape(1,
-                                                                         -1))
+                            np.array(inter.exterior.coords[:-1]).reshape(1, -1))
                         crop_poly[0::2] -= xmin
                         crop_poly[1::2] -= ymin
                         crop_segm.append(crop_poly.tolist())

@@ -215,8 +215,8 @@ class FPN(nn.Layer):
 
                 for i in range(1, self.extra_stage):
                     if self.relu_before_extra_convs:
-                        fpn_output.append(self.fpn_convs[num_levels + i](
-                            F.relu(fpn_output[-1])))
+                        fpn_output.append(self.fpn_convs[num_levels + i](F.relu(
+                            fpn_output[-1])))
                     else:
                         fpn_output.append(self.fpn_convs[num_levels + i](
                             fpn_output[-1]))

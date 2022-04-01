@@ -1,4 +1,4 @@
-# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -347,18 +347,12 @@ def SE_ResNeXt50_32x4d(pretrained=False, use_ssld=False, **kwargs):
 def SE_ResNeXt101_32x4d(pretrained=False, use_ssld=False, **kwargs):
     model = ResNeXt(layers=101, cardinality=32, **kwargs)
     _load_pretrained(
-        pretrained,
-        model,
-        MODEL_URLS["SE_ResNeXt101_32x4d"],
-        use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["SE_ResNeXt101_32x4d"], use_ssld=use_ssld)
     return model
 
 
 def SE_ResNeXt152_64x4d(pretrained=False, use_ssld=False, **kwargs):
     model = ResNeXt(layers=152, cardinality=64, **kwargs)
     _load_pretrained(
-        pretrained,
-        model,
-        MODEL_URLS["SE_ResNeXt152_64x4d"],
-        use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["SE_ResNeXt152_64x4d"], use_ssld=use_ssld)
     return model

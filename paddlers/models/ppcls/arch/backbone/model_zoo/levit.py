@@ -1,4 +1,4 @@
-# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -366,8 +366,8 @@ class LeViT(nn.Layer):
         down_ops.append([''])
         resolution = img_size // patch_size
         for i, (ed, kd, dpth, nh, ar, mr, do) in enumerate(
-                zip(embed_dim, key_dim, depth, num_heads, attn_ratio,
-                    mlp_ratio, down_ops)):
+                zip(embed_dim, key_dim, depth, num_heads, attn_ratio, mlp_ratio,
+                    down_ops)):
             for _ in range(dpth):
                 self.blocks.append(
                     Residual(

@@ -55,25 +55,35 @@ class BIT(nn.Layer):
     Raises:
         ValueError: When an unsupported backbone type is specified, or the number of backbone stages is not 3, 4, or 5.
     """
-    
-    def __init__(
-        self, in_channels, num_classes,
-        backbone='resnet18', n_stages=4, 
-        use_tokenizer=True, token_len=4, 
-        pool_mode='max', pool_size=2,
-        enc_with_pos=True, 
-        enc_depth=1, enc_head_dim=64, 
-        dec_depth=8, dec_head_dim=8,
-        **backbone_kwargs
-    ):
+
+    def __init__(self,
+                 in_channels,
+                 num_classes,
+                 backbone='resnet18',
+                 n_stages=4,
+                 use_tokenizer=True,
+                 token_len=4,
+                 pool_mode='max',
+                 pool_size=2,
+                 enc_with_pos=True,
+                 enc_depth=1,
+                 enc_head_dim=64,
+                 dec_depth=8,
+                 dec_head_dim=8,
+                 **backbone_kwargs):
         super().__init__()
 
         # TODO: reduce hard-coded parameters
         DIM = 32
-        MLP_DIM = 2*DIM
+        MLP_DIM = 2 * DIM
         EBD_DIM = DIM
 
-        self.backbone = Backbone(in_channels, EBD_DIM, arch=backbone, n_stages=n_stages, **backbone_kwargs)
+        self.backbone = Backbone(
+            in_channels,
+            EBD_DIM,
+            arch=backbone,
+            n_stages=n_stages,
+            **backbone_kwargs)
 
         self.use_tokenizer = use_tokenizer
         if not use_tokenizer:
@@ -88,46 +98,43 @@ class BIT(nn.Layer):
         self.enc_with_pos = enc_with_pos
         if enc_with_pos:
             self.enc_pos_embedding = self.create_parameter(
-                shape=(1,self.token_len*2,EBD_DIM), 
-                default_initializer=Normal()
-            )
+                shape=(1, self.token_len * 2, EBD_DIM),
+                default_initializer=Normal())
 
         self.enc_depth = enc_depth
         self.dec_depth = dec_depth
         self.enc_head_dim = enc_head_dim
         self.dec_head_dim = dec_head_dim
-        
+
         self.encoder = TransformerEncoder(
-            dim=DIM, 
-            depth=enc_depth, 
+            dim=DIM,
+            depth=enc_depth,
             n_heads=8,
             head_dim=enc_head_dim,
             mlp_dim=MLP_DIM,
-            dropout_rate=0.
-        )
+            dropout_rate=0.)
         self.decoder = TransformerDecoder(
-            dim=DIM, 
+            dim=DIM,
             depth=dec_depth,
-            n_heads=8, 
-            head_dim=dec_head_dim, 
-            mlp_dim=MLP_DIM, 
+            n_heads=8,
+            head_dim=dec_head_dim,
+            mlp_dim=MLP_DIM,
             dropout_rate=0.,
-            apply_softmax=True
-        )
+            apply_softmax=True)
 
         self.upsample = nn.Upsample(scale_factor=4, mode='bilinear')
         self.conv_out = nn.Sequential(
-            Conv3x3(EBD_DIM, EBD_DIM, norm=True, act=True),
-            Conv3x3(EBD_DIM, num_classes)
-        )
+            Conv3x3(
+                EBD_DIM, EBD_DIM, norm=True, act=True),
+            Conv3x3(EBD_DIM, num_classes))
 
     def _get_semantic_tokens(self, x):
         b, c = paddle.shape(x)[:2]
         att_map = self.conv_att(x)
-        att_map = att_map.reshape((b,self.token_len,1,-1))
+        att_map = att_map.reshape((b, self.token_len, 1, -1))
         att_map = F.softmax(att_map, axis=-1)
-        x = x.reshape((b,1,c,-1))
-        tokens = (x*att_map).sum(-1)
+        x = x.reshape((b, 1, c, -1))
+        tokens = (x * att_map).sum(-1)
         return tokens
 
     def _get_reshaped_tokens(self, x):
@@ -137,7 +144,7 @@ class BIT(nn.Layer):
             x = F.adaptive_avg_pool2d(x, (self.pool_size, self.pool_size))
         else:
             x = x
-        tokens = x.transpose((0,2,3,1)).flatten(1,2)
+        tokens = x.transpose((0, 2, 3, 1)).flatten(1, 2)
         return tokens
 
     def encode(self, x):
@@ -148,9 +155,9 @@ class BIT(nn.Layer):
 
     def decode(self, x, m):
         b, c, h, w = paddle.shape(x)
-        x = x.transpose((0,2,3,1)).flatten(1,2)
+        x = x.transpose((0, 2, 3, 1)).flatten(1, 2)
         x = self.decoder(x, m)
-        x = x.transpose((0,2,1)).reshape((b,c,h,w))
+        x = x.transpose((0, 2, 1)).reshape((b, c, h, w))
         return x
 
     def forward(self, t1, t2):
@@ -232,29 +239,30 @@ class FeedForward(nn.Sequential):
             nn.Linear(dim, hidden_dim),
             nn.GELU(),
             nn.Dropout(dropout_rate),
-            nn.Linear(hidden_dim, dim),
-            nn.Dropout(dropout_rate)
-        )
+            nn.Linear(hidden_dim, dim), nn.Dropout(dropout_rate))
 
 
 class CrossAttention(nn.Layer):
-    def __init__(self, dim, n_heads=8, head_dim=64, dropout_rate=0., apply_softmax=True):
+    def __init__(self,
+                 dim,
+                 n_heads=8,
+                 head_dim=64,
+                 dropout_rate=0.,
+                 apply_softmax=True):
         super().__init__()
 
         inner_dim = head_dim * n_heads
         self.n_heads = n_heads
-        self.scale = dim ** -0.5
+        self.scale = dim**-0.5
 
         self.apply_softmax = apply_softmax
-        
+
         self.fc_q = nn.Linear(dim, inner_dim, bias_attr=False)
         self.fc_k = nn.Linear(dim, inner_dim, bias_attr=False)
         self.fc_v = nn.Linear(dim, inner_dim, bias_attr=False)
 
         self.fc_out = nn.Sequential(
-            nn.Linear(inner_dim, dim),
-            nn.Dropout(dropout_rate)
-        )
+            nn.Linear(inner_dim, dim), nn.Dropout(dropout_rate))
 
     def forward(self, x, ref):
         b, n = paddle.shape(x)[:2]
@@ -264,9 +272,9 @@ class CrossAttention(nn.Layer):
         k = self.fc_k(ref)
         v = self.fc_v(ref)
 
-        q = q.reshape((b,n,h,-1)).transpose((0,2,1,3))
-        k = k.reshape((b,paddle.shape(ref)[1],h,-1)).transpose((0,2,1,3))
-        v = v.reshape((b,paddle.shape(ref)[1],h,-1)).transpose((0,2,1,3))
+        q = q.reshape((b, n, h, -1)).transpose((0, 2, 1, 3))
+        k = k.reshape((b, paddle.shape(ref)[1], h, -1)).transpose((0, 2, 1, 3))
+        v = v.reshape((b, paddle.shape(ref)[1], h, -1)).transpose((0, 2, 1, 3))
 
         mult = paddle.matmul(q, k, transpose_y=True) * self.scale
 
@@ -274,7 +282,7 @@ class CrossAttention(nn.Layer):
             mult = F.softmax(mult, axis=-1)
 
         out = paddle.matmul(mult, v)
-        out = out.transpose((0,2,1,3)).flatten(2)
+        out = out.transpose((0, 2, 1, 3)).flatten(2)
         return self.fc_out(out)
 
 
@@ -288,10 +296,15 @@ class TransformerEncoder(nn.Layer):
         super().__init__()
         self.layers = nn.LayerList([])
         for _ in range(depth):
-            self.layers.append(nn.LayerList([
-                Residual(PreNorm(dim, SelfAttention(dim, n_heads, head_dim, dropout_rate))),
-                Residual(PreNorm(dim, FeedForward(dim, mlp_dim, dropout_rate)))
-            ]))
+            self.layers.append(
+                nn.LayerList([
+                    Residual(
+                        PreNorm(dim,
+                                SelfAttention(dim, n_heads, head_dim,
+                                              dropout_rate))),
+                    Residual(
+                        PreNorm(dim, FeedForward(dim, mlp_dim, dropout_rate)))
+                ]))
 
     def forward(self, x):
         for att, ff in self.layers:
@@ -301,14 +314,26 @@ class TransformerEncoder(nn.Layer):
 
 
 class TransformerDecoder(nn.Layer):
-    def __init__(self, dim, depth, n_heads, head_dim, mlp_dim, dropout_rate, apply_softmax=True):
+    def __init__(self,
+                 dim,
+                 depth,
+                 n_heads,
+                 head_dim,
+                 mlp_dim,
+                 dropout_rate,
+                 apply_softmax=True):
         super().__init__()
         self.layers = nn.LayerList([])
         for _ in range(depth):
-            self.layers.append(nn.LayerList([
-                Residual2(PreNorm2(dim, CrossAttention(dim, n_heads, head_dim, dropout_rate, apply_softmax))),
-                Residual(PreNorm(dim, FeedForward(dim, mlp_dim, dropout_rate)))
-            ]))
+            self.layers.append(
+                nn.LayerList([
+                    Residual2(
+                        PreNorm2(dim,
+                                 CrossAttention(dim, n_heads, head_dim,
+                                                dropout_rate, apply_softmax))),
+                    Residual(
+                        PreNorm(dim, FeedForward(dim, mlp_dim, dropout_rate)))
+                ]))
 
     def forward(self, x, m):
         for att, ff in self.layers:
@@ -318,21 +343,26 @@ class TransformerDecoder(nn.Layer):
 
 
 class Backbone(nn.Layer, KaimingInitMixin):
-    def __init__(
-        self, 
-        in_ch, out_ch=32,
-        arch='resnet18',
-        pretrained=True,
-        n_stages=5
-    ):
+    def __init__(self,
+                 in_ch,
+                 out_ch=32,
+                 arch='resnet18',
+                 pretrained=True,
+                 n_stages=5):
         super().__init__()
 
         expand = 1
-        strides = (2,1,2,1,1)
+        strides = (2, 1, 2, 1, 1)
         if arch == 'resnet18':
-            self.resnet = resnet.resnet18(pretrained=pretrained, strides=strides, norm_layer=get_norm_layer())
+            self.resnet = resnet.resnet18(
+                pretrained=pretrained,
+                strides=strides,
+                norm_layer=get_norm_layer())
         elif arch == 'resnet34':
-            self.resnet = resnet.resnet34(pretrained=pretrained, strides=strides, norm_layer=get_norm_layer())
+            self.resnet = resnet.resnet34(
+                pretrained=pretrained,
+                strides=strides,
+                norm_layer=get_norm_layer())
         else:
             raise ValueError
 
@@ -346,7 +376,7 @@ class Backbone(nn.Layer, KaimingInitMixin):
             itm_ch = 128 * expand
         else:
             raise ValueError
-            
+
         self.upsample = nn.Upsample(scale_factor=2)
         self.conv_out = Conv3x3(itm_ch, out_ch)
 
@@ -354,13 +384,7 @@ class Backbone(nn.Layer, KaimingInitMixin):
 
         if in_ch != 3:
             self.resnet.conv1 = nn.Conv2D(
-                in_ch, 
-                64,
-                kernel_size=7,
-                stride=2,
-                padding=3,
-                bias_attr=False
-            )
+                in_ch, 64, kernel_size=7, stride=2, padding=3, bias_attr=False)
 
         if not pretrained:
             self.init_weight()

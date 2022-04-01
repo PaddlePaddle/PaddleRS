@@ -65,8 +65,8 @@ class Integral(nn.Layer):
     def __init__(self, reg_max=16):
         super(Integral, self).__init__()
         self.reg_max = reg_max
-        self.register_buffer(
-            'project', paddle.linspace(0, self.reg_max, self.reg_max + 1))
+        self.register_buffer('project',
+                             paddle.linspace(0, self.reg_max, self.reg_max + 1))
 
     def forward(self, x):
         """Forward feature from the regression head to get integral result of
@@ -160,8 +160,7 @@ class GFLHead(nn.Layer):
                 n QFL setting. Default: 16.
     """
     __inject__ = [
-        'conv_feat', 'dgqp_module', 'loss_class', 'loss_dfl', 'loss_bbox',
-        'nms'
+        'conv_feat', 'dgqp_module', 'loss_class', 'loss_dfl', 'loss_bbox', 'nms'
     ]
     __shared__ = ['num_classes']
 
@@ -320,8 +319,7 @@ class GFLHead(nn.Layer):
                 as_tuple=False).squeeze(1)
             score = np.zeros(labels.shape)
             if len(pos_inds) > 0:
-                pos_bbox_targets = paddle.gather(
-                    bbox_targets, pos_inds, axis=0)
+                pos_bbox_targets = paddle.gather(bbox_targets, pos_inds, axis=0)
                 pos_bbox_pred = paddle.gather(bbox_pred, pos_inds, axis=0)
                 pos_grid_cells = paddle.gather(grid_cells, pos_inds, axis=0)
                 pos_grid_cell_centers = self._grid_cells_to_center(
@@ -330,8 +328,7 @@ class GFLHead(nn.Layer):
                 weight_targets = F.sigmoid(cls_score.detach())
                 weight_targets = paddle.gather(
                     weight_targets.max(axis=1, keepdim=True), pos_inds, axis=0)
-                pos_bbox_pred_corners = self.distribution_project(
-                    pos_bbox_pred)
+                pos_bbox_pred_corners = self.distribution_project(pos_bbox_pred)
                 pos_decode_bbox_pred = distance2bbox(pos_grid_cell_centers,
                                                      pos_bbox_pred_corners)
                 pos_decode_bbox_targets = pos_bbox_targets / stride
@@ -379,12 +376,10 @@ class GFLHead(nn.Layer):
         except:
             avg_factor = max(avg_factor.item(), 1)
         if avg_factor <= 0:
-            loss_qfl = paddle.to_tensor(
-                0, dtype='float32', stop_gradient=False)
+            loss_qfl = paddle.to_tensor(0, dtype='float32', stop_gradient=False)
             loss_bbox = paddle.to_tensor(
                 0, dtype='float32', stop_gradient=False)
-            loss_dfl = paddle.to_tensor(
-                0, dtype='float32', stop_gradient=False)
+            loss_dfl = paddle.to_tensor(0, dtype='float32', stop_gradient=False)
         else:
             losses_bbox = list(map(lambda x: x / avg_factor, loss_bbox_list))
             losses_dfl = list(map(lambda x: x / avg_factor, loss_dfl_list))
@@ -397,9 +392,7 @@ class GFLHead(nn.Layer):
 
         return loss_states
 
-    def get_single_level_center_point(self,
-                                      featmap_size,
-                                      stride,
+    def get_single_level_center_point(self, featmap_size, stride,
                                       cell_offset=0):
         """
         Generate pixel centers of a single stage feature map.

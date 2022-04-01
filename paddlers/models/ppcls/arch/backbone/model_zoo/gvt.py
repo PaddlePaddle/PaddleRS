@@ -1,4 +1,4 @@
-# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -125,8 +125,7 @@ class Attention(nn.Layer):
 
         self.sr_ratio = sr_ratio
         if sr_ratio > 1:
-            self.sr = nn.Conv2D(
-                dim, dim, kernel_size=sr_ratio, stride=sr_ratio)
+            self.sr = nn.Conv2D(dim, dim, kernel_size=sr_ratio, stride=sr_ratio)
             self.norm = nn.LayerNorm(dim)
 
     def forward(self, x, H, W):
@@ -234,8 +233,8 @@ class GroupBlock(ViTBlock):
                          attn_drop, drop_path, act_layer, norm_layer)
         del self.attn
         if ws == 1:
-            self.attn = Attention(dim, num_heads, qkv_bias, qk_scale,
-                                  attn_drop, drop, sr_ratio)
+            self.attn = Attention(dim, num_heads, qkv_bias, qk_scale, attn_drop,
+                                  drop, sr_ratio)
         else:
             self.attn = GroupAttention(dim, num_heads, qkv_bias, qk_scale,
                                        attn_drop, drop, ws)

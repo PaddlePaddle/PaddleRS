@@ -30,6 +30,7 @@ class REDSDataset(Dataset):
     """
     REDS dataset for EDVR model
     """
+
     def __init__(self,
                  mode,
                  lq_folder,
@@ -75,12 +76,12 @@ class REDSDataset(Dataset):
         print("initialize reader")
         self.filelist = []
         for video_name in os.listdir(self.fileroot):
-            if (self.mode == 'train') and (video_name in [
-                    '000', '011', '015', '020'
-            ]):  #These four videos are used as val
+            if (self.mode == 'train') and (
+                    video_name in ['000', '011', '015', '020'
+                                   ]):  #These four videos are used as val
                 continue
-            for frame_name in os.listdir(os.path.join(self.fileroot,
-                                                      video_name)):
+            for frame_name in os.listdir(
+                    os.path.join(self.fileroot, video_name)):
                 frame_idx = frame_name.split('.')[0]
                 video_frame_idx = video_name + '_' + str(frame_idx)
                 # for each item in self.filelist is like '010_00000015', '260_00000090'
@@ -149,8 +150,8 @@ class REDSDataset(Dataset):
                     for v in frame_list
                 ]
                 rnd_h_HR, rnd_w_HR = int(rnd_h * scale), int(rnd_w * scale)
-                img_GT = img_GT[rnd_h_HR:rnd_h_HR + crop_size,
-                                rnd_w_HR:rnd_w_HR + crop_size, :]
+                img_GT = img_GT[rnd_h_HR:rnd_h_HR + crop_size, rnd_w_HR:rnd_w_HR
+                                + crop_size, :]
             else:
                 rnd_h = random.randint(0, max(0, H - crop_size))
                 rnd_w = random.randint(0, max(0, W - crop_size))
@@ -158,8 +159,8 @@ class REDSDataset(Dataset):
                     v[rnd_h:rnd_h + crop_size, rnd_w:rnd_w + crop_size, :]
                     for v in frame_list
                 ]
-                img_GT = img_GT[rnd_h:rnd_h + crop_size,
-                                rnd_w:rnd_w + crop_size, :]
+                img_GT = img_GT[rnd_h:rnd_h + crop_size, rnd_w:rnd_w +
+                                crop_size, :]
 
         # add random flip and rotation
         frame_list.append(img_GT)
@@ -200,14 +201,12 @@ class REDSDataset(Dataset):
                 direction = 1
             if direction == 1:
                 neighbor_list = list(
-                    range(center_frame_idx,
-                          center_frame_idx + interval * number_frames,
-                          interval))
+                    range(center_frame_idx, center_frame_idx + interval *
+                          number_frames, interval))
             else:
                 neighbor_list = list(
-                    range(center_frame_idx,
-                          center_frame_idx - interval * number_frames,
-                          -interval))
+                    range(center_frame_idx, center_frame_idx - interval *
+                          number_frames, -interval))
             name_b = '{:08d}'.format(neighbor_list[0])
         else:
             # ensure not exceeding the borders

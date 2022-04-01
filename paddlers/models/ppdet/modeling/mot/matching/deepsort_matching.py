@@ -61,8 +61,7 @@ def iou_1toN(bbox, candidates):
     area_intersection = wh.prod(axis=1)
     area_bbox = bbox[2:].prod()
     area_candidates = candidates[:, 2:].prod(axis=1)
-    ious = area_intersection / (
-        area_bbox + area_candidates - area_intersection)
+    ious = area_intersection / (area_bbox + area_candidates - area_intersection)
     return ious
 
 
@@ -95,8 +94,7 @@ def iou_cost(tracks, detections, track_indices=None, detection_indices=None):
             continue
 
         bbox = tracks[track_idx].to_tlwh()
-        candidates = np.asarray(
-            [detections[i].tlwh for i in detection_indices])
+        candidates = np.asarray([detections[i].tlwh for i in detection_indices])
         cost_matrix[row, :] = 1. - iou_1toN(bbox, candidates)
     return cost_matrix
 
@@ -323,8 +321,7 @@ def matching_cascade(distance_metric,
             break
 
         track_indices_l = [
-            k for k in track_indices
-            if tracks[k].time_since_update == 1 + level
+            k for k in track_indices if tracks[k].time_since_update == 1 + level
         ]
         if len(track_indices_l) == 0:  # Nothing to match at this level
             continue

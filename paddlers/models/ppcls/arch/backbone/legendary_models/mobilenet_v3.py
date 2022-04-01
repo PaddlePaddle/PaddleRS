@@ -1,4 +1,4 @@
-# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,8 +46,7 @@ MODEL_URLS = {
 }
 
 MODEL_STAGES_PATTERN = {
-    "MobileNetV3_small":
-    ["blocks[0]", "blocks[2]", "blocks[7]", "blocks[10]"],
+    "MobileNetV3_small": ["blocks[0]", "blocks[2]", "blocks[7]", "blocks[10]"],
     "MobileNetV3_large":
     ["blocks[0]", "blocks[2]", "blocks[5]", "blocks[11]", "blocks[14]"]
 }
@@ -172,7 +171,7 @@ class MobileNetV3(TheseusLayer):
             if_act=True,
             act="hardswish")
 
-        self.blocks = nn.Sequential(* [
+        self.blocks = nn.Sequential(*[
             ResidualUnit(
                 in_c=_make_divisible(self.inplanes * self.scale if i == 0 else
                                      self.cfg[i - 1][2] * self.scale),

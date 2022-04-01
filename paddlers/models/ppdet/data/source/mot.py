@@ -180,14 +180,12 @@ class MOTDataSet(DetDataset):
             lbl_file = self.label_files[data_name][img_index - start_index]
 
             if not os.path.exists(img_file):
-                logger.warning(
-                    'Illegal image file: {}, and it will be ignored'.format(
-                        img_file))
+                logger.warning('Illegal image file: {}, and it will be ignored'.
+                               format(img_file))
                 continue
             if not os.path.isfile(lbl_file):
-                logger.warning(
-                    'Illegal label file: {}, and it will be ignored'.format(
-                        lbl_file))
+                logger.warning('Illegal label file: {}, and it will be ignored'.
+                               format(lbl_file))
                 continue
 
             labels = np.loadtxt(lbl_file, dtype=np.float32).reshape(-1, 6)
@@ -340,8 +338,7 @@ class MCMOTDataSet(DetDataset):
         last_idx_dict = defaultdict(int)
         for i, (k, v) in enumerate(self.tid_num.items()):  # each sub dataset
             for cls_id, id_num in v.items():  # v is a max_ids_dict
-                self.tid_start_idx_of_cls_ids[k][cls_id] = last_idx_dict[
-                    cls_id]
+                self.tid_start_idx_of_cls_ids[k][cls_id] = last_idx_dict[cls_id]
                 last_idx_dict[cls_id] += id_num
 
         self.num_identities_dict = defaultdict(int)
@@ -408,14 +405,12 @@ class MCMOTDataSet(DetDataset):
             lbl_file = self.label_files[data_name][img_index - start_index]
 
             if not os.path.exists(img_file):
-                logger.warning(
-                    'Illegal image file: {}, and it will be ignored'.format(
-                        img_file))
+                logger.warning('Illegal image file: {}, and it will be ignored'.
+                               format(img_file))
                 continue
             if not os.path.isfile(lbl_file):
-                logger.warning(
-                    'Illegal label file: {}, and it will be ignored'.format(
-                        lbl_file))
+                logger.warning('Illegal label file: {}, and it will be ignored'.
+                               format(lbl_file))
                 continue
 
             labels = np.loadtxt(lbl_file, dtype=np.float32).reshape(-1, 6)
@@ -430,8 +425,7 @@ class MCMOTDataSet(DetDataset):
             for i, _ in enumerate(gt_ide):
                 if gt_ide[i] > -1:
                     cls_id = int(gt_class[i])
-                    start_idx = self.tid_start_idx_of_cls_ids[data_name][
-                        cls_id]
+                    start_idx = self.tid_start_idx_of_cls_ids[data_name][cls_id]
                     gt_ide[i] += start_idx
 
             mot_rec = {

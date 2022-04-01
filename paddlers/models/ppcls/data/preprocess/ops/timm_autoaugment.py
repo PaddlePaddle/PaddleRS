@@ -864,8 +864,7 @@ class RawTimmAutoAugment(object):
             self.augment_func = rand_augment_transform(config_str, aa_params)
         elif config_str.startswith('augmix'):
             aa_params['translate_pct'] = 0.3
-            self.augment_func = augment_and_mix_transform(config_str,
-                                                          aa_params)
+            self.augment_func = augment_and_mix_transform(config_str, aa_params)
         elif config_str.startswith('auto'):
             self.augment_func = auto_augment_transform(config_str, aa_params)
         else:

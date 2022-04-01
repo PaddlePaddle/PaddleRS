@@ -369,9 +369,8 @@ class Tracker(object):
                 frame_rate = int(meta_info[meta_info.find('frameRate') + 10:
                                            meta_info.find('\nseqLength')])
 
-            save_dir = os.path.join(
-                output_dir, 'mot_outputs',
-                seq) if save_images or save_videos else None
+            save_dir = os.path.join(output_dir, 'mot_outputs',
+                                    seq) if save_images or save_videos else None
             logger.info('start seq: {}'.format(seq))
 
             self.dataset.set_images(self.get_infer_images(infer_dir))

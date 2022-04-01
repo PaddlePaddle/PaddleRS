@@ -88,8 +88,7 @@ class S2ANetAnchorGenerator(nn.Layer):
         shift_x = paddle.arange(0, feat_w, 1, 'int32') * stride
         shift_y = paddle.arange(0, feat_h, 1, 'int32') * stride
         shift_xx, shift_yy = self._meshgrid(shift_x, shift_y)
-        shifts = paddle.stack(
-            [shift_xx, shift_yy, shift_xx, shift_yy], axis=-1)
+        shifts = paddle.stack([shift_xx, shift_yy, shift_xx, shift_yy], axis=-1)
 
         all_anchors = self.base_anchors[:, :] + shifts[:, :]
         all_anchors = all_anchors.reshape([feat_h * feat_w, 4])
@@ -183,8 +182,7 @@ class AlignConv(nn.Layer):
         offset_y = y_anchor - y_conv
         offset = paddle.stack([offset_y, offset_x], axis=-1)
         offset = paddle.reshape(
-            offset,
-            [feat_h * feat_w, self.kernel_size * self.kernel_size * 2])
+            offset, [feat_h * feat_w, self.kernel_size * self.kernel_size * 2])
         offset = paddle.transpose(offset, [1, 0])
         offset = paddle.reshape(
             offset,
@@ -435,8 +433,7 @@ class S2ANetHead(nn.Layer):
             fam_reg = self.fam_reg(fam_reg_feat)
             # [N, 5, H, W] --> [N, H, W, 5]
             fam_reg = fam_reg.transpose([0, 2, 3, 1])
-            fam_reg_reshape = paddle.reshape(fam_reg,
-                                             [fam_reg.shape[0], -1, 5])
+            fam_reg_reshape = paddle.reshape(fam_reg, [fam_reg.shape[0], -1, 5])
             fam_reg_branch_list.append(fam_reg_reshape)
 
             # prepare anchor
@@ -452,8 +449,7 @@ class S2ANetHead(nn.Layer):
             self.base_anchors_list.append(init_anchors)
 
             if self.training:
-                refine_anchor = self.bbox_decode(fam_reg.detach(),
-                                                 init_anchors)
+                refine_anchor = self.bbox_decode(fam_reg.detach(), init_anchors)
             else:
                 refine_anchor = self.bbox_decode(fam_reg, init_anchors)
 
@@ -545,10 +541,8 @@ class S2ANetHead(nn.Layer):
             feat_labels = labels[st_idx:st_idx + feat_anchor_num]
             feat_label_weights = label_weights[st_idx:st_idx + feat_anchor_num]
 
-            feat_bbox_targets = bbox_targets[st_idx:st_idx +
-                                             feat_anchor_num, :]
-            feat_bbox_weights = bbox_weights[st_idx:st_idx +
-                                             feat_anchor_num, :]
+            feat_bbox_targets = bbox_targets[st_idx:st_idx + feat_anchor_num, :]
+            feat_bbox_weights = bbox_weights[st_idx:st_idx + feat_anchor_num, :]
 
             # step2: calc cls loss
             feat_labels = feat_labels.reshape(-1)
@@ -661,10 +655,8 @@ class S2ANetHead(nn.Layer):
             feat_labels = labels[st_idx:st_idx + feat_anchor_num]
             feat_label_weights = label_weights[st_idx:st_idx + feat_anchor_num]
 
-            feat_bbox_targets = bbox_targets[st_idx:st_idx +
-                                             feat_anchor_num, :]
-            feat_bbox_weights = bbox_weights[st_idx:st_idx +
-                                             feat_anchor_num, :]
+            feat_bbox_targets = bbox_targets[st_idx:st_idx + feat_anchor_num, :]
+            feat_bbox_weights = bbox_weights[st_idx:st_idx + feat_anchor_num, :]
 
             # step2: calc cls loss
             feat_labels = feat_labels.reshape(-1)
@@ -830,8 +822,8 @@ class S2ANetHead(nn.Layer):
         mlvl_scores = []
 
         idx = 0
-        for cls_score, bbox_pred, anchors in zip(cls_score_list,
-                                                 bbox_pred_list, mlvl_anchors):
+        for cls_score, bbox_pred, anchors in zip(cls_score_list, bbox_pred_list,
+                                                 mlvl_anchors):
             cls_score = paddle.reshape(cls_score, [-1, cls_out_channels])
             if use_sigmoid_cls:
                 scores = F.sigmoid(cls_score)

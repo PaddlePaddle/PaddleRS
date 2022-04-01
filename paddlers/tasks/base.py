@@ -28,9 +28,9 @@ from paddleslim import L1NormFilterPruner, FPGMFilterPruner
 import paddlers
 from paddlers.transforms import arrange_transforms
 from paddlers.utils import (seconds_to_hms, get_single_card_bs, dict2str,
-                           get_pretrain_weights, load_pretrain_weights,
-                           load_checkpoint, SmoothedValue, TrainingStats,
-                           _get_shared_memory_size_in_M, EarlyStop)
+                            get_pretrain_weights, load_pretrain_weights,
+                            load_checkpoint, SmoothedValue, TrainingStats,
+                            _get_shared_memory_size_in_M, EarlyStop)
 import paddlers.utils.logging as logging
 from .slim.prune import _pruner_eval_fn, _pruner_template_input, sensitive_prune
 from .utils.infer_nets import InferNet
@@ -130,8 +130,8 @@ class BaseModel:
         info['version'] = paddlers.__version__
         info['Model'] = self.__class__.__name__
         info['_Attributes'] = dict(
-            [('model_type', self.model_type),
-             ('num_classes', self.num_classes), ('labels', self.labels),
+            [('model_type', self.model_type), ('num_classes', self.num_classes),
+             ('labels', self.labels),
              ('fixed_input_shape', self.fixed_input_shape),
              ('best_accuracy', self.best_accuracy),
              ('best_model_epoch', self.best_model_epoch)])
@@ -173,10 +173,7 @@ class BaseModel:
         info['pruning_ratios'] = self.pruning_ratios
         pruner_inputs = self.pruner.inputs
         if self.model_type == 'detector':
-            pruner_inputs = {
-                k: v.tolist()
-                for k, v in pruner_inputs[0].items()
-            }
+            pruner_inputs = {k: v.tolist() for k, v in pruner_inputs[0].items()}
         info['pruner_inputs'] = pruner_inputs
 
         return info
@@ -194,8 +191,7 @@ class BaseModel:
         model_info = self.get_model_info()
         model_info['status'] = self.status
 
-        paddle.save(self.net.state_dict(),
-                    osp.join(save_dir, 'model.pdparams'))
+        paddle.save(self.net.state_dict(), osp.join(save_dir, 'model.pdparams'))
         paddle.save(self.optimizer.state_dict(),
                     osp.join(save_dir, 'model.pdopt'))
 
@@ -326,8 +322,7 @@ class BaseModel:
         for i in range(start_epoch, num_epochs):
             self.net.train()
             if callable(
-                    getattr(self.train_data_loader.dataset, 'set_epoch',
-                            None)):
+                    getattr(self.train_data_loader.dataset, 'set_epoch', None)):
                 self.train_data_loader.dataset.set_epoch(i)
             train_avg_metrics = TrainingStats()
             step_time_tic = time.time()

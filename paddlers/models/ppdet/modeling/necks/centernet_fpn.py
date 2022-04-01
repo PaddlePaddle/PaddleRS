@@ -289,8 +289,7 @@ class TransitionUp(nn.Layer):
 
     def forward(self, x, skip):
         w, h = skip.shape[2], skip.shape[3]
-        out = F.interpolate(
-            x, size=(w, h), mode="bilinear", align_corners=True)
+        out = F.interpolate(x, size=(w, h), mode="bilinear", align_corners=True)
         out = paddle.concat([out, skip], 1)
         return out
 
@@ -355,8 +354,7 @@ class CenterNetHarDNetFPN(nn.Layer):
         self.transUpBlocks = nn.LayerList([])
         self.denseBlocksUp = nn.LayerList([])
         self.conv1x1_up = nn.LayerList([])
-        self.avg9x9 = nn.AvgPool2D(
-            kernel_size=(9, 9), stride=1, padding=(4, 4))
+        self.avg9x9 = nn.AvgPool2D(kernel_size=(9, 9), stride=1, padding=(4, 4))
         prev_ch = self.last_blk.get_out_ch()
 
         for i in range(3):

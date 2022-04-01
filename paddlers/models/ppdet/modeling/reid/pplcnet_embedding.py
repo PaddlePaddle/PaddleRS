@@ -41,9 +41,9 @@ NET_CONFIG = {
     [[3, 16, 32, 1, False]],
     "blocks3": [[3, 32, 64, 2, False], [3, 64, 64, 1, False]],
     "blocks4": [[3, 64, 128, 2, False], [3, 128, 128, 1, False]],
-    "blocks5": [[3, 128, 256, 2, False], [5, 256, 256, 1, False],
-                [5, 256, 256, 1, False], [5, 256, 256, 1, False],
-                [5, 256, 256, 1, False], [5, 256, 256, 1, False]],
+    "blocks5":
+    [[3, 128, 256, 2, False], [5, 256, 256, 1, False], [5, 256, 256, 1, False],
+     [5, 256, 256, 1, False], [5, 256, 256, 1, False], [5, 256, 256, 1, False]],
     "blocks6": [[5, 256, 512, 2, True], [5, 512, 512, 1, True]]
 }
 
@@ -253,8 +253,7 @@ class FC(nn.Layer):
     def __init__(self, input_ch, output_ch):
         super(FC, self).__init__()
         weight_attr = ParamAttr(initializer=XavierNormal())
-        self.fc = paddle.nn.Linear(
-            input_ch, output_ch, weight_attr=weight_attr)
+        self.fc = paddle.nn.Linear(input_ch, output_ch, weight_attr=weight_attr)
 
     def forward(self, x):
         out = self.fc(x)

@@ -36,10 +36,10 @@ class ChannelAttention(nn.Layer):
         super().__init__()
         self.avg_pool = nn.AdaptiveAvgPool2D(1)
         self.max_pool = nn.AdaptiveMaxPool2D(1)
-        self.fc1 = Conv1x1(in_ch, in_ch//ratio, bias=False, act=True)
-        self.fc2 = Conv1x1(in_ch//ratio, in_ch, bias=False)
+        self.fc1 = Conv1x1(in_ch, in_ch // ratio, bias=False, act=True)
+        self.fc2 = Conv1x1(in_ch // ratio, in_ch, bias=False)
 
-    def forward(self,x):
+    def forward(self, x):
         avg_out = self.fc2(self.fc1(self.avg_pool(x)))
         max_out = self.fc2(self.fc1(self.max_pool(x)))
         out = avg_out + max_out
@@ -83,7 +83,7 @@ class CBAM(nn.Layer):
         ratio (int, optional): The channel reduction ratio for the channel attention module. Default: 8.
         kernel_size (int, optional): The size of the convolutional kernel used in the spatial attention module. Default: 7.
     """
-    
+
     def __init__(self, in_ch, ratio=8, kernel_size=7):
         super().__init__()
         self.ca = ChannelAttention(in_ch, ratio=ratio)

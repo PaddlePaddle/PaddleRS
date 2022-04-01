@@ -167,8 +167,7 @@ class BatchRandomResize(BaseOperator):
         else:
             interp = self.interp
 
-        resizer = Resize(
-            target_size, keep_ratio=self.keep_ratio, interp=interp)
+        resizer = Resize(target_size, keep_ratio=self.keep_ratio, interp=interp)
         return resizer(samples, context=context)
 
 
@@ -306,8 +305,7 @@ class Gt2FCOSTarget(BaseOperator):
         object_sizes_of_interest = []
         for i in range(len(self.object_sizes_boundary) - 1):
             object_sizes_of_interest.append([
-                self.object_sizes_boundary[i],
-                self.object_sizes_boundary[i + 1]
+                self.object_sizes_boundary[i], self.object_sizes_boundary[i + 1]
             ])
         self.object_sizes_of_interest = object_sizes_of_interest
         self.norm_reg_targets = norm_reg_targets
@@ -379,8 +377,7 @@ class Gt2FCOSTarget(BaseOperator):
         r_res = clipped_box[:, :, 2] - xs
         t_res = ys - clipped_box[:, :, 1]
         b_res = clipped_box[:, :, 3] - ys
-        clipped_box_reg_targets = np.stack(
-            [l_res, t_res, r_res, b_res], axis=2)
+        clipped_box_reg_targets = np.stack([l_res, t_res, r_res, b_res], axis=2)
         inside_gt_box = np.min(clipped_box_reg_targets, axis=2) > 0
         return inside_gt_box
 
@@ -460,10 +457,8 @@ class Gt2FCOSTarget(BaseOperator):
                 split_sections.append(end)
                 beg = end
             labels_by_level = np.split(labels, split_sections, axis=0)
-            reg_targets_by_level = np.split(
-                reg_targets, split_sections, axis=0)
-            ctn_targets_by_level = np.split(
-                ctn_targets, split_sections, axis=0)
+            reg_targets_by_level = np.split(reg_targets, split_sections, axis=0)
+            ctn_targets_by_level = np.split(ctn_targets, split_sections, axis=0)
             for lvl in range(len(self.downsample_ratios)):
                 grid_w = int(np.ceil(w / self.downsample_ratios[lvl]))
                 grid_h = int(np.ceil(h / self.downsample_ratios[lvl]))
@@ -674,8 +669,7 @@ class Gt2TTFTarget(BaseOperator):
 
             for k in range(len(gt_bbox)):
                 cls_id = gt_class[k]
-                fake_heatmap = np.zeros(
-                    (feat_size, feat_size), dtype='float32')
+                fake_heatmap = np.zeros((feat_size, feat_size), dtype='float32')
                 self.draw_truncate_gaussian(fake_heatmap, ct_inds[k],
                                             h_radiuses_alpha[k],
                                             w_radiuses_alpha[k])
@@ -760,8 +754,7 @@ class Gt2Solov2Target(BaseOperator):
             im_c, im_h, im_w = sample['image'].shape[:]
             gt_masks_raw = sample['gt_segm'].astype(np.uint8)
             mask_feat_size = [
-                int(im_h / self.sampling_ratio),
-                int(im_w / self.sampling_ratio)
+                int(im_h / self.sampling_ratio), int(im_w / self.sampling_ratio)
             ]
             gt_areas = np.sqrt((gt_bboxes_raw[:, 2] - gt_bboxes_raw[:, 0]) *
                                (gt_bboxes_raw[:, 3] - gt_bboxes_raw[:, 1]))
@@ -817,18 +810,15 @@ class Gt2Solov2Target(BaseOperator):
                     top_box = max(0,
                                   int(((center_h - half_h) / upsampled_size[0])
                                       // (1. / num_grid)))
-                    down_box = min(
-                        num_grid - 1,
-                        int(((center_h + half_h) / upsampled_size[0]) //
-                            (1. / num_grid)))
-                    left_box = max(
-                        0,
-                        int(((center_w - half_w) / upsampled_size[1]) //
-                            (1. / num_grid)))
+                    down_box = min(num_grid - 1,
+                                   int(((center_h + half_h) / upsampled_size[0])
+                                       // (1. / num_grid)))
+                    left_box = max(0,
+                                   int(((center_w - half_w) / upsampled_size[1])
+                                       // (1. / num_grid)))
                     right_box = min(num_grid - 1,
                                     int(((center_w + half_w) /
-                                         upsampled_size[1]) //
-                                        (1. / num_grid)))
+                                         upsampled_size[1]) // (1. / num_grid)))
 
                     top = max(top_box, coord_h - 1)
                     down = min(down_box, coord_h + 1)

@@ -1,4 +1,4 @@
-# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -178,8 +178,7 @@ class MLATransformer(nn.Layer):
             nn.Conv2D(
                 in_channels=aux_channels,
                 out_channels=self.num_classes,
-                kernel_size=1,
-            ))
+                kernel_size=1, ))
 
         self.pretrained = pretrained
         self.init_weight()

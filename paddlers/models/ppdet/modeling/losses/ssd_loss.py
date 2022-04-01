@@ -148,8 +148,7 @@ class SSDLoss(nn.Layer):
         if bbox_mask.astype(boxes.dtype).sum() > 0:
             location = paddle.masked_select(boxes, bbox_mask)
             targets_bbox = paddle.masked_select(targets_bbox, bbox_mask)
-            loc_loss = F.smooth_l1_loss(
-                location, targets_bbox, reduction='sum')
+            loc_loss = F.smooth_l1_loss(location, targets_bbox, reduction='sum')
             loc_loss = loc_loss * self.loc_loss_weight
         else:
             loc_loss = paddle.zeros([1])

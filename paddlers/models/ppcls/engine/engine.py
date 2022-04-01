@@ -146,8 +146,8 @@ class Engine(object):
                         self.config["DataLoader"]["Eval"], "Gallery",
                         self.device, self.use_dali)
                     self.query_dataloader = build_dataloader(
-                        self.config["DataLoader"]["Eval"], "Query",
-                        self.device, self.use_dali)
+                        self.config["DataLoader"]["Eval"], "Query", self.device,
+                        self.use_dali)
 
         # build loss
         if self.mode == "train":
@@ -212,8 +212,8 @@ class Engine(object):
                 load_dygraph_pretrain_from_url(
                     self.model, self.config["Global"]["pretrained_model"])
             else:
-                load_dygraph_pretrain(
-                    self.model, self.config["Global"]["pretrained_model"])
+                load_dygraph_pretrain(self.model,
+                                      self.config["Global"]["pretrained_model"])
 
         # build optimizer
         if self.mode == 'train':

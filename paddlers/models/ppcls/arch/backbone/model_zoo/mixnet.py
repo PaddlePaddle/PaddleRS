@@ -1,4 +1,4 @@
-# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -691,8 +691,7 @@ class MixNet(nn.Layer):
             "final_pool", nn.AvgPool2D(
                 kernel_size=7, stride=1))
 
-        self.output = nn.Linear(
-            in_features=in_channels, out_features=class_num)
+        self.output = nn.Linear(in_features=in_channels, out_features=class_num)
 
     def forward(self, x):
         x = self.features(x)

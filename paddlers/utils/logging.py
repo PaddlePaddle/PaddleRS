@@ -29,12 +29,11 @@ def log(level=2, message="", use_color=False):
         time_array = time.localtime(current_time)
         current_time = time.strftime("%Y-%m-%d %H:%M:%S", time_array)
         if use_color:
-            print("\033[1;31;40m{} [{}]\t{}\033[0m".format(
-                current_time, levels[level], message).encode("utf-8")
-                    .decode("latin1"))
-        else:
-            print("{} [{}]\t{}".format(current_time, levels[
+            print("\033[1;31;40m{} [{}]\t{}\033[0m".format(current_time, levels[
                 level], message).encode("utf-8").decode("latin1"))
+        else:
+            print("{} [{}]\t{}".format(current_time, levels[level], message)
+                  .encode("utf-8").decode("latin1"))
         sys.stdout.flush()
 
 

@@ -31,6 +31,7 @@ class Registry(object):
     .. code-block:: python
         BACKBONE_REGISTRY.register(MyBackbone)
     """
+
     def __init__(self, name):
         """
         Args:
@@ -70,9 +71,8 @@ class Registry(object):
     def get(self, name):
         ret = self._obj_map.get(name)
         if ret is None:
-            raise KeyError(
-                "No object named '{}' found in '{}' registry!".format(
-                    name, self._name))
+            raise KeyError("No object named '{}' found in '{}' registry!".
+                           format(name, self._name))
 
         return ret
 

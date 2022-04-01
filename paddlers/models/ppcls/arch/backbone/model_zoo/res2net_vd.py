@@ -1,4 +1,4 @@
-# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -278,10 +278,7 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
 def Res2Net50_vd_26w_4s(pretrained=False, use_ssld=False, **kwargs):
     model = Res2Net_vd(layers=50, scales=4, width=26, **kwargs)
     _load_pretrained(
-        pretrained,
-        model,
-        MODEL_URLS["Res2Net50_vd_26w_4s"],
-        use_ssld=use_ssld)
+        pretrained, model, MODEL_URLS["Res2Net50_vd_26w_4s"], use_ssld=use_ssld)
     return model
 
 

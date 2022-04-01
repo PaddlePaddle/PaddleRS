@@ -58,11 +58,7 @@ class MultiHeadAttentionMap(nn.Layer):
         This is a 2D attention module, which only returns the attention softmax (no multiplication by value)
     """
 
-    def __init__(self,
-                 query_dim,
-                 hidden_dim,
-                 num_heads,
-                 dropout=0.0,
+    def __init__(self, query_dim, hidden_dim, num_heads, dropout=0.0,
                  bias=True):
         super().__init__()
         self.num_heads = num_heads
@@ -128,8 +124,8 @@ class MaskHeadFPNConv(nn.Layer):
         self.conv_inter = nn.LayerList()
         for in_dims, out_dims in zip(inter_dims[:-1], inter_dims[1:]):
             self.conv_inter.append(
-                self._make_layers(in_dims, out_dims, 3, num_groups,
-                                  weight_attr, bias_attr))
+                self._make_layers(in_dims, out_dims, 3, num_groups, weight_attr,
+                                  bias_attr))
 
         self.conv_out = nn.Conv2D(
             inter_dims[-1],

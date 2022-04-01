@@ -21,10 +21,7 @@ from paddlers.utils import is_pic
 from .det_metrics.coco_utils import loadRes
 
 
-def visualize_detection(image,
-                        result,
-                        threshold=0.5,
-                        save_dir='./',
+def visualize_detection(image, result, threshold=0.5, save_dir='./',
                         color=None):
     """
         Visualize bbox and mask results
@@ -46,10 +43,7 @@ def visualize_detection(image,
         return image
 
 
-def visualize_segmentation(image,
-                           result,
-                           weight=0.6,
-                           save_dir='./',
+def visualize_segmentation(image, result, weight=0.6, save_dir='./',
                            color=None):
     """
     Convert segment result to color image, and save added image.
@@ -96,8 +90,7 @@ def visualize_segmentation(image,
         vis_result = pseudo_img
     else:
         vis_result = cv2.addWeighted(im, weight,
-                                     pseudo_img.astype(im.dtype), 1 - weight,
-                                     0)
+                                     pseudo_img.astype(im.dtype), 1 - weight, 0)
 
     if save_dir is not None:
         if not os.path.exists(save_dir):
@@ -222,8 +215,7 @@ def draw_bbox_mask(image, results, threshold=0.5, color_map=None):
             image[idx[0], idx[1], :] += alpha * color_mask
             image = image.astype("uint8")
             contours = cv2.findContours(
-                mask.astype("uint8"), cv2.RETR_CCOMP,
-                cv2.CHAIN_APPROX_NONE)[-2]
+                mask.astype("uint8"), cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)[-2]
             image = cv2.drawContours(
                 image,
                 contours,
@@ -386,9 +378,8 @@ def draw_pr_curve(eval_details_file=None,
             plt.plot(x, sr_array, color=color, label=nm, linewidth=1)
         plt.legend(loc="lower left", fontsize=5)
         plt.savefig(
-            os.path.join(
-                save_dir,
-                "./{}_pr_curve(iou-{}).png".format(style, iou_thresh)),
+            os.path.join(save_dir,
+                         "./{}_pr_curve(iou-{}).png".format(style, iou_thresh)),
             dpi=800)
         plt.close()
 

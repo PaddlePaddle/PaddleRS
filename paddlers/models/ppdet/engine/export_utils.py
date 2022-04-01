@@ -173,5 +173,4 @@ def _dump_infer_config(config, path, image_shape, model):
         infer_cfg['fpn_stride'] = config['PicoHead']['fpn_stride']
 
     yaml.dump(infer_cfg, open(path, 'w'))
-    logger.info("Export inference config file to {}".format(
-        os.path.join(path)))
+    logger.info("Export inference config file to {}".format(os.path.join(path)))

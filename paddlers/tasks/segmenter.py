@@ -61,8 +61,9 @@ class BaseSegmenter(BaseModel):
     def build_net(self, **params):
         # TODO: when using paddle.utils.unique_name.guard,
         # DeepLabv3p and HRNet will raise a error
-        net = dict(paddleseg.models.__dict__, **seg.models.__dict__)[self.model_name](
-            num_classes=self.num_classes, **params)
+        net = dict(paddleseg.models.__dict__,
+                   **seg.models.__dict__)[self.model_name](
+                       num_classes=self.num_classes, **params)
         return net
 
     def _fix_transforms_shape(self, image_shape):
@@ -122,8 +123,7 @@ class BaseSegmenter(BaseModel):
                         .squeeze().numpy())
                     score_map_list.append(
                         F.softmax(
-                            logit, axis=-1).squeeze().numpy().astype(
-                                'float32'))
+                            logit, axis=-1).squeeze().numpy().astype('float32'))
             outputs['label_map'] = label_map_list
             outputs['score_map'] = score_map_list
 
@@ -131,8 +131,7 @@ class BaseSegmenter(BaseModel):
             if self.status == 'Infer':
                 pred = paddle.unsqueeze(net_out[0], axis=1)  # NCHW
             else:
-                pred = paddle.argmax(
-                    logit, axis=1, keepdim=True, dtype='int32')
+                pred = paddle.argmax(logit, axis=1, keepdim=True, dtype='int32')
             label = inputs[1]
             origin_shape = [label.shape[-2:]]
             pred = self._postprocess(
@@ -276,8 +275,7 @@ class BaseSegmenter(BaseModel):
                                 "set pretrain_weights to be None.".format(
                                     seg_pretrain_weights_dict[self.model_name][
                                         0]))
-                pretrain_weights = seg_pretrain_weights_dict[self.model_name][
-                    0]
+                pretrain_weights = seg_pretrain_weights_dict[self.model_name][0]
         elif pretrain_weights is not None and osp.exists(pretrain_weights):
             if osp.splitext(pretrain_weights)[-1] != '.pdparams':
                 logging.error(
@@ -456,8 +454,8 @@ class BaseSegmenter(BaseModel):
         # TODO 确认是按oacc还是macc
         class_acc, oacc = paddleseg.utils.metrics.accuracy(intersect_area_all,
                                                            pred_area_all)
-        kappa = paddleseg.utils.metrics.kappa(intersect_area_all,
-                                              pred_area_all, label_area_all)
+        kappa = paddleseg.utils.metrics.kappa(intersect_area_all, pred_area_all,
+                                              label_area_all)
         category_f1score = metrics.f1_score(intersect_area_all, pred_area_all,
                                             label_area_all)
         eval_metrics = OrderedDict(
@@ -700,8 +698,7 @@ class DeepLabV3P(BaseSegmenter):
         if params.get('with_net', True):
             with DisablePrint():
                 backbone = getattr(paddleseg.models, backbone)(
-                    input_channel=input_channel,
-                    output_stride=output_stride)
+                    input_channel=input_channel, output_stride=output_stride)
         else:
             backbone = None
         params.update({
@@ -741,8 +738,8 @@ class HRNet(BaseSegmenter):
                  **params):
         if width not in (18, 48):
             raise ValueError(
-                "width={} is not supported, please choose from [18, 48]".
-                format(width))
+                "width={} is not supported, please choose from [18, 48]".format(
+                    width))
         self.backbone_name = 'HRNet_W{}'.format(width)
         if params.get('with_net', True):
             with DisablePrint():
@@ -775,10 +772,7 @@ class BiSeNetV2(BaseSegmenter):
 
 
 class FarSeg(BaseSegmenter):
-    def __init__(self,
-                 num_classes=2,
-                 use_mixed_loss=False,
-                 **params):
+    def __init__(self, num_classes=2, use_mixed_loss=False, **params):
         super(FarSeg, self).__init__(
             model_name='FarSeg',
             num_classes=num_classes,

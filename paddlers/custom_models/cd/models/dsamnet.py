@@ -39,13 +39,14 @@ class DSAMNet(nn.Layer):
         ca_ratio (int, optional): The channel reduction ratio for the channel attention module. Default: 8.
         sa_kernel (int, optional): The size of the convolutional kernel used in the spatial attention module. Default: 7.
     """
-    
+
     def __init__(self, in_channels, num_classes, ca_ratio=8, sa_kernel=7):
         super().__init__()
 
         WIDTH = 64
 
-        self.backbone = Backbone(in_ch=in_channels, arch='resnet18', strides=(1,1,2,2,1))
+        self.backbone = Backbone(
+            in_ch=in_channels, arch='resnet18', strides=(1, 1, 2, 2, 1))
         self.decoder = Decoder(WIDTH)
 
         self.cbam1 = CBAM(64, ratio=ca_ratio, kernel_size=sa_kernel)
@@ -55,9 +56,9 @@ class DSAMNet(nn.Layer):
         self.dsl3 = DSLayer(128, num_classes, 32, stride=4, output_padding=3)
 
         self.conv_out = nn.Sequential(
-            Conv3x3(WIDTH, WIDTH, norm=True, act=True),
-            Conv3x3(WIDTH, num_classes)
-        )
+            Conv3x3(
+                WIDTH, WIDTH, norm=True, act=True),
+            Conv3x3(WIDTH, num_classes))
 
         self.init_weight()
 
@@ -71,15 +72,16 @@ class DSAMNet(nn.Layer):
         y1 = self.cbam1(y1)
         y2 = self.cbam2(y2)
 
-        out = paddle.abs(y1-y2)
-        out = F.interpolate(out, size=paddle.shape(t1)[2:], mode='bilinear', align_corners=True)
+        out = paddle.abs(y1 - y2)
+        out = F.interpolate(
+            out, size=paddle.shape(t1)[2:], mode='bilinear', align_corners=True)
         pred = self.conv_out(out)
 
         if not self.training:
             return [pred]
         else:
-            ds2 = self.dsl2(paddle.abs(f1[0]-f2[0]))
-            ds3 = self.dsl3(paddle.abs(f1[1]-f2[1]))
+            ds2 = self.dsl2(paddle.abs(f1[0] - f2[0]))
+            ds3 = self.dsl3(paddle.abs(f1[1] - f2[1]))
             return [pred, ds2, ds3]
 
     def init_weight(self):
@@ -89,9 +91,10 @@ class DSAMNet(nn.Layer):
 class DSLayer(nn.Sequential):
     def __init__(self, in_ch, out_ch, itm_ch, **convd_kwargs):
         super().__init__(
-            nn.Conv2DTranspose(in_ch, itm_ch, kernel_size=3, padding=1, **convd_kwargs),
+            nn.Conv2DTranspose(
+                in_ch, itm_ch, kernel_size=3, padding=1, **convd_kwargs),
             make_norm(itm_ch),
             nn.ReLU(),
             nn.Dropout2D(p=0.2),
-            nn.Conv2DTranspose(itm_ch, out_ch, kernel_size=3, padding=1)
-        )
+            nn.Conv2DTranspose(
+                itm_ch, out_ch, kernel_size=3, padding=1))

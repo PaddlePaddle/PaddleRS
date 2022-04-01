@@ -1,4 +1,4 @@
-# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -246,7 +246,7 @@ class HighResolutionModule(TheseusLayer):
 
         for i in range(len(num_filters)):
             self.basic_block_list.append(
-                nn.Sequential(* [
+                nn.Sequential(*[
                     BasicBlock(
                         num_channels=num_filters[i],
                         num_filters=num_filters[i],
@@ -389,11 +389,7 @@ class HRNet(TheseusLayer):
         ]
 
         self.conv_layer1_1 = ConvBNLayer(
-            num_channels=3,
-            num_filters=64,
-            filter_size=3,
-            stride=2,
-            act="relu")
+            num_channels=3, num_filters=64, filter_size=3, stride=2, act="relu")
 
         self.conv_layer1_2 = ConvBNLayer(
             num_channels=64,
@@ -402,7 +398,7 @@ class HRNet(TheseusLayer):
             stride=2,
             act="relu")
 
-        self.layer1 = nn.Sequential(* [
+        self.layer1 = nn.Sequential(*[
             BottleneckBlock(
                 num_channels=64 if i == 0 else 256,
                 num_filters=64,

@@ -87,8 +87,8 @@ class FairMOT(BaseArch):
             return loss
         else:
             pred_dets, pred_embs = self.reid(
-                neck_feat, self.inputs, det_outs['bbox'],
-                det_outs['bbox_inds'], det_outs['topk_clses'])
+                neck_feat, self.inputs, det_outs['bbox'], det_outs['bbox_inds'],
+                det_outs['topk_clses'])
             return pred_dets, pred_embs
 
     def get_pred(self):

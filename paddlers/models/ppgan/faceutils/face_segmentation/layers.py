@@ -62,4 +62,3 @@ class ConvBN(nn.Layer):
         x = self._conv(x)
         x = self._batch_norm(x)
         return x
-

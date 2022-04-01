@@ -312,8 +312,7 @@ class TagGenerate(object):
     def __call__(self, records):
         kpts_lst = records['joints']
         kpts = kpts_lst[0]
-        tagmap = np.zeros(
-            (self.max_people, self.num_joints, 4), dtype=np.int64)
+        tagmap = np.zeros((self.max_people, self.num_joints, 4), dtype=np.int64)
         inds = np.where(kpts[..., 2] > 0)
         p, j = inds[0], inds[1]
         visible = kpts[inds]
@@ -548,8 +547,7 @@ class AugmentationbyInformantionDropping(object):
             vis_idx, _ = np.where(joints_vis > 0)
             occlusion_joint_id = np.random.choice(vis_idx)
             center = joints[occlusion_joint_id, 0:2]
-            offset = np.random.randn(2) * self.trainsize[
-                0] * self.offset_factor
+            offset = np.random.randn(2) * self.trainsize[0] * self.offset_factor
             center = center + offset
             radius = np.random.uniform(0.1, 0.2) * self.trainsize[0]
             x_offset = (center[0] - feat_x_int) / radius

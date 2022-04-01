@@ -72,9 +72,7 @@ class BaseDetector(BaseModel):
             "im_shape": InputSpec(
                 shape=[image_shape[0], 2], name='im_shape', dtype='float32'),
             "scale_factor": InputSpec(
-                shape=[image_shape[0], 2],
-                name='scale_factor',
-                dtype='float32')
+                shape=[image_shape[0], 2], name='scale_factor', dtype='float32')
         }]
         return input_spec
 
@@ -492,8 +490,8 @@ class BaseDetector(BaseModel):
                     classwise=False)
             scores = collections.OrderedDict()
             logging.info(
-                "Start to evaluate(total_samples={}, total_steps={})...".
-                format(eval_dataset.num_samples, eval_dataset.num_samples))
+                "Start to evaluate(total_samples={}, total_steps={})...".format(
+                    eval_dataset.num_samples, eval_dataset.num_samples))
             with paddle.no_grad():
                 for step, data in enumerate(self.eval_data_loader):
                     outputs = self.run(self.net, data, 'eval')
@@ -1479,8 +1477,7 @@ class PPYOLO(YOLOv3):
                                [135, 169], [344, 319]]
                     anchor_masks = [[3, 4, 5], [0, 1, 2]]
             elif anchors is None or anchor_masks is None:
-                raise ValueError(
-                    "Please define both anchors and anchor_masks.")
+                raise ValueError("Please define both anchors and anchor_masks.")
 
             if backbone == 'ResNet50_vd_dcn':
                 backbone = self._get_backbone(
@@ -1635,9 +1632,8 @@ class PPYOLOTiny(YOLOv3):
                  **params):
         self.init_params = locals()
         if backbone != 'MobileNetV3':
-            logging.warning(
-                "PPYOLOTiny only supports MobileNetV3 as backbone. "
-                "Backbone is forcibly set to MobileNetV3.")
+            logging.warning("PPYOLOTiny only supports MobileNetV3 as backbone. "
+                            "Backbone is forcibly set to MobileNetV3.")
         self.backbone_name = 'MobileNetV3'
         self.downsample_ratios = [32, 16, 8]
         if params.get('with_net', True):
@@ -2111,8 +2107,7 @@ class MaskRCNN(BaseDetector):
                     keep_top_k=keep_top_k,
                     nms_threshold=nms_threshold))
 
-            mask_post_process = ppdet.modeling.MaskPostProcess(
-                binary_thresh=.5)
+            mask_post_process = ppdet.modeling.MaskPostProcess(binary_thresh=.5)
 
             params.update({
                 'backbone': backbone,

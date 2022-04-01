@@ -43,8 +43,7 @@ def _pruner_template_input(sample, model_type):
 def sensitive_prune(pruner, pruned_flops, skip_vars=[], align=None):
     # skip depthwise convolutions
     for layer in pruner.model.sublayers():
-        if isinstance(layer,
-                      paddle.nn.layer.conv.Conv2D) and layer._groups > 1:
+        if isinstance(layer, paddle.nn.layer.conv.Conv2D) and layer._groups > 1:
             for param in layer.parameters(include_sublayers=False):
                 skip_vars.append(param.name)
     pruner.restore()

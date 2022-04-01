@@ -1,4 +1,4 @@
-# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -42,9 +42,7 @@ class TheseusLayer(nn.Layer):
             res_dict[res_key] = self.res_dict.pop(res_key)
         return res_dict
 
-    def init_res(self,
-                 stages_pattern,
-                 return_patterns=None,
+    def init_res(self, stages_pattern, return_patterns=None,
                  return_stages=None):
         if return_patterns and return_stages:
             msg = f"The 'return_patterns' would be ignored when 'return_stages' is set."
@@ -206,8 +204,7 @@ def save_sub_res_hook(layer, input, output):
     layer.res_dict[layer.res_name] = output
 
 
-def set_identity(parent_layer: nn.Layer,
-                 layer_name: str,
+def set_identity(parent_layer: nn.Layer, layer_name: str,
                  layer_index: str=None) -> bool:
     """set the layer specified by layer_name and layer_index to Indentity.
 
@@ -230,8 +227,7 @@ def set_identity(parent_layer: nn.Layer,
 
     if layer_index and stop_after:
         stop_after = False
-        for sub_layer_index in parent_layer._sub_layers[
-                layer_name]._sub_layers:
+        for sub_layer_index in parent_layer._sub_layers[layer_name]._sub_layers:
             if stop_after:
                 parent_layer._sub_layers[layer_name][
                     sub_layer_index] = Identity()
@@ -242,8 +238,8 @@ def set_identity(parent_layer: nn.Layer,
     return stop_after
 
 
-def parse_pattern_str(pattern: str, parent_layer: nn.Layer) -> Union[
-        None, List[Dict[str, Union[nn.Layer, str, None]]]]:
+def parse_pattern_str(pattern: str, parent_layer: nn.Layer) -> Union[None, List[
+        Dict[str, Union[nn.Layer, str, None]]]]:
     """parse the string type pattern.
 
     Args:

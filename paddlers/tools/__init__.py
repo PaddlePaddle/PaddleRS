@@ -13,4 +13,3 @@
 # limitations under the License.
 
 from .yolo_cluster import YOLOAnchorCluster
-

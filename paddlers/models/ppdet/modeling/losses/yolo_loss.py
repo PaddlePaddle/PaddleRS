@@ -110,13 +110,7 @@ class YOLOv3Loss(nn.Layer):
             pcls, tcls, reduction='none')
         return loss_cls
 
-    def yolov3_loss(self,
-                    p,
-                    t,
-                    gt_box,
-                    anchor,
-                    downsample,
-                    scale=1.,
+    def yolov3_loss(self, p, t, gt_box, anchor, downsample, scale=1.,
                     eps=1e-10):
         na = len(anchor)
         b, c, h, w = p.shape

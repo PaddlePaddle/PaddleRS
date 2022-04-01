@@ -206,8 +206,7 @@ class CascadeHead(BBoxHead):
         """
         targets = []
         if self.training:
-            rois, rois_num, targets = self.bbox_assigner(rois, rois_num,
-                                                         inputs)
+            rois, rois_num, targets = self.bbox_assigner(rois, rois_num, inputs)
             targets_list = [targets]
             self.assigned_rois = (rois, rois_num)
             self.assigned_targets = targets

@@ -1,4 +1,4 @@
-# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -80,8 +80,7 @@ class mAP(nn.Layer):
 
         #calc map
         precision_mask = paddle.multiply(equal_flag, precision)
-        ap = paddle.sum(precision_mask, axis=1) / paddle.sum(equal_flag,
-                                                             axis=1)
+        ap = paddle.sum(precision_mask, axis=1) / paddle.sum(equal_flag, axis=1)
         metric_dict["mAP"] = paddle.mean(ap).numpy()[0]
         return metric_dict
 
@@ -285,8 +284,7 @@ class AccuracyScore(MutiLabelMetric):
 
     def __init__(self, base="label"):
         super().__init__()
-        assert base in ["sample", "label"
-                        ], 'must be one of ["sample", "label"]'
+        assert base in ["sample", "label"], 'must be one of ["sample", "label"]'
         self.base = base
 
     def __call__(self, output, target):

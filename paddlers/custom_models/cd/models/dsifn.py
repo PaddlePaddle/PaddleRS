@@ -43,7 +43,7 @@ class DSIFN(nn.Layer):
         self.encoder1 = self.encoder2 = VGG16FeaturePicker()
 
         self.sa1 = SpatialAttention()
-        self.sa2= SpatialAttention()
+        self.sa2 = SpatialAttention()
         self.sa3 = SpatialAttention()
         self.sa4 = SpatialAttention()
         self.sa5 = SpatialAttention()
@@ -98,7 +98,7 @@ class DSIFN(nn.Layer):
             t2_feats = self.encoder2(t2)
 
         t1_f_l3, t1_f_l8, t1_f_l15, t1_f_l22, t1_f_l29 = t1_feats
-        t2_f_l3, t2_f_l8, t2_f_l15, t2_f_l22, t2_f_l29,= t2_feats
+        t2_f_l3, t2_f_l8, t2_f_l15, t2_f_l22, t2_f_l29, = t2_feats
 
         aux_x = []
 
@@ -113,44 +113,44 @@ class DSIFN(nn.Layer):
 
         x = self.trans_conv1(x)
         x = paddle.concat([x, t1_f_l22, t2_f_l22], axis=1)
-        x = self.ca2(x)*x
+        x = self.ca2(x) * x
         x = self.o2_conv1(x)
         x = self.o2_conv2(x)
         x = self.o2_conv3(x)
-        x = self.sa2(x) *x
+        x = self.sa2(x) * x
         x = self.bn_sa2(x)
         if self.training:
             aux_x.append(x)
 
         x = self.trans_conv2(x)
         x = paddle.concat([x, t1_f_l15, t2_f_l15], axis=1)
-        x = self.ca3(x)*x
+        x = self.ca3(x) * x
         x = self.o3_conv1(x)
         x = self.o3_conv2(x)
         x = self.o3_conv3(x)
-        x = self.sa3(x) *x
+        x = self.sa3(x) * x
         x = self.bn_sa3(x)
         if self.training:
             aux_x.append(x)
 
         x = self.trans_conv3(x)
         x = paddle.concat([x, t1_f_l8, t2_f_l8], axis=1)
-        x = self.ca4(x)*x
+        x = self.ca4(x) * x
         x = self.o4_conv1(x)
         x = self.o4_conv2(x)
         x = self.o4_conv3(x)
-        x = self.sa4(x) *x
+        x = self.sa4(x) * x
         x = self.bn_sa4(x)
         if self.training:
             aux_x.append(x)
 
         x = self.trans_conv4(x)
         x = paddle.concat([x, t1_f_l3, t2_f_l3], axis=1)
-        x = self.ca5(x)*x
+        x = self.ca5(x) * x
         x = self.o5_conv1(x)
         x = self.o5_conv2(x)
         x = self.o5_conv3(x)
-        x = self.sa5(x) *x
+        x = self.sa5(x) * x
         x = self.bn_sa5(x)
 
         out5 = self.o5_conv4(x)
@@ -160,29 +160,25 @@ class DSIFN(nn.Layer):
         else:
             size = paddle.shape(t1)[2:]
             out1 = F.interpolate(
-                self.o1_conv3(aux_x[0]), 
-                size=size, 
-                mode='bilinear', 
-                align_corners=True
-            )
+                self.o1_conv3(aux_x[0]),
+                size=size,
+                mode='bilinear',
+                align_corners=True)
             out2 = F.interpolate(
-                self.o2_conv4(aux_x[1]), 
-                size=size, 
-                mode='bilinear', 
-                align_corners=True
-            )
+                self.o2_conv4(aux_x[1]),
+                size=size,
+                mode='bilinear',
+                align_corners=True)
             out3 = F.interpolate(
-                self.o3_conv4(aux_x[2]), 
-                size=size, 
-                mode='bilinear', 
-                align_corners=True
-            )
+                self.o3_conv4(aux_x[2]),
+                size=size,
+                mode='bilinear',
+                align_corners=True)
             out4 = F.interpolate(
-                self.o4_conv4(aux_x[3]), 
-                size=size, 
-                mode='bilinear', 
-                align_corners=True
-            )
+                self.o4_conv4(aux_x[3]),
+                size=size,
+                mode='bilinear',
+                align_corners=True)
             return [out5, out4, out3, out2, out1]
 
     def init_weight(self):
@@ -191,7 +187,7 @@ class DSIFN(nn.Layer):
 
 
 class VGG16FeaturePicker(nn.Layer):
-    def __init__(self, indices=(3,8,15,22,29)):
+    def __init__(self, indices=(3, 8, 15, 22, 29)):
         super().__init__()
         features = list(vgg16(pretrained=True).features)[:30]
         self.features = nn.LayerList(features)
@@ -209,7 +205,8 @@ class VGG16FeaturePicker(nn.Layer):
 
 def conv2d_bn(in_ch, out_ch, with_dropout=True):
     lst = [
-        nn.Conv2D(in_ch, out_ch, kernel_size=3, stride=1, padding=1),
+        nn.Conv2D(
+            in_ch, out_ch, kernel_size=3, stride=1, padding=1),
         nn.PReLU(),
         make_norm(out_ch),
     ]

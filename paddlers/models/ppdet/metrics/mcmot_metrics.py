@@ -143,8 +143,7 @@ class MCMOTMetricOverall(object):
     def precision_overall(summary_df, overall_dic):
         del summary_df
         precision = quiet_divide(overall_dic['num_detections'], (
-            overall_dic['num_false_positives'] + overall_dic['num_detections']
-        ))
+            overall_dic['num_false_positives'] + overall_dic['num_detections']))
         return precision
 
     def recall_overall(summary_df, overall_dic):
@@ -318,8 +317,7 @@ class MCMOTEvaluator(object):
         mm.lap.default_solver = 'lap'
         self.acc = mm.MOTAccumulator(auto_id=True)
 
-    def eval_frame_dict(self, trk_objs, gt_objs, rtn_events=False,
-                        union=False):
+    def eval_frame_dict(self, trk_objs, gt_objs, rtn_events=False, union=False):
         import motmetrics as mm
         mm.lap.default_solver = 'lap'
         if union:
@@ -339,8 +337,7 @@ class MCMOTEvaluator(object):
                 gt_cls = np.repeat(gt_cls, trk_cls_len, axis=1)
                 trk_cls = trk_cls.reshape(1, trk_cls_len)
                 trk_cls = np.repeat(trk_cls, gt_cls_len, axis=0)
-                iou_distance = np.where(gt_cls == trk_cls, iou_distance,
-                                        np.nan)
+                iou_distance = np.where(gt_cls == trk_cls, iou_distance, np.nan)
 
         else:
             trk_tlwhs, trk_ids = unzip_objs(trk_objs)[:2]

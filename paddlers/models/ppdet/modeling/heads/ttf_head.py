@@ -70,8 +70,7 @@ class HMHead(nn.Layer):
                             in_channels=ch_in if i == 0 else ch_out,
                             out_channels=ch_out,
                             kernel_size=3,
-                            weight_attr=ParamAttr(initializer=Normal(0,
-                                                                     0.01))))
+                            weight_attr=ParamAttr(initializer=Normal(0, 0.01))))
                 else:
                     head_conv.add_sublayer(
                         name,
@@ -86,8 +85,8 @@ class HMHead(nn.Layer):
                 head_conv.add_sublayer(name + '.act', nn.ReLU())
         self.feat = head_conv
         bias_init = float(-np.log((1 - 0.01) / 0.01))
-        weight_attr = None if lite_head else ParamAttr(initializer=Normal(
-            0, 0.01))
+        weight_attr = None if lite_head else ParamAttr(initializer=Normal(0,
+                                                                          0.01))
         self.head = nn.Conv2D(
             in_channels=ch_out,
             out_channels=num_classes,
@@ -147,8 +146,7 @@ class WHHead(nn.Layer):
                             in_channels=ch_in if i == 0 else ch_out,
                             out_channels=ch_out,
                             kernel_size=3,
-                            weight_attr=ParamAttr(initializer=Normal(0,
-                                                                     0.01))))
+                            weight_attr=ParamAttr(initializer=Normal(0, 0.01))))
                 else:
                     head_conv.add_sublayer(
                         name,
@@ -162,8 +160,8 @@ class WHHead(nn.Layer):
                                 learning_rate=2., regularizer=L2Decay(0.))))
                 head_conv.add_sublayer(name + '.act', nn.ReLU())
 
-        weight_attr = None if lite_head else ParamAttr(initializer=Normal(
-            0, 0.01))
+        weight_attr = None if lite_head else ParamAttr(initializer=Normal(0,
+                                                                          0.01))
         self.feat = head_conv
         self.head = nn.Conv2D(
             in_channels=ch_out,
@@ -283,10 +281,7 @@ class TTFHead(nn.Layer):
         base_loc.stop_gradient = True
 
         pred_boxes = paddle.concat(
-            [
-                0 - pred_wh[:, 0:2, :, :] + base_loc,
-                pred_wh[:, 2:4] + base_loc
-            ],
+            [0 - pred_wh[:, 0:2, :, :] + base_loc, pred_wh[:, 2:4] + base_loc],
             axis=1)
         pred_boxes = paddle.transpose(pred_boxes, [0, 2, 3, 1])
         boxes = paddle.transpose(box_target, [0, 2, 3, 1])
@@ -297,8 +292,8 @@ class TTFHead(nn.Layer):
             pred_hm_max_softmax = F.softmax(pred_hm_max, axis=1)
             pred_hm_max_softmax = paddle.transpose(pred_hm_max_softmax,
                                                    [0, 2, 3, 1])
-            pred_hm_max_softmax = self.filter_loc_by_weight(
-                pred_hm_max_softmax, mask)
+            pred_hm_max_softmax = self.filter_loc_by_weight(pred_hm_max_softmax,
+                                                            mask)
         else:
             pred_hm_max_softmax = None
 

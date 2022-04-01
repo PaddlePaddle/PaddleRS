@@ -77,7 +77,8 @@ class Encoder(nn.Layer):
         super().__init__()
 
         self.double_conv = nn.Sequential(
-            layers.ConvBNReLU(input_channel, 64, 3), layers.ConvBNReLU(64, 64, 3))
+            layers.ConvBNReLU(input_channel, 64, 3),
+            layers.ConvBNReLU(64, 64, 3))
         down_channels = [[64, 128], [128, 256], [256, 512], [512, 512]]
         self.down_sample_list = nn.LayerList([
             self.down_sampling(channel[0], channel[1])

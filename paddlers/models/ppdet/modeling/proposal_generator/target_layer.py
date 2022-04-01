@@ -237,8 +237,7 @@ class BBoxLibraAssigner(object):
         outs = libra_generate_proposal_target(
             rpn_rois, gt_classes, gt_boxes, self.batch_size_per_im,
             self.fg_fraction, self.fg_thresh, self.bg_thresh, self.num_classes,
-            self.use_random, is_cascade, self.cascade_iou[stage],
-            self.num_bins)
+            self.use_random, is_cascade, self.cascade_iou[stage], self.num_bins)
         rois = outs[0]
         rois_num = outs[-1]
         # tgt_labels, tgt_bboxes, tgt_gt_inds

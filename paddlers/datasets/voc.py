@@ -136,8 +136,7 @@ class VOCDetection(Dataset):
                     ct = int(tree.find('id').text)
                     im_id = np.asarray([int(tree.find('id').text)])
                 pattern = re.compile('<size>', re.IGNORECASE)
-                size_tag = pattern.findall(
-                    str(ET.tostringlist(tree.getroot())))
+                size_tag = pattern.findall(str(ET.tostringlist(tree.getroot())))
                 if len(size_tag) > 0:
                     size_tag = size_tag[0][1:-1]
                     size_element = tree.find(size_tag)
@@ -170,8 +169,8 @@ class VOCDetection(Dataset):
                 difficult = np.zeros((num_bbox, 1), dtype=np.int32)
                 for obj in objs:
                     pattern = re.compile('<name>', re.IGNORECASE)
-                    name_tag = pattern.findall(str(ET.tostringlist(obj)))[0][
-                        1:-1]
+                    name_tag = pattern.findall(str(ET.tostringlist(obj)))[0][1:
+                                                                             -1]
                     cname = obj.find(name_tag).text.strip()
                     pattern = re.compile('<difficult>', re.IGNORECASE)
                     diff_tag = pattern.findall(str(ET.tostringlist(obj)))
@@ -218,7 +217,8 @@ class VOCDetection(Dataset):
                     if not (x2 >= x1 and y2 >= y1):
                         logging.warning(
                             "Bounding box for object {} does not satisfy xmin {} <= xmax {} and ymin {} <= ymax {}, "
-                            "so this object is skipped. xml file: {}".format(i, x1, x2, y1, y2, xml_file))
+                            "so this object is skipped. xml file: {}".format(
+                                i, x1, x2, y1, y2, xml_file))
                         continue
 
                     gt_bbox[i, :] = [x1, y1, x2, y2]
@@ -287,8 +287,7 @@ class VOCDetection(Dataset):
                     self.num_max_boxes = max(self.num_max_boxes, len(objs))
 
         if not ct:
-            logging.error(
-                "No voc record found in %s' % (file_list)", exit=True)
+            logging.error("No voc record found in %s' % (file_list)", exit=True)
         self.pos_num = len(self.file_list)
         if self.allow_empty and neg_file_list:
             self.file_list += self._sample_empty(neg_file_list)
@@ -319,7 +318,8 @@ class VOCDetection(Dataset):
             if self.data_fields is not None:
                 sample_mix = {k: sample_mix[k] for k in self.data_fields}
             sample = self.mixup_op(sample=[
-                ImgDecoder(to_rgb=False)(sample), ImgDecoder(to_rgb=False)(sample_mix)
+                ImgDecoder(to_rgb=False)(sample),
+                ImgDecoder(to_rgb=False)(sample_mix)
             ])
         sample = self.transforms(sample)
         return sample
@@ -384,8 +384,7 @@ class VOCDetection(Dataset):
         if empty_ratio is not None:
             self.empty_ratio = empty_ratio
         image_list = os.listdir(image_dir)
-        max_img_id = max(
-            len(self.file_list) - 1, max(self.coco_gt.getImgIds()))
+        max_img_id = max(len(self.file_list) - 1, max(self.coco_gt.getImgIds()))
         neg_file_list = list()
         for image in image_list:
             if not is_pic(image):
@@ -416,13 +415,7 @@ class VOCDetection(Dataset):
             if 'gt_poly' in self.file_list[0]:
                 label_info['gt_poly'] = []
 
-            neg_file_list.append({
-                'image': im_fname,
-                **
-                im_info,
-                **
-                label_info
-            })
+            neg_file_list.append({'image': im_fname, ** im_info, ** label_info})
         if neg_file_list:
             self.allow_empty = True
             self.file_list += self._sample_empty(neg_file_list)

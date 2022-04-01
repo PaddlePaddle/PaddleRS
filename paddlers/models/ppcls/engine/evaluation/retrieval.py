@@ -40,8 +40,7 @@ def retrieval_eval(engine, epoch_id=0):
         sections.append(len(query_feas) % sim_block_size)
     fea_blocks = paddle.split(query_feas, num_or_sections=sections)
     if query_query_id is not None:
-        query_id_blocks = paddle.split(
-            query_query_id, num_or_sections=sections)
+        query_id_blocks = paddle.split(query_query_id, num_or_sections=sections)
     image_id_blocks = paddle.split(query_img_id, num_or_sections=sections)
     metric_key = None
 
@@ -110,8 +109,7 @@ def cal_feature(engine, name='gallery'):
             break
         if idx % engine.config["Global"]["print_batch_step"] == 0:
             logger.info(
-                f"{name} feature calculation process: [{idx}/{len(dataloader)}]"
-            )
+                f"{name} feature calculation process: [{idx}/{len(dataloader)}]")
         if engine.use_dali:
             batch = [
                 paddle.to_tensor(batch[0]['data']),

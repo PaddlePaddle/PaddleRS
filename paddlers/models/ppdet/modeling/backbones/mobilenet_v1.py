@@ -219,8 +219,7 @@ class MobileNet(nn.Layer):
                 norm_type=norm_type,
                 name="conv2_1"))
         self.dwsl.append(dws21)
-        self._update_out_channels(
-            int(64 * scale), len(self.dwsl), feature_maps)
+        self._update_out_channels(int(64 * scale), len(self.dwsl), feature_maps)
         dws22 = self.add_sublayer(
             "conv2_2",
             sublayer=DepthwiseSeparable(

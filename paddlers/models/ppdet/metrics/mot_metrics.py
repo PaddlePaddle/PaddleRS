@@ -158,8 +158,7 @@ class MOTEvaluator(object):
             trk_ids = trk_ids[keep]
 
         # get distance matrix
-        iou_distance = mm.distances.iou_matrix(
-            gt_tlwhs, trk_tlwhs, max_iou=0.5)
+        iou_distance = mm.distances.iou_matrix(gt_tlwhs, trk_tlwhs, max_iou=0.5)
 
         # acc
         self.acc.update(gt_ids, trk_ids, iou_distance)
@@ -447,8 +446,7 @@ class KITTIEvaluation(object):
 
     def loadGroundtruth(self):
         try:
-            self._loadData(
-                self.gt_path, cls=self.cls, loading_groundtruth=True)
+            self._loadData(self.gt_path, cls=self.cls, loading_groundtruth=True)
         except IOError:
             return False
         return True
@@ -571,8 +569,8 @@ class KITTIEvaluation(object):
 
                 # check if uploaded data provides information for 2D and 3D evaluation
                 if not loading_groundtruth and eval_2d is True and (
-                        t_data.x1 == -1 or t_data.x2 == -1 or
-                        t_data.y1 == -1 or t_data.y2 == -1):
+                        t_data.x1 == -1 or t_data.x2 == -1 or t_data.y1 == -1 or
+                        t_data.y2 == -1):
                     eval_2d = False
                 if not loading_groundtruth and eval_3d is True and (
                         t_data.X == -1000 or t_data.Y == -1000 or
@@ -1075,8 +1073,8 @@ class KITTIEvaluation(object):
                                    self.MOTAL) + "\n"
         summary += self.printEntry("Multiple Object Detection Accuracy (MODA)",
                                    self.MODA) + "\n"
-        summary += self.printEntry(
-            "Multiple Object Detection Precision (MODP)", self.MODP) + "\n"
+        summary += self.printEntry("Multiple Object Detection Precision (MODP)",
+                                   self.MODP) + "\n"
         summary += "\n"
         summary += self.printEntry("Recall", self.recall) + "\n"
         summary += self.printEntry("Precision", self.precision) + "\n"
@@ -1123,8 +1121,7 @@ class KITTIEvaluation(object):
         summary += "\n"
         summary += self.printEntry("Tracker Objects (Total)", self.n_tr) + "\n"
         #summary += self.printEntry("Tracker Objects (Total) per Sequence", self.n_trs) + "\n"
-        summary += self.printEntry("Ignored Tracker Objects",
-                                   self.n_itr) + "\n"
+        summary += self.printEntry("Ignored Tracker Objects", self.n_itr) + "\n"
         #summary += self.printEntry("Ignored Tracker Objects per Sequence", self.n_itrs) + "\n"
         summary += self.printEntry("Tracker Trajectories",
                                    self.n_tr_trajectories) + "\n"
@@ -1216,8 +1213,7 @@ class KITTIMOTMetric(Metric):
         # sanity checks
         if len(e.groundtruth) is not len(e.tracker):
             logger.info(
-                "The uploaded data does not provide results for every sequence."
-            )
+                "The uploaded data does not provide results for every sequence.")
             return False
         logger.info("Loaded %d Sequences." % len(e.groundtruth))
         logger.info("Start Evaluation...")

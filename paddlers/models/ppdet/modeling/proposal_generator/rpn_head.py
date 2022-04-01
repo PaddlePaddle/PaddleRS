@@ -177,8 +177,7 @@ class RPNHead(nn.Layer):
                 rpn_prob = paddle.concat(rpn_prob_list).flatten()
 
                 if rpn_prob.shape[0] > post_nms_top_n:
-                    topk_prob, topk_inds = paddle.topk(rpn_prob,
-                                                       post_nms_top_n)
+                    topk_prob, topk_inds = paddle.topk(rpn_prob, post_nms_top_n)
                     topk_rois = paddle.gather(rpn_rois, topk_inds)
                 else:
                     topk_rois = rpn_rois

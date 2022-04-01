@@ -41,6 +41,7 @@ def get_encoding(path):
     f.close()
     return file_encoding
 
+
 def get_single_card_bs(batch_size):
     card_num = paddlers.env_info['num']
     place = paddlers.env_info['place']
@@ -53,6 +54,7 @@ def get_single_card_bs(batch_size):
         raise Exception("Please support correct batch_size, \
                         which can be divided by available cards({}) in {}"
                         .format(card_num, place))
+
 
 def dict2str(dict_input):
     out = ''
@@ -76,7 +78,9 @@ def path_normalization(path):
 
 
 def is_pic(img_path):
-    valid_suffix = ['JPEG', 'jpeg', 'JPG', 'jpg', 'BMP', 'bmp', 'PNG', 'png', '.npy']
+    valid_suffix = [
+        'JPEG', 'jpeg', 'JPG', 'jpg', 'BMP', 'bmp', 'PNG', 'png', '.npy'
+    ]
     suffix = img_path.split('.')[-1]
     if suffix in valid_suffix:
         return True

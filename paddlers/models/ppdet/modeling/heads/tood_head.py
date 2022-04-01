@@ -311,8 +311,7 @@ class TOODHead(nn.Layer):
         # rescale bbox
         assigned_bboxes /= stride_tensor_list
         # classification loss
-        loss_cls = self._focal_loss(
-            pred_scores, assigned_scores, alpha=alpha_l)
+        loss_cls = self._focal_loss(pred_scores, assigned_scores, alpha=alpha_l)
         # select positive samples mask
         mask_positive = (assigned_labels != self.num_classes)
         num_pos = mask_positive.astype(paddle.float32).sum()

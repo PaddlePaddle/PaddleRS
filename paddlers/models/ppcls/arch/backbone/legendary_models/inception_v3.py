@@ -1,4 +1,4 @@
-# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -86,11 +86,7 @@ class InceptionStem(TheseusLayer):
     def __init__(self):
         super().__init__()
         self.conv_1a_3x3 = ConvBNLayer(
-            num_channels=3,
-            num_filters=32,
-            filter_size=3,
-            stride=2,
-            act="relu")
+            num_channels=3, num_filters=32, filter_size=3, stride=2, act="relu")
         self.conv_2a_3x3 = ConvBNLayer(
             num_channels=32,
             num_filters=32,

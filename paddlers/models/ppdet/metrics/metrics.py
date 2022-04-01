@@ -32,13 +32,13 @@ from paddlers.models.ppdet.utils.logger import setup_logger
 logger = setup_logger(__name__)
 
 __all__ = [
-    'Metric', 'COCOMetric', 'VOCMetric', 'WiderFaceMetric',
-    'get_infer_results', 'RBoxMetric', 'SNIPERCOCOMetric'
+    'Metric', 'COCOMetric', 'VOCMetric', 'WiderFaceMetric', 'get_infer_results',
+    'RBoxMetric', 'SNIPERCOCOMetric'
 ]
 
 COCO_SIGMAS = np.array([
-    .26, .25, .25, .35, .35, .79, .79, .72, .72, .62, .62, 1.07, 1.07, .87,
-    .87, .89, .89
+    .26, .25, .25, .35, .35, .79, .79, .72, .72, .62, .62, 1.07, 1.07, .87, .87,
+    .89, .89
 ]) / 10.0
 CROWD_SIGMAS = np.array(
     [.79, .79, .72, .72, .62, .62, 1.07, 1.07, .87, .87, .89, .89, .79,
@@ -282,8 +282,8 @@ class VOCMetric(Metric):
 
     def log(self):
         map_stat = 100. * self.detection_map.get_map()
-        logger.info("mAP({:.2f}, {}) = {:.2f}%".format(
-            self.overlap_thresh, self.map_type, map_stat))
+        logger.info("mAP({:.2f}, {}) = {:.2f}%".format(self.overlap_thresh,
+                                                       self.map_type, map_stat))
 
     def get_results(self):
         return {'bbox': [self.detection_map.get_map()]}
@@ -391,8 +391,8 @@ class RBoxMetric(Metric):
 
     def log(self):
         map_stat = 100. * self.detection_map.get_map()
-        logger.info("mAP({:.2f}, {}) = {:.2f}%".format(
-            self.overlap_thresh, self.map_type, map_stat))
+        logger.info("mAP({:.2f}, {}) = {:.2f}%".format(self.overlap_thresh,
+                                                       self.map_type, map_stat))
 
     def get_results(self):
         return {'bbox': [self.detection_map.get_map()]}

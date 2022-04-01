@@ -264,7 +264,6 @@ class ATSSAssigner(object):
         max_overlaps = overlaps_inf.max(axis=1)
         argmax_overlaps = overlaps_inf.argmax(axis=1)
         assigned_gt_inds[max_overlaps !=
-                         -np.inf] = argmax_overlaps[max_overlaps !=
-                                                    -np.inf] + 1
+                         -np.inf] = argmax_overlaps[max_overlaps != -np.inf] + 1
 
         return assigned_gt_inds, max_overlaps

@@ -96,11 +96,9 @@ class JDEEmbeddingHead(nn.Layer):
                     bias_attr=ParamAttr(regularizer=L2Decay(0.))))
             self.identify_outputs.append(identify_output)
 
-            loss_p_cls = self.add_sublayer('cls.{}'.format(i),
-                                           LossParam(-4.15))
+            loss_p_cls = self.add_sublayer('cls.{}'.format(i), LossParam(-4.15))
             self.loss_params_cls.append(loss_p_cls)
-            loss_p_reg = self.add_sublayer('reg.{}'.format(i),
-                                           LossParam(-4.85))
+            loss_p_reg = self.add_sublayer('reg.{}'.format(i), LossParam(-4.85))
             self.loss_params_reg.append(loss_p_reg)
             loss_p_ide = self.add_sublayer('ide.{}'.format(i), LossParam(-2.3))
             self.loss_params_ide.append(loss_p_ide)

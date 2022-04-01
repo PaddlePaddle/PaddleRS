@@ -341,9 +341,8 @@ class Trainer(object):
         assert self.mode == 'train', "Model not in 'train' mode"
         Init_mark = False
 
-        sync_bn = (
-            getattr(self.cfg, 'norm_type', None) in [None, 'sync_bn'] and
-            self.cfg.use_gpu and self._nranks > 1)
+        sync_bn = (getattr(self.cfg, 'norm_type', None) in [None, 'sync_bn'] and
+                   self.cfg.use_gpu and self._nranks > 1)
         if sync_bn:
             self.model = BaseArch.convert_sync_batchnorm(self.model)
 
@@ -635,8 +634,8 @@ class Trainer(object):
 
         # Save infer cfg
         _dump_infer_config(self.cfg,
-                           os.path.join(save_dir, 'infer_cfg.yml'),
-                           image_shape, self.model)
+                           os.path.join(save_dir, 'infer_cfg.yml'), image_shape,
+                           self.model)
 
         input_spec = [{
             "image": InputSpec(

@@ -133,7 +133,7 @@ def cocoapi_eval(anns,
         results_flatten = list(itertools.chain(*results_per_category))
         headers = ['category', 'AP'] * (num_columns // 2)
         results_2d = itertools.zip_longest(
-            * [results_flatten[i::num_columns] for i in range(num_columns)])
+            *[results_flatten[i::num_columns] for i in range(num_columns)])
         table_data = [headers]
         table_data += [result for result in results_2d]
         table = AsciiTable(table_data)
@@ -275,8 +275,7 @@ def makeplot(rs, ps, outDir, class_name, iou_type):
         plt.close(fig)
 
 
-def analyze_individual_category(k, cocoDt, cocoGt, catId, iou_type,
-                                areas=None):
+def analyze_individual_category(k, cocoDt, cocoGt, catId, iou_type, areas=None):
     """针对某个特定类别，分析忽略亚类混淆和类别混淆时的准确率。
 
        Refer to https://github.com/open-mmlab/mmdetection/blob/master/tools/analysis_tools/coco_error_analysis.py#L174
@@ -442,8 +441,7 @@ def coco_error_analysis(eval_details_file=None,
         thread_pool = mp.pool.ThreadPool(thread_num)
         args = [(k, cocoDt, cocoGt, catId, iou_type)
                 for k, catId in enumerate(catIds)]
-        analyze_results = thread_pool.starmap(analyze_individual_category,
-                                              args)
+        analyze_results = thread_pool.starmap(analyze_individual_category, args)
         for k, catId in enumerate(catIds):
             nm = cocoGt.loadCats(catId)[0]
             logging.info('--------------saving {}-{}---------------'.format(

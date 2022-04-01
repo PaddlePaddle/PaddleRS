@@ -34,21 +34,21 @@ class PixelNorm(nn.Layer):
 
     def forward(self, inputs):
         return inputs * paddle.rsqrt(
-            paddle.mean(inputs * inputs, 1, keepdim=True) + 1e-8)
+            paddle.mean(
+                inputs * inputs, 1, keepdim=True) + 1e-8)
 
 
 class ModulatedConv2D(nn.Layer):
     def __init__(
-        self,
-        in_channel,
-        out_channel,
-        kernel_size,
-        style_dim,
-        demodulate=True,
-        upsample=False,
-        downsample=False,
-        blur_kernel=[1, 3, 3, 1],
-    ):
+            self,
+            in_channel,
+            out_channel,
+            kernel_size,
+            style_dim,
+            demodulate=True,
+            upsample=False,
+            downsample=False,
+            blur_kernel=[1, 3, 3, 1], ):
         super().__init__()
 
         self.eps = 1e-8
@@ -64,9 +64,8 @@ class ModulatedConv2D(nn.Layer):
             pad0 = (p + 1) // 2 + factor - 1
             pad1 = p // 2 + 1
 
-            self.blur = Upfirdn2dBlur(blur_kernel,
-                                      pad=(pad0, pad1),
-                                      upsample_factor=factor)
+            self.blur = Upfirdn2dBlur(
+                blur_kernel, pad=(pad0, pad1), upsample_factor=factor)
 
         if downsample:
             factor = 2
@@ -113,11 +112,8 @@ class ModulatedConv2D(nn.Layer):
             weight = weight.transpose((0, 2, 1, 3, 4)).reshape(
                 (batch * in_channel, self.out_channel, self.kernel_size,
                  self.kernel_size))
-            out = F.conv2d_transpose(inputs,
-                                     weight,
-                                     padding=0,
-                                     stride=2,
-                                     groups=batch)
+            out = F.conv2d_transpose(
+                inputs, weight, padding=0, stride=2, groups=batch)
             _, _, height, width = out.shape
             out = out.reshape((batch, self.out_channel, height, width))
             out = self.blur(out)
@@ -191,12 +187,11 @@ class StyledConv(nn.Layer):
             style_dim,
             upsample=upsample,
             blur_kernel=blur_kernel,
-            demodulate=demodulate,
-        )
+            demodulate=demodulate, )
 
         self.noise = NoiseInjection(is_concat=is_concat)
-        self.activate = FusedLeakyReLU(out_channel *
-                                       2 if is_concat else out_channel)
+        self.activate = FusedLeakyReLU(out_channel * 2
+                                       if is_concat else out_channel)
 
     def forward(self, inputs, style, noise=None):
         out = self.conv(inputs, style)
@@ -217,11 +212,8 @@ class ToRGB(nn.Layer):
         if upsample:
             self.upsample = Upfirdn2dUpsample(blur_kernel)
 
-        self.conv = ModulatedConv2D(in_channel,
-                                    3,
-                                    1,
-                                    style_dim,
-                                    demodulate=False)
+        self.conv = ModulatedConv2D(
+            in_channel, 3, 1, style_dim, demodulate=False)
         self.bias = self.create_parameter((1, 3, 1, 1),
                                           nn.initializer.Constant(0.0))
 
@@ -257,10 +249,11 @@ class StyleGANv2Generator(nn.Layer):
 
         for i in range(n_mlp):
             layers.append(
-                EqualLinear(style_dim,
-                            style_dim,
-                            lr_mul=lr_mlp,
-                            activation="fused_lrelu"))
+                EqualLinear(
+                    style_dim,
+                    style_dim,
+                    lr_mul=lr_mlp,
+                    activation="fused_lrelu"))
 
         self.style = nn.Sequential(*layers)
 
@@ -277,16 +270,17 @@ class StyleGANv2Generator(nn.Layer):
         }
 
         self.input = ConstantInput(self.channels[4])
-        self.conv1 = StyledConv(self.channels[4],
-                                self.channels[4],
-                                3,
-                                style_dim,
-                                blur_kernel=blur_kernel,
-                                is_concat=is_concat)
-        self.to_rgb1 = ToRGB(self.channels[4] *
-                             2 if is_concat else self.channels[4],
-                             style_dim,
-                             upsample=False)
+        self.conv1 = StyledConv(
+            self.channels[4],
+            self.channels[4],
+            3,
+            style_dim,
+            blur_kernel=blur_kernel,
+            is_concat=is_concat)
+        self.to_rgb1 = ToRGB(
+            self.channels[4] * 2 if is_concat else self.channels[4],
+            style_dim,
+            upsample=False)
 
         self.log_size = int(math.log(size, 2))
         self.num_layers = (self.log_size - 2) * 2 + 1
@@ -315,16 +309,16 @@ class StyleGANv2Generator(nn.Layer):
                     style_dim,
                     upsample=True,
                     blur_kernel=blur_kernel,
-                    is_concat=is_concat,
-                ))
+                    is_concat=is_concat, ))
 
             self.convs.append(
-                StyledConv(out_channel * 2 if is_concat else out_channel,
-                           out_channel,
-                           3,
-                           style_dim,
-                           blur_kernel=blur_kernel,
-                           is_concat=is_concat))
+                StyledConv(
+                    out_channel * 2 if is_concat else out_channel,
+                    out_channel,
+                    3,
+                    style_dim,
+                    blur_kernel=blur_kernel,
+                    is_concat=is_concat))
 
             self.to_rgbs.append(
                 ToRGB(out_channel * 2 if is_concat else out_channel, style_dim))
@@ -366,16 +360,15 @@ class StyleGANv2Generator(nn.Layer):
         return mean_style
 
     def forward(
-        self,
-        styles,
-        return_latents=False,
-        inject_index=None,
-        truncation=1.0,
-        truncation_latent=None,
-        input_is_latent=False,
-        noise=None,
-        randomize_noise=True,
-    ):
+            self,
+            styles,
+            return_latents=False,
+            inject_index=None,
+            truncation=1.0,
+            truncation_latent=None,
+            input_is_latent=False,
+            noise=None,
+            randomize_noise=True, ):
         if not input_is_latent:
             styles = [self.style(s) for s in styles]
 
@@ -393,8 +386,8 @@ class StyleGANv2Generator(nn.Layer):
             if truncation_latent is None:
                 truncation_latent = self.get_mean_style()
             for style in styles:
-                style_t.append(truncation_latent + truncation *
-                               (style - truncation_latent))
+                style_t.append(truncation_latent + truncation * (
+                    style - truncation_latent))
 
             styles = style_t
 
@@ -429,11 +422,12 @@ class StyleGANv2Generator(nn.Layer):
             outs = []
             for conv1, conv2, to_rgb in zip(self.convs[::2], self.convs[1::2],
                                             self.to_rgbs):
-                out = conv1(out, latent[:, i],
-                            noise=noise[(noise_i + 1) // 2])  ### 1 for 2
-                out = conv2(out,
-                            latent[:, i + 1],
-                            noise=noise[(noise_i + 2) // 2])  ### 1 for 2
+                out = conv1(
+                    out, latent[:, i],
+                    noise=noise[(noise_i + 1) // 2])  ### 1 for 2
+                out = conv2(
+                    out, latent[:, i + 1],
+                    noise=noise[(noise_i + 2) // 2])  ### 1 for 2
                 skip = to_rgb(out, latent[:, i + 2], skip)
 
                 i += 2

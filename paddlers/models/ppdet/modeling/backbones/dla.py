@@ -177,8 +177,7 @@ class DLA(nn.Layer):
                 bias_on=False,
                 norm_decay=None),
             nn.ReLU())
-        self.level0 = self._make_conv_level(channels[0], channels[0],
-                                            levels[0])
+        self.level0 = self._make_conv_level(channels[0], channels[0], levels[0])
         self.level1 = self._make_conv_level(
             channels[0], channels[1], levels[1], stride=2)
         self.level2 = Tree(

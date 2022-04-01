@@ -1,4 +1,4 @@
-# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -112,8 +112,7 @@ class Attention(nn.Layer):
     def forward(self, x):
         B, N, C = x.shape
         qk = self.qk(x).reshape(
-            (B, N, 2, self.num_heads, self.head_dim)).transpose(
-                (2, 0, 3, 1, 4))
+            (B, N, 2, self.num_heads, self.head_dim)).transpose((2, 0, 3, 1, 4))
 
         q, k = qk[0], qk[1]
         v = self.v(x).reshape(
@@ -125,8 +124,7 @@ class Attention(nn.Layer):
         attn = self.attn_drop(attn)
 
         x = paddle.matmul(attn, v)
-        x = x.transpose((0, 2, 1, 3)).reshape(
-            (B, N, x.shape[-1] * x.shape[-3]))
+        x = x.transpose((0, 2, 1, 3)).reshape((B, N, x.shape[-1] * x.shape[-3]))
         x = self.proj(x)
         x = self.proj_drop(x)
         return x

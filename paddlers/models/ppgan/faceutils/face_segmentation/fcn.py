@@ -115,4 +115,3 @@ class FCNHead(nn.Layer):
         logit = self.cls(x)
         logit_list.append(logit)
         return logit_list
-

@@ -1,4 +1,4 @@
-# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -61,9 +61,9 @@ NET_CONFIG = {
     [[3, 16, 32, 1, False]],
     "blocks3": [[3, 32, 64, 2, False], [3, 64, 64, 1, False]],
     "blocks4": [[3, 64, 128, 2, False], [3, 128, 128, 1, False]],
-    "blocks5": [[3, 128, 256, 2, False], [5, 256, 256, 1, False],
-                [5, 256, 256, 1, False], [5, 256, 256, 1, False],
-                [5, 256, 256, 1, False], [5, 256, 256, 1, False]],
+    "blocks5":
+    [[3, 128, 256, 2, False], [5, 256, 256, 1, False], [5, 256, 256, 1, False],
+     [5, 256, 256, 1, False], [5, 256, 256, 1, False], [5, 256, 256, 1, False]],
     "blocks6": [[5, 256, 512, 2, True], [5, 512, 512, 1, True]]
 }
 
@@ -189,7 +189,7 @@ class PPLCNet(TheseusLayer):
             num_filters=make_divisible(16 * scale),
             stride=2)
 
-        self.blocks2 = nn.Sequential(* [
+        self.blocks2 = nn.Sequential(*[
             DepthwiseSeparable(
                 num_channels=make_divisible(in_c * scale),
                 num_filters=make_divisible(out_c * scale),
@@ -199,7 +199,7 @@ class PPLCNet(TheseusLayer):
             for i, (k, in_c, out_c, s, se) in enumerate(NET_CONFIG["blocks2"])
         ])
 
-        self.blocks3 = nn.Sequential(* [
+        self.blocks3 = nn.Sequential(*[
             DepthwiseSeparable(
                 num_channels=make_divisible(in_c * scale),
                 num_filters=make_divisible(out_c * scale),
@@ -209,7 +209,7 @@ class PPLCNet(TheseusLayer):
             for i, (k, in_c, out_c, s, se) in enumerate(NET_CONFIG["blocks3"])
         ])
 
-        self.blocks4 = nn.Sequential(* [
+        self.blocks4 = nn.Sequential(*[
             DepthwiseSeparable(
                 num_channels=make_divisible(in_c * scale),
                 num_filters=make_divisible(out_c * scale),
@@ -219,7 +219,7 @@ class PPLCNet(TheseusLayer):
             for i, (k, in_c, out_c, s, se) in enumerate(NET_CONFIG["blocks4"])
         ])
 
-        self.blocks5 = nn.Sequential(* [
+        self.blocks5 = nn.Sequential(*[
             DepthwiseSeparable(
                 num_channels=make_divisible(in_c * scale),
                 num_filters=make_divisible(out_c * scale),
@@ -229,7 +229,7 @@ class PPLCNet(TheseusLayer):
             for i, (k, in_c, out_c, s, se) in enumerate(NET_CONFIG["blocks5"])
         ])
 
-        self.blocks6 = nn.Sequential(* [
+        self.blocks6 = nn.Sequential(*[
             DepthwiseSeparable(
                 num_channels=make_divisible(in_c * scale),
                 num_filters=make_divisible(out_c * scale),

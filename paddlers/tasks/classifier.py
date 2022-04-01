@@ -121,12 +121,12 @@ class BaseClassifier(BaseModel):
         return outputs
 
     def default_metric(self):
-        default_config = [{"TopkAcc":{"topk": [1, 5]}}]
-        return build_metrics(default_config) 
+        default_config = [{"TopkAcc": {"topk": [1, 5]}}]
+        return build_metrics(default_config)
 
     def default_loss(self):
         # TODO: use mixed loss and other loss
-        default_config = [{"CELoss":{"weight": 1.0}}]
+        default_config = [{"CELoss": {"weight": 1.0}}]
         return build_loss(default_config)
 
     def default_optimizer(self,
@@ -229,8 +229,7 @@ class BaseClassifier(BaseModel):
                                 "set pretrain_weights to be None.".format(
                                     cls_pretrain_weights_dict[self.model_name][
                                         0]))
-                pretrain_weights = cls_pretrain_weights_dict[self.model_name][
-                    0]
+                pretrain_weights = cls_pretrain_weights_dict[self.model_name][0]
         elif pretrain_weights is not None and osp.exists(pretrain_weights):
             if osp.splitext(pretrain_weights)[-1] != '.pdparams':
                 logging.error(
@@ -414,8 +413,8 @@ class BaseClassifier(BaseModel):
         if isinstance(img_file, list):
             prediction = [{
                 'class_ids_map': l,
-                'scores_map': s, 
-                'label_names_map': n, 
+                'scores_map': s,
+                'label_names_map': n,
             } for l, s, n in zip(label_list, score_list, name_list)]
         else:
             prediction = {
@@ -493,11 +492,9 @@ class BaseClassifier(BaseModel):
             batch_restore_list.append(restore_list)
         return batch_restore_list
 
+
 class ResNet50_vd(BaseClassifier):
-    def __init__(self,
-                 num_classes=2,
-                 use_mixed_loss=False,
-                 **params):
+    def __init__(self, num_classes=2, use_mixed_loss=False, **params):
         super(ResNet50_vd, self).__init__(
             model_name='ResNet50_vd',
             num_classes=num_classes,
@@ -506,10 +503,7 @@ class ResNet50_vd(BaseClassifier):
 
 
 class MobileNetV3_small_x1_0(BaseClassifier):
-    def __init__(self,
-                 num_classes=2,
-                 use_mixed_loss=False,
-                 **params):
+    def __init__(self, num_classes=2, use_mixed_loss=False, **params):
         super(MobileNetV3_small_x1_0, self).__init__(
             model_name='MobileNetV3_small_x1_0',
             num_classes=num_classes,
@@ -518,10 +512,7 @@ class MobileNetV3_small_x1_0(BaseClassifier):
 
 
 class HRNet_W18_C(BaseClassifier):
-    def __init__(self,
-                 num_classes=2,
-                 use_mixed_loss=False,
-                 **params):
+    def __init__(self, num_classes=2, use_mixed_loss=False, **params):
         super(HRNet_W18_C, self).__init__(
             model_name='HRNet_W18_C',
             num_classes=num_classes,

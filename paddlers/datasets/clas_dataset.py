@@ -72,8 +72,9 @@ class ClasDataset(Dataset):
                     raise IOError('Image file {} does not exist!'.format(
                         full_path_im))
                 if not label.isdigit():
-                    raise ValueError('Label {} does not convert to number(int)!'.format(
-                        label))
+                    raise ValueError(
+                        'Label {} does not convert to number(int)!'.format(
+                            label))
                 self.file_list.append({
                     'image': full_path_im,
                     'label': int(label)

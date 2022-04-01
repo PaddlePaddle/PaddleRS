@@ -36,7 +36,6 @@ import paddle.nn as nn
 
 from paddle.utils.download import get_weights_path_from_url
 
-
 __all__ = []
 
 model_urls = {
@@ -180,7 +179,13 @@ class ResNet(nn.Layer):
             resnet18 = ResNet(BasicBlock, 18)
     """
 
-    def __init__(self, block, depth, num_classes=1000, with_pool=True, strides=(1,1,2,2,2), norm_layer=None):
+    def __init__(self,
+                 block,
+                 depth,
+                 num_classes=1000,
+                 with_pool=True,
+                 strides=(1, 1, 2, 2, 2),
+                 norm_layer=None):
         super(ResNet, self).__init__()
         layer_cfg = {
             18: [2, 2, 2, 2],

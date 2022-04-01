@@ -280,9 +280,9 @@ class EvalMOTReader(BaseDataLoader):
                  drop_last=False,
                  num_classes=1,
                  **kwargs):
-        super(EvalMOTReader, self).__init__(
-            sample_transforms, batch_transforms, batch_size, shuffle,
-            drop_last, num_classes, **kwargs)
+        super(EvalMOTReader, self).__init__(sample_transforms, batch_transforms,
+                                            batch_size, shuffle, drop_last,
+                                            num_classes, **kwargs)
 
 
 @register
@@ -297,6 +297,6 @@ class TestMOTReader(BaseDataLoader):
                  drop_last=False,
                  num_classes=1,
                  **kwargs):
-        super(TestMOTReader, self).__init__(
-            sample_transforms, batch_transforms, batch_size, shuffle,
-            drop_last, num_classes, **kwargs)
+        super(TestMOTReader, self).__init__(sample_transforms, batch_transforms,
+                                            batch_size, shuffle, drop_last,
+                                            num_classes, **kwargs)

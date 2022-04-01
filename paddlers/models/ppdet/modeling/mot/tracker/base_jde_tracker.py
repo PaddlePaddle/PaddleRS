@@ -127,8 +127,8 @@ class STrack(BaseTrack):
         if self.smooth_feat is None:
             self.smooth_feat = feat
         else:
-            self.smooth_feat = self.alpha * self.smooth_feat + (
-                1.0 - self.alpha) * feat
+            self.smooth_feat = self.alpha * self.smooth_feat + (1.0 - self.alpha
+                                                                ) * feat
         self.features.append(feat)
         self.smooth_feat /= np.linalg.norm(self.smooth_feat)
 
@@ -136,8 +136,8 @@ class STrack(BaseTrack):
         mean_state = self.mean.copy()
         if self.state != TrackState.Tracked:
             mean_state[7] = 0
-        self.mean, self.covariance = self.kalman_filter.predict(
-            mean_state, self.covariance)
+        self.mean, self.covariance = self.kalman_filter.predict(mean_state,
+                                                                self.covariance)
 
     @staticmethod
     def multi_predict(tracks, kalman_filter):

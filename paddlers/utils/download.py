@@ -113,11 +113,10 @@ def download(url, path, md5sum=None):
                     if download_size % 524288 == 0:
                         total_size_m = round(
                             int(total_size) / 1024.0 / 1024.0, 2)
-                        download_size_m = round(download_size / 1024.0 /
-                                                1024.0, 2)
-                        speed = int(524288 /
-                                    (time.time() - current_time + 0.01) /
-                                    1024.0)
+                        download_size_m = round(download_size / 1024.0 / 1024.0,
+                                                2)
+                        speed = int(524288 / (time.time() - current_time + 0.01)
+                                    / 1024.0)
                         current_time = time.time()
                         logging.debug(
                             "Downloading: TotalSize={}M, DownloadSize={}M, Speed={}KB/s"

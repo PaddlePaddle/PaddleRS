@@ -99,8 +99,7 @@ class DecodeImage(object):
         data = np.frombuffer(img, dtype='uint8')
         img = cv2.imdecode(data, 1)
         if self.to_rgb:
-            assert img.shape[2] == 3, 'invalid shape of image[%s]' % (
-                img.shape)
+            assert img.shape[2] == 3, 'invalid shape of image[%s]' % (img.shape)
             img = img[:, :, ::-1]
 
         if self.channel_first:
@@ -348,8 +347,7 @@ class AugMix(object):
 
         ws = np.float32(
             np.random.dirichlet([self.aug_prob_coeff] * self.mixture_width))
-        m = np.float32(
-            np.random.beta(self.aug_prob_coeff, self.aug_prob_coeff))
+        m = np.float32(np.random.beta(self.aug_prob_coeff, self.aug_prob_coeff))
 
         # image = Image.fromarray(image)
         mix = np.zeros(image.shape)

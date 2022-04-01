@@ -38,6 +38,7 @@ class VSRFolderDataset(BaseDataset):
         num_frames (int): Number of frames of each input clip.
         times (int): Repeat times of datset length.
     """
+
     def __init__(self,
                  lq_folder,
                  gt_folder,
@@ -65,9 +66,10 @@ class VSRFolderDataset(BaseDataset):
             else:
                 num_frames = self.num_frames
             data_infos.append(
-                dict(lq_path=self.lq_folder,
-                     gt_path=self.gt_folder,
-                     key=sequence.replace(f'{self.lq_folder}/', ''),
-                     num_frames=num_frames,
-                     sequence_length=sequence_length))
+                dict(
+                    lq_path=self.lq_folder,
+                    gt_path=self.gt_folder,
+                    key=sequence.replace(f'{self.lq_folder}/', ''),
+                    num_frames=num_frames,
+                    sequence_length=sequence_length))
         return data_infos

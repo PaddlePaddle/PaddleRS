@@ -24,36 +24,22 @@ from .layers import Conv3x3, Identity
 class _ChangeStarBase(nn.Layer):
 
     USE_MULTITASK_DECODER = True
-    OUT_TYPES = (
-        MaskType.CD, 
-        MaskType.CD, 
-        MaskType.SEG_T1, 
-        MaskType.SEG_T2
-    )
+    OUT_TYPES = (MaskType.CD, MaskType.CD, MaskType.SEG_T1, MaskType.SEG_T2)
 
-    def __init__(
-        self,
-        seg_model,
-        num_classes,
-        mid_channels,
-        inner_channels,
-        num_convs,
-        scale_factor
-    ):
+    def __init__(self, seg_model, num_classes, mid_channels, inner_channels,
+                 num_convs, scale_factor):
         super().__init__()
 
         self.extract = seg_model
         self.detect = ChangeMixin(
-            in_ch=mid_channels*2,
+            in_ch=mid_channels * 2,
             out_ch=num_classes,
             mid_ch=inner_channels,
             num_convs=num_convs,
-            scale_factor=scale_factor
-        )
+            scale_factor=scale_factor)
         self.segment = nn.Sequential(
             Conv3x3(mid_channels, 2),
-            nn.UpsamplingBilinear2D(scale_factor=scale_factor)
-        )
+            nn.UpsamplingBilinear2D(scale_factor=scale_factor))
 
         self.init_weight()
 
@@ -80,14 +66,14 @@ class ChangeMixin(nn.Layer):
         super().__init__()
         convs = [Conv3x3(in_ch, mid_ch, norm=True, act=True)]
         convs += [
-            Conv3x3(mid_ch, mid_ch, norm=True, act=True) 
-            for _ in range(num_convs-1)
+            Conv3x3(
+                mid_ch, mid_ch, norm=True, act=True)
+            for _ in range(num_convs - 1)
         ]
         self.detect = nn.Sequential(
             *convs,
             Conv3x3(mid_ch, out_ch),
-            nn.UpsamplingBilinear2D(scale_factor=scale_factor)
-        )
+            nn.UpsamplingBilinear2D(scale_factor=scale_factor))
 
     def forward(self, x1, x2):
         pred12 = self.detect(paddle.concat([x1, x2], axis=1))
@@ -117,13 +103,12 @@ class ChangeStar_FarSeg(_ChangeStarBase):
     """
 
     def __init__(
-        self, 
-        num_classes,
-        mid_channels=256,
-        inner_channels=16,
-        num_convs=4,
-        scale_factor=4.0,
-    ):
+            self,
+            num_classes,
+            mid_channels=256,
+            inner_channels=16,
+            num_convs=4,
+            scale_factor=4.0, ):
         # TODO: Configurable FarSeg model
         class _FarSegWrapper(nn.Layer):
             def __init__(self, seg_model):
@@ -137,7 +122,8 @@ class ChangeStar_FarSeg(_ChangeStarBase):
                 if self._seg_model.scene_relation:
                     c5 = feat_list[-1]
                     c6 = self._seg_model.gap(c5)
-                    refined_fpn_feat_list = self._seg_model.sr(c6, fpn_feat_list)
+                    refined_fpn_feat_list = self._seg_model.sr(c6,
+                                                               fpn_feat_list)
                 else:
                     refined_fpn_feat_list = fpn_feat_list
                 final_feat = self._seg_model.decoder(refined_fpn_feat_list)
@@ -151,8 +137,8 @@ class ChangeStar_FarSeg(_ChangeStarBase):
             mid_channels=mid_channels,
             inner_channels=inner_channels,
             num_convs=num_convs,
-            scale_factor=scale_factor
-        )
+            scale_factor=scale_factor)
+
 
 # NOTE: Currently, ChangeStar = FarSeg + ChangeMixin + SegHead
 ChangeStar = ChangeStar_FarSeg

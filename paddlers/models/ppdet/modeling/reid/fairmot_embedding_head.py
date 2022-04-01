@@ -52,8 +52,7 @@ class FairMOTEmbeddingHead(nn.Layer):
                 in_channels, ch_head, kernel_size=3, padding=1, bias=True),
             nn.ReLU(),
             ConvLayer(
-                ch_head, ch_emb, kernel_size=1, stride=1, padding=0,
-                bias=True))
+                ch_head, ch_emb, kernel_size=1, stride=1, padding=0, bias=True))
         param_attr = paddle.ParamAttr(initializer=KaimingUniform())
         bound = 1 / math.sqrt(ch_emb)
         bias_attr = paddle.ParamAttr(initializer=Uniform(-bound, bound))

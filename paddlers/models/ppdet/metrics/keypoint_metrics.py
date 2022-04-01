@@ -69,10 +69,10 @@ class KeyPointTopDownCOCOEval(object):
         num_images = inputs['image'].shape[0]
         self.results['all_preds'][self.idx:self.idx + num_images, :, 0:
                                   3] = kpts[:, :, 0:3]
-        self.results['all_boxes'][self.idx:self.idx + num_images, 0:
-                                  2] = inputs['center'].numpy()[:, 0:2]
-        self.results['all_boxes'][self.idx:self.idx + num_images, 2:
-                                  4] = inputs['scale'].numpy()[:, 0:2]
+        self.results['all_boxes'][self.idx:self.idx + num_images, 0:2] = inputs[
+            'center'].numpy()[:, 0:2]
+        self.results['all_boxes'][self.idx:self.idx + num_images, 2:4] = inputs[
+            'scale'].numpy()[:, 0:2]
         self.results['all_boxes'][self.idx:self.idx + num_images, 4] = np.prod(
             inputs['scale'].numpy() * 200, 1)
         self.results['all_boxes'][self.idx:self.idx + num_images,

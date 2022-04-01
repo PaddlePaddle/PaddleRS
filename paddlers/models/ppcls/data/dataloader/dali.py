@@ -150,8 +150,7 @@ def dali_dataloader(config, mode, device, seed=None):
     config_dataloader = config[mode]
     seed = 42 if seed is None else seed
     ops = [
-        list(x.keys())[0]
-        for x in config_dataloader["dataset"]["transform_ops"]
+        list(x.keys())[0] for x in config_dataloader["dataset"]["transform_ops"]
     ]
     support_ops_train = [
         "DecodeImage", "NormalizeImage", "RandFlipImage", "RandCropImage"

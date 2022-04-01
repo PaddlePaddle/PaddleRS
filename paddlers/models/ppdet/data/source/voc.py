@@ -109,8 +109,8 @@ class VOCDataSet(DetDataset):
                         for x in line.strip().split()[:2]]
                 if not os.path.exists(img_file):
                     logger.warning(
-                        'Illegal image file: {}, and it will be ignored'.
-                        format(img_file))
+                        'Illegal image file: {}, and it will be ignored'.format(
+                            img_file))
                     continue
                 if not os.path.isfile(xml_file):
                     logger.warning(

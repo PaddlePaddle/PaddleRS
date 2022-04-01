@@ -126,8 +126,7 @@ class PicoFeat(nn.Layer):
         for i in range(len(self.cls_convs[stage_idx])):
             cls_feat = self.act_func(self.cls_convs[stage_idx][i](cls_feat))
             if not self.share_cls_reg:
-                reg_feat = self.act_func(self.reg_convs[stage_idx][i](
-                    reg_feat))
+                reg_feat = self.act_func(self.reg_convs[stage_idx][i](reg_feat))
         return cls_feat, reg_feat
 
 

@@ -36,7 +36,7 @@ class CDNet(nn.Layer):
         self.conv8 = Conv7x7(64, 64, norm=True, act=True)
         self.upool1 = nn.MaxUnPool2D(2, 2)
         self.conv_out = Conv7x7(64, num_classes, norm=False, act=False)
-    
+
     def forward(self, t1, t2):
         x = paddle.concat([t1, t2], axis=1)
         x, ind1 = self.pool1(self.conv1(x))
@@ -54,15 +54,15 @@ class Conv7x7(nn.Layer):
     def __init__(self, in_ch, out_ch, norm=False, act=False):
         super(Conv7x7, self).__init__()
         layers = [
-            nn.Pad2D(3),
-            nn.Conv2D(in_ch, out_ch, 7, bias_attr=(False if norm else None))
+            nn.Pad2D(3), nn.Conv2D(
+                in_ch, out_ch, 7, bias_attr=(False if norm else None))
         ]
         if norm:
             layers.append(nn.BatchNorm2D(out_ch))
         if act:
             layers.append(nn.ReLU())
         self.layers = nn.Sequential(*layers)
-    
+
     def forward(self, x):
         return self.layers(x)
 
