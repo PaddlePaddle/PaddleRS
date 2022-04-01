@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Refer to https://github.com/likyoo/Siam-NestedUNet .
+
 import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
