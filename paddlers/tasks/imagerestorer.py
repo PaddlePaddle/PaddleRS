@@ -751,3 +751,37 @@ class ESRGANet(BasicSRNet):
                 'name': 'CosineAnnealingRestartLR',
                 'eta_min': 1e-07
             }
+
+
+# RCAN模型训练
+class RCANet(BasicSRNet):
+    def __init__(
+            self,
+            scale=2,
+            n_resgroups=10,
+            n_resblocks=20, ):
+        super(RCANet, self).__init__()
+        self.min_max = '(0., 255.)'
+        self.generator = {
+            'name': 'RCAN',
+            'scale': scale,
+            'n_resgroups': n_resgroups,
+            'n_resblocks': n_resblocks
+        }
+        self.pixel_criterion = {'name': 'L1Loss'}
+        self.model = {
+            'name': 'RCANModel',
+            'generator': self.generator,
+            'pixel_criterion': self.pixel_criterion
+        }
+        self.optimizer = {
+            'name': 'Adam',
+            'net_names': ['generator'],
+            'beta1': 0.9,
+            'beta2': 0.99
+        }
+        self.lr_scheduler = {
+            'name': 'MultiStepDecay',
+            'milestones': [250000, 500000, 750000, 1000000],
+            'gamma': 0.5
+        }
