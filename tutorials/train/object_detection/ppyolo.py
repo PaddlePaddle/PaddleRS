@@ -84,7 +84,7 @@ model.train(
     train_batch_size=4,
     eval_dataset=eval_dataset,
     # 每多少个epoch存储一次检查点
-    save_interval_epochs=10,
+    save_interval_epochs=5,
     # 每多少次迭代记录一次日志
     log_interval_steps=4,
     save_dir=EXP_DIR,
