@@ -192,9 +192,9 @@ PaddleRS是xxx、xxx、xxx等遥感科研院所共同基于飞桨开发的遥感
 * 模型训练
 * 推理部署
 * 应用案例
-  * [【官方】第十一届 “中国软件杯”大学生软件设计大赛—A组：变化检测](https://aistudio.baidu.com/aistudio/projectdetail/3684588)
-  * [使用超分模块提高真实的低分辨率无人机影像的分割精度](https://aistudio.baidu.com/aistudio/projectdetail/3696814)
-  * [无人机影像汽车识别](https://aistudio.baidu.com/aistudio/projectdetail/3713122/i)
+  * [【官方】第十一届 “中国软件杯”大学生软件设计大赛—A组：变化检测](./docs/cases/csc_cd_cn.md)
+  * [使用超分模块提高真实的低分辨率无人机影像的分割精度](./docs/cases/sr_seg_cn.md)
+  * [无人机影像汽车识别](./docs/cases/car_det_cn.md)
 
 ## 许可证书
 
