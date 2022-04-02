@@ -113,8 +113,9 @@ PaddleRS是xxx、xxx、xxx等遥感科研院所共同基于飞桨开发的遥感
       <td>
         <b>数据格式转换</b><br>
         <ul>
-          <li>geojson to mask</li>
+          <li>coco to mask</li>
           <li>mask to shpfile</li>
+          <li>mask to geojson</li>
         </ul>
         <b>数据预处理</b><br>
         <ul>
