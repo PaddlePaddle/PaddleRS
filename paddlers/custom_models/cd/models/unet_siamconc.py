@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Transferred from https://github.com/rcdaudt/fully_convolutional_change_detection/blob/master/siamunet_conc.py .
+
 import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
