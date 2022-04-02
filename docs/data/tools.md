@@ -2,8 +2,9 @@
 
 工具箱位于`tools`文件夹下，目前有如下工具：
 
-- `geojson2mask`：用于将geojson格式的分割标注标签转换为png格式。
+- `coco2mask`：用于将geojson格式的分割标注标签转换为png格式。
 - `mask2shp`：用于对推理得到的png提取shapefile。
+- `mask2geojson`：用于对推理得到的png提取geojson。
 - `matcher`：用于在推理前匹配两个时段的影响。
 - `spliter`：用于将大图数据进行分割以作为训练数据。
 
@@ -18,12 +19,12 @@ git clone https://github.com/PaddleCV-SIG/PaddleRS.git
 dc PaddleRS\tools
 ```
 
-### geojson2mask
+### coco2mask
 
-`geojson2mask`的主要功能是将图像以及对应json格式的分割标签转换为图像与png格式的标签，结果会分别存放在`img`和`gt`两个文件夹中。相关的数据样例可以参考[中国典型城市建筑物实例数据集](https://www.scidb.cn/detail?dataSetId=806674532768153600&dataSetType=journal)。保存结果为单通道的伪彩色图像。使用代码如下：
+`coco2mask`的主要功能是将图像以及对应json格式的分割标签转换为图像与png格式的标签，结果会分别存放在`img`和`gt`两个文件夹中。相关的数据样例可以参考[中国典型城市建筑物实例数据集](https://www.scidb.cn/detail?dataSetId=806674532768153600&dataSetType=journal)。保存结果为单通道的伪彩色图像。使用代码如下：
 
 ```shell
-python geojson2mask.py --raw_folder xxx --save_folder xxx
+python coco2mask.py --raw_folder xxx --save_folder xxx
 ```
 
 其中：
@@ -42,9 +43,26 @@ python mask2shp.py --srcimg_path xxx.tif --mask_path xxx.png [--save_path output
 其中：
 
 - `srcimg_path`：原始图像的路径，需要带有地理信息，以便为生成的shapefile提供crs等信息。
+
 - `mask_path`：推理得到的png格式的标签的路径。
+
 - `save_path`：保存shapefile的路径，默认为`output`。
+
 - `ignore_index`：忽略生成shp的索引，如背景等，默认为255。
+
+### mask2geojson
+
+  `mask2geojson`的主要功能是将推理得到的png格式的分割结果转换为geojson格式。使用代码如下：
+
+  ```shell
+  python mask2geojson.py --mask_path xxx.tif --save_path xxx.json [--epsilon 0]
+  ```
+
+  其中：
+
+  - `mask_path`：推理得到的png格式的标签的路径。
+  - `save_path`：保存geojson的路径。
+  - `epsilon`：opencv的简化参数，默认为0。
 
 ### matcher
 
