@@ -27,13 +27,6 @@
 ## 数据预处理
 
 ```python
-# 解压数据集
-# 该操作涉及大量文件IO，可能需要一些时间
-!unzip -o -d /home/aistudio/data/data134796/dataset /home/aistudio/data/data134796/train_data.zip > /dev/null
-!unzip -o -d /home/aistudio/data/data134796/dataset /home/aistudio/data/data134796/test_data.zip > /dev/null
-```
-
-```python
 # 划分训练集/验证集，并生成文件名列表
 
 import random
