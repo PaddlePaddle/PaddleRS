@@ -1,4 +1,4 @@
-# [PaddleRS：使用超分模块提高真实的低分辨率无人机影像的分割精度](https://aistudio.baidu.com/aistudio/projectdetail/3696814)
+# [使用图像超分提高低分辨率无人机影像的分割精度](https://aistudio.baidu.com/aistudio/projectdetail/3696814)
 
 ## 一、项目背景
 
