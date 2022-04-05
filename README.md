@@ -5,7 +5,7 @@
     <img src="./docs/images/logo.png" align="middle" width = "500" />
   </p>
 
-  **飞桨高性能遥感图像处理开发套件，端到端地完成从训练到部署的全流程遥感深度学习应用。**
+  **基于飞桨框架开发的高性能遥感图像处理开发套件，端到端地完成从训练到部署的全流程遥感深度学习应用。**
 
   <!-- [![Build Status](https://travis-ci.org/PaddleCV-SIG/PaddleRS.svg?branch=release/0.1)](https://travis-ci.org/PaddleCV-SIG/PaddleRS) -->
   <!-- [![Version](https://img.shields.io/github/release/PaddleCV-SIG/PaddleRS.svg)](https://github.com/PaddleCV-SIG/PaddleRS/releases) -->
@@ -16,11 +16,11 @@
 
 ## 最新动态 <img src="docs/images/seg_news_icon.png" width="30"/>
 
-* [2022-03-30] PaddleRS alpha版本发布！详细发版信息请参考[Release Note](https://github.com/PaddleCV-SIG)。
+* [2022-04-09] PaddleRS 将发布alpha版本！详细发版信息请参考[Release Note](https://github.com/PaddleCV-SIG)。
 
 ## 简介
 
-PaddleRS是xxx、xxx、xxx等遥感科研院所共同基于飞桨开发的遥感处理平台，支持遥感图像分类，目标检测，图像分割，以及变化检测等常用遥感任务，帮助开发者更便捷地完成从训练到部署全流程遥感深度学习应用。
+PaddleRS是遥感科研院所、相关高校共同基于飞桨开发的遥感处理平台，支持遥感图像分类，目标检测，图像分割，以及变化检测等常用遥感任务，帮助开发者更便捷地完成从训练到部署全流程遥感深度学习应用。
 
 <div align="center">
 <img src="docs/images/whole_image.jpg"  width = "2000" />  
@@ -176,7 +176,7 @@ PaddleRS是xxx、xxx、xxx等遥感科研院所共同基于飞桨开发的遥感
 * 如果你发现任何PaddleRS存在的问题或者是建议, 欢迎通过[GitHub Issues](https://github.com/PaddleCV-SIG/PaddleRS/issues)给我们提issues。
 * 欢迎加入PaddleRS 微信群
 <div align="center">
-<img src="./docs/images/wechat.jpg"  width = "200" />  
+<img src="./docs/images/wechat.jpg"  width = "150" />  
 </div>
 
 ## 使用教程 <img src="./docs/images/teach.png" width="30"/>
@@ -187,11 +187,14 @@ PaddleRS是xxx、xxx、xxx等遥感科研院所共同基于飞桨开发的遥感
    * [遥感数据集](./docs/data/dataset_cn.md)
    * [智能标注工具EISeg](https://github.com/PaddlePaddle/PaddleSeg/tree/release/2.4/EISeg)
    * [遥感数据处理脚本](./docs/data/tools.md)
-* APIs
-   * [模型库](./docs/apis/model_zoo.md)
-   * [数据增强](./docs/apis/transforms.md)
 * 模型训练
+   * [数据增强](./docs/apis/transforms.md)
+   * [模型库](./docs/apis/model_zoo.md)
+   * [模型训练说明](./docs/apis/model_zoo.md)
+   * 模型验证
 * 推理部署
+   * 模型导出
+   * 推理预测
 * 应用案例
   * [变化检测示例](./docs/cases/csc_cd_cn.md)
   * [超分模块示例](./docs/cases/sr_seg_cn.md)
@@ -216,3 +219,5 @@ PaddleRS是xxx、xxx、xxx等遥感科研院所共同基于飞桨开发的遥感
     year={2022}
 }
 ```
+
+

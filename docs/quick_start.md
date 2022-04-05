@@ -1,20 +1,3 @@
-# 使用教程——训练模型
-
-本目录下整理了使用PaddleRS训练模型的示例代码，代码中均提供了示例数据的自动下载，并均使用单张GPU卡进行训练。
-
-|代码 | 模型任务 | 数据 |
-|------|--------|---------|
-|object_detection/ppyolo.py | 目标检测PPYOLO | 昆虫检测 |
-|semantic_segmentation/deeplabv3p_resnet50_multi_channel.py | 语义分割DeepLabV3 | 地块分类 |
-|semantic_segmentation/farseg_test.py | 语义分割FarSeg | 遥感建筑分割 |
-|change_detection/cdnet_build.py | 变化检测CDNet | 遥感变化检测 |
-|classification/resnet50_vd_rs.py | 图像分类ResNet50_vd | 遥感场景分类 |
-
-<!-- 可参考API接口说明了解示例代码中的API：
-* [数据集读取API](../../docs/apis/datasets.md)
-* [数据预处理和数据增强API](../../docs/apis/transforms/transforms.md)
-* [模型API/模型加载API](../../docs/apis/models/README.md)
-* [预测结果可视化API](../../docs/apis/visualize.md) -->
 
 ## 环境准备
 
@@ -57,4 +40,3 @@ visualdl --logdir output/deeplabv3p_resnet50_multi_channel/vdl_log --port 8001
 ```
 
 服务启动后，使用浏览器打开 https://0.0.0.0:8001 或 https://localhost:8001
-
