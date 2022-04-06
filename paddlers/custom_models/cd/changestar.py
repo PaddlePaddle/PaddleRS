@@ -17,7 +17,7 @@ import paddle.nn as nn
 import paddle.nn.functional as F
 
 from paddlers.datasets.cd_dataset import MaskType
-from paddlers.custom_models.seg.models import FarSeg
+from paddlers.custom_models.seg import FarSeg
 from .layers import Conv3x3, Identity
 
 
