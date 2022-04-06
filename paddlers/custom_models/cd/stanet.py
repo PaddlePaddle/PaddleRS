@@ -46,7 +46,7 @@ class STANet(nn.Layer):
     """
 
     def __init__(self, in_channels, num_classes, att_type='BAM', ds_factor=1):
-        super().__init__()
+        super(STANet, self).__init__()
 
         WIDTH = 64
 
@@ -94,7 +94,7 @@ def build_sta_module(in_ch, att_type, ds):
 
 class Backbone(nn.Layer, KaimingInitMixin):
     def __init__(self, in_ch, arch, pretrained=True, strides=(2, 1, 2, 2, 2)):
-        super().__init__()
+        super(Backbone, self).__init__()
 
         if arch == 'resnet18':
             self.resnet = resnet.resnet18(
@@ -148,7 +148,7 @@ class Backbone(nn.Layer, KaimingInitMixin):
 
 class Decoder(nn.Layer, KaimingInitMixin):
     def __init__(self, f_ch):
-        super().__init__()
+        super(Decoder, self).__init__()
         self.dr1 = Conv1x1(64, 96, norm=True, act=True)
         self.dr2 = Conv1x1(128, 96, norm=True, act=True)
         self.dr3 = Conv1x1(256, 96, norm=True, act=True)
@@ -183,7 +183,7 @@ class Decoder(nn.Layer, KaimingInitMixin):
 
 class BAM(nn.Layer):
     def __init__(self, in_ch, ds):
-        super().__init__()
+        super(BAM, self).__init__()
 
         self.ds = ds
         self.pool = nn.AvgPool2D(self.ds)
@@ -220,7 +220,7 @@ class BAM(nn.Layer):
 
 class PAMBlock(nn.Layer):
     def __init__(self, in_ch, scale=1, ds=1):
-        super().__init__()
+        super(PAMBlock, self).__init__()
 
         self.scale = scale
         self.ds = ds
@@ -280,7 +280,7 @@ class PAMBlock(nn.Layer):
 
 class PAM(nn.Layer):
     def __init__(self, in_ch, ds, scales=(1, 2, 4, 8)):
-        super().__init__()
+        super(PAM, self).__init__()
 
         self.stages = nn.LayerList(
             [PAMBlock(
@@ -296,7 +296,7 @@ class PAM(nn.Layer):
 
 class Attention(nn.Layer):
     def __init__(self, att):
-        super().__init__()
+        super(Attention, self).__init__()
         self.att = att
 
     def forward(self, x1, x2):
