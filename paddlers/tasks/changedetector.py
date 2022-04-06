@@ -35,7 +35,7 @@ from .base import BaseModel
 from .utils import seg_metrics as metrics
 
 __all__ = [
-    "CDNet", "UNetEarlyFusion", "UNetSiamConc", "UNetSiamDiff", "STANet", "BIT",
+    "CDNet", "FCEarlyFusion", "FCSiamConc", "FCSiamDiff", "STANet", "BIT",
     "SNUNet", "DSIFN", "DSAMNet", "ChangeStar"
 ]
 
@@ -685,7 +685,7 @@ class CDNet(BaseChangeDetector):
             **params)
 
 
-class UNetEarlyFusion(BaseChangeDetector):
+class FCEarlyFusion(BaseChangeDetector):
     def __init__(self,
                  num_classes=2,
                  use_mixed_loss=False,
@@ -693,14 +693,14 @@ class UNetEarlyFusion(BaseChangeDetector):
                  use_dropout=False,
                  **params):
         params.update({'in_channels': in_channels, 'use_dropout': use_dropout})
-        super(UNetEarlyFusion, self).__init__(
-            model_name='UNetEarlyFusion',
+        super(FCEarlyFusion, self).__init__(
+            model_name='FCEarlyFusion',
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
             **params)
 
 
-class UNetSiamConc(BaseChangeDetector):
+class FCSiamConc(BaseChangeDetector):
     def __init__(self,
                  num_classes=2,
                  use_mixed_loss=False,
@@ -708,14 +708,14 @@ class UNetSiamConc(BaseChangeDetector):
                  use_dropout=False,
                  **params):
         params.update({'in_channels': in_channels, 'use_dropout': use_dropout})
-        super(UNetSiamConc, self).__init__(
-            model_name='UNetSiamConc',
+        super(FCSiamConc, self).__init__(
+            model_name='FCSiamConc',
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
             **params)
 
 
-class UNetSiamDiff(BaseChangeDetector):
+class FCSiamDiff(BaseChangeDetector):
     def __init__(self,
                  num_classes=2,
                  use_mixed_loss=False,
@@ -723,8 +723,8 @@ class UNetSiamDiff(BaseChangeDetector):
                  use_dropout=False,
                  **params):
         params.update({'in_channels': in_channels, 'use_dropout': use_dropout})
-        super(UNetSiamDiff, self).__init__(
-            model_name='UNetSiamDiff',
+        super(FCSiamDiff, self).__init__(
+            model_name='FCSiamDiff',
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
             **params)

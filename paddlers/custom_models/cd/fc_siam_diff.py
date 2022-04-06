@@ -19,10 +19,9 @@ import paddle.nn as nn
 import paddle.nn.functional as F
 
 from .layers import Conv3x3, MaxPool2x2, ConvTransposed3x3, Identity
-from .param_init import normal_init, constant_init
 
 
-class UNetSiamDiff(nn.Layer):
+class FCSiamDiff(nn.Layer):
     """
     The FC-Siam-diff implementation based on PaddlePaddle.
 
@@ -38,7 +37,7 @@ class UNetSiamDiff(nn.Layer):
     """
 
     def __init__(self, in_channels, num_classes, use_dropout=False):
-        super().__init__()
+        super(FCSiamDiff, self).__init__()
 
         C1, C2, C3, C4, C5 = 16, 32, 64, 128, 256
 
@@ -157,12 +156,8 @@ class UNetSiamDiff(nn.Layer):
         x4d = self.upconv4(x4p)
         pad4 = (0, paddle.shape(x43_1)[3] - paddle.shape(x4d)[3], 0,
                 paddle.shape(x43_1)[2] - paddle.shape(x4d)[2])
-        x4d = paddle.concat(
-            [
-                F.pad(x4d, pad=pad4, mode='replicate'),
-                paddle.abs(x43_1 - x43_2)
-            ],
-            1)
+        x4d = F.pad(x4d, pad=pad4, mode='replicate')
+        x4d = paddle.concat([x4d, paddle.abs(x43_1 - x43_2)], 1)
         x43d = self.do43d(self.conv43d(x4d))
         x42d = self.do42d(self.conv42d(x43d))
         x41d = self.do41d(self.conv41d(x42d))
@@ -171,12 +166,8 @@ class UNetSiamDiff(nn.Layer):
         x3d = self.upconv3(x41d)
         pad3 = (0, paddle.shape(x33_1)[3] - paddle.shape(x3d)[3], 0,
                 paddle.shape(x33_1)[2] - paddle.shape(x3d)[2])
-        x3d = paddle.concat(
-            [
-                F.pad(x3d, pad=pad3, mode='replicate'),
-                paddle.abs(x33_1 - x33_2)
-            ],
-            1)
+        x3d = F.pad(x3d, pad=pad3, mode='replicate')
+        x3d = paddle.concat([x3d, paddle.abs(x33_1 - x33_2)], 1)
         x33d = self.do33d(self.conv33d(x3d))
         x32d = self.do32d(self.conv32d(x33d))
         x31d = self.do31d(self.conv31d(x32d))
@@ -185,12 +176,8 @@ class UNetSiamDiff(nn.Layer):
         x2d = self.upconv2(x31d)
         pad2 = (0, paddle.shape(x22_1)[3] - paddle.shape(x2d)[3], 0,
                 paddle.shape(x22_1)[2] - paddle.shape(x2d)[2])
-        x2d = paddle.concat(
-            [
-                F.pad(x2d, pad=pad2, mode='replicate'),
-                paddle.abs(x22_1 - x22_2)
-            ],
-            1)
+        x2d = F.pad(x2d, pad=pad2, mode='replicate')
+        x2d = paddle.concat([x2d, paddle.abs(x22_1 - x22_2)], 1)
         x22d = self.do22d(self.conv22d(x2d))
         x21d = self.do21d(self.conv21d(x22d))
 
@@ -198,24 +185,15 @@ class UNetSiamDiff(nn.Layer):
         x1d = self.upconv1(x21d)
         pad1 = (0, paddle.shape(x12_1)[3] - paddle.shape(x1d)[3], 0,
                 paddle.shape(x12_1)[2] - paddle.shape(x1d)[2])
-        x1d = paddle.concat(
-            [
-                F.pad(x1d, pad=pad1, mode='replicate'),
-                paddle.abs(x12_1 - x12_2)
-            ],
-            1)
+        x1d = F.pad(x1d, pad=pad1, mode='replicate')
+        x1d = paddle.concat([x1d, paddle.abs(x12_1 - x12_2)], 1)
         x12d = self.do12d(self.conv12d(x1d))
         x11d = self.conv11d(x12d)
 
         return [x11d]
 
     def init_weight(self):
-        for sublayer in self.sublayers():
-            if isinstance(sublayer, nn.Conv2D):
-                normal_init(sublayer.weight, std=0.001)
-            elif isinstance(sublayer, (nn.BatchNorm, nn.SyncBatchNorm)):
-                constant_init(sublayer.weight, value=1.0)
-                constant_init(sublayer.bias, value=0.0)
+        pass
 
     def _make_dropout(self):
         if self.use_dropout:

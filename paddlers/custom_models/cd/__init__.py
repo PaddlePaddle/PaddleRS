@@ -19,6 +19,6 @@ from .stanet import STANet
 from .snunet import SNUNet
 from .dsamnet import DSAMNet
 from .changestar import ChangeStar
-from .unet_ef import UNetEarlyFusion
-from .unet_siamconc import UNetSiamConc
-from .unet_siamdiff import UNetSiamDiff
+from .fc_ef import FCEarlyFusion
+from .fc_siamconc import FCSiamConc
+from .fc_siamdiff import FCSiamDiff

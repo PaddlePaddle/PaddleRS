@@ -1,0 +1,2 @@
+cropped_test_images/im1_1.bmp cropped_test_images/im2_1.bmp cropped_test_images/gt_1.bmp
+cropped_test_images/im1_2.bmp cropped_test_images/im2_2.bmp cropped_test_images/gt_2.bmp
