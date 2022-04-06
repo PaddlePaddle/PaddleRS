@@ -39,6 +39,7 @@ from .utils.infer_nets import InferNet
 class BaseModel:
     def __init__(self, model_type):
         self.model_type = model_type
+        self.in_channels = None
         self.num_classes = None
         self.labels = None
         self.version = paddlers.__version__
@@ -130,8 +131,8 @@ class BaseModel:
         info['version'] = paddlers.__version__
         info['Model'] = self.__class__.__name__
         info['_Attributes'] = dict(
-            [('model_type', self.model_type), ('num_classes', self.num_classes),
-             ('labels', self.labels),
+            [('model_type', self.model_type), ('in_channels', self.in_channels),
+             ('num_classes', self.num_classes), ('labels', self.labels),
              ('fixed_input_shape', self.fixed_input_shape),
              ('best_accuracy', self.best_accuracy),
              ('best_model_epoch', self.best_model_epoch)])

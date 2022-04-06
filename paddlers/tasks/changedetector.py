@@ -24,7 +24,7 @@ import paddle.nn.functional as F
 from paddle.static import InputSpec
 
 import paddlers
-import paddlers.custom_models.cd as cd
+import paddlers.custom_models.cd as cmcd
 import paddlers.utils.logging as logging
 import paddlers.models.ppseg as paddleseg
 from paddlers.transforms import arrange_transforms
@@ -65,8 +65,8 @@ class BaseChangeDetector(BaseModel):
 
     def build_net(self, **params):
         # TODO: add other model
-        net = cd.models.__dict__[self.model_name](num_classes=self.num_classes,
-                                                  **params)
+        net = cmcd.__dict__[self.model_name](num_classes=self.num_classes,
+                                             **params)
         return net
 
     def _fix_transforms_shape(self, image_shape):

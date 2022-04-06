@@ -315,7 +315,7 @@ def select_bands(im, band_list=[1, 2, 3]):
             raise ValueError("The element in band_list must > 1 and <= {}.".
                              format(str(total_band)))
         result.append(im[:, :, band])
-    ima = np.stack(result, axis=0)
+    ima = np.stack(result, axis=-1)
     return ima
 
 

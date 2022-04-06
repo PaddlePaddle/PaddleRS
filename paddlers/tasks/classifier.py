@@ -20,6 +20,7 @@ import paddle
 import paddle.nn.functional as F
 from paddle.static import InputSpec
 import paddlers.models.ppcls as paddleclas
+import paddlers.custom_models.cls as cmcls
 import paddlers
 from paddlers.transforms import arrange_transforms
 from paddlers.utils import get_single_card_bs, DisablePrint
@@ -31,12 +32,15 @@ from paddlers.models.ppcls.data.postprocess import build_postprocess
 from paddlers.utils.checkpoint import cls_pretrain_weights_dict
 from paddlers.transforms import ImgDecoder, Resize
 
-__all__ = ["ResNet50_vd", "MobileNetV3_small_x1_0", "HRNet_W18_C"]
+__all__ = [
+    "ResNet50_vd", "MobileNetV3_small_x1_0", "HRNet_W18_C", "CondenseNetV2_b"
+]
 
 
 class BaseClassifier(BaseModel):
     def __init__(self,
                  model_name,
+                 in_channels=3,
                  num_classes=2,
                  use_mixed_loss=False,
                  **params):
@@ -44,10 +48,12 @@ class BaseClassifier(BaseModel):
         if 'with_net' in self.init_params:
             del self.init_params['with_net']
         super(BaseClassifier, self).__init__('classifier')
-        if not hasattr(paddleclas.arch.backbone, model_name):
+        if not hasattr(paddleclas.arch.backbone, model_name) and \
+           not hasattr(cmcls, model_name):
             raise Exception("ERROR: There's no model named {}.".format(
                 model_name))
         self.model_name = model_name
+        self.in_channels = in_channels
         self.num_classes = num_classes
         self.use_mixed_loss = use_mixed_loss
         self.metrics = None
@@ -61,8 +67,17 @@ class BaseClassifier(BaseModel):
 
     def build_net(self, **params):
         with paddle.utils.unique_name.guard():
-            net = paddleclas.arch.backbone.__dict__[self.model_name](
-                class_num=self.num_classes, **params)
+            model = dict(paddleclas.arch.backbone.__dict__,
+                         **cmcls.__dict__)[self.model_name]
+            # TODO: Determine whether there is in_channels
+            try:
+                net = model(
+                    class_num=self.num_classes,
+                    in_channels=self.in_channels,
+                    **params)
+            except:
+                net = model(class_num=self.num_classes, **params)
+                self.in_channels = 3
         return net
 
     def _fix_transforms_shape(self, image_shape):
@@ -515,6 +530,15 @@ class HRNet_W18_C(BaseClassifier):
     def __init__(self, num_classes=2, use_mixed_loss=False, **params):
         super(HRNet_W18_C, self).__init__(
             model_name='HRNet_W18_C',
+            num_classes=num_classes,
+            use_mixed_loss=use_mixed_loss,
+            **params)
+
+
+class CondenseNetV2_b(BaseClassifier):
+    def __init__(self, num_classes=2, use_mixed_loss=False, **params):
+        super(CondenseNetV2_b, self).__init__(
+            model_name='CondenseNetV2_b',
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
             **params)
