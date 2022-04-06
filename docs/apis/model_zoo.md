@@ -13,9 +13,9 @@ PaddleRS的基础模型库来自[PaddleClas](https://github.com/PaddlePaddle/Pad
 | STANet          | 变化检测 |
 | SNUNet          | 变化检测 | 
 | DSAMNet         | 变化检测 |
-| UNetEarlyFusion | 变化检测 | 
-| UNetSiamConc    | 变化检测 | 
-| UNetSiamDiff    | 变化检测 | 
+| FCEarlyFusion | 变化检测 | 
+| FCSiamConc    | 变化检测 | 
+| FCSiamDiff    | 变化检测 | 
 
 
 ## 如何导入
@@ -23,11 +23,11 @@ PaddleRS的基础模型库来自[PaddleClas](https://github.com/PaddlePaddle/Pad
 模型均位于`paddlers/models`和`paddlers/custom_models`中，对于套件中的模型可以通过如下方法进行使用
 
 ```python
-from paddlers.models import xxxxNet
+from paddlers.models import xxxx
 ```
 
 而PaddleRS所特有的模型可以通过如下方法调用
 
 ```python
-from paddlers.custom_models import xxxxNet
+from paddlers.custom_models import xxxx
 ```
