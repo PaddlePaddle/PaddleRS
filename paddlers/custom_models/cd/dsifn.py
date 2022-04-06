@@ -41,7 +41,7 @@ class DSIFN(nn.Layer):
     """
 
     def __init__(self, num_classes, use_dropout=False):
-        super().__init__()
+        super(DSIFN, self).__init__()
 
         self.encoder1 = self.encoder2 = VGG16FeaturePicker()
 
@@ -191,7 +191,7 @@ class DSIFN(nn.Layer):
 
 class VGG16FeaturePicker(nn.Layer):
     def __init__(self, indices=(3, 8, 15, 22, 29)):
-        super().__init__()
+        super(VGG16FeaturePicker, self).__init__()
         features = list(vgg16(pretrained=True).features)[:30]
         self.features = nn.LayerList(features)
         self.features.eval()

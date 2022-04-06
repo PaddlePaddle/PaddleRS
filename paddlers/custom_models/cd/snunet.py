@@ -39,7 +39,7 @@ class SNUNet(nn.Layer, KaimingInitMixin):
     """
 
     def __init__(self, in_channels, num_classes, width=32):
-        super().__init__()
+        super(SNUNet, self).__init__()
 
         filters = (width, width * 2, width * 4, width * 8, width * 16)
 
@@ -142,7 +142,7 @@ class SNUNet(nn.Layer, KaimingInitMixin):
 
 class ConvBlockNested(nn.Layer):
     def __init__(self, in_ch, out_ch, mid_ch):
-        super().__init__()
+        super(ConvBlockNested, self).__init__()
         self.act = nn.ReLU()
         self.conv1 = nn.Conv2D(in_ch, mid_ch, kernel_size=3, padding=1)
         self.bn1 = make_norm(mid_ch)
@@ -163,7 +163,7 @@ class ConvBlockNested(nn.Layer):
 
 class Up(nn.Layer):
     def __init__(self, in_ch, use_conv=False):
-        super().__init__()
+        super(Up, self).__init__()
         if use_conv:
             self.up = nn.Conv2DTranspose(in_ch, in_ch, 2, stride=2)
         else:

@@ -21,4 +21,4 @@ env_info = get_environ_info()
 
 log_level = 2
 
-from . import tasks, datasets, transforms, utils, tools, models
+from . import tasks, datasets, transforms, utils, tools, models, deploy

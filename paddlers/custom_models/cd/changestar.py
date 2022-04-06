@@ -28,7 +28,7 @@ class _ChangeStarBase(nn.Layer):
 
     def __init__(self, seg_model, num_classes, mid_channels, inner_channels,
                  num_convs, scale_factor):
-        super().__init__()
+        super(_ChangeStarBase, self).__init__(_ChangeStarBase, self)
 
         self.extract = seg_model
         self.detect = ChangeMixin(
@@ -63,7 +63,7 @@ class _ChangeStarBase(nn.Layer):
 
 class ChangeMixin(nn.Layer):
     def __init__(self, in_ch, out_ch, mid_ch, num_convs, scale_factor):
-        super().__init__()
+        super(ChangeMixin, self).__init__(ChangeMixin, self)
         convs = [Conv3x3(in_ch, mid_ch, norm=True, act=True)]
         convs += [
             Conv3x3(
@@ -112,7 +112,7 @@ class ChangeStar_FarSeg(_ChangeStarBase):
         # TODO: Configurable FarSeg model
         class _FarSegWrapper(nn.Layer):
             def __init__(self, seg_model):
-                super().__init__()
+                super(_FarSegWrapper, self).__init__()
                 self._seg_model = seg_model
                 self._seg_model.cls_pred_conv = Identity()
 
@@ -131,7 +131,7 @@ class ChangeStar_FarSeg(_ChangeStarBase):
 
         seg_model = FarSeg(out_ch=mid_channels)
 
-        super().__init__(
+        super(ChangeStar_FarSeg, self).__init__(
             seg_model=_FarSegWrapper(seg_model),
             num_classes=num_classes,
             mid_channels=mid_channels,

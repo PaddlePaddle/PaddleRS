@@ -33,7 +33,7 @@ from paddlers.utils import (seconds_to_hms, get_single_card_bs, dict2str,
                             _get_shared_memory_size_in_M, EarlyStop)
 import paddlers.utils.logging as logging
 from .slim.prune import _pruner_eval_fn, _pruner_template_input, sensitive_prune
-from .utils.infer_nets import InferNet
+from .utils.infer_nets import InferNet, InferCDNet
 
 
 class BaseModel:
@@ -580,13 +580,16 @@ class BaseModel:
         return pipeline_info
 
     def _build_inference_net(self):
-        infer_net = self.net if self.model_type == 'detector' else InferNet(
-            self.net, self.model_type)
+        if self.model_type == 'detector':
+            infer_net = self.net
+        elif self.model_type == 'changedetector':
+            infer_net = InferCDNet(self.net)
+        else:
+            infer_net = InferNet(self.net, self.model_type)
         infer_net.eval()
         return infer_net
 
     def _export_inference_model(self, save_dir, image_shape=None):
-        save_dir = osp.join(save_dir, 'inference_model')
         self.test_inputs = self._get_test_inputs(image_shape)
         infer_net = self._build_inference_net()
 

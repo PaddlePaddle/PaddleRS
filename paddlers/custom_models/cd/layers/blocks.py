@@ -51,7 +51,7 @@ class BasicConv(nn.Layer):
                  norm=False,
                  act=False,
                  **kwargs):
-        super().__init__()
+        super(BasicConv, self).__init__()
         seq = []
         if kernel_size >= 2:
             seq.append(nn.Pad2D(kernel_size // 2, mode=pad_mode))
@@ -87,7 +87,7 @@ class Conv1x1(BasicConv):
                  norm=False,
                  act=False,
                  **kwargs):
-        super().__init__(
+        super(Conv1x1, self).__init__(
             in_ch,
             out_ch,
             1,
@@ -107,7 +107,7 @@ class Conv3x3(BasicConv):
                  norm=False,
                  act=False,
                  **kwargs):
-        super().__init__(
+        super(Conv3x3, self).__init__(
             in_ch,
             out_ch,
             3,
@@ -127,7 +127,7 @@ class Conv7x7(BasicConv):
                  norm=False,
                  act=False,
                  **kwargs):
-        super().__init__(
+        super(Conv7x7, self).__init__(
             in_ch,
             out_ch,
             7,
@@ -140,12 +140,12 @@ class Conv7x7(BasicConv):
 
 class MaxPool2x2(nn.MaxPool2D):
     def __init__(self, **kwargs):
-        super().__init__(kernel_size=2, stride=(2, 2), padding=(0, 0), **kwargs)
+        super(MaxPool2x2, self).__init__(kernel_size=2, stride=(2, 2), padding=(0, 0), **kwargs)
 
 
 class MaxUnPool2x2(nn.MaxUnPool2D):
     def __init__(self, **kwargs):
-        super().__init__(kernel_size=2, stride=(2, 2), padding=(0, 0), **kwargs)
+        super(MaxUnPool2x2, self).__init__(kernel_size=2, stride=(2, 2), padding=(0, 0), **kwargs)
 
 
 class ConvTransposed3x3(nn.Layer):
@@ -156,7 +156,7 @@ class ConvTransposed3x3(nn.Layer):
                  norm=False,
                  act=False,
                  **kwargs):
-        super().__init__()
+        super(ConvTransposed3x3, self).__init__()
         seq = []
         seq.append(
             nn.Conv2DTranspose(
@@ -185,7 +185,7 @@ class Identity(nn.Layer):
     """A placeholder identity operator that accepts exactly one argument."""
 
     def __init__(self, *args, **kwargs):
-        super().__init__()
+        super(Identity, self).__init__()
 
     def forward(self, x):
         return x

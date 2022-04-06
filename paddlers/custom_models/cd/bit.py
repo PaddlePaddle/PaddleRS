@@ -71,7 +71,7 @@ class BIT(nn.Layer):
                  dec_depth=8,
                  dec_head_dim=8,
                  **backbone_kwargs):
-        super().__init__()
+        super(BIT, self).__init__()
 
         # TODO: reduce hard-coded parameters
         DIM = 32
@@ -197,7 +197,7 @@ class BIT(nn.Layer):
 
 class Residual(nn.Layer):
     def __init__(self, fn):
-        super().__init__()
+        super(Residual, self).__init__()
         self.fn = fn
 
     def forward(self, x, **kwargs):
@@ -206,7 +206,7 @@ class Residual(nn.Layer):
 
 class Residual2(nn.Layer):
     def __init__(self, fn):
-        super().__init__()
+        super(Residual2, self).__init__()
         self.fn = fn
 
     def forward(self, x1, x2, **kwargs):
@@ -215,7 +215,7 @@ class Residual2(nn.Layer):
 
 class PreNorm(nn.Layer):
     def __init__(self, dim, fn):
-        super().__init__()
+        super(PreNorm, self).__init__()
         self.norm = nn.LayerNorm(dim)
         self.fn = fn
 
@@ -225,7 +225,7 @@ class PreNorm(nn.Layer):
 
 class PreNorm2(nn.Layer):
     def __init__(self, dim, fn):
-        super().__init__()
+        super(PreNorm2, self).__init__()
         self.norm = nn.LayerNorm(dim)
         self.fn = fn
 
@@ -235,7 +235,7 @@ class PreNorm2(nn.Layer):
 
 class FeedForward(nn.Sequential):
     def __init__(self, dim, hidden_dim, dropout_rate=0.):
-        super().__init__(
+        super(FeedForward, self).__init__(
             nn.Linear(dim, hidden_dim),
             nn.GELU(),
             nn.Dropout(dropout_rate),
@@ -249,7 +249,7 @@ class CrossAttention(nn.Layer):
                  head_dim=64,
                  dropout_rate=0.,
                  apply_softmax=True):
-        super().__init__()
+        super(CrossAttention, self).__init__()
 
         inner_dim = head_dim * n_heads
         self.n_heads = n_heads
@@ -288,12 +288,12 @@ class CrossAttention(nn.Layer):
 
 class SelfAttention(CrossAttention):
     def forward(self, x):
-        return super().forward(x, x)
+        return super(SelfAttention, self).forward(x, x)
 
 
 class TransformerEncoder(nn.Layer):
     def __init__(self, dim, depth, n_heads, head_dim, mlp_dim, dropout_rate):
-        super().__init__()
+        super(TransformerEncoder, self).__init__()
         self.layers = nn.LayerList([])
         for _ in range(depth):
             self.layers.append(
@@ -322,7 +322,7 @@ class TransformerDecoder(nn.Layer):
                  mlp_dim,
                  dropout_rate,
                  apply_softmax=True):
-        super().__init__()
+        super(TransformerDecoder, self).__init__()
         self.layers = nn.LayerList([])
         for _ in range(depth):
             self.layers.append(
@@ -349,7 +349,7 @@ class Backbone(nn.Layer, KaimingInitMixin):
                  arch='resnet18',
                  pretrained=True,
                  n_stages=5):
-        super().__init__()
+        super(Backbone, self).__init__()
 
         expand = 1
         strides = (2, 1, 2, 1, 1)

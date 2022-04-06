@@ -41,7 +41,7 @@ class DSAMNet(nn.Layer):
     """
 
     def __init__(self, in_channels, num_classes, ca_ratio=8, sa_kernel=7):
-        super().__init__()
+        super(DSAMNet, self).__init__()
 
         WIDTH = 64
 
@@ -90,7 +90,7 @@ class DSAMNet(nn.Layer):
 
 class DSLayer(nn.Sequential):
     def __init__(self, in_ch, out_ch, itm_ch, **convd_kwargs):
-        super().__init__(
+        super(DSLayer, self).__init__(
             nn.Conv2DTranspose(
                 in_ch, itm_ch, kernel_size=3, padding=1, **convd_kwargs),
             make_norm(itm_ch),

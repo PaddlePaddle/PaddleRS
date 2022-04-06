@@ -33,7 +33,7 @@ class ChannelAttention(nn.Layer):
     """
 
     def __init__(self, in_ch, ratio=8):
-        super().__init__()
+        super(ChannelAttention, self).__init__()
         self.avg_pool = nn.AdaptiveAvgPool2D(1)
         self.max_pool = nn.AdaptiveMaxPool2D(1)
         self.fc1 = Conv1x1(in_ch, in_ch // ratio, bias=False, act=True)
@@ -59,7 +59,7 @@ class SpatialAttention(nn.Layer):
     """
 
     def __init__(self, kernel_size=7):
-        super().__init__()
+        super(SpatialAttention, self).__init__()
         self.conv = BasicConv(2, 1, kernel_size, bias=False)
 
     def forward(self, x):
@@ -85,7 +85,7 @@ class CBAM(nn.Layer):
     """
 
     def __init__(self, in_ch, ratio=8, kernel_size=7):
-        super().__init__()
+        super(CBAM, self).__init__()
         self.ca = ChannelAttention(in_ch, ratio=ratio)
         self.sa = SpatialAttention(kernel_size=kernel_size)
 

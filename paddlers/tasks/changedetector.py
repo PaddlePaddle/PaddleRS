@@ -98,11 +98,11 @@ class BaseChangeDetector(BaseModel):
         else:
             image_shape = [None, 3, -1, -1]
         self.fixed_input_shape = image_shape
-        input_spec = [
+        return [
             InputSpec(
-                shape=image_shape, name='image', dtype='float32')
+                shape=image_shape, name='image', dtype='float32'), InputSpec(
+                    shape=image_shape, name='image2', dtype='float32')
         ]
-        return input_spec
 
     def run(self, net, inputs, mode):
         net_out = net(inputs[0], inputs[1])
@@ -532,22 +532,26 @@ class BaseChangeDetector(BaseModel):
     def _preprocess(self, images, transforms, to_tensor=True):
         arrange_transforms(
             model_type=self.model_type, transforms=transforms, mode='test')
-        batch_im = list()
+        batch_im1, batch_im2 = list(), list()
         batch_ori_shape = list()
-        for im in images:
-            sample = {'image': im}
-            if isinstance(sample['image'], str):
+        for im1, im2 in images:
+            sample = {'image_t1': im1, 'image_t2': im2}
+            if isinstance(sample['image_t1'], str) or \
+                isinstance(sample['image_t2'], str):
                 sample = ImgDecoder(to_rgb=False)(sample)
             ori_shape = sample['image'].shape[:2]
-            im = transforms(sample)[0]
-            batch_im.append(im)
+            im1, im2 = transforms(sample)[:2]
+            batch_im1.append(im1)
+            batch_im2.append(im2)
             batch_ori_shape.append(ori_shape)
         if to_tensor:
-            batch_im = paddle.to_tensor(batch_im)
+            batch_im1 = paddle.to_tensor(batch_im1)
+            batch_im2 = paddle.to_tensor(batch_im2)
         else:
-            batch_im = np.asarray(batch_im)
+            batch_im1 = np.asarray(batch_im1)
+            batch_im2 = np.asarray(batch_im2)
 
-        return batch_im, batch_ori_shape
+        return batch_im1, batch_im2, batch_ori_shape
 
     @staticmethod
     def get_transforms_shape_info(batch_ori_shape, transforms):
