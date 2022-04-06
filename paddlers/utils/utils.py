@@ -79,7 +79,7 @@ def path_normalization(path):
 
 def is_pic(img_path):
     valid_suffix = [
-        'JPEG', 'jpeg', 'JPG', 'jpg', 'BMP', 'bmp', 'PNG', 'png', '.npy'
+        'JPEG', 'jpeg', 'JPG', 'jpg', 'BMP', 'bmp', 'PNG', 'png', 'npy'
     ]
     suffix = img_path.split('.')[-1]
     if suffix in valid_suffix:

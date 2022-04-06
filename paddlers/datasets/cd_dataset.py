@@ -82,12 +82,14 @@ class CDDataset(Dataset):
                         format(line.strip(), file_list))
 
                 items = list(map(path_normalization, items))
-                if not all(map(is_pic, items)):
-                    continue
 
                 full_path_im_t1 = osp.join(data_dir, items[0])
                 full_path_im_t2 = osp.join(data_dir, items[1])
                 full_path_label = osp.join(data_dir, items[2])
+                if not all(
+                        map(is_pic, (full_path_im_t1, full_path_im_t2,
+                                     full_path_label))):
+                    continue
                 if not osp.exists(full_path_im_t1):
                     raise IOError('Image file {} does not exist!'.format(
                         full_path_im_t1))

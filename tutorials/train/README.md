@@ -1,14 +1,31 @@
 # 使用教程——训练模型
 
-本目录下整理了使用PaddleRS训练模型的示例代码，代码中均提供了示例数据的自动下载，并均使用单张GPU卡进行训练。
+本目录下整理了使用PaddleRS训练模型的示例代码。代码中均提供了示例数据的自动下载，并均使用GPU对模型进行训练。
 
-|代码 | 模型任务 | 数据 |
+|示例代码路径 | 任务 | 模型 |
 |------|--------|---------|
-|object_detection/ppyolo.py | 目标检测PPYOLO | 昆虫检测 |
-|semantic_segmentation/deeplabv3p_resnet50_multi_channel.py | 语义分割DeepLabV3 | 地块分类 |
-|semantic_segmentation/farseg_test.py | 语义分割FarSeg | 遥感建筑分割 |
-|change_detection/cdnet_build.py | 变化检测CDNet | 遥感变化检测 |
-|classification/resnet50_vd_rs.py | 图像分类ResNet50_vd | 遥感场景分类 |
+|change_detection/bit.py | 变化检测 | BIT |
+|change_detection/cdnet.py | 变化检测 | CDNet |
+|change_detection/dsamnet.py | 变化检测 | DSAMNet |
+|change_detection/dsifn.py | 变化检测 | DSIFN |
+|change_detection/snunet.py | 变化检测 | SNUNet |
+|change_detection/stanet.py | 变化检测 | STANet |
+|change_detection/fc_ef.py | 变化检测 | FC-EF |
+|change_detection/fc_siam_conc.py | 变化检测 | FC-Siam-conc |
+|change_detection/fc_siam_diff.py | 变化检测 | FC-Siam-diff |
+|classification/hrnet.py | 场景分类 | HRNet |
+|classification/mobilenetv3.py | 场景分类 | MobileNetV3 |
+|classification/resnet50_vd.py | 场景分类 | ResNet50-vd |
+|image_restoration/drn.py | 超分辨率 | DRN |
+|image_restoration/esrgan.py | 超分辨率 | ESRGAN |
+|image_restoration/lesrcnn.py | 超分辨率 | LESRCNN |
+|object_detection/faster_rcnn.py | 目标检测 | Faster R-CNN |
+|object_detection/ppyolo.py | 目标检测 | PP-YOLO |
+|object_detection/ppyolotiny.py | 目标检测 | PP-YOLO Tiny |
+|object_detection/ppyolov2.py | 目标检测 | PP-YOLOv2 |
+|object_detection/yolov3.py | 目标检测 | YOLOv3 |
+|semantic_segmentation/deeplabv3p.py | 图像分割 | DeepLab V3+ |
+|semantic_segmentation/unet.py | 图像分割 | UNet |
 
 <!-- 可参考API接口说明了解示例代码中的API：
 * [数据集读取API](../../docs/apis/datasets.md)
@@ -35,26 +52,25 @@ python setup.py install
 ```
 
 ## 开始训练
-* 在安装PaddleRS后，使用如下命令开始训练，代码会自动下载训练数据, 并均使用单张GPU卡进行训练。
+* 在安装PaddleRS后，使用如下命令进行单卡训练。代码会自动下载训练数据。以DeepLab V3+图像分割模型为例：
 
 ```commandline
+# 指定需要使用的GPU设备编号
 export CUDA_VISIBLE_DEVICES=0
-python tutorials/train/semantic_segmentation/deeplabv3p_resnet50_multi_channel.py
+python tutorials/train/semantic_segmentation/deeplabv3p.py
 ```
 
-* 若需使用多张GPU卡进行训练，例如使用2张卡时执行：
+* 如需使用多块GPU进行训练，例如使用2张显卡时，执行如下命令：
 
 ```commandline
-python -m paddle.distributed.launch --gpus 0,1 tutorials/train/semantic_segmentation/deeplabv3p_resnet50_multi_channel.py
+python -m paddle.distributed.launch --gpus 0,1 tutorials/train/semantic_segmentation/deeplabv3p.py
 ```
-使用多卡时，参考[训练参数调整](../../docs/parameters.md)调整学习率和批量大小。
-
 
 ## VisualDL可视化训练指标
-在模型训练过程，在`train`函数中，将`use_vdl`设为True，则训练过程会自动将训练日志以VisualDL的格式打点在`save_dir`（用户自己指定的路径）下的`vdl_log`目录，用户可以使用如下命令启动VisualDL服务，查看可视化指标
+将传入`train`方法的`use_vdl`参数设为`True`，则模型训练过程中将自动把训练日志以VisualDL的格式存储到`save_dir`（用户自己指定的路径）目录下名为`vdl_log`的子目录中。用户可以使用如下命令启动VisualDL服务，查看可视化指标。同样以DeepLab V3+模型为例：
 ```commandline
-visualdl --logdir output/deeplabv3p_resnet50_multi_channel/vdl_log --port 8001
+# 指定端口号为8001
+visualdl --logdir output/deeplabv3p/vdl_log --port 8001
 ```
 
 服务启动后，使用浏览器打开 https://0.0.0.0:8001 或 https://localhost:8001
-
