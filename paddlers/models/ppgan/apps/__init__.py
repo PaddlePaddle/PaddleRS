@@ -17,3 +17,4 @@ from .mpr_predictor import MPRPredictor
 from .drn_predictor import DRNPredictor
 from .pan_predictor import PANPredictor
 from .lesrcnn_predictor import LESRCNNPredictor
+from .esrgan_predictor import ESRGANPredictor
