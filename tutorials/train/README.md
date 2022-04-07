@@ -36,10 +36,9 @@
 ## 环境准备
 
 - [PaddlePaddle安装](https://www.paddlepaddle.org.cn/install/quick)
-* 版本要求：PaddlePaddle>=2.1.0
+  * 版本要求：PaddlePaddle>=2.2.0
 
 - PaddleRS安装
-
 
 PaddleRS代码会跟随开发进度不断更新，可以安装develop分支的代码使用最新的功能，安装方式如下：
 
@@ -49,6 +48,27 @@ cd PaddleRS
 git checkout develop
 pip install -r requirements.txt
 python setup.py install
+```
+
+- \*GDAL安装
+
+PaddleRS支持多种类型的卫星数据IO以及地理处理等，可能需要使用GDAL，可以根据需求进行安装，安装方式如下：
+
+  - Linux / MacOS
+
+推荐使用conda进行安装:
+
+```
+conda install gdal
+```
+
+  - Windows
+
+Windows用户可以通过[这里](https://www.lfd.uci.edu/~gohlke/pythonlibs/#gdal)下载对应Python和系统版本的二进制文件（\*.whl）到本地，以*GDAL‑3.3.3‑cp39‑cp39‑win_amd64.whl*为例，进入下载目录进行安装:
+
+```
+cd download
+pip install GDAL‑3.3.3‑cp39‑cp39‑win_amd64.whl
 ```
 
 ## 开始训练
