@@ -9,7 +9,7 @@ from paddlers import transforms as T
 # 下载文件存放目录
 DOWNLOAD_DIR = './data/ucmerced/'
 # 数据集存放目录
-DATA_DIR = './data/ucmerced/UCMerced_LandUse/'
+DATA_DIR = './data/ucmerced/'
 # 训练集`file_list`文件路径
 TRAIN_FILE_LIST_PATH = './data/ucmerced/train.txt'
 # 验证集`file_list`文件路径
