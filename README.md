@@ -16,7 +16,7 @@
 
 ## 最新动态 <img src="docs/images/seg_news_icon.png" width="30"/>
 
-* [2022-04-09] PaddleRS 将发布alpha版本！详细发版信息请参考[Release Note](https://github.com/PaddleCV-SIG)。
+*  PaddleRS 即将发布alpha版本！欢迎大家试用
 
 ## 简介
 
