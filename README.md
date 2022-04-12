@@ -176,7 +176,7 @@ PaddleRS是遥感科研院所、相关高校共同基于飞桨开发的遥感处
 * 如果你发现任何PaddleRS存在的问题或者是建议, 欢迎通过[GitHub Issues](https://github.com/PaddleCV-SIG/PaddleRS/issues)给我们提issues。
 * 欢迎加入PaddleRS 微信群
 <div align="center">
-<img src="./docs/images/wechat.jpg"  width = "150" />  
+<img src="./docs/images/wechat.png"  width = "150" />  
 </div>
 
 ## 使用教程 <img src="./docs/images/teach.png" width="30"/>
