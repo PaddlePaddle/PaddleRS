@@ -14,7 +14,7 @@
 
 from .object_detector import *
 from .segmenter import *
-from .changedetector import *
+from .change_detector import *
 from .classifier import *
 from .load_model import load_model
-from .imagerestorer import *
+from .image_restorer import *

@@ -67,7 +67,7 @@ eval_dataset = pdrs.datasets.CDDataset(
 
 # 使用默认参数构建DSIFN模型
 # 目前已支持的模型请参考：https://github.com/PaddleCV-SIG/PaddleRS/blob/develop/docs/apis/model_zoo.md
-# 模型输入参数请参考：https://github.com/PaddleCV-SIG/PaddleRS/blob/develop/paddlers/tasks/changedetector.py
+# 模型输入参数请参考：https://github.com/PaddleCV-SIG/PaddleRS/blob/develop/paddlers/tasks/change_detector.py
 model = pdrs.tasks.DSIFN()
 
 # 执行模型训练
