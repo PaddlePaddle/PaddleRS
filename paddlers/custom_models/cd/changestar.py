@@ -28,7 +28,7 @@ class _ChangeStarBase(nn.Layer):
 
     def __init__(self, seg_model, num_classes, mid_channels, inner_channels,
                  num_convs, scale_factor):
-        super(_ChangeStarBase, self).__init__(_ChangeStarBase, self)
+        super(_ChangeStarBase, self).__init__()
 
         self.extract = seg_model
         self.detect = ChangeMixin(
@@ -63,7 +63,7 @@ class _ChangeStarBase(nn.Layer):
 
 class ChangeMixin(nn.Layer):
     def __init__(self, in_ch, out_ch, mid_ch, num_convs, scale_factor):
-        super(ChangeMixin, self).__init__(ChangeMixin, self)
+        super(ChangeMixin, self).__init__()
         convs = [Conv3x3(in_ch, mid_ch, norm=True, act=True)]
         convs += [
             Conv3x3(
