@@ -1438,7 +1438,7 @@ class DimReducing(Transform):
         self.whiten = whiten
 
     def apply_im(self, image):
-        image = pca(image, self.gamma)
+        image = pca(image, self.dim, self.whiten)
         return image
 
     def apply(self, sample):
