@@ -55,14 +55,200 @@ def center_crop(im, crop_size=224):
     return im
 
 
+# region flip
+def img_flip(im, method=0):
+    """
+    flip image in different ways, this function provides 5 method to filp
+    this function can be applied to 2D or 3D images
+
+    Args:
+        im(array): image array
+        method(int or string): choose the flip method, it must be one of [
+                                0, 1, 2, 3, 4, 'h', 'v', 'hv', 'rt2lb', 'lt2rb', 'dia', 'adia']
+        0 or 'h': flipped in horizontal direction, which is the most frequently used method
+        1 or 'v': flipped in vertical direction
+        2 or 'hv': flipped in both horizontal diction and vertical direction
+        3 or 'rt2lb' or 'dia': flipped around the diagonal,
+                                which also can be thought as changing the RightTop part with LeftBottom part,
+                                so it is called 'rt2lb' as well.
+        4 or 'lt2rb' or 'adia': flipped around the anti-diagonal
+                                    which also can be thought as changing the LeftTop part with RightBottom part,
+                                    so it is called 'lt2rb' as well.
+
+    Returns:
+        flipped image(array)
+
+    Raises:
+        ValueError: Shape of image should 2d, 3d or more.
+
+    Examples:
+        --assume an image is like this:
+
+        img:
+        / + +
+        - / *
+        - * /
+
+        --we can flip it in following code:
+
+        img_h = im_flip(img, 'h')
+        img_v = im_flip(img, 'v')
+        img_vh = im_flip(img, 2)
+        img_rt2lb = im_flip(img, 3)
+        img_lt2rb = im_flip(img, 4)
+
+        --we can get flipped image:
+
+        img_h, flipped in horizontal direction
+        + + \
+        * \ -
+        \ * -
+
+        img_v, flipped in vertical direction
+        - * \
+        - \ *
+        \ + +
+
+        img_vh, flipped in both horizontal diction and vertical direction
+        / * -
+        * / -
+        + + /
+
+        img_rt2lb, flipped around the diagonal
+        / | |
+        + / *
+        + * /
+
+        img_lt2rb, flipped around the anti-diagonal
+        / * +
+        * / +
+        | | /
+
+    """
+    if not len(im.shape) >= 2:
+        raise ValueError("Shape of image should 2d, 3d or more")
+    if method==0 or method=='h':
+        return horizontal_flip(im)
+    elif method==1 or method=='v':
+        return vertical_flip(im)
+    elif method==2 or method=='hv':
+        return hv_flip(im)
+    elif method==3 or method=='rt2lb' or method=='dia':
+        return rt2lb_flip(im)
+    elif method==4 or method=='lt2rb' or method=='adia':
+        return lt2rb_flip(im)
+    else:
+        return im
+
 def horizontal_flip(im):
     im = im[:, ::-1, ...]
     return im
 
-
 def vertical_flip(im):
     im = im[::-1, :, ...]
     return im
+
+def hv_flip(im):
+    im = im[::-1, ::-1, ...]
+    return im
+
+def rt2lb_flip(im):
+    axs_list = list(range(len(im.shape)))
+    axs_list[:2] = [1, 0]
+    im = im.transpose(axs_list)
+    return im
+
+def lt2rb_flip(im):
+    axs_list = list(range(len(im.shape)))
+    axs_list[:2] = [1, 0]
+    im = im[::-1, ::-1, ...].transpose(axs_list)
+    return im
+
+# endregion
+
+# region rotation
+def img_simple_rotate(im, method=0):
+    """
+    rotate image in simple ways, this function provides 3 method to rotate
+    this function can be applied to 2D or 3D images
+
+    Args:
+        im(array): image array
+        method(int or string): choose the flip method, it must be one of [
+                                0, 1, 2, 90, 180, 270
+                                ]
+        0 or 90 : rotated in 90 degree, clockwise
+        1 or 180: rotated in 180 degree, clockwise
+        2 or 270: rotated in 270 degree, clockwise
+
+    Returns:
+        flipped image(array)
+
+
+    Raises:
+        ValueError: Shape of image should 2d, 3d or more.
+
+
+    Examples:
+        --assume an image is like this:
+
+        img:
+        / + +
+        - / *
+        - * /
+
+        --we can rotate it in following code:
+
+        img_r90 = img_simple_rotate(img, 90)
+        img_r180 = img_simple_rotate(img, 1)
+        img_r270 = img_simple_rotate(img, 2)
+
+        --we can get rotated image:
+
+        img_r90, rotated in 90 degree
+        | | \
+        * \ +
+        \ * +
+
+        img_r180, rotated in 180 degree
+        / * -
+        * / -
+        + + /
+
+        img_r270, rotated in 270 degree
+        + * \
+        + \ *
+        \ | |
+
+
+    """
+    if not len(im.shape) >= 2:
+        raise ValueError("Shape of image should 2d, 3d or more")
+    if method==0 or method==90:
+        return rot_90(im)
+    elif method==1 or method==180:
+        return rot_180(im)
+    elif method==2 or method==270:
+        return rot_270(im)
+    else:
+        return im
+
+def rot_90(im):
+    axs_list = list(range(len(im.shape)))
+    axs_list[:2] = [1, 0]
+    im = im[::-1, :, ...].transpose(axs_list)
+    return im
+
+def rot_180(im):
+    im = im[::-1, ::-1, ...]
+    return im
+
+def rot_270(im):
+    axs_list = list(range(len(im.shape)))
+    axs_list[:2] = [1, 0]
+    im = im[:, ::-1, ...].transpose(axs_list)
+    return im
+# endregion
 
 
 def rgb2bgr(im):

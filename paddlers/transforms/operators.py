@@ -32,7 +32,7 @@ import paddlers
 from .functions import normalize, horizontal_flip, permute, vertical_flip, center_crop, is_poly, \
     horizontal_flip_poly, horizontal_flip_rle, vertical_flip_poly, vertical_flip_rle, crop_poly, \
     crop_rle, expand_poly, expand_rle, resize_poly, resize_rle, de_haze, pca, select_bands, \
-    to_intensity, to_uint8
+    to_intensity, to_uint8, img_flip, img_simple_rotate
 
 __all__ = [
     "Compose", "ImgDecoder", "Resize", "RandomResize", "ResizeByShort",
@@ -516,6 +516,106 @@ class ResizeByLong(Transform):
         sample = Resize(
             target_size=(target_h, target_w), interp=self.interp)(sample)
 
+        return sample
+
+class RandomFlipOrRotation(Transform):
+    """
+    Flip or Rotate an image in different ways with a certain probability.
+
+    Args:
+        probs (list of float): Probabilities of flipping and rotation. Default: [0.35,0.25].
+        probsf (list of float): Probabilities of 5 flipping mode
+                                (horizontal, vertical, both horizontal diction and vertical, diagonal, anti-diagonal).
+                                Default: [0.3, 0.3, 0.2, 0.1, 0.1].
+        probsr (list of float): Probabilities of 3 rotation mode(90°, 180°, 270° clockwise). Default: [0.25,0.5,0.25].
+
+    Examples:
+
+        from paddlers import transforms as T
+
+        # 定义数据增强
+        train_transforms = T.Compose([
+            T.RandomFlipOrRotation(
+                probs  = [0.3, 0.2]             # 进行flip增强的概率是0.3，进行rotate增强的概率是0.2，不变的概率是0.5
+                probsf = [0.3, 0.25, 0, 0, 0]   # flip增强时，使用水平flip、垂直flip的概率分别是0.3、0.25，水平且垂直flip、对角线flip、反对角线flip概率均为0，不变的概率是0.45
+                probsr = [0, 0.65, 0]),         # rotate增强时，顺时针旋转90度的概率是0，顺时针旋转180度的概率是0.65，顺时针旋转90度的概率是0，不变的概率是0.35
+            T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ])
+
+    """
+
+    def __init__(self, probs=[0.35, 0.25], probsf=[0.3, 0.3, 0.2, 0.1, 0.1], probsr=[0.25,0.5,0.25]):
+        super(RandomFlipOrRotation, self).__init__()
+        # Change various probabilities into probability intervals, to judge in which mode to flip or rotate
+        self.probs = [probs[0], probs[0]+probs[1]]
+        self.probsf = self.get_probs_range(probsf)
+        self.probsr = self.get_probs_range(probsr)
+
+    def apply_im(self, image, mode_id, flip_mode=True):
+        if flip_mode:
+            image = img_flip(image, mode_id)
+        else:
+            image = img_simple_rotate(image, mode_id)
+        return image
+
+    def apply_mask(self, mask, mode_id, flip_mode=True):
+        if flip_mode:
+            mask = img_flip(mask, mode_id)
+        else:
+            mask = img_simple_rotate(mask, mode_id)
+        return mask
+
+    def get_probs_range(self, probs):
+        '''
+        Change various probabilities into cumulative probabilities
+
+        Args:
+            probs(list of float): probabilities of different mode, shape:[n]
+
+        Returns:
+            probability intervals(list of binary list): shape:[n, 2]
+        '''
+        ps = []
+        last_prob = 0
+        for prob in probs:
+            p_s = last_prob
+            cur_prob = prob / sum(probs)
+            last_prob += cur_prob
+            p_e = last_prob
+            ps.append([p_s, p_e])
+        return ps
+
+    def judge_probs_range(self, p, probs):
+        '''
+        Judge whether a probability value falls within the given probability interval
+
+        Args:
+            p(float): probability
+            probs(list of binary list): probability intervals, shape:[n, 2]
+
+        Returns:
+            mode id(int):the probability interval number where the input probability falls,
+                         if return -1, the image will remain as it is and will not be processed
+        '''
+        for id, id_range in enumerate(probs):
+            if p> id_range[0] and p<id_range[1]:
+                return id
+        return -1
+
+    def apply(self, sample):
+        p_m = random.random()
+        if p_m < self.probs[0]:
+            mode_p = random.random()
+            mode_id = self.judge_probs_range(mode_p, self.probsf)
+            sample['image'] = self.apply_im(sample['image'], mode_id, True)
+            if 'mask' in sample:
+                sample['mask'] = self.apply_mask(sample['mask'], mode_id, True)
+        elif p_m < self.probs[1]:
+            mode_p = random.random()
+            mode_id = self.judge_probs_range(mode_p, self.probsr)
+            sample['image'] = self.apply_im(sample['image'], mode_id, False)
+            if 'mask' in sample:
+                sample['mask'] = self.apply_mask(sample['mask'], mode_id, False)
         return sample
 
 
