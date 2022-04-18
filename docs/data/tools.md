@@ -16,7 +16,7 @@
 
 ```shell
 git clone https://github.com/PaddleCV-SIG/PaddleRS.git
-dc PaddleRS\tools
+cd PaddleRS\tools
 ```
 
 ### coco2mask
