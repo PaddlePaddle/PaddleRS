@@ -8,8 +8,9 @@
 '''
 @File Description:
 # 输出json文件基本信息
-!python ./json_infoShow.py \
-    --json_path=./input/instances_val2017.json
+python ./coco_tools/json_InfoShow.py \
+       --json_path=./annotations/instances_val2017.json \
+       --show_num 5
 '''
 
 import json

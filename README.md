@@ -93,6 +93,7 @@ PaddleRS是遥感科研院所、相关高校共同基于飞桨开发的遥感处
           <li>ResizeByShort</li>
           <li>RandomResizeByShort</li>
           <li>ResizeByLong</li>  
+          <li>RandomFlipOrRotation</li> 
           <li>RandomHorizontalFlip</li>  
           <li>RandomVerticalFlip</li>
           <li>Normalize</li>

@@ -8,15 +8,15 @@
 '''
 @File Description:
 # json文件annotations信息，生成统计结果csv，对象框shape、对象看shape比例、对象框起始位置、对象结束位置、对象结束位置、对象类别、单个图像对象数量的分布
-!python ./json_annotation_sta.py \
-    --json_path=./input/instances_val2017.json \
-    --csv_path=./anno_sta/instances_val2017_annotations.csv \
-    --png_shape_path=./anno_sta/instances_val2017_annotations_shape.png \
-    --png_shapeRate_path=./anno_sta/instances_val2017_annotations_shapeRate.png \
-    --png_pos_path=./anno_sta/instances_val2017_annotations_pos.png \
-    --png_posEnd_path=./anno_sta/instances_val2017_annotations_posEnd.png \
-    --png_cat_path=./anno_sta/instances_val2017_annotations_cat.png \
-    --png_objNum_path=./anno_sta/instances_val2017_annotations_objNum.png \
+python ./coco_tools/json_AnnoSta.py \
+    --json_path=./annotations/instances_val2017.json \
+    --csv_path=./anno_sta/annos.csv \
+    --png_shape_path=./anno_sta/annos_shape.png \
+    --png_shapeRate_path=./anno_sta/annos_shapeRate.png \
+    --png_pos_path=./anno_sta/annos_pos.png \
+    --png_posEnd_path=./anno_sta/annos_posEnd.png \
+    --png_cat_path=./anno_sta/annos_cat.png \
+    --png_objNum_path=./anno_sta/annos_objNum.png \
     --get_relative=True
 '''
 import os

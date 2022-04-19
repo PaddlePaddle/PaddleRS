@@ -8,11 +8,11 @@
 '''
 @File Description:
 # 统计json文件images信息，生成统计结果csv，同时生成图像shape、图像shape比例的二维分布图
-!python ./json_images_sta.py \
-    --json_path=./input/instances_val2017.json \
-    --csv_path=./img_sta/instances_val2017_images.csv \
-    --png_shape_path=./img_sta/instances_val2017_images_shape.png \
-    --png_shapeRate_path=./img_sta/instances_val2017_images_shapeRate.png
+python ./coco_tools/json_ImgSta.py \
+    --json_path=./annotations/instances_val2017.json \
+    --csv_path=./img_sta/images.csv \
+    --png_shape_path=./img_sta/images_shape.png \
+    --png_shapeRate_path=./img_sta/images_shapeRate.png
 '''
 
 import json

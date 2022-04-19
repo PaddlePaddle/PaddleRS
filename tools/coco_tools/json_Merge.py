@@ -8,10 +8,10 @@
 '''
 @File Description:
 # 合并json文件，可以通过merge_keys控制合并的字段, 默认合并'images', 'annotations'字段
-!python ./json_merge.py \
-    --json1_path=./input/instances_train2017.json \
-    --json2_path=./input/instances_val2017.json \
-    --save_path=./output/instances_trainval2017.json
+python ./coco_tools/json_Merge.py \
+    --json1_path=./annotations/instances_train2017.json \
+    --json2_path=./annotations/instances_val2017.json \
+    --save_path=./instances_trainval2017.json
 '''
 
 import json

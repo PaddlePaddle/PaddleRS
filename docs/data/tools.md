@@ -7,6 +7,7 @@
 - `mask2geojson`：用于对推理得到的png提取geojson。
 - `matcher`：用于在推理前匹配两个时段的影响。
 - `spliter`：用于将大图数据进行分割以作为训练数据。
+- `coco_tools`：用于统计处理coco类标注文件。
 
 后期将根据DL和RS/GIS方面的前后处理需求增加更多的工具。
 
@@ -43,26 +44,23 @@ python mask2shp.py --srcimg_path xxx.tif --mask_path xxx.png [--save_path output
 其中：
 
 - `srcimg_path`：原始图像的路径，需要带有地理信息，以便为生成的shapefile提供crs等信息。
-
 - `mask_path`：推理得到的png格式的标签的路径。
-
 - `save_path`：保存shapefile的路径，默认为`output`。
-
 - `ignore_index`：忽略生成shp的索引，如背景等，默认为255。
 
 ### mask2geojson
 
-  `mask2geojson`的主要功能是将推理得到的png格式的分割结果转换为geojson格式。使用代码如下：
+`mask2geojson`的主要功能是将推理得到的png格式的分割结果转换为geojson格式。使用代码如下：
 
-  ```shell
-  python mask2geojson.py --mask_path xxx.tif --save_path xxx.json [--epsilon 0]
-  ```
+```shell
+python mask2geojson.py --mask_path xxx.tif --save_path xxx.json [--epsilon 0]
+```
 
-  其中：
+其中：
 
-  - `mask_path`：推理得到的png格式的标签的路径。
-  - `save_path`：保存geojson的路径。
-  - `epsilon`：opencv的简化参数，默认为0。
+- `mask_path`：推理得到的png格式的标签的路径。
+- `save_path`：保存geojson的路径。
+- `epsilon`：opencv的简化参数，默认为0。
 
 ### matcher
 
@@ -92,3 +90,16 @@ python spliter.py --image_path xxx.tif [--block_size 512] [--save_folder output]
 - `image_path`：需要切分的图像的路径。
 - `block_size`：切分图像块大小，默认为512。
 - `save_folder`：保存切分后结果的文件夹路径，默认为`output`。
+
+### coco_tools
+
+目前coco_tools共有6个文件，各文件及其功能如下：
+
+* json_InfoShow:    打印json文件中各个字典的基本信息；
+* json_ImgSta:      统计json文件中的图像信息，生成统计表、统计图；
+* json_AnnoSta:     统计json文件中的标注信息，生成统计表、统计图；
+* json_Img2Json:    统计test集图像，生成json文件；
+* json_Split:       json文件拆分，划分为train set、val set
+* json_Merge:       json文件合并，将多个json合并为1个json
+
+详细使用方法与参数见[coco_tools说明](coco_tools_cn.md)
