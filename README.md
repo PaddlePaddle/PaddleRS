@@ -10,7 +10,7 @@
   <!-- [![Build Status](https://travis-ci.org/PaddleCV-SIG/PaddleRS.svg?branch=release/0.1)](https://travis-ci.org/PaddleCV-SIG/PaddleRS) -->
   <!-- [![Version](https://img.shields.io/github/release/PaddleCV-SIG/PaddleRS.svg)](https://github.com/PaddleCV-SIG/PaddleRS/releases) -->
   [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](LICENSE)
-  ![python version](https://img.shields.io/badge/python-3.6+-orange.svg)
+  ![python version](https://img.shields.io/badge/python-3.7+-orange.svg)
   ![support os](https://img.shields.io/badge/os-linux%2C%20win%2C%20mac-yellow.svg)
 </div>
 
@@ -220,5 +220,4 @@ PaddleRS是遥感科研院所、相关高校共同基于飞桨开发的遥感处
     year={2022}
 }
 ```
-
 
