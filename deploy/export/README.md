@@ -60,3 +60,4 @@ python deploy/export_model.py --model_dir=./output/deeplabv3p/best_model/ --save
 - 对于检测模型中的YOLO/PPYOLO系列模型，请保证输入影像的`w`和`h`有相同取值、且均为32的倍数；指定`--fixed_input_shape`时，R-CNN模型的`w`和`h`也均需为32的倍数。
 - 指定`[w,h]`时，请使用半角逗号（`,`）分隔`w`和`h`，二者之间不允许存在空格等其它字符。
 - 将`w`和`h`设得越大，则模型在推理过程中的耗时和内存/显存占用越高。不过，如果`w`和`h`过小，则可能对模型的精度存在较大负面影响。
+- 对于变化检测模型BIT，请保证指定`--fixed_input_shape`，并且数值不包含负数，因为BIT用到空间注意力，需要从tensor中获取`b,c,h,w`的属性，若为负数则报错。
