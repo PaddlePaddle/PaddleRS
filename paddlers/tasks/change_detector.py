@@ -539,7 +539,7 @@ class BaseChangeDetector(BaseModel):
             if isinstance(sample['image_t1'], str) or \
                 isinstance(sample['image_t2'], str):
                 sample = ImgDecoder(to_rgb=False)(sample)
-            ori_shape = sample['image'].shape[:2]
+            ori_shape = sample['image_t1'].shape[:2]
             im1, im2 = transforms(sample)[:2]
             batch_im1.append(im1)
             batch_im2.append(im2)
