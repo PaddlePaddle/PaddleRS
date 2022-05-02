@@ -539,7 +539,9 @@ class BaseChangeDetector(BaseModel):
             if isinstance(sample['image_t1'], str) or \
                 isinstance(sample['image_t2'], str):
                 sample = ImgDecoder(to_rgb=False)(sample)
-            ori_shape = sample['image_t1'].shape[:2]
+                ori_shape = sample['image'].shape[:2]
+            else:
+                ori_shape = im1.shape[:2]
             im1, im2 = transforms(sample)[:2]
             batch_im1.append(im1)
             batch_im2.append(im2)
@@ -828,7 +830,9 @@ class DSIFN(BaseChangeDetector):
                 'coef': [1.0] * 5
             }
         else:
-            raise ValueError(f"Currently `use_mixed_loss` must be set to False for {self.__class__}")
+            raise ValueError(
+                f"Currently `use_mixed_loss` must be set to False for {self.__class__}"
+            )
 
 
 class DSAMNet(BaseChangeDetector):
@@ -860,7 +864,9 @@ class DSAMNet(BaseChangeDetector):
                 'coef': [1.0, 0.05, 0.05]
             }
         else:
-            raise ValueError(f"Currently `use_mixed_loss` must be set to False for {self.__class__}")
+            raise ValueError(
+                f"Currently `use_mixed_loss` must be set to False for {self.__class__}"
+            )
 
 
 class ChangeStar(BaseChangeDetector):
@@ -892,4 +898,6 @@ class ChangeStar(BaseChangeDetector):
                 'coef': [1.0] * 4
             }
         else:
-            raise ValueError(f"Currently `use_mixed_loss` must be set to False for {self.__class__}")
+            raise ValueError(
+                f"Currently `use_mixed_loss` must be set to False for {self.__class__}"
+            )
