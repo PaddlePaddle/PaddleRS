@@ -158,6 +158,7 @@ class Raster:
             # the type is complex means this is a SAR data
             if isinstance(type(ima[0, 0]), complex):
                 ima = abs(ima)
+            ima = ima.squeeze()
         else:
             ima = ima.transpose((1, 2, 0))
         if self.to_uint8 is True:
