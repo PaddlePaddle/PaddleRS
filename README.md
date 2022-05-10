@@ -1,4 +1,3 @@
-简体中文 | [English](README_EN.md)
 
 <div align="center">
   <p align="center">
