@@ -198,14 +198,17 @@ PaddleRS是遥感科研院所、相关高校共同基于飞桨开发的遥感处
 * 应用案例
   * [变化检测示例](./docs/cases/csc_cd_cn.md)
   * [超分模块示例](./docs/cases/sr_seg_cn.md)
+* 代码贡献
+  * [PaddleRS代码注释规范](https://github.com/PaddleCV-SIG/PaddleRS/wiki/PaddleRS代码注释规范)
+
+
+## 开源贡献 <img src="./docs/images/love.png" width="30"/>
+
+非常感谢国家对地观测科学数据中心、中国科学院空天信息创新研究院、北京航空航天大学、武汉大学、中国石油大学（华东）、中国地质大学、中国四维测绘技术有限公司、中科星图、航天宏图等单位对PaddleRS项目的贡献。注：排名不分先后。
 
 ## 许可证书
 
 本项目的发布受Apache 2.0 license许可认证。
-
-## 贡献说明 <img src="./docs/images/love.png" width="30"/>
-
-我们非常欢迎你可以为PaddleRS提供代码，也十分感谢你的反馈。代码注释规范请参考[PaddleRS代码注释规范](https://github.com/PaddleCV-SIG/PaddleRS/wiki/PaddleRS代码注释规范)。
 
 ## 学术引用 <img src="./docs/images/yinyong.png" width="30"/>
 
