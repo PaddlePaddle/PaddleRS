@@ -18,11 +18,13 @@ Apache License [see LICENSE for details]
 """
 
 import math
+
 import paddle.nn as nn
 import paddle.nn.functional as F
 from paddle.vision.models import resnet50
 from paddle import nn
 import paddle.nn.functional as F
+
 from .layers import (Identity, ConvReLU, kaiming_normal_init, constant_init)
 
 

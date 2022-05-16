@@ -13,10 +13,12 @@
 # limitations under the License.
 
 import os.path as osp
-import numpy as np
 import yaml
+
+import numpy as np
 import paddle
 import paddleslim
+
 import paddlers
 import paddlers.utils.logging as logging
 from paddlers.transforms import build_transforms

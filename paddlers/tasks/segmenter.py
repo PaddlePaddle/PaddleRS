@@ -14,12 +14,14 @@
 
 import math
 import os.path as osp
+from collections import OrderedDict
+
 import numpy as np
 import cv2
-from collections import OrderedDict
 import paddle
 import paddle.nn.functional as F
 from paddle.static import InputSpec
+
 import paddlers.models.ppseg as paddleseg
 import paddlers.custom_models.seg as cmseg
 import paddlers

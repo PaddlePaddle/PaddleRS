@@ -21,8 +21,10 @@ import time
 import hashlib
 import tarfile
 import zipfile
+
 import filelock
 import paddle
+
 from . import logging
 
 DOWNLOAD_RETRY_LIMIT = 3

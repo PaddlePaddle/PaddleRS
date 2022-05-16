@@ -20,7 +20,9 @@ import math
 import imghdr
 import chardet
 import json
+
 import numpy as np
+
 from . import logging
 import platform
 import paddlers

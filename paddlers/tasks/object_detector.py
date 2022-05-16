@@ -18,9 +18,11 @@ import collections
 import copy
 import os
 import os.path as osp
+
 import numpy as np
 import paddle
 from paddle.static import InputSpec
+
 import paddlers.models.ppdet as ppdet
 from paddlers.models.ppdet.modeling.proposal_generator.target_layer import BBoxAssigner, MaskAssigner
 import paddlers

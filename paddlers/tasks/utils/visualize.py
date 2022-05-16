@@ -16,6 +16,7 @@ import os
 import cv2
 import numpy as np
 import time
+
 import paddlers.utils.logging as logging
 from paddlers.utils import is_pic
 from .det_metrics.coco_utils import loadRes

@@ -14,9 +14,11 @@
 
 import copy
 import os
+
 import numpy as np
 from tqdm import tqdm
 from scipy.cluster.vq import kmeans
+
 from paddlers.utils import logging
 
 __all__ = ['YOLOAnchorCluster']

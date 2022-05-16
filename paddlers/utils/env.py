@@ -16,6 +16,7 @@ import os
 import platform
 import random
 import multiprocessing as mp
+
 import numpy as np
 import paddle
 

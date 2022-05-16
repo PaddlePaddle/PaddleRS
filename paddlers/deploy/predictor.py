@@ -18,6 +18,7 @@ import numpy as np
 from paddle.inference import Config
 from paddle.inference import create_predictor
 from paddle.inference import PrecisionType
+
 from paddlers.tasks import load_model
 from paddlers.utils import logging, Timer
 

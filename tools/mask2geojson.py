@@ -13,11 +13,13 @@
 # limitations under the License.
 
 import codecs
+import argparse
+
 import cv2
 import numpy as np
-import argparse
 import geojson
 from geojson import Polygon, Feature, FeatureCollection
+
 from utils import Raster, Timer
 
 

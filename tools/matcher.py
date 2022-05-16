@@ -12,16 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import argparse
+
 import numpy as np
 import cv2
-import argparse
-from utils import Raster, raster2uint8, Timer
-
 try:
     from osgeo import gdal
 except ImportError:
     import gdal
 
+from utils import Raster, raster2uint8, Timer
 
 class MatchError(Exception):
     def __str__(self):
