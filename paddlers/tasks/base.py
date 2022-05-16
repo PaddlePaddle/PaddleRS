@@ -20,11 +20,13 @@ import copy
 import math
 import yaml
 import json
+
 import paddle
 from paddle.io import DataLoader, DistributedBatchSampler
 from paddleslim import QAT
 from paddleslim.analysis import flops
 from paddleslim import L1NormFilterPruner, FPGMFilterPruner
+
 import paddlers
 from paddlers.transforms import arrange_transforms
 from paddlers.utils import (seconds_to_hms, get_single_card_bs, dict2str,

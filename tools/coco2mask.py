@@ -15,14 +15,16 @@
 import os
 import os.path as osp
 import shutil
-import cv2
-import numpy as np
 import json
 import argparse
+from collections import defaultdict
+
+import cv2
+import numpy as np
 import glob
 from tqdm import tqdm
 from PIL import Image
-from collections import defaultdict
+
 from utils import Timer
 
 

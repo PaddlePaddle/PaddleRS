@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import collections
-import numpy as np
 import datetime
 
+import numpy as np
 
 class SmoothedValue(object):
     """Track a series of values and provide access to smoothed values over a

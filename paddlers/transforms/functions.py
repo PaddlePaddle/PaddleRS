@@ -13,8 +13,9 @@
 # limitations under the License.
 
 import cv2
-import numpy as np
 import copy
+
+import numpy as np
 import shapely.ops
 from shapely.geometry import Polygon, MultiPolygon, GeometryCollection
 from sklearn.decomposition import PCA

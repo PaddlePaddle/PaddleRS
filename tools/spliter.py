@@ -16,7 +16,9 @@ import os
 import os.path as osp
 import argparse
 from math import ceil
+
 from PIL import Image
+
 from utils import Raster, Timer
 
 

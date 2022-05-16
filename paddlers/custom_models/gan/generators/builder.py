@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import copy
+
 from ....models.ppgan.utils.registry import Registry
 
 GENERATORS = Registry("GENERATOR")

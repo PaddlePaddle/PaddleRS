@@ -14,7 +14,6 @@
 
 import os
 import time
-
 import datetime
 
 import paddle

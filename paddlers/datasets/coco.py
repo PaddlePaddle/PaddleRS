@@ -17,9 +17,11 @@ import copy
 import os
 import os.path as osp
 import random
-import numpy as np
 from collections import OrderedDict
+
+import numpy as np
 from paddle.io import Dataset
+
 from paddlers.utils import logging, get_num_workers, get_encoding, path_normalization, is_pic
 from paddlers.transforms import ImgDecoder, MixupImage
 from paddlers.tools import YOLOAnchorCluster

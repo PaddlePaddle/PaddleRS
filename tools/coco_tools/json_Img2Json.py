@@ -1,10 +1,17 @@
-# -*- coding: utf-8 -*- 
-# @File             : json_getTest.py
-# @Author           : zhaoHL
-# @Contact          : huilin16@qq.com
-# @Time Create First: 2021/8/1 10:25
-# @Contributor      : zhaoHL
-# @Time Modify Last : 2021/8/1 10:25
+# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 '''
 @File Description:
 # 根据test影像文件夹生成test.json
@@ -16,6 +23,7 @@ python ./coco_tools/json_Img2Json.py \
 import os, cv2
 import json
 import argparse
+
 from tqdm import tqdm
 
 

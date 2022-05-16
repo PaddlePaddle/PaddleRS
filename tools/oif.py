@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy as np
-import pandas as pd
 import itertools
 import argparse
-from utils import Raster, Timer
 from easydict import EasyDict as edict
 
+import numpy as np
+import pandas as pd
+
+from utils import Raster, Timer
 
 def _calcOIF(rgb, stds, rho):
     r, g, b = rgb

@@ -14,17 +14,18 @@
 
 import os
 import os.path as osp
-import numpy as np
 import argparse
-from PIL import Image
-from utils import Raster, Timer
 
+import numpy as np
+from PIL import Image
 try:
     from osgeo import gdal, ogr, osr
 except ImportError:
     import gdal
     import ogr
     import osr
+
+from utils import Raster, Timer
 
 
 def _mask2tif(mask_path, tmp_path, proj, geot):
