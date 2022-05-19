@@ -166,6 +166,7 @@ class BaseModel(metaclass=ModelMeta):
              ('fixed_input_shape', self.fixed_input_shape),
              ('best_accuracy', self.best_accuracy),
              ('best_model_epoch', self.best_model_epoch)])
+
         if 'self' in init_params:
             del init_params['self']
         if '__class__' in init_params:
