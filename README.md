@@ -15,7 +15,7 @@
 
 ## 最新动态 <img src="docs/images/seg_news_icon.png" width="30"/>
 
-*  PaddleRS 即将发布alpha版本！欢迎大家试用
+*  [2022-05-19] 🔥 PaddleRS发布1.0-beta版本，全面支持遥感领域深度学习任务。详细发版信息请参考[Release Note](https://github.com/PaddleCV-SIG/PaddleRS/releases)。
 
 ## 简介
 
