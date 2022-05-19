@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import math
+import os
 import os.path as osp
 from collections import OrderedDict
 
@@ -517,6 +518,81 @@ class BaseSegmenter(BaseModel):
                 'score_map': score_map_list[0]
             }
         return prediction
+
+    def slider_predict(self, img_file, save_dir, block_size, overlap=36, transforms=None):
+        """
+        Do inference.
+        Args:
+            Args:
+            img_file(str):
+                Image path.
+            save_dir(str):
+                Folder of geotiff saved.
+            block_size(List[int] or Tuple[int], int):
+                The size of block.
+            overlap(List[int] or Tuple[int], int):
+                The overlap between two blocks. Defaults to 36.
+            transforms(paddlers.transforms.Compose or None, optional):
+                Transforms for inputs. If None, the transforms for evaluation process will be used. Defaults to None.
+        """
+        try:
+            from osgeo import gdal
+        except:
+            import gdal
+        
+        if isinstance(block_size, int):
+            block_size = (block_size, block_size)
+        elif isinstance(block_size, (tuple, list)) and len(block_size) == 2:
+            block_size = tuple(block_size)
+        else:
+            raise ValueError("`block_size` must be a tuple/list of length 2 or a integer.")
+        if isinstance(overlap, int):
+            overlap = (overlap, overlap)
+        elif isinstance(overlap, (tuple, list)) and len(overlap) == 2:
+            overlap = tuple(overlap)
+        else:
+            raise ValueError("`overlap` must be a tuple/list of length 2 or a integer.")
+
+        src_data = gdal.Open(img_file)
+        width = src_data.RasterXSize
+        height = src_data.RasterYSize
+        bands = src_data.RasterCount
+
+        driver = gdal.GetDriverByName("GTiff")
+        file_name = osp.splitext(osp.normpath(img_file).split(os.sep)[-1])[0] + ".tif"
+        if not osp.exists(save_dir):
+            os.makedirs(save_dir)
+        save_file = osp.join(save_dir, file_name)
+        dst_data = driver.Create(save_file, width, height, 1, gdal.GDT_Byte)
+        dst_data.SetGeoTransform(src_data.GetGeoTransform())
+        dst_data.SetProjection(src_data.GetProjection())
+        band = dst_data.GetRasterBand(1)
+        band.WriteArray(255 * np.ones((height, width), dtype="uint8"))
+
+        step = np.array(block_size) - np.array(overlap)
+        for yoff in range(0, height, step[1]):
+            for xoff in range(0, width, step[0]):
+                xsize, ysize = block_size
+                if xoff + xsize > width:
+                    xsize = int(width - xoff)
+                if yoff + ysize > height:
+                    ysize = int(height - yoff)
+                im = src_data.ReadAsArray(int(xoff), int(yoff), xsize, ysize).transpose((1, 2, 0))
+                # fill
+                h, w = im.shape[:2]
+                im_fill = np.zeros((block_size[1], block_size[0], bands), dtype=im.dtype)
+                im_fill[:h, :w, :] = im
+                # predict
+                pred = self.predict(im_fill, transforms)["label_map"].astype("uint8")
+                # overlap
+                rd_block = band.ReadAsArray(int(xoff), int(yoff), xsize, ysize)
+                mask = (rd_block == pred[:h, :w]) | (rd_block == 255)
+                temp = pred[:h, :w].copy()
+                temp[mask == False] = 0
+                band.WriteArray(temp, int(xoff), int(yoff))
+                dst_data.FlushCache()
+        dst_data = None
+        print("GeoTiff saved in {}.".format(save_file))
 
     def _preprocess(self, images, transforms, to_tensor=True):
         arrange_transforms(
