@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import setuptools
+import paddlers
 
 DESCRIPTION = "Awesome Remote Sensing Toolkit based on PaddlePaddle"
 
@@ -24,9 +25,9 @@ with open("requirements.txt") as fin:
 
 setuptools.setup(
     name="paddlers",
-    version='0.0.1',
-    author="paddlers",
-    author_email="paddlers@baidu.com",
+    version=paddlers.__version__.replace('-', ''),
+    author='PaddleRS Authors',
+    author_email="",
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/plain",
@@ -35,12 +36,6 @@ setuptools.setup(
     python_requires='>=3.7',
     setup_requires=['cython', 'numpy'],
     install_requires=REQUIRED_PACKAGES,
-    # [
-    #     "pycocotools", 'pyyaml', 'colorama', 'tqdm', 'paddleslim==2.2.1',
-    #     'visualdl>=2.2.2', 'shapely>=1.7.0', 'opencv-python', 'scipy', 'lap',
-    #     'motmetrics', 'scikit-learn==0.23.2', 'chardet', 'flask_cors',
-    #     'openpyxl', 'gdal'
-    # ],
     classifiers=[
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
