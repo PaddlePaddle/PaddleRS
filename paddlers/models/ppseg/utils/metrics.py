@@ -135,6 +135,37 @@ def mean_iou(intersect_area, pred_area, label_area):
     return np.array(class_iou), miou
 
 
+def fwiou(intersect_area, pred_area, label_area):
+    """
+    Calculate iou.
+
+    Args:
+        intersect_area (Tensor): The intersection area of prediction and ground truth on all classes.
+        pred_area (Tensor): The prediction area on all classes.
+        label_area (Tensor): The ground truth area on all classes.
+
+    Returns:
+        np.ndarray: iou on all classes.
+        float: Frequency Weighted iou of all classes.
+        np.ndarray: Frequency of all classes.
+    """
+    intersect_area = intersect_area.numpy()
+    pred_area = pred_area.numpy()
+    label_area = label_area.numpy()
+    union = pred_area + label_area - intersect_area
+    class_iou = []
+    for i in range(len(intersect_area)):
+        if union[i] == 0:
+            iou = 0
+        else:
+            iou = intersect_area[i] / union[i]
+        class_iou.append(iou)
+    fw = label_area / np.sum(label_area)
+    fwious = np.array(fw) * np.array(class_iou)
+    fwiou = np.sum(fwious)
+    return np.array(class_iou), fwiou, fw
+
+
 def dice(intersect_area, pred_area, label_area):
     """
     Calculate DICE.

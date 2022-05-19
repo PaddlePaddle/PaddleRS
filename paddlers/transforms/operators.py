@@ -41,7 +41,7 @@ __all__ = [
     "RandomScaleAspect", "RandomExpand", "Padding", "MixupImage",
     "RandomDistort", "RandomBlur", "RandomSwap", "Defogging", "DimReducing",
     "BandSelecting", "ArrangeSegmenter", "ArrangeChangeDetector",
-    "ArrangeClassifier", "ArrangeDetector"
+    "ArrangeClassifier", "ArrangeDetector", "RandomFlipOrRotation",
 ]
 
 interp_dict = {
