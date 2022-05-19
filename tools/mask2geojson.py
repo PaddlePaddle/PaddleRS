@@ -33,6 +33,9 @@ def _gt_convert(x, y, geotf):
 def convert_data(mask_path, save_path, epsilon=0):
     raster = Raster(mask_path)
     img = raster.getArray()
+    ext = save_path.split(".")[-1]
+    if ext != "json" and ext != "geojson":
+        raise ValueError("The ext of `save_path` must be `json` or `geojson`, not {}.".format(ext))
     geo_writer = codecs.open(save_path, "w", encoding="utf-8")
     clas = np.unique(img)
     cv2_v = (cv2.__version__.split(".")[0] == "3")
@@ -69,7 +72,7 @@ parser = argparse.ArgumentParser(description="input parameters")
 parser.add_argument("--mask_path", type=str, required=True, \
                     help="The path of mask tif.")
 parser.add_argument("--save_path", type=str, required=True, \
-                    help="The path to save the results, file suffix is `*.json`.")
+                    help="The path to save the results, file suffix is `*.json/geojson`.")
 parser.add_argument("--epsilon", type=float, default=0, \
                     help="The CV2 simplified parameters, `0` is the default.")
 

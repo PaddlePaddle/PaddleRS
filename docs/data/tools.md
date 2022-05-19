@@ -5,6 +5,7 @@
 - `coco2mask`：用于将geojson格式的分割标注标签转换为png格式。
 - `mask2shp`：用于对推理得到的png提取shapefile。
 - `mask2geojson`：用于对推理得到的png提取geojson。
+- `geojson2mask`：用于从geojson和原图中提取mask作为训练标签。
 - `matcher`：用于在推理前匹配两个时段的影响。
 - `spliter`：用于将大图数据进行分割以作为训练数据。
 - `coco_tools`：用于统计处理coco类标注文件。
@@ -62,6 +63,19 @@ python mask2geojson.py --mask_path xxx.tif --save_path xxx.json [--epsilon 0]
 - `save_path`：保存geojson的路径。
 - `epsilon`：opencv的简化参数，默认为0。
 
+### geojson2mask
+
+`geojson2mask`的主要功能是从原图和geojson文件中提取mask图像。使用代码如下：
+
+```shell
+python  geojson2mask.py --image_path xxx.tif --geojson_path xxx.json
+```
+
+其中：
+
+- `image_path`：原图像的路径。
+- `geojson_path`：geojson的路径。
+
 ### matcher
 
 ` matcher`的主要功能是在进行变化检测的推理前，匹配两期影像的位置，并将转换后的`im2`图像保存在原地址下，命名为`im2_M.tif`。使用代码如下：
@@ -82,12 +96,13 @@ python matcher.py --im1_path xxx.tif --im2_path xxx.xxx [--im1_bands 1 2 3] [--i
 `spliter`的主要功能是在划分大的遥感图像为图像块，便于进行训练。使用代码如下：
 
 ```shell
-python spliter.py --image_path xxx.tif [--block_size 512] [--save_folder output]
+python spliter.py --image_path xxx.tif [--mask_path None] [--block_size 512] [--save_folder output]
 ```
 
 其中：
 
 - `image_path`：需要切分的图像的路径。
+- `mask_path`：一同切分的标签图像路径，默认没有。
 - `block_size`：切分图像块大小，默认为512。
 - `save_folder`：保存切分后结果的文件夹路径，默认为`output`。
 

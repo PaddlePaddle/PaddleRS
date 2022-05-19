@@ -192,3 +192,15 @@ class Raster:
             tmp = np.zeros((block_size[0], block_size[1]), dtype=ima.dtype)
             tmp[:h, :w] = ima
         return tmp
+
+
+def save_mask_geotiff(mask: np.ndarray, save_path: str, proj: str, geotf: Tuple) -> None:
+    height, width = mask.shape
+    driver = gdal.GetDriverByName("GTiff")
+    dst_ds = driver.Create(save_path, width, height, 1, gdal.GDT_UInt16)
+    dst_ds.SetGeoTransform(geotf)
+    dst_ds.SetProjection(proj)
+    band = dst_ds.GetRasterBand(1)
+    band.WriteArray(mask)
+    dst_ds.FlushCache()
+    dst_ds = None
