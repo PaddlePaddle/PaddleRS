@@ -518,6 +518,7 @@ class ResizeByLong(Transform):
 
         return sample
 
+
 class RandomFlipOrRotation(Transform):
     """
     Flip or Rotate an image in different ways with a certain probability.
@@ -544,10 +545,13 @@ class RandomFlipOrRotation(Transform):
 
     """
 
-    def __init__(self, probs=[0.35, 0.25], probsf=[0.3, 0.3, 0.2, 0.1, 0.1], probsr=[0.25,0.5,0.25]):
+    def __init__(self,
+                 probs=[0.35, 0.25],
+                 probsf=[0.3, 0.3, 0.2, 0.1, 0.1],
+                 probsr=[0.25, 0.5, 0.25]):
         super(RandomFlipOrRotation, self).__init__()
         # Change various probabilities into probability intervals, to judge in which mode to flip or rotate
-        self.probs = [probs[0], probs[0]+probs[1]]
+        self.probs = [probs[0], probs[0] + probs[1]]
         self.probsf = self.get_probs_range(probsf)
         self.probsr = self.get_probs_range(probsr)
 
@@ -598,7 +602,7 @@ class RandomFlipOrRotation(Transform):
                          if return -1, the image will remain as it is and will not be processed
         '''
         for id, id_range in enumerate(probs):
-            if p> id_range[0] and p<id_range[1]:
+            if p > id_range[0] and p < id_range[1]:
                 return id
         return -1
 
@@ -747,15 +751,13 @@ class Normalize(Transform):
         std(List[float] or Tuple[float], optional): Standard deviation of input image(s). Defaults to [0.229, 0.224, 0.225].
         min_val(List[float] or Tuple[float], optional): Minimum value of input image(s). Defaults to [0, 0, 0, ].
         max_val(List[float] or Tuple[float], optional): Max value of input image(s). Defaults to [255., 255., 255.].
-        is_scale(bool, optional): If True, the image pixel values will be divided by 255.
     """
 
     def __init__(self,
                  mean=[0.485, 0.456, 0.406],
                  std=[0.229, 0.224, 0.225],
                  min_val=None,
-                 max_val=None,
-                 is_scale=True):
+                 max_val=None):
         super(Normalize, self).__init__()
         channel = len(mean)
         if min_val is None:
@@ -765,20 +767,18 @@ class Normalize(Transform):
 
         from functools import reduce
         if reduce(lambda x, y: x * y, std) == 0:
-            raise ValueError('Std should not have 0, but received is {}'.format(
-                std))
-        if is_scale:
-            if reduce(lambda x, y: x * y,
-                      [a - b for a, b in zip(max_val, min_val)]) == 0:
-                raise ValueError(
-                    '(max_val - min_val) should not have 0, but received is {}'.
-                    format((np.asarray(max_val) - np.asarray(min_val)).tolist(
-                    )))
+            raise ValueError(
+                'Std should not contain 0, but received is {}.'.format(std))
+        if reduce(lambda x, y: x * y,
+                  [a - b for a, b in zip(max_val, min_val)]) == 0:
+            raise ValueError(
+                '(max_val - min_val) should not contain 0, but received is {}.'.
+                format((np.asarray(max_val) - np.asarray(min_val)).tolist()))
+
         self.mean = mean
         self.std = std
         self.min_val = min_val
         self.max_val = max_val
-        self.is_scale = is_scale
 
     def apply_im(self, image):
         image = image.astype(np.float32)
