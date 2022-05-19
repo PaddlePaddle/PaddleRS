@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__version__ = '0.0.1'
+__version__ = 'develop'
 
 from paddlers.utils.env import get_environ_info, init_parallel_env
 init_parallel_env()
