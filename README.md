@@ -55,21 +55,21 @@ PaddleRS是遥感科研院所、相关高校共同基于飞桨开发的遥感处
       <td>
         <b>场景分类</b><br>
         <ul>
-          <li>ResNet</li>
-          <li>MobileNet</li>
+          <li>ResNet50-vd</li>
+          <li>MobileNetV3</li>
           <li>HRNet</li>
         </ul>
         <b>语义分割</b><br>
         <ul>
           <li>UNet</li>
           <li>FarSeg</li>
-          <li>DeepLabV3P</li>
+          <li>DeepLab V3+</li>
         </ul>
         <b>目标检测</b><br>
         <ul>
           <li>PP-YOLO</li>
-          <li>Faster RCNN</li>
-          <li>PicoDet</li>
+          <li>Faster R-CNN</li>
+          <li>YOLOv3</li>
         </ul>
         <b>超分/去噪</b><br>
         <ul>
@@ -81,7 +81,7 @@ PaddleRS是遥感科研院所、相关高校共同基于飞桨开发的遥感处
         <ul>
           <li>DSIFN</li>
           <li>STANet</li>
-          <li>UNetSiamDiff</li>
+          <li>FC-Siam-diff</li>
         </ul>
       </td>
       <td>
