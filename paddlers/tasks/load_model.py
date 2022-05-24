@@ -82,6 +82,10 @@ def load_model(model_dir, **params):
     model_info['_init_params'].update({'with_net': with_net})
 
     with paddle.utils.unique_name.guard():
+        if 'raw_params' not in model_info:
+            logging.warning(
+                "Cannot find raw_params. Default arguments will be used to construct the model."
+            )
         params = model_info.pop('raw_params', {})
         params.update(model_info['_init_params'])
         model = getattr(paddlers.tasks, model_info['Model'])(**params)
