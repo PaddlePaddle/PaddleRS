@@ -182,7 +182,7 @@ class Raster:
             xsize = self.width - xoff
         if yoff + ysize > self.height:
             ysize = self.height - yoff
-        ima = self._getAarray([int(xoff), int(yoff), int(xsize), int(ysize)])
+        ima = self._getArray([int(xoff), int(yoff), int(xsize), int(ysize)])
         h, w = ima.shape[:2] if len(ima.shape) == 3 else ima.shape
         if self.bands != 1:
             tmp = np.zeros(
