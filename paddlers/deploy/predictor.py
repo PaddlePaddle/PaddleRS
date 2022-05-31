@@ -275,7 +275,7 @@ class Predictor(object):
         self.timer.img_num = len(images)
         self.timer.info(average=True)
 
-        if isinstance(img_file, (str, np.ndarray)):
+        if isinstance(img_file, (str, np.ndarray, tuple)):
             results = results[0]
 
         return results

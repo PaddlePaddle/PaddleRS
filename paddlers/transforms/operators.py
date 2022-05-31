@@ -35,13 +35,33 @@ from .functions import normalize, horizontal_flip, permute, vertical_flip, cente
     to_intensity, to_uint8, img_flip, img_simple_rotate
 
 __all__ = [
-    "Compose", "ImgDecoder", "Resize", "RandomResize", "ResizeByShort",
-    "RandomResizeByShort", "ResizeByLong", "RandomHorizontalFlip",
-    "RandomVerticalFlip", "Normalize", "CenterCrop", "RandomCrop",
-    "RandomScaleAspect", "RandomExpand", "Padding", "MixupImage",
-    "RandomDistort", "RandomBlur", "RandomSwap", "Defogging", "DimReducing",
-    "BandSelecting", "ArrangeSegmenter", "ArrangeChangeDetector",
-    "ArrangeClassifier", "ArrangeDetector", "RandomFlipOrRotation",
+    "Compose",
+    "ImgDecoder",
+    "Resize",
+    "RandomResize",
+    "ResizeByShort",
+    "RandomResizeByShort",
+    "ResizeByLong",
+    "RandomHorizontalFlip",
+    "RandomVerticalFlip",
+    "Normalize",
+    "CenterCrop",
+    "RandomCrop",
+    "RandomScaleAspect",
+    "RandomExpand",
+    "Padding",
+    "MixupImage",
+    "RandomDistort",
+    "RandomBlur",
+    "RandomSwap",
+    "Defogging",
+    "DimReducing",
+    "BandSelecting",
+    "ArrangeSegmenter",
+    "ArrangeChangeDetector",
+    "ArrangeClassifier",
+    "ArrangeDetector",
+    "RandomFlipOrRotation",
 ]
 
 interp_dict = {
@@ -179,13 +199,17 @@ class ImgDecoder(Transform):
     def apply(self, sample):
         """
         Args:
-            sample (dict): Input sample, containing 'image' at least.
+            sample (dict): Input sample.
         Returns:
             dict: Decoded sample.
         """
         if 'image' in sample:
             sample['image'] = self.apply_im(sample['image'])
-        else:  # image_tx
+        if 'image2' in sample:
+            sample['image2'] = self.apply_im(sample['image2'])
+        if 'image_t1' in sample and not 'image' in sample:
+            if not ('image_t2' in sample and 'image2' not in sample):
+                raise ValueError
             sample['image'] = self.apply_im(sample['image_t1'])
             sample['image2'] = self.apply_im(sample['image_t2'])
         if 'mask' in sample:
