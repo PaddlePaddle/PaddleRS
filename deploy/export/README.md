@@ -47,7 +47,7 @@ python deploy/export/export_model.py --model_dir=./output/deeplabv3p/best_model/
 | --save_dir | 导出的部署格式模型存储路径，例如`./inference_model/`。 |
 | --fixed_input_shape | 固定导出模型的输入张量形状。默认值为None，表示使用任务默认输入张量形状。 |
 
-当使用TensorRT执行模型推理时，需固定模型的输入张量形状。此时，可通过`--fixed_input_shape`选项来指定输入形状，具体有两种形式：`[w,h]`或者`[n,c,w,h]`。例如，指定`--fixed_input_shape`为`[224,224]`时，实际的输入张量形状可视为`[-1,3,224,224]`（-1表示可以为任意正整数，通道数默认为3）；若想同时固定输入数据在batch维度的大小为1、通道数为4，则可将该选项设置为`[1,4,224,224]`。
+当使用TensorRT执行模型推理时，需固定模型的输入张量形状。此时，可通过`--fixed_input_shape`选项来指定输入形状，具体有两种形式：`[w,h]`或者`[n,c,w,h]`。例如，指定`--fixed_input_shape`为`[224,224]`时，实际的输入张量形状可视为`[1,3,224,224]`（batch size默认为1，通道数默认为3）；若需要使模型能够处理任何batch size（需为正整数）的通道数为4的输入，则可将该选项设置为`[-1,4,224,224]`。
 
 完整命令示例：
 
