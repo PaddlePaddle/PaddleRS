@@ -16,12 +16,11 @@ import copy
 from enum import IntEnum
 import os.path as osp
 
-from paddle.io import Dataset
+from .base import BaseDataset
+from paddlers.utils import logging, get_encoding, path_normalization, is_pic
 
-from paddlers.utils import logging, get_num_workers, get_encoding, path_normalization, is_pic
 
-
-class CDDataset(Dataset):
+class CDDataset(BaseDataset):
     """
     读取变化检测任务数据集，并对样本进行相应的处理（来自SegDataset，图像标签需要两个）。
 
@@ -31,8 +30,10 @@ class CDDataset(Dataset):
             False（默认设置）时，文件中每一行应依次包含第一时相影像、第二时相影像以及变化检测标签的路径；当`with_seg_labels`为True时，
             文件中每一行应依次包含第一时相影像、第二时相影像、变化检测标签、第一时相建筑物标签以及第二时相建筑物标签的路径。
         label_list (str): 描述数据集包含的类别信息文件路径。默认值为None。
-        transforms (paddlers.transforms): 数据集中每个样本的预处理/增强算子。
-        num_workers (int|str): 数据集中样本在预处理过程中的线程或进程数。默认为'auto'。
+        transforms (paddlers.transforms.Compose): 数据集中每个样本的预处理/增强算子。
+        num_workers (int|str): 数据集中样本在预处理过程中的线程或进程数。默认为'auto'。当设为'auto'时，根据
+            系统的实际CPU核数设置`num_workers`: 如果CPU核数的一半大于8，则`num_workers`为8，否则为CPU核数的
+            一半。
         shuffle (bool): 是否需要对数据集中样本打乱顺序。默认为False。
         with_seg_labels (bool, optional): 数据集中是否包含两个时相的语义分割标签。默认为False。
         binarize_labels (bool, optional): 是否对数据集中的标签进行二值化操作。默认为False。
@@ -47,15 +48,13 @@ class CDDataset(Dataset):
                  shuffle=False,
                  with_seg_labels=False,
                  binarize_labels=False):
-        super(CDDataset, self).__init__()
+        super(CDDataset, self).__init__(data_dir, label_list, transforms,
+                                        num_workers, shuffle)
 
         DELIMETER = ' '
 
-        self.transforms = copy.deepcopy(transforms)
         # TODO: batch padding
         self.batch_transforms = None
-        self.num_workers = get_num_workers(num_workers)
-        self.shuffle = shuffle
         self.file_list = list()
         self.labels = list()
         self.with_seg_labels = with_seg_labels

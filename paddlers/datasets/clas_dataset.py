@@ -15,20 +15,21 @@
 import os.path as osp
 import copy
 
-from paddle.io import Dataset
+from .base import BaseDataset
+from paddlers.utils import logging, get_encoding, path_normalization, is_pic
 
-from paddlers.utils import logging, get_num_workers, get_encoding, path_normalization, is_pic
 
-
-class ClasDataset(Dataset):
+class ClasDataset(BaseDataset):
     """读取图像分类任务数据集，并对样本进行相应的处理。
 
     Args:
         data_dir (str): 数据集所在的目录路径。
         file_list (str): 描述数据集图片文件和对应标注序号（文本内每行路径为相对data_dir的相对路）。
         label_list (str): 描述数据集包含的类别信息文件路径，文件格式为（类别 说明）。默认值为None。
-        transforms (paddlers.transforms): 数据集中每个样本的预处理/增强算子。
-        num_workers (int|str): 数据集中样本在预处理过程中的线程或进程数。默认为'auto'。
+        transforms (paddlers.transforms.Compose): 数据集中每个样本的预处理/增强算子。
+        num_workers (int|str): 数据集中样本在预处理过程中的线程或进程数。默认为'auto'。当设为'auto'时，根据
+            系统的实际CPU核数设置`num_workers`: 如果CPU核数的一半大于8，则`num_workers`为8，否则为CPU核数的
+            一半。
         shuffle (bool): 是否需要对数据集中样本打乱顺序。默认为False。
     """
 
@@ -39,14 +40,11 @@ class ClasDataset(Dataset):
                  transforms=None,
                  num_workers='auto',
                  shuffle=False):
-        super(ClasDataset, self).__init__()
-        self.transforms = copy.deepcopy(transforms)
+        super(ClasDataset, self).__init__(data_dir, label_list, transforms,
+                                          num_workers, shuffle)
         # TODO batch padding
         self.batch_transforms = None
-        self.num_workers = get_num_workers(num_workers)
-        self.shuffle = shuffle
         self.file_list = list()
-        self.label_list = label_list
         self.labels = list()
 
         # TODO：非None时，让用户跳转数据集分析生成label_list
