@@ -13,8 +13,10 @@
 # limitations under the License.
 
 import os.path as osp
+from operator import itemgetter
 
 import numpy as np
+import paddle
 from paddle.inference import Config
 from paddle.inference import create_predictor
 from paddle.inference import PrecisionType
@@ -170,7 +172,20 @@ class Predictor(object):
     def postprocess(self, net_outputs, topk=1, ori_shape=None, transforms=None):
         if self._model.model_type == 'classifier':
             true_topk = min(self._model.num_classes, topk)
-            preds = self._model._postprocess(net_outputs[0], true_topk)
+            if self._model._postprocess is None:
+                self._model.build_postprocess_from_labels(topk)
+            # XXX: Convert ndarray to tensor as self._model._postprocess requires
+            net_outputs = paddle.to_tensor(net_outputs)
+            assert net_outputs.shape[1] == 1
+            outputs = self._model._postprocess(net_outputs.squeeze(1))
+            class_ids = map(itemgetter('class_ids'), outputs)
+            scores = map(itemgetter('scores'), outputs)
+            label_names = map(itemgetter('label_names'), outputs)
+            preds = [{
+                'class_ids_map': l,
+                'scores_map': s,
+                'label_names_map': n,
+            } for l, s, n in zip(class_ids, scores, label_names)]
         elif self._model.model_type in ('segmenter', 'changedetector'):
             label_map, score_map = self._model._postprocess(
                 net_outputs,

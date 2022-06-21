@@ -15,6 +15,7 @@
 import math
 import os.path as osp
 from collections import OrderedDict
+from operator import itemgetter
 
 import numpy as np
 import paddle
@@ -119,11 +120,12 @@ class BaseClassifier(BaseModel):
 
     def run(self, net, inputs, mode):
         net_out = net(inputs[0])
-        label = paddle.to_tensor(inputs[1], dtype="int64")
-        outputs = OrderedDict()
+
         if mode == 'test':
-            result = self._postprocess(net_out)
-            outputs = result[0]
+            return self._postprocess(net_out)
+
+        outputs = OrderedDict()
+        label = paddle.to_tensor(inputs[1], dtype="int64")
 
         if mode == 'eval':
             # print(self._postprocess(net_out)[0])  # for test
@@ -170,6 +172,18 @@ class BaseClassifier(BaseModel):
             "class_id_map_file": class_id_map_file
         }
         return build_postprocess(default_config)
+
+    def build_postprocess_from_labels(self, topk=1):
+        label_dict = dict()
+        for i, label in enumerate(self.labels):
+            label_dict[i] = label
+        self._postprocess = build_postprocess({
+            "name": "Topk",
+            "topk": topk,
+            "class_id_map_file": None
+        })
+        # Add class_id_map from model.yml
+        self._postprocess.class_id_map = label_dict
 
     def train(self,
               num_epochs,
@@ -423,28 +437,25 @@ class BaseClassifier(BaseModel):
                                                         self.model_type)
         self.net.eval()
         data = (batch_im, batch_origin_shape, transforms.transforms)
-        # add class_id_map from model.yml
+
         if self._postprocess is None:
-            label_dict = dict()
-            for i, label in enumerate(self.labels):
-                label_dict[i] = label
-            self._postprocess = self.default_postprocess(None)
-            self._postprocess.class_id_map = label_dict
+            self.build_postprocess_from_labels()
+
         outputs = self.run(self.net, data, 'test')
-        label_list = outputs['class_ids']
-        score_list = outputs['scores']
-        name_list = outputs['label_names']
+        class_ids = map(itemgetter('class_ids'), outputs)
+        scores = map(itemgetter('scores'), outputs)
+        label_names = map(itemgetter('label_names'), outputs)
         if isinstance(img_file, list):
             prediction = [{
                 'class_ids_map': l,
                 'scores_map': s,
                 'label_names_map': n,
-            } for l, s, n in zip(label_list, score_list, name_list)]
+            } for l, s, n in zip(class_ids, scores, label_names)]
         else:
             prediction = {
-                'class_ids': label_list[0],
-                'scores': score_list[0],
-                'label_names': name_list[0]
+                'class_ids_map': next(class_ids),
+                'scores_map': next(scores),
+                'label_names_map': next(label_names)
             }
         return prediction
 

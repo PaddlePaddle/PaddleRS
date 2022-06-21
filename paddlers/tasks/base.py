@@ -614,7 +614,7 @@ class BaseModel(metaclass=ModelMeta):
         return pipeline_info
 
     def _build_inference_net(self):
-        if self.model_type == 'detector':
+        if self.model_type in ('classifier', 'detector'):
             infer_net = self.net
         elif self.model_type == 'changedetector':
             infer_net = InferCDNet(self.net)
