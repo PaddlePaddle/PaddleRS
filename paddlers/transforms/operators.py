@@ -27,11 +27,12 @@ import numpy as np
 import cv2
 import imghdr
 from PIL import Image
+from joblib import load
 
 import paddlers
 from .functions import normalize, horizontal_flip, permute, vertical_flip, center_crop, is_poly, \
     horizontal_flip_poly, horizontal_flip_rle, vertical_flip_poly, vertical_flip_rle, crop_poly, \
-    crop_rle, expand_poly, expand_rle, resize_poly, resize_rle, de_haze, pca, select_bands, \
+    crop_rle, expand_poly, expand_rle, resize_poly, resize_rle, de_haze, select_bands, \
     to_intensity, to_uint8, img_flip, img_simple_rotate
 
 __all__ = [
@@ -242,7 +243,7 @@ class Compose(Transform):
         ValueError: Invalid length of transforms.
     """
 
-    def __init__(self, transforms):
+    def __init__(self, transforms, to_uint8=True):
         super(Compose, self).__init__()
         if not isinstance(transforms, list):
             raise TypeError(
@@ -253,7 +254,7 @@ class Compose(Transform):
                 'Length of transforms must not be less than 1, but received is {}'
                 .format(len(transforms)))
         self.transforms = transforms
-        self.decode_image = ImgDecoder()
+        self.decode_image = ImgDecoder(to_uint8=to_uint8)
         self.arrange_outputs = None
         self.apply_im_only = False
 
@@ -1552,18 +1553,22 @@ class DimReducing(Transform):
     Use PCA to reduce input image(s) dimension.
 
     Args: 
-        dim (int, optional): Reserved dimensions. Defaults to 3.
-        whiten (bool, optional): PCA whiten or not. Defaults to True.
+        joblib_path (str): Path of *.joblib about PCA.
     """
 
-    def __init__(self, dim=3, whiten=True):
+    def __init__(self, joblib_path):
         super(DimReducing, self).__init__()
-        self.dim = dim
-        self.whiten = whiten
+        ext = joblib_path.split(".")[-1]
+        if ext != "joblib":
+            raise ValueError("`joblib_path` must be *.joblib, not *.{}.".format(ext))
+        self.pca = load(joblib_path)
 
     def apply_im(self, image):
-        image = pca(image, self.dim, self.whiten)
-        return image
+        H, W, C = image.shape
+        n_im = np.reshape(image, (-1, C))
+        im_pca = self.pca.transform(n_im)
+        result = np.reshape(im_pca, (H, W, -1))
+        return result
 
     def apply(self, sample):
         sample['image'] = self.apply_im(sample['image'])

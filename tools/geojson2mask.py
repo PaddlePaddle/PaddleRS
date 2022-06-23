@@ -18,7 +18,7 @@ import numpy as np
 import argparse
 import geojson
 from tqdm import tqdm
-from utils import Raster, save_mask_geotiff, Timer
+from utils import Raster, save_geotiff, Timer
 
 
 def _gt_convert(x_geo, y_geo, geotf):
@@ -48,7 +48,7 @@ def convert_data(image_path, geojson_path):
         # TODO: Label category
         cv2.fillPoly(tmp_img, [xy_points], 1)  # 多边形填充
     ext = "." + geojson_path.split(".")[-1]
-    save_mask_geotiff(tmp_img, geojson_path.replace(ext, ".tif"), raster.proj, raster.geot)
+    save_geotiff(tmp_img, geojson_path.replace(ext, ".tif"), raster.proj, raster.geot)
 
 
 parser = argparse.ArgumentParser(description="input parameters")

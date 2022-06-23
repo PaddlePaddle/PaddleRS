@@ -25,13 +25,34 @@ except:
     import gdal
 
 
+def _get_type(type_name: str) -> int:
+    if type_name in ["bool", "uint8"]:
+        gdal_type = gdal.GDT_Byte
+    elif type_name in ["int8", "int16"]:
+        gdal_type = gdal.GDT_Int16
+    elif type_name == "uint16":
+        gdal_type = gdal.GDT_UInt16
+    elif type_name == "int32":
+        gdal_type = gdal.GDT_Int32
+    elif type_name == "uint32":
+        gdal_type = gdal.GDT_UInt32
+    elif type_name in ["int64", "uint64", "float16", "float32"]:
+        gdal_type = gdal.GDT_Float32
+    elif type_name == "float64":
+        gdal_type = gdal.GDT_Float64
+    elif type_name == "complex64":
+        gdal_type = gdal.GDT_CFloat64
+    else:
+        raise TypeError("Non-suported data type `{}`.".format(type_name))
+    return gdal_type
+
+
 class Raster:
     def __init__(self,
                  path: str,
                  band_list: Union[List[int], Tuple[int], None]=None,
                  to_uint8: bool=False) -> None:
         """ Class of read raster.
-
         Args:
             path (str): The path of raster.
             band_list (Union[List[int], Tuple[int], None], optional): 
@@ -61,7 +82,6 @@ class Raster:
 
     def setBands(self, band_list: Union[List[int], Tuple[int], None]) -> None:
         """ Set band of data.
-
         Args:
             band_list (Union[List[int], Tuple[int], None]): 
                 band list (start with 1) or None (all of bands).
@@ -82,13 +102,11 @@ class Raster:
             start_loc: Union[List[int], Tuple[int], None]=None,
             block_size: Union[List[int], Tuple[int]]=[512, 512]) -> np.ndarray:
         """ Get ndarray data 
-
         Args:
             start_loc (Union[List[int], Tuple[int], None], optional): 
                 Coordinates of the upper left corner of the block, if None means return full image.
             block_size (Union[List[int], Tuple[int]], optional): 
                 Block size. Defaults to [512, 512].
-
         Returns:
             np.ndarray: data's ndarray.
         """
@@ -119,12 +137,7 @@ class Raster:
                 self.bands = 1
             self.geot = None
             self.proj = None
-        if "int8" in d_name:
-            self.datatype = gdal.GDT_Byte
-        elif "int16" in d_name:
-            self.datatype = gdal.GDT_UInt16
-        else:
-            self.datatype = gdal.GDT_Float32
+        self.datatype = _get_type(d_name)
 
     def _getNumpy(self):
         ima = np.load(self.path)
@@ -195,13 +208,20 @@ class Raster:
         return tmp
 
 
-def save_mask_geotiff(mask: np.ndarray, save_path: str, proj: str, geotf: Tuple) -> None:
-    height, width = mask.shape
+def save_geotiff(image: np.ndarray, save_path: str, proj: str, geotf: Tuple) -> None:
+    height, width, channel = image.shape
+    data_type = _get_type(image.dtype.name)
     driver = gdal.GetDriverByName("GTiff")
-    dst_ds = driver.Create(save_path, width, height, 1, gdal.GDT_UInt16)
+    dst_ds = driver.Create(save_path, width, height, channel, data_type)
     dst_ds.SetGeoTransform(geotf)
     dst_ds.SetProjection(proj)
-    band = dst_ds.GetRasterBand(1)
-    band.WriteArray(mask)
-    dst_ds.FlushCache()
+    if channel > 1:
+        for i in range(channel):
+            band = dst_ds.GetRasterBand(i + 1)
+            band.WriteArray(image[:, :, i])
+            dst_ds.FlushCache()
+    else:
+        band = dst_ds.GetRasterBand(1)
+        band.WriteArray(image)
+        dst_ds.FlushCache()
     dst_ds = None
