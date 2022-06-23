@@ -374,7 +374,12 @@ class BaseModel(metaclass=ModelMeta):
                 lr = self.optimizer.get_lr()
                 if isinstance(self.optimizer._learning_rate,
                               paddle.optimizer.lr.LRScheduler):
-                    self.optimizer._learning_rate.step()
+                    # If ReduceOnPlateau is used as the scheduler, use the loss value as the metric.
+                    if isinstance(self.optimizer._learning_rate,
+                                  paddle.optimizer.lr.ReduceOnPlateau):
+                        self.optimizer._learning_rate.step(loss.item())
+                    else:
+                        self.optimizer._learning_rate.step()
 
                 train_avg_metrics.update(outputs)
                 outputs['lr'] = lr
