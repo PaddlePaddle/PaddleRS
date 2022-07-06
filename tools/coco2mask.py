@@ -25,7 +25,7 @@ import glob
 from tqdm import tqdm
 from PIL import Image
 
-from utils import Timer
+from utils import timer
 
 
 def _mkdir_p(path):
@@ -69,7 +69,7 @@ def _read_geojson(json_path):
         return annotations, sizes
 
 
-@Timer
+@timer
 def convert_data(raw_folder, end_folder):
     print("-- Initializing --")
     img_folder = osp.join(raw_folder, "images")

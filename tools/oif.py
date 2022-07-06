@@ -19,7 +19,7 @@ from easydict import EasyDict as edict
 import numpy as np
 import pandas as pd
 
-from utils import Raster, Timer
+from utils import Raster, timer
 
 def _calcOIF(rgb, stds, rho):
     r, g, b = rgb
@@ -32,7 +32,7 @@ def _calcOIF(rgb, stds, rho):
     return (s1 + s2 + s3) / (abs(r12) + abs(r23) + abs(r31))
 
 
-@Timer
+@timer
 def oif(img_path, topk=5):
     raster = Raster(img_path)
     img = raster.getArray()

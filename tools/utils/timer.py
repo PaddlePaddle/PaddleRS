@@ -13,14 +13,14 @@
 # limitations under the License.
 
 import time
+from functools import wraps
 
 
-class Timer(object):
-    def __init__(self, func):
-        self.func = func
-
-    def __call__(self, *args, **kwds):
+def timer(func):
+    @wraps(func)
+    def wrapper(*args,**kwargs):
         start_time = time.time()
-        func_t = self.func(*args, **kwds)
+        result = func(*args,**kwargs)
         print("Total time: {0}.".format(time.time() - start_time))
-        return func_t
+        return result
+    return wrapper

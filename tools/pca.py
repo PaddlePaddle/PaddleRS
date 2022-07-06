@@ -18,10 +18,10 @@ import numpy as np
 import argparse
 from sklearn.decomposition import PCA
 from joblib import dump
-from utils import Raster, Timer, save_geotiff
+from utils import Raster, save_geotiff, timer
 
 
-@Timer
+@timer
 def pca_train(img_path, save_dir="output", dim=3):
     raster = Raster(img_path)
     im = raster.getArray()

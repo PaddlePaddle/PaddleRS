@@ -16,12 +16,8 @@ import argparse
 
 import numpy as np
 import cv2
-try:
-    from osgeo import gdal
-except ImportError:
-    import gdal
 
-from utils import Raster, raster2uint8, Timer
+from utils import Raster, raster2uint8, save_geotiff, timer
 
 class MatchError(Exception):
     def __str__(self):
@@ -64,26 +60,7 @@ def _get_match_img(raster, bands):
     return ima
 
 
-def _img2tif(ima, save_path, proj, geot, dtype):
-    if len(ima.shape) == 3:
-        row, columns, bands = ima.shape
-    else:
-        row, columns = ima.shape
-        bands = 1
-    driver = gdal.GetDriverByName("GTiff")
-    dst_ds = driver.Create(save_path, columns, row, bands, dtype)
-    dst_ds.SetGeoTransform(geot)
-    dst_ds.SetProjection(proj)
-    if bands != 1:
-        for b in range(bands):
-            dst_ds.GetRasterBand(b + 1).WriteArray(ima[:, :, b])
-    else:
-        dst_ds.GetRasterBand(1).WriteArray(ima)
-    dst_ds.FlushCache()
-    return dst_ds
-
-
-@Timer
+@timer
 def matching(im1_path, im2_path, im1_bands=[1, 2, 3], im2_bands=[1, 2, 3]):
     im1_ras = Raster(im1_path)
     im2_ras = Raster(im2_path)
@@ -96,7 +73,7 @@ def matching(im1_path, im2_path, im1_bands=[1, 2, 3], im2_bands=[1, 2, 3]):
     im2_arr_t = cv2.warpPerspective(im2_ras.getArray(), H,
                                     (im1_ras.width, im1_ras.height))
     save_path = im2_ras.path.replace(("." + im2_ras.ext_type), "_M.tif")
-    _img2tif(im2_arr_t, save_path, im1_ras.proj, im1_ras.geot, im1_ras.datatype)
+    save_geotiff(im2_arr_t, save_path, im1_ras.proj, im1_ras.geot, im1_ras.datatype)
 
 
 parser = argparse.ArgumentParser(description="input parameters")
