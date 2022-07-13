@@ -527,7 +527,7 @@ class BaseSegmenter(BaseModel):
             img_file(str):
                 Image path.
             save_dir(str):
-                Folder of geotiff saved.
+                Directory that contains saved geotiff file.
             block_size(List[int] or Tuple[int], int):
                 The size of block.
             overlap(List[int] or Tuple[int], int):
@@ -545,13 +545,13 @@ class BaseSegmenter(BaseModel):
         elif isinstance(block_size, (tuple, list)) and len(block_size) == 2:
             block_size = tuple(block_size)
         else:
-            raise ValueError("`block_size` must be a tuple/list of length 2 or a integer.")
+            raise ValueError("`block_size` must be a tuple/list of length 2 or an integer.")
         if isinstance(overlap, int):
             overlap = (overlap, overlap)
         elif isinstance(overlap, (tuple, list)) and len(overlap) == 2:
             overlap = tuple(overlap)
         else:
-            raise ValueError("`overlap` must be a tuple/list of length 2 or a integer.")
+            raise ValueError("`overlap` must be a tuple/list of length 2 or an integer.")
 
         src_data = gdal.Open(img_file)
         width = src_data.RasterXSize
