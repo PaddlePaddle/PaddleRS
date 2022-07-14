@@ -32,7 +32,7 @@ class FPN(nn.Layer):
     """
     Module that adds FPN on top of a list of feature maps.
     The feature maps are currently supposed to be in increasing depth
-    order, and must be consecutive
+        order, and must be consecutive
     """
 
     def __init__(self,

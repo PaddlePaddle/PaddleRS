@@ -25,7 +25,7 @@ from .det_metrics.coco_utils import loadRes
 def visualize_detection(image, result, threshold=0.5, save_dir='./',
                         color=None):
     """
-        Visualize bbox and mask results
+    Visualize bbox and mask results
     """
 
     if isinstance(image, np.ndarray):
@@ -48,6 +48,7 @@ def visualize_segmentation(image, result, weight=0.6, save_dir='./',
                            color=None):
     """
     Convert segment result to color image, and save added image.
+
     Args:
         image: the path of origin image
         result: the predict result of image
@@ -55,6 +56,7 @@ def visualize_segmentation(image, result, weight=0.6, save_dir='./',
         save_dir: the directory for saving visual image
         color: the list of a BGR-mode color for each label.
     """
+
     label_map = result['label_map'].astype("uint8")
     color_map = get_color_map_list(256)
     if color is not None:
@@ -104,13 +106,16 @@ def visualize_segmentation(image, result, weight=0.6, save_dir='./',
 
 
 def get_color_map_list(num_classes):
-    """ Returns the color map for visualizing the segmentation mask,
-        which can support arbitrary number of classes.
+    """ 
+    Returns the color map for visualizing the segmentation mask, which can support arbitrary number of classes.
+
     Args:
         num_classes: Number of classes
+
     Returns:
         The color map
     """
+
     color_map = num_classes * [0, 0, 0]
     for i in range(0, num_classes):
         j = 0
