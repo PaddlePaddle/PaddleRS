@@ -17,5 +17,5 @@ import os.path as osp
 sys.path.insert(0, osp.abspath(".."))  # add workspace
 
 from .raster import Raster, raster2uint8, save_geotiff
-from .vector import vector_translate
-from .timer import timer
+from .vector import translate_vector
+from .timer import time_it

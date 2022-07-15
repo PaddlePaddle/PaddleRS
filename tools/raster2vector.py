@@ -25,13 +25,13 @@ except ImportError:
     import ogr
     import osr
 
-from utils import Raster, save_geotiff, timer
+from utils import Raster, save_geotiff, time_it
 
 
 def _mask2tif(mask_path, tmp_path, proj, geot):
     dst_ds = save_geotiff(
-        np.asarray(Image.open(mask_path)),
-        tmp_path, proj, geot,  gdal.GDT_UInt16, False)
+        np.asarray(Image.open(mask_path)), tmp_path, proj, geot,
+        gdal.GDT_UInt16, False)
     return dst_ds
 
 
@@ -47,9 +47,7 @@ def _polygonize_raster(mask_path, vec_save_path, proj, geot, ignore_index, ext):
     gdal.SetConfigOption("GDAL_FILENAME_IS_UTF8", "YES")
     gdal.SetConfigOption("SHAPE_ENCODING", "UTF-8")
     ogr.RegisterAll()
-    drv = ogr.GetDriverByName(
-        "ESRI Shapefile" if ext == "shp" else "GeoJSON"
-    )
+    drv = ogr.GetDriverByName("ESRI Shapefile" if ext == "shp" else "GeoJSON")
     if osp.exists(vec_save_path):
         os.remove(vec_save_path)
     dst_ds = drv.CreateDataSource(vec_save_path)
@@ -73,30 +71,35 @@ def _polygonize_raster(mask_path, vec_save_path, proj, geot, ignore_index, ext):
         os.remove(tmp_path)
 
 
-@timer
+@time_it
 def raster2vector(srcimg_path, mask_path, save_path, ignore_index=255):
     vec_ext = save_path.split(".")[-1].lower()
     if vec_ext not in ["json", "geojson", "shp"]:
-        raise ValueError("The ext of `save_path` must be `json/geojson` or `shp`, not {}.".format(vec_ext))
+        raise ValueError(
+            "The ext of `save_path` must be `json/geojson` or `shp`, not {}.".
+            format(vec_ext))
     ras_ext = srcimg_path.split(".")[-1].lower()
     if osp.exists(srcimg_path) and ras_ext in ["tif", "tiff", "geotiff", "img"]:
         src = Raster(srcimg_path)
-        _polygonize_raster(mask_path, save_path, src.proj, src.geot, ignore_index, vec_ext)
+        _polygonize_raster(mask_path, save_path, src.proj, src.geot,
+                           ignore_index, vec_ext)
         src = None
     else:
-        _polygonize_raster(mask_path, save_path, None, None, ignore_index, vec_ext)
+        _polygonize_raster(mask_path, save_path, None, None, ignore_index,
+                           vec_ext)
 
 
-parser = argparse.ArgumentParser(description="input parameters")
+parser = argparse.ArgumentParser()
 parser.add_argument("--mask_path", type=str, required=True, \
-                    help="The path of mask data.")
+                    help="Path of mask data.")
 parser.add_argument("--save_path", type=str, required=True, \
-                    help="The path to save the results, file suffix is `*.json/geojson` or `*.shp`.")
+                    help="Path to save the shape file (the file suffix is `*.json/geojson` or `*.shp`).")
 parser.add_argument("--srcimg_path", type=str, default="", \
-                    help="The path of original data with geoinfos, `` is the default.")
+                    help="Path of original data with geoinfo. Default to empty.")
 parser.add_argument("--ignore_index", type=int, default=255, \
-                    help="It will not be converted to the value of SHP, `255` is the default.")
+                    help="The ignored index will not be converted to a value in the shape file. Default value is `255`.")
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    raster2vector(args.srcimg_path, args.mask_path, args.save_path, args.ignore_index)
+    raster2vector(args.srcimg_path, args.mask_path, args.save_path,
+                  args.ignore_index)

@@ -16,12 +16,14 @@ import os
 import os.path as osp
 import numpy as np
 import argparse
+
 from sklearn.decomposition import PCA
 from joblib import dump
-from utils import Raster, save_geotiff, timer
+
+from utils import Raster, save_geotiff, time_it
 
 
-@timer
+@time_it
 def pca_train(img_path, save_dir="output", dim=3):
     raster = Raster(img_path)
     im = raster.getArray()
@@ -33,20 +35,21 @@ def pca_train(img_path, save_dir="output", dim=3):
     name = osp.splitext(osp.normpath(img_path).split(os.sep)[-1])[0]
     model_save_path = osp.join(save_dir, (name + "_pca.joblib"))
     image_save_path = osp.join(save_dir, (name + "_pca.tif"))
-    dump(pca_model, model_save_path)  # save model
-    output = pca_model.transform(n_im).reshape((raster.height, raster.width, -1))
-    save_geotiff(output, image_save_path, raster.proj, raster.geot)  # save tiff
-    print("The Image and model of PCA saved in {}.".format(save_dir))
+    dump(pca_model, model_save_path)  # Save model
+    output = pca_model.transform(n_im).reshape(
+        (raster.height, raster.width, -1))
+    save_geotiff(output, image_save_path, raster.proj, raster.geot)  # Save tiff
+    print("The output image and the PCA model are saved in {}.".format(
+        save_dir))
 
 
-parser = argparse.ArgumentParser(description="input parameters")
+parser = argparse.ArgumentParser()
 parser.add_argument("--im_path", type=str, required=True, \
-                    help="The path of HSIs image.")
+                    help="Path of HSIs image.")
 parser.add_argument("--save_dir", type=str, default="output", \
-                    help="The params(*.joblib) saved folder, `output` is the default.")
+                    help="Directory to save PCA params(*.joblib). Default: `output`.")
 parser.add_argument("--dim", type=int, default=3, \
-                    help="The dimension after reduced, `3` is the default.")
-
+                    help="Dimension to reduce to. Default: `3`.")
 
 if __name__ == "__main__":
     args = parser.parse_args()

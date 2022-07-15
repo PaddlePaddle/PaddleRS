@@ -19,7 +19,7 @@ import numpy as np
 import argparse
 import geojson
 from tqdm import tqdm
-from utils import Raster, save_geotiff, vector_translate, timer
+from utils import Raster, save_geotiff, translate_vector, time_it
 
 
 def _gt_convert(x_geo, y_geo, geotf):
@@ -28,13 +28,13 @@ def _gt_convert(x_geo, y_geo, geotf):
     return np.round(np.linalg.solve(a, b)).tolist()  # 解一元二次方程
 
 
-@timer
+@time_it
 # TODO: update for vector2raster
 def convert_data(image_path, geojson_path):
     raster = Raster(image_path)
     tmp_img = np.zeros((raster.height, raster.width), dtype=np.int32)
     # vector to EPSG from raster
-    temp_geojson_path = vector_translate(geojson_path, raster.proj)
+    temp_geojson_path = translate_vector(geojson_path, raster.proj)
     geo_reader = codecs.open(temp_geojson_path, "r", encoding="utf-8")
     feats = geojson.loads(geo_reader.read())["features"]  # 所有图像块
     geo_reader.close()
@@ -45,25 +45,25 @@ def convert_data(image_path, geojson_path):
         elif geo["type"] == "MultiPolygon":  # 多面
             geo_points = geo["coordinates"][0][0]
         else:
-            raise TypeError("Geometry type must be `Polygon` or `MultiPolygon`, not {}.".format(
-                geo["type"]))
+            raise TypeError(
+                "Geometry type must be `Polygon` or `MultiPolygon`, not {}.".
+                format(geo["type"]))
         xy_points = np.array([
-            _gt_convert(point[0], point[1], raster.geot)
-            for point in geo_points
+            _gt_convert(point[0], point[1], raster.geot) for point in geo_points
         ]).astype(np.int32)
         # TODO: Label category
         cv2.fillPoly(tmp_img, [xy_points], 1)  # 多边形填充
     ext = "." + geojson_path.split(".")[-1]
-    save_geotiff(tmp_img, geojson_path.replace(ext, ".tif"), raster.proj, raster.geot)
+    save_geotiff(tmp_img,
+                 geojson_path.replace(ext, ".tif"), raster.proj, raster.geot)
     os.remove(temp_geojson_path)
 
 
-parser = argparse.ArgumentParser(description="input parameters")
+parser = argparse.ArgumentParser()
 parser.add_argument("--image_path", type=str, required=True, \
-                    help="The path of original image.")
+                    help="Path of original image.")
 parser.add_argument("--geojson_path", type=str, required=True, \
-                    help="The path of geojson. (coordinate of geojson is WGS84)")
-
+                    help="Path of the geojson file (the coordinate system should be WGS84).")
 
 if __name__ == "__main__":
     args = parser.parse_args()

@@ -18,7 +18,7 @@ import argparse
 from math import ceil
 from tqdm import tqdm
 
-from utils import Raster, save_geotiff, timer
+from utils import Raster, save_geotiff, time_it
 
 
 def _calc_window_tf(geot, loc):
@@ -27,17 +27,19 @@ def _calc_window_tf(geot, loc):
     return (x + nx * hr, hr, r1, y + ny * vr, r2, vr)
 
 
-@timer
+@time_it
 def split_data(image_path, mask_path, block_size, save_folder):
     if not osp.exists(save_folder):
         os.makedirs(save_folder)
         os.makedirs(osp.join(save_folder, "images"))
         if mask_path is not None:
             os.makedirs(osp.join(save_folder, "masks"))
-    image_name, image_ext = image_path.replace("\\", "/").split("/")[-1].split(".")
+    image_name, image_ext = image_path.replace("\\",
+                                               "/").split("/")[-1].split(".")
     image = Raster(image_path)
     mask = Raster(mask_path) if mask_path is not None else None
-    if mask is not None and (image.width != mask.width or image.height != mask.height):
+    if mask is not None and (image.width != mask.width or
+                             image.height != mask.height):
         raise ValueError("image's shape must equal mask's shape.")
     rows = ceil(image.height / block_size)
     cols = ceil(image.width / block_size)
@@ -47,20 +49,21 @@ def split_data(image_path, mask_path, block_size, save_folder):
         for r in range(rows):
             for c in range(cols):
                 loc_start = (c * block_size, r * block_size)
-                image_title = image.getArray(loc_start, (block_size, block_size))
+                image_title = image.getArray(loc_start,
+                                             (block_size, block_size))
                 image_save_path = osp.join(save_folder, "images", (
                     image_name + "_" + str(r) + "_" + str(c) + "." + image_ext))
                 window_geotf = _calc_window_tf(image.geot, loc_start)
-                save_geotiff(
-                    image_title, image_save_path, image.proj, window_geotf
-                )
+                save_geotiff(image_title, image_save_path, image.proj,
+                             window_geotf)
                 if mask is not None:
-                    mask_title = mask.getArray(loc_start, (block_size, block_size))
-                    mask_save_path = osp.join(save_folder, "masks", (
-                        image_name + "_" + str(r) + "_" + str(c) + "." + image_ext))
-                    save_geotiff(
-                        mask_title, mask_save_path, image.proj, window_geotf
-                    )
+                    mask_title = mask.getArray(loc_start,
+                                               (block_size, block_size))
+                    mask_save_path = osp.join(save_folder, "masks",
+                                              (image_name + "_" + str(r) + "_" +
+                                               str(c) + "." + image_ext))
+                    save_geotiff(mask_title, mask_save_path, image.proj,
+                                 window_geotf)
                 pbar.update(1)
 
 
@@ -76,4 +79,5 @@ parser.add_argument("--save_folder", type=str, default="dataset", \
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    split_data(args.image_path, args.mask_path, args.block_size, args.save_folder)
+    split_data(args.image_path, args.mask_path, args.block_size,
+               args.save_folder)
