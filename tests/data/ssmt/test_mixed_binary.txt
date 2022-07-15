@@ -1,0 +1,3 @@
+optical_t1.bmp optical_t2.bmp binary_gt.bmp
+sar_t1.tiff sar_t2.tiff binary_gt.bmp
+multispectral_t1.tif multispectral_t2.tif binary_gt.bmp

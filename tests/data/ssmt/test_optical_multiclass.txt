@@ -1,0 +1,2 @@
+optical_t1.bmp optical_t2.bmp multiclass_gt.png
+optical_t1.bmp optical_t2.bmp multiclass_gt2.png

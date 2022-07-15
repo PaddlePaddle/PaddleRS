@@ -1,0 +1,1 @@
+optical_t1.bmp optical_t2.bmp binary_gt.bmp

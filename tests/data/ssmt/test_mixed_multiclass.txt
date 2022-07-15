@@ -1,0 +1,6 @@
+optical_t1.bmp optical_t2.bmp multiclass_gt.png
+sar_t1.tiff sar_t2.tiff multiclass_gt.png
+multispectral_t1.tif multispectral_t2.tif multiclass_gt.png
+optical_t1.bmp optical_t2.bmp multiclass_gt2.png
+sar_t1.tiff sar_t2.tiff multiclass_gt2.png
+multispectral_t1.tif multispectral_t2.tif multiclass_gt2.png

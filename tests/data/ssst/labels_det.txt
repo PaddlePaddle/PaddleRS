@@ -1,0 +1,3 @@
+ship
+plane
+submarine
