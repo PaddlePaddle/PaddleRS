@@ -122,6 +122,7 @@ class Transform(object):
 class DecodeImg(Transform):
     """
     Decode image(s) in input.
+    
     Args:
         to_rgb (bool, optional): If True, convert input images from BGR format to RGB format. Defaults to True.
     """

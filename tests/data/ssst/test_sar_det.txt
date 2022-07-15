@@ -1,1 +1,1 @@
-sar.tiff det_gt.xml
+sar.tiff det_gt_voc.xml

@@ -38,7 +38,7 @@ def _add_op_tests(cls):
             attr_name = 'test_' + op_name
             if hasattr(cls, attr_name):
                 continue
-            # If the operator cannot be initialized with default parameters, skip it
+            # If the operator cannot be initialized with default parameters, skip it.
             for key, param in inspect.signature(
                     op_class.__init__).parameters.items():
                 if key == 'self':
@@ -165,6 +165,9 @@ class TestTransform(CpuCommonTest):
                 'data/ssst/test_multispectral_det.txt',
                 prefix='./data/ssst',
                 label_list='data/ssst/labels_det.txt'), 
+            build_input_from_file(
+                'data/ssst/test_det_coco.txt',
+                prefix='./data/ssst'), 
             build_input_from_file(
                 'data/ssmt/test_mixed_binary.txt',
                 prefix='./data/ssmt'), 

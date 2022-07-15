@@ -17,7 +17,7 @@ import re
 import imghdr
 import platform
 from collections import OrderedDict
-from functools import partial
+from functools import partial, wraps
 
 import numpy as np
 
@@ -51,6 +51,22 @@ def is_pic(im_path):
 def get_full_path(p, prefix=''):
     p = norm_path(p)
     return osp.join(prefix, p)
+
+
+def silent(func):
+    def _do_nothing(*args, **kwargs):
+        pass
+
+    @wraps(func)
+    def _wrapper(*args, **kwargs):
+        import builtins
+        print = builtins.print
+        builtins.print = _do_nothing
+        ret = func(*args, **kwargs)
+        builtins.print = print
+        return ret
+
+    return _wrapper
 
 
 class ConstrSample(object):
@@ -235,6 +251,7 @@ class ConstrDetSample(ConstrSample):
         self.ct += 1
         return {'image': im_path, ** im_info, ** label_info}
 
+    @silent
     def _parse_coco_files(self, im_dir, ann_path):
         from pycocotools.coco import COCO
 
