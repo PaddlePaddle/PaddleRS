@@ -62,32 +62,35 @@ def _get_match_img(raster, bands):
 
 
 @time_it
-def match(im1_path, im2_path, im1_bands=[1, 2, 3], im2_bands=[1, 2, 3]):
+def match(im1_path,
+          im2_path,
+          save_path,
+          im1_bands=[1, 2, 3],
+          im2_bands=[1, 2, 3]):
     im1_ras = Raster(im1_path)
     im2_ras = Raster(im2_path)
     im1 = _get_match_img(im1_ras._src_data, im1_bands)
     im2 = _get_match_img(im2_ras._src_data, im2_bands)
     H = _calcu_tf(im1, im2)
-    # test
-    # im2_t = cv2.warpPerspective(im2, H, (im1.shape[1], im1.shape[0]))
-    # cv2.imwrite("B_M.png", cv2.cvtColor(im2_t, cv2.COLOR_RGB2BGR))
     im2_arr_t = cv2.warpPerspective(im2_ras.getArray(), H,
                                     (im1_ras.width, im1_ras.height))
-    save_path = im2_ras.path.replace(("." + im2_ras.ext_type), "_M.tif")
     save_geotiff(im2_arr_t, save_path, im1_ras.proj, im1_ras.geot,
                  im1_ras.datatype)
 
 
 parser = argparse.ArgumentParser(description="input parameters")
-parser.add_argument("--im1_path", type=str, required=True, \
+parser.add_argument('--im1_path', type=str, required=True, \
                     help="Path of time1 image (with geoinfo).")
-parser.add_argument("--im2_path", type=str, required=True, \
+parser.add_argument('--im2_path', type=str, required=True, \
                     help="Path of time2 image.")
-parser.add_argument("--im1_bands", type=int, nargs="+", default=[1, 2, 3], \
-                    help="Bands of im1 to be used for matching, RGB or monochrome. `[1, 2, 3]` is the default value.")
-parser.add_argument("--im2_bands", type=int, nargs="+", default=[1, 2, 3], \
-                    help="Bands of im2 to be used for matching, RGB or monochrome. `[1, 2, 3]` is the default value.")
+parser.add_argument('--save_path', type=str, required=True, \
+                    help="Path to save matching result.")
+parser.add_argument('--im1_bands', type=int, nargs="+", default=[1, 2, 3], \
+                    help="Bands of im1 to be used for matching, RGB or monochrome. The default value is [1, 2, 3].")
+parser.add_argument('--im2_bands', type=int, nargs="+", default=[1, 2, 3], \
+                    help="Bands of im2 to be used for matching, RGB or monochrome. The default value is [1, 2, 3].")
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    match(args.im1_path, args.im2_path, args.im1_bands, args.im2_bands)
+    match(args.im1_path, args.im2_path, args.save_path, args.im1_bands,
+          args.im2_bands)

@@ -53,15 +53,15 @@ class Raster:
                  band_list: Union[List[int], Tuple[int], None]=None,
                  to_uint8: bool=False) -> None:
         """
-        Class of read raster.
+        Class of raster reader.
         
         Args:
-            path (Optional[str]): The path of raster.
-            gdal_obj (Optional[Any], optional): The object of GDAL. Defaults to None.
+            path (Optional[str]): Path of raster file.
+            gdal_obj (Optional[Any], optional): GDAL dataset. Defaults to None.
             band_list (Union[List[int], Tuple[int], None], optional): 
-                band list (start with 1) or None (all of bands). Defaults to None.
+                Select a set of bands (the band index starts from 1) or None (read all bands). Defaults to None.
             to_uint8 (bool, optional): 
-                Convert uint8 or return raw data. Defaults to False.
+                Whether to convert data type to uint8. Defaults to False.
         """
         super(Raster, self).__init__()
         if path is not None:
@@ -93,11 +93,11 @@ class Raster:
 
     def setBands(self, band_list: Union[List[int], Tuple[int], None]) -> None:
         """ 
-        Set band of data.
+        Set bands of data.
         
         Args:
             band_list (Union[List[int], Tuple[int], None]): 
-                band list (start with 1) or None (all of bands).
+                Select a set of bands (the band index starts from 1) or None (read all bands). Defaults to None.
         """
         if band_list is not None:
             if len(band_list) > self.bands:
@@ -114,11 +114,11 @@ class Raster:
                  block_size: Union[List[int], Tuple[int, int]]=[512, 512]
                  ) -> np.ndarray:
         """ 
-        Get ndarray data 
+        Fetch data in a ndarray.
         
         Args:
             start_loc (Union[List[int], Tuple[int], None], optional): 
-                Coordinates of the upper left corner of the block, if None means return full image.
+                Coordinates of the upper left corner of the block. None value means returning full image.
             block_size (Union[List[int], Tuple[int]], optional): 
                 Block size. Defaults to [512, 512].
 

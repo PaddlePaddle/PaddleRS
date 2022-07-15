@@ -28,12 +28,12 @@ def _calc_window_tf(geot, loc):
 
 
 @time_it
-def split_data(image_path, mask_path, block_size, save_folder):
-    if not osp.exists(save_folder):
-        os.makedirs(save_folder)
-        os.makedirs(osp.join(save_folder, "images"))
-        if mask_path is not None:
-            os.makedirs(osp.join(save_folder, "masks"))
+def split_data(image_path, mask_path, block_size, save_dir):
+    if not osp.exists(save_dir):
+        os.makedirs(save_dir)
+    os.makedirs(osp.join(save_dir, "images"))
+    if mask_path is not None:
+        os.makedirs(osp.join(save_dir, "masks"))
     image_name, image_ext = image_path.replace("\\",
                                                "/").split("/")[-1].split(".")
     image = Raster(image_path)
@@ -51,7 +51,7 @@ def split_data(image_path, mask_path, block_size, save_folder):
                 loc_start = (c * block_size, r * block_size)
                 image_title = image.getArray(loc_start,
                                              (block_size, block_size))
-                image_save_path = osp.join(save_folder, "images", (
+                image_save_path = osp.join(save_dir, "images", (
                     image_name + "_" + str(r) + "_" + str(c) + "." + image_ext))
                 window_geotf = _calc_window_tf(image.geot, loc_start)
                 save_geotiff(image_title, image_save_path, image.proj,
@@ -59,7 +59,7 @@ def split_data(image_path, mask_path, block_size, save_folder):
                 if mask is not None:
                     mask_title = mask.getArray(loc_start,
                                                (block_size, block_size))
-                    mask_save_path = osp.join(save_folder, "masks",
+                    mask_save_path = osp.join(save_dir, "masks",
                                               (image_name + "_" + str(r) + "_" +
                                                str(c) + "." + image_ext))
                     save_geotiff(mask_title, mask_save_path, image.proj,
@@ -69,15 +69,14 @@ def split_data(image_path, mask_path, block_size, save_folder):
 
 parser = argparse.ArgumentParser(description="input parameters")
 parser.add_argument("--image_path", type=str, required=True, \
-                    help="The path of big image data.")
+                    help="Path of input image.")
 parser.add_argument("--mask_path", type=str, default=None, \
-                    help="The path of big image label data.")
+                    help="Path of input labels.")
 parser.add_argument("--block_size", type=int, default=512, \
-                    help="The size of image block, `512` is the default.")
-parser.add_argument("--save_folder", type=str, default="dataset", \
-                    help="The folder path to save the results, `dataset` is the default.")
+                    help="Size of image block. Default value is 512.")
+parser.add_argument("--save_dir", type=str, default="dataset", \
+                    help="Directory to save the results. Default value is `dataset`.")
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    split_data(args.image_path, args.mask_path, args.block_size,
-               args.save_folder)
+    split_data(args.image_path, args.mask_path, args.block_size, args.save_dir)

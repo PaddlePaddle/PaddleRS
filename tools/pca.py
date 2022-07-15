@@ -47,9 +47,9 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--im_path", type=str, required=True, \
                     help="Path of HSIs image.")
 parser.add_argument("--save_dir", type=str, default="output", \
-                    help="Directory to save PCA params(*.joblib). Default: `output`.")
+                    help="Directory to save PCA params(*.joblib). Default: output.")
 parser.add_argument("--dim", type=int, default=3, \
-                    help="Dimension to reduce to. Default: `3`.")
+                    help="Dimension to reduce to. Default: 3.")
 
 if __name__ == "__main__":
     args = parser.parse_args()

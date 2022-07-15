@@ -59,7 +59,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--im_path", type=str, required=True, \
                     help="Path of HSIs image.")
 parser.add_argument("--topk", type=int, default=5, \
-                    help="Number of top results. `5` is the default value.")
+                    help="Number of top results. The default value is 5.")
 
 if __name__ == "__main__":
     args = parser.parse_args()

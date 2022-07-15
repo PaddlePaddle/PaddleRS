@@ -16,11 +16,22 @@
 
 import unittest
 import warnings
+import subprocess
 
 import numpy as np
 import paddle
 
-__all__ = ['CommonTest', 'CpuCommonTest']
+__all__ = ['CommonTest', 'CpuCommonTest', 'run_script']
+
+
+def run_script(cmd, silent=True, wd=None):
+    # XXX: This function is not safe!!!
+    cfg = dict(check=True, shell=True)
+    if silent:
+        cfg['stdout'] = subprocess.DEVNULL
+    if wd is not None:
+        cmd = f"cd {wd} && {cmd}"
+    return subprocess.run(cmd, **cfg)
 
 
 # Assume all elements has same data type
@@ -140,7 +151,8 @@ class _CommonTestNamespace:
                                rtol=1.e-5,
                                atol=1.e-8):
             '''
-                Check whether result and expected result are equal, including shape. 
+            Check whether result and expected result are equal, including shape. 
+            
             Args:
                 result: str, int, bool, set, np.ndarray.
                     The result needs to be checked.
@@ -159,7 +171,8 @@ class _CommonTestNamespace:
                                    rtol=1.e-5,
                                    atol=1.e-8):
             '''
-                Check whether result and expected result are not equal, including shape. 
+            Check whether result and expected result are not equal, including shape. 
+
             Args:
                 result: str, int, bool, set, np.ndarray.
                     The result needs to be checked.
