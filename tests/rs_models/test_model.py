@@ -15,75 +15,80 @@
 import paddle
 import numpy as np
 
-from test_utils import CommonTest
+from testing_utils import CommonTest
 
 
-class TestModel(CommonTest):
-    MODEL_CLASS = None
-    DEFAULT_HW = (256, 256)
-    DEFAULT_BATCH_SIZE = 2
+class _TestModelNamespace:
+    class TestModel(CommonTest):
+        MODEL_CLASS = None
+        DEFAULT_HW = (256, 256)
+        DEFAULT_BATCH_SIZE = 2
 
-    def setUp(self):
-        self.set_specs()
-        self.set_inputs()
-        self.set_targets()
-        self.set_models()
+        def setUp(self):
+            self.set_specs()
+            self.set_inputs()
+            self.set_targets()
+            self.set_models()
 
-    def test_forward(self):
-        for i, (input, model, target
-                ) in enumerate(zip(self.inputs, self.models, self.targets)):
-            with self.subTest(i=i):
-                output = model(input)
-                self.check_output(output, target)
+        def test_forward(self):
+            for i, (
+                    input, model, target
+            ) in enumerate(zip(self.inputs, self.models, self.targets)):
+                with self.subTest(i=i):
+                    output = model(input)
+                    self.check_output(output, target)
 
-    def check_output(self, output, target):
-        pass
+        def check_output(self, output, target):
+            pass
 
-    def set_specs(self):
-        self.specs = []
+        def set_specs(self):
+            self.specs = []
 
-    def set_models(self):
-        self.models = (self.build_model(spec) for spec in self.specs)
+        def set_models(self):
+            self.models = (self.build_model(spec) for spec in self.specs)
 
-    def set_inputs(self):
-        self.inputs = []
+        def set_inputs(self):
+            self.inputs = []
 
-    def set_targets(self):
-        self.targets = []
+        def set_targets(self):
+            self.targets = []
 
-    def build_model(self, spec):
-        if '_phase' in spec:
-            phase = spec.pop('_phase')
-        else:
-            phase = 'train'
-        if '_stop_grad' in spec:
-            stop_grad = spec.pop('_stop_grad')
-        else:
-            stop_grad = False
+        def build_model(self, spec):
+            if '_phase' in spec:
+                phase = spec.pop('_phase')
+            else:
+                phase = 'train'
+            if '_stop_grad' in spec:
+                stop_grad = spec.pop('_stop_grad')
+            else:
+                stop_grad = False
 
-        model = self.MODEL_CLASS(**spec)
+            model = self.MODEL_CLASS(**spec)
 
-        if phase == 'train':
-            model.train()
-        elif phase == 'eval':
-            model.eval()
-            if stop_grad:
-                for p in model.parameters():
-                    p.stop_gradient = True
+            if phase == 'train':
+                model.train()
+            elif phase == 'eval':
+                model.eval()
+                if stop_grad:
+                    for p in model.parameters():
+                        p.stop_gradient = True
 
-        return model
+            return model
 
-    def get_shape(self, c, b=None, h=None, w=None):
-        if h is None or w is None:
-            h, w = self.DEFAULT_HW
-        if b is None:
-            b = self.DEFAULT_BATCH_SIZE
-        return (b, c, h, w)
+        def get_shape(self, c, b=None, h=None, w=None):
+            if h is None or w is None:
+                h, w = self.DEFAULT_HW
+            if b is None:
+                b = self.DEFAULT_BATCH_SIZE
+            return (b, c, h, w)
 
-    def get_zeros_array(self, c, b=None, h=None, w=None):
-        shape = self.get_shape(c, b, h, w)
-        return np.zeros(shape)
+        def get_zeros_array(self, c, b=None, h=None, w=None):
+            shape = self.get_shape(c, b, h, w)
+            return np.zeros(shape)
 
-    def get_randn_tensor(self, c, b=None, h=None, w=None):
-        shape = self.get_shape(c, b, h, w)
-        return paddle.randn(shape)
+        def get_randn_tensor(self, c, b=None, h=None, w=None):
+            shape = self.get_shape(c, b, h, w)
+            return paddle.randn(shape)
+
+
+TestModel = _TestModelNamespace.TestModel
