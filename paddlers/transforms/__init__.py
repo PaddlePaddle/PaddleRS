@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from .operators import *
-from .batch_operators import BatchRandomResize, BatchRandomResizeByShort, _BatchPadding
+from .batch_operators import BatchRandomResize, BatchRandomResizeByShort, _BatchPad
 from paddlers import transforms as T
 
 

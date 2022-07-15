@@ -32,12 +32,12 @@ from joblib import load
 import paddlers
 from .functions import normalize, horizontal_flip, permute, vertical_flip, center_crop, is_poly, \
     horizontal_flip_poly, horizontal_flip_rle, vertical_flip_poly, vertical_flip_rle, crop_poly, \
-    crop_rle, expand_poly, expand_rle, resize_poly, resize_rle, de_haze, select_bands, \
+    crop_rle, expand_poly, expand_rle, resize_poly, resize_rle, dehaze, select_bands, \
     to_intensity, to_uint8, img_flip, img_simple_rotate
 
 __all__ = [
     "Compose",
-    "ImgDecoder",
+    "DecodeImg",
     "Resize",
     "RandomResize",
     "ResizeByShort",
@@ -50,19 +50,19 @@ __all__ = [
     "RandomCrop",
     "RandomScaleAspect",
     "RandomExpand",
-    "Padding",
+    "Pad",
     "MixupImage",
     "RandomDistort",
     "RandomBlur",
     "RandomSwap",
-    "Defogging",
-    "DimReducing",
-    "BandSelecting",
+    "Dehaze",
+    "ReduceDim",
+    "SelectBand",
     "ArrangeSegmenter",
     "ArrangeChangeDetector",
     "ArrangeClassifier",
     "ArrangeDetector",
-    "RandomFlipOrRotation",
+    "RandomFlipOrRotate",
 ]
 
 interp_dict = {
@@ -119,7 +119,7 @@ class Transform(object):
         return sample
 
 
-class ImgDecoder(Transform):
+class DecodeImg(Transform):
     """
     Decode image(s) in input.
     Args:
@@ -127,7 +127,7 @@ class ImgDecoder(Transform):
     """
 
     def __init__(self, to_rgb=True, to_uint8=True):
-        super(ImgDecoder, self).__init__()
+        super(DecodeImg, self).__init__()
         self.to_rgb = to_rgb
         self.to_uint8 = to_uint8
 
@@ -254,7 +254,7 @@ class Compose(Transform):
                 'Length of transforms must not be less than 1, but received is {}'
                 .format(len(transforms)))
         self.transforms = transforms
-        self.decode_image = ImgDecoder(to_uint8=to_uint8)
+        self.decode_image = DecodeImg(to_uint8=to_uint8)
         self.arrange_outputs = None
         self.apply_im_only = False
 
@@ -544,7 +544,7 @@ class ResizeByLong(Transform):
         return sample
 
 
-class RandomFlipOrRotation(Transform):
+class RandomFlipOrRotate(Transform):
     """
     Flip or Rotate an image in different ways with a certain probability.
 
@@ -561,7 +561,7 @@ class RandomFlipOrRotation(Transform):
 
         # 定义数据增强
         train_transforms = T.Compose([
-            T.RandomFlipOrRotation(
+            T.RandomFlipOrRotate(
                 probs  = [0.3, 0.2]             # 进行flip增强的概率是0.3，进行rotate增强的概率是0.2，不变的概率是0.5
                 probsf = [0.3, 0.25, 0, 0, 0]   # flip增强时，使用水平flip、垂直flip的概率分别是0.3、0.25，水平且垂直flip、对角线flip、反对角线flip概率均为0，不变的概率是0.45
                 probsr = [0, 0.65, 0]),         # rotate增强时，顺时针旋转90度的概率是0，顺时针旋转180度的概率是0.65，顺时针旋转90度的概率是0，不变的概率是0.35
@@ -574,7 +574,7 @@ class RandomFlipOrRotation(Transform):
                  probs=[0.35, 0.25],
                  probsf=[0.3, 0.3, 0.2, 0.1, 0.1],
                  probsr=[0.25, 0.5, 0.25]):
-        super(RandomFlipOrRotation, self).__init__()
+        super(RandomFlipOrRotate, self).__init__()
         # Change various probabilities into probability intervals, to judge in which mode to flip or rotate
         self.probs = [probs[0], probs[0] + probs[1]]
         self.probsf = self.get_probs_range(probsf)
@@ -1092,7 +1092,7 @@ class RandomExpand(Transform):
         label_padding_value(int, optional): Filling value for the mask. Defaults to 255.
 
     See Also:
-        paddlers.transforms.Padding
+        paddlers.transforms.Pad
     """
 
     def __init__(self,
@@ -1120,7 +1120,7 @@ class RandomExpand(Transform):
                 x = np.random.randint(0, w - im_w)
                 target_size = (h, w)
                 offsets = (x, y)
-                sample = Padding(
+                sample = Pad(
                     target_size=target_size,
                     pad_mode=-1,
                     offsets=offsets,
@@ -1129,7 +1129,7 @@ class RandomExpand(Transform):
         return sample
 
 
-class Padding(Transform):
+class Pad(Transform):
     def __init__(self,
                  target_size=None,
                  pad_mode=0,
@@ -1148,7 +1148,7 @@ class Padding(Transform):
             label_padding_value(int, optional): Filling value for the mask. Defaults to 255.
             size_divisor(int): Image width and height after padding is a multiple of coarsest_stride.
         """
-        super(Padding, self).__init__()
+        super(Pad, self).__init__()
         if isinstance(target_size, (list, tuple)):
             if len(target_size) != 2:
                 raise ValueError(
@@ -1525,20 +1525,20 @@ class RandomBlur(Transform):
         return sample
 
 
-class Defogging(Transform):
+class Dehaze(Transform):
     """
-    Defog input image(s).
+    Dehaze input image(s).
 
     Args: 
         gamma (bool, optional): Use gamma correction or not. Defaults to False.
     """
 
     def __init__(self, gamma=False):
-        super(Defogging, self).__init__()
+        super(Dehaze, self).__init__()
         self.gamma = gamma
 
     def apply_im(self, image):
-        image = de_haze(image, self.gamma)
+        image = dehaze(image, self.gamma)
         return image
 
     def apply(self, sample):
@@ -1548,19 +1548,20 @@ class Defogging(Transform):
         return sample
 
 
-class DimReducing(Transform):
+class ReduceDim(Transform):
     """
-    Use PCA to reduce input image(s) dimension.
+    Use PCA to reduce the dimension of input image(s).
 
     Args: 
-        joblib_path (str): Path of *.joblib about PCA.
+        joblib_path (str): Path of *.joblib file of PCA.
     """
 
     def __init__(self, joblib_path):
-        super(DimReducing, self).__init__()
+        super(ReduceDim, self).__init__()
         ext = joblib_path.split(".")[-1]
         if ext != "joblib":
-            raise ValueError("`joblib_path` must be *.joblib, not *.{}.".format(ext))
+            raise ValueError("`joblib_path` must be *.joblib, not *.{}.".format(
+                ext))
         self.pca = load(joblib_path)
 
     def apply_im(self, image):
@@ -1577,16 +1578,16 @@ class DimReducing(Transform):
         return sample
 
 
-class BandSelecting(Transform):
+class SelectBand(Transform):
     """
-    Select the band of the input image(s).
+    Select a set of bands of input image(s).
 
     Args: 
-        band_list (list, optional): Bands of selected (Start with 1). Defaults to [1, 2, 3].
+        band_list (list, optional): Bands to select (the band index starts with 1). Defaults to [1, 2, 3].
     """
 
     def __init__(self, band_list=[1, 2, 3]):
-        super(BandSelecting, self).__init__()
+        super(SelectBand, self).__init__()
         self.band_list = band_list
 
     def apply_im(self, image):

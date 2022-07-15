@@ -29,7 +29,7 @@ import paddlers.custom_models.cd as cmcd
 import paddlers.utils.logging as logging
 import paddlers.models.ppseg as paddleseg
 from paddlers.transforms import arrange_transforms
-from paddlers.transforms import ImgDecoder, Resize
+from paddlers.transforms import DecodeImg, Resize
 from paddlers.utils import get_single_card_bs, DisablePrint
 from paddlers.utils.checkpoint import seg_pretrain_weights_dict
 from .base import BaseModel
@@ -546,7 +546,12 @@ class BaseChangeDetector(BaseModel):
             }
         return prediction
 
-    def slider_predict(self, img_file, save_dir, block_size, overlap=36, transforms=None):
+    def slider_predict(self,
+                       img_file,
+                       save_dir,
+                       block_size,
+                       overlap=36,
+                       transforms=None):
         """
         Do inference.
         Args:
@@ -566,7 +571,7 @@ class BaseChangeDetector(BaseModel):
             from osgeo import gdal
         except:
             import gdal
-        
+
         if len(img_file) != 2:
             raise ValueError("`img_file` must be a list of length 2.")
         if isinstance(block_size, int):
@@ -574,13 +579,15 @@ class BaseChangeDetector(BaseModel):
         elif isinstance(block_size, (tuple, list)) and len(block_size) == 2:
             block_size = tuple(block_size)
         else:
-            raise ValueError("`block_size` must be a tuple/list of length 2 or an integer.")
+            raise ValueError(
+                "`block_size` must be a tuple/list of length 2 or an integer.")
         if isinstance(overlap, int):
             overlap = (overlap, overlap)
         elif isinstance(overlap, (tuple, list)) and len(overlap) == 2:
             overlap = tuple(overlap)
         else:
-            raise ValueError("`overlap` must be a tuple/list of length 2 or an integer.")
+            raise ValueError(
+                "`overlap` must be a tuple/list of length 2 or an integer.")
 
         src1_data = gdal.Open(img_file[0])
         src2_data = gdal.Open(img_file[1])
@@ -589,7 +596,8 @@ class BaseChangeDetector(BaseModel):
         bands = src1_data.RasterCount
 
         driver = gdal.GetDriverByName("GTiff")
-        file_name = osp.splitext(osp.normpath(img_file[0]).split(os.sep)[-1])[0] + ".tif"
+        file_name = osp.splitext(osp.normpath(img_file[0]).split(os.sep)[-1])[
+            0] + ".tif"
         if not osp.exists(save_dir):
             os.makedirs(save_dir)
         save_file = osp.join(save_dir, file_name)
@@ -607,17 +615,21 @@ class BaseChangeDetector(BaseModel):
                     xsize = int(width - xoff)
                 if yoff + ysize > height:
                     ysize = int(height - yoff)
-                im1 = src1_data.ReadAsArray(int(xoff), int(yoff), xsize, ysize).transpose((1, 2, 0))
-                im2 = src2_data.ReadAsArray(int(xoff), int(yoff), xsize, ysize).transpose((1, 2, 0))
+                im1 = src1_data.ReadAsArray(
+                    int(xoff), int(yoff), xsize, ysize).transpose((1, 2, 0))
+                im2 = src2_data.ReadAsArray(
+                    int(xoff), int(yoff), xsize, ysize).transpose((1, 2, 0))
                 # fill
                 h, w = im1.shape[:2]
-                im1_fill = np.zeros((block_size[1], block_size[0], bands), dtype=im1.dtype)
+                im1_fill = np.zeros(
+                    (block_size[1], block_size[0], bands), dtype=im1.dtype)
                 im2_fill = im1_fill.copy()
                 im1_fill[:h, :w, :] = im1
                 im2_fill[:h, :w, :] = im2
                 im_fill = (im1_fill, im2_fill)
                 # predict
-                pred = self.predict(im_fill, transforms)["label_map"].astype("uint8")
+                pred = self.predict(im_fill,
+                                    transforms)["label_map"].astype("uint8")
                 # overlap
                 rd_block = band.ReadAsArray(int(xoff), int(yoff), xsize, ysize)
                 mask = (rd_block == pred[:h, :w]) | (rd_block == 255)
@@ -637,7 +649,7 @@ class BaseChangeDetector(BaseModel):
             sample = {'image_t1': im1, 'image_t2': im2}
             if isinstance(sample['image_t1'], str) or \
                 isinstance(sample['image_t2'], str):
-                sample = ImgDecoder(to_rgb=False)(sample)
+                sample = DecodeImg(to_rgb=False)(sample)
                 ori_shape = sample['image'].shape[:2]
             else:
                 ori_shape = im1.shape[:2]
@@ -679,7 +691,7 @@ class BaseChangeDetector(BaseModel):
                     scale = float(op.long_size) / float(im_long_size)
                     h = int(round(h * scale))
                     w = int(round(w * scale))
-                elif op.__class__.__name__ == 'Padding':
+                elif op.__class__.__name__ == 'Pad':
                     if op.target_size:
                         target_h, target_w = op.target_size
                     else:

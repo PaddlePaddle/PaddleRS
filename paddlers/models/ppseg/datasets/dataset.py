@@ -49,7 +49,7 @@ class Dataset(paddle.io.Dataset):
             import paddlers.models.ppseg.transforms as T
             from paddlers.models.ppseg.datasets import Dataset
 
-            transforms = [T.RandomPaddingCrop(crop_size=(512,512)), T.Normalize()]
+            transforms = [T.RandomPadCrop(crop_size=(512,512)), T.Normalize()]
             dataset_root = 'dataset_root_path'
             train_path = 'train_path'
             num_classes = 2

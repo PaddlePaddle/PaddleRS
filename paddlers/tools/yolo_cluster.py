@@ -28,6 +28,7 @@ class BaseAnchorCluster(object):
     def __init__(self, num_anchors, cache, cache_path):
         """
         Base Anchor Cluster
+        
         Args:
             num_anchors (int): number of clusters
             cache (bool): whether using cache

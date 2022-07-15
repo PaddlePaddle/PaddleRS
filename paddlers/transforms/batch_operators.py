@@ -149,9 +149,9 @@ class BatchRandomResizeByShort(Transform):
         return samples
 
 
-class _BatchPadding(Transform):
+class _BatchPad(Transform):
     def __init__(self, pad_to_stride=0):
-        super(_BatchPadding, self).__init__()
+        super(_BatchPad, self).__init__()
         self.pad_to_stride = pad_to_stride
 
     def __call__(self, samples):

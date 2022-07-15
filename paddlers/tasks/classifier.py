@@ -33,7 +33,7 @@ from paddlers.models.ppcls.metric import build_metrics
 from paddlers.models.ppcls.loss import build_loss
 from paddlers.models.ppcls.data.postprocess import build_postprocess
 from paddlers.utils.checkpoint import cls_pretrain_weights_dict
-from paddlers.transforms import ImgDecoder, Resize
+from paddlers.transforms import DecodeImg, Resize
 
 __all__ = [
     "ResNet50_vd", "MobileNetV3_small_x1_0", "HRNet_W18_C", "CondenseNetV2_b"
@@ -467,7 +467,7 @@ class BaseClassifier(BaseModel):
         for im in images:
             sample = {'image': im}
             if isinstance(sample['image'], str):
-                sample = ImgDecoder(to_rgb=False)(sample)
+                sample = DecodeImg(to_rgb=False)(sample)
             ori_shape = sample['image'].shape[:2]
             im = transforms(sample)
             batch_im.append(im)
@@ -504,7 +504,7 @@ class BaseClassifier(BaseModel):
                     scale = float(op.long_size) / float(im_long_size)
                     h = int(round(h * scale))
                     w = int(round(w * scale))
-                elif op.__class__.__name__ == 'Padding':
+                elif op.__class__.__name__ == 'Pad':
                     if op.target_size:
                         target_h, target_w = op.target_size
                     else:

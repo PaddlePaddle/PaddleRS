@@ -27,9 +27,9 @@ import paddlers.models.ppdet as ppdet
 from paddlers.models.ppdet.modeling.proposal_generator.target_layer import BBoxAssigner, MaskAssigner
 import paddlers
 import paddlers.utils.logging as logging
-from paddlers.transforms.operators import _NormalizeBox, _PadBox, _BboxXYXY2XYWH, Resize, Padding
+from paddlers.transforms.operators import _NormalizeBox, _PadBox, _BboxXYXY2XYWH, Resize, Pad
 from paddlers.transforms.batch_operators import BatchCompose, BatchRandomResize, BatchRandomResizeByShort, \
-    _BatchPadding, _Gt2YoloTarget
+    _BatchPad, _Gt2YoloTarget
 from paddlers.transforms import arrange_transforms
 from .base import BaseModel
 from .utils.det_metrics import VOCMetric, COCOMetric
@@ -757,7 +757,7 @@ class PicoDet(BaseDetector):
             model_name='PicoDet', num_classes=num_classes, **params)
 
     def _compose_batch_transform(self, transforms, mode='train'):
-        default_batch_transforms = [_BatchPadding(pad_to_stride=32)]
+        default_batch_transforms = [_BatchPad(pad_to_stride=32)]
         if mode == 'eval':
             collate_batch = True
         else:
@@ -1005,7 +1005,7 @@ class YOLOv3(BaseDetector):
     def _compose_batch_transform(self, transforms, mode='train'):
         if mode == 'train':
             default_batch_transforms = [
-                _BatchPadding(pad_to_stride=-1), _NormalizeBox(),
+                _BatchPad(pad_to_stride=-1), _NormalizeBox(),
                 _PadBox(getattr(self, 'num_max_boxes', 50)), _BboxXYXY2XYWH(),
                 _Gt2YoloTarget(
                     anchor_masks=self.anchor_masks,
@@ -1015,7 +1015,7 @@ class YOLOv3(BaseDetector):
                     num_classes=self.num_classes)
             ]
         else:
-            default_batch_transforms = [_BatchPadding(pad_to_stride=-1)]
+            default_batch_transforms = [_BatchPad(pad_to_stride=-1)]
         if mode == 'eval' and self.metric == 'voc':
             collate_batch = False
         else:
@@ -1362,11 +1362,11 @@ class FasterRCNN(BaseDetector):
     def _compose_batch_transform(self, transforms, mode='train'):
         if mode == 'train':
             default_batch_transforms = [
-                _BatchPadding(pad_to_stride=32 if self.with_fpn else -1)
+                _BatchPad(pad_to_stride=32 if self.with_fpn else -1)
             ]
         else:
             default_batch_transforms = [
-                _BatchPadding(pad_to_stride=32 if self.with_fpn else -1)
+                _BatchPad(pad_to_stride=32 if self.with_fpn else -1)
             ]
         custom_batch_transforms = []
         for i, op in enumerate(transforms.transforms):
@@ -1408,7 +1408,7 @@ class FasterRCNN(BaseDetector):
                 self.test_transforms.transforms[resize_op_idx] = Resize(
                     target_size=image_shape, keep_ratio=True, interp='CUBIC')
             self.test_transforms.transforms.append(
-                Padding(im_padding_value=[0., 0., 0.]))
+                Pad(im_padding_value=[0., 0., 0.]))
 
     def _get_test_inputs(self, image_shape):
         if image_shape is not None:
@@ -1418,7 +1418,7 @@ class FasterRCNN(BaseDetector):
             image_shape = [None, 3, -1, -1]
             if self.with_fpn:
                 self.test_transforms.transforms.append(
-                    Padding(im_padding_value=[0., 0., 0.]))
+                    Pad(im_padding_value=[0., 0., 0.]))
 
         self.fixed_input_shape = image_shape
         return self._define_input_spec(image_shape)
@@ -2187,11 +2187,11 @@ class MaskRCNN(BaseDetector):
     def _compose_batch_transform(self, transforms, mode='train'):
         if mode == 'train':
             default_batch_transforms = [
-                _BatchPadding(pad_to_stride=32 if self.with_fpn else -1)
+                _BatchPad(pad_to_stride=32 if self.with_fpn else -1)
             ]
         else:
             default_batch_transforms = [
-                _BatchPadding(pad_to_stride=32 if self.with_fpn else -1)
+                _BatchPad(pad_to_stride=32 if self.with_fpn else -1)
             ]
         custom_batch_transforms = []
         for i, op in enumerate(transforms.transforms):
@@ -2233,7 +2233,7 @@ class MaskRCNN(BaseDetector):
                 self.test_transforms.transforms[resize_op_idx] = Resize(
                     target_size=image_shape, keep_ratio=True, interp='CUBIC')
             self.test_transforms.transforms.append(
-                Padding(im_padding_value=[0., 0., 0.]))
+                Pad(im_padding_value=[0., 0., 0.]))
 
     def _get_test_inputs(self, image_shape):
         if image_shape is not None:
@@ -2243,7 +2243,7 @@ class MaskRCNN(BaseDetector):
             image_shape = [None, 3, -1, -1]
             if self.with_fpn:
                 self.test_transforms.transforms.append(
-                    Padding(im_padding_value=[0., 0., 0.]))
+                    Pad(im_padding_value=[0., 0., 0.]))
         self.fixed_input_shape = image_shape
 
         return self._define_input_spec(image_shape)

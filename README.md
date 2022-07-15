@@ -92,7 +92,7 @@ PaddleRS是遥感科研院所、相关高校共同基于飞桨开发的遥感处
           <li>ResizeByShort</li>
           <li>RandomResizeByShort</li>
           <li>ResizeByLong</li>  
-          <li>RandomFlipOrRotation</li> 
+          <li>RandomFlipOrRotate</li>
           <li>RandomHorizontalFlip</li>  
           <li>RandomVerticalFlip</li>
           <li>Normalize</li>
@@ -100,13 +100,13 @@ PaddleRS是遥感科研院所、相关高校共同基于飞桨开发的遥感处
           <li>RandomCrop</li>
           <li>RandomScaleAspect</li>  
           <li>RandomExpand</li>
-          <li>Padding</li>
+          <li>Pad</li>
           <li>MixupImage</li>  
           <li>RandomDistort</li>  
           <li>RandomBlur</li>  
-          <li>Defogging</li>  
-          <li>DimReducing</li>  
-          <li>BandSelecting</li>  
+          <li>Dehaze</li>  
+          <li>ReduceDim</li>  
+          <li>SelectBand</li>  
           <li>RandomSwap</li>
         </ul>  
       </td>
@@ -223,4 +223,3 @@ PaddleRS是遥感科研院所、相关高校共同基于飞桨开发的遥感处
     year={2022}
 }
 ```
-

@@ -32,7 +32,7 @@ import paddlers.utils.logging as logging
 from .base import BaseModel
 from .utils import seg_metrics as metrics
 from paddlers.utils.checkpoint import seg_pretrain_weights_dict
-from paddlers.transforms import ImgDecoder, Resize
+from paddlers.transforms import DecodeImg, Resize
 
 __all__ = ["UNet", "DeepLabV3P", "FastSCNN", "HRNet", "BiSeNetV2", "FarSeg"]
 
@@ -519,7 +519,12 @@ class BaseSegmenter(BaseModel):
             }
         return prediction
 
-    def slider_predict(self, img_file, save_dir, block_size, overlap=36, transforms=None):
+    def slider_predict(self,
+                       img_file,
+                       save_dir,
+                       block_size,
+                       overlap=36,
+                       transforms=None):
         """
         Do inference.
         Args:
@@ -539,19 +544,21 @@ class BaseSegmenter(BaseModel):
             from osgeo import gdal
         except:
             import gdal
-        
+
         if isinstance(block_size, int):
             block_size = (block_size, block_size)
         elif isinstance(block_size, (tuple, list)) and len(block_size) == 2:
             block_size = tuple(block_size)
         else:
-            raise ValueError("`block_size` must be a tuple/list of length 2 or an integer.")
+            raise ValueError(
+                "`block_size` must be a tuple/list of length 2 or an integer.")
         if isinstance(overlap, int):
             overlap = (overlap, overlap)
         elif isinstance(overlap, (tuple, list)) and len(overlap) == 2:
             overlap = tuple(overlap)
         else:
-            raise ValueError("`overlap` must be a tuple/list of length 2 or an integer.")
+            raise ValueError(
+                "`overlap` must be a tuple/list of length 2 or an integer.")
 
         src_data = gdal.Open(img_file)
         width = src_data.RasterXSize
@@ -559,7 +566,8 @@ class BaseSegmenter(BaseModel):
         bands = src_data.RasterCount
 
         driver = gdal.GetDriverByName("GTiff")
-        file_name = osp.splitext(osp.normpath(img_file).split(os.sep)[-1])[0] + ".tif"
+        file_name = osp.splitext(osp.normpath(img_file).split(os.sep)[-1])[
+            0] + ".tif"
         if not osp.exists(save_dir):
             os.makedirs(save_dir)
         save_file = osp.join(save_dir, file_name)
@@ -577,13 +585,16 @@ class BaseSegmenter(BaseModel):
                     xsize = int(width - xoff)
                 if yoff + ysize > height:
                     ysize = int(height - yoff)
-                im = src_data.ReadAsArray(int(xoff), int(yoff), xsize, ysize).transpose((1, 2, 0))
+                im = src_data.ReadAsArray(int(xoff), int(yoff), xsize,
+                                          ysize).transpose((1, 2, 0))
                 # fill
                 h, w = im.shape[:2]
-                im_fill = np.zeros((block_size[1], block_size[0], bands), dtype=im.dtype)
+                im_fill = np.zeros(
+                    (block_size[1], block_size[0], bands), dtype=im.dtype)
                 im_fill[:h, :w, :] = im
                 # predict
-                pred = self.predict(im_fill, transforms)["label_map"].astype("uint8")
+                pred = self.predict(im_fill,
+                                    transforms)["label_map"].astype("uint8")
                 # overlap
                 rd_block = band.ReadAsArray(int(xoff), int(yoff), xsize, ysize)
                 mask = (rd_block == pred[:h, :w]) | (rd_block == 255)
@@ -602,7 +613,7 @@ class BaseSegmenter(BaseModel):
         for im in images:
             sample = {'image': im}
             if isinstance(sample['image'], str):
-                sample = ImgDecoder(to_rgb=False)(sample)
+                sample = DecodeImg(to_rgb=False)(sample)
             ori_shape = sample['image'].shape[:2]
             im = transforms(sample)[0]
             batch_im.append(im)
@@ -639,7 +650,7 @@ class BaseSegmenter(BaseModel):
                     scale = float(op.long_size) / float(im_long_size)
                     h = int(round(h * scale))
                     w = int(round(w * scale))
-                elif op.__class__.__name__ == 'Padding':
+                elif op.__class__.__name__ == 'Pad':
                     if op.target_size:
                         target_h, target_w = op.target_size
                     else:
