@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os.path as osp
 import tempfile
 import unittest.mock as mock
 
@@ -28,14 +29,18 @@ class TestPredictor(CommonTest):
 
     @staticmethod
     def add_tests(cls):
+        """
+        Automatically patch testing functions to cls.
+        """
+
         def _test_predictor(trainer_name):
             def _test_predictor_impl(self):
                 trainer_class = getattr(self.MODULE, trainer_name)
                 # Construct trainer with default parameters
                 trainer = trainer_class()
                 with tempfile.TemporaryDirectory() as td:
-                    dynamic_model_dir = f"{td}/dynamic"
-                    static_model_dir = f"{td}/static"
+                    dynamic_model_dir = osp.join(td, "dynamic")
+                    static_model_dir = osp.join(td, "static")
                     # HACK: BaseModel.save_model() requires BaseModel().optimizer to be set
                     optimizer = mock.Mock()
                     optimizer.state_dict.return_value = {'foo': 'bar'}
@@ -114,9 +119,9 @@ class TestCDPredictor(TestPredictor):
                               out_single_file_list_t[0])
 
         # Single input (ndarrays)
-        input_ = (cv2.imread(t1_path).astype('float32'),
-                  cv2.imread(t2_path).astype('float32')
-                  )  # Reuse the name `input_`
+        input_ = (
+            cv2.imread(t1_path).astype('float32'),
+            cv2.imread(t2_path).astype('float32'))  # Reuse the name `input_`
         out_single_array_p = predictor.predict(input_, transforms=transforms)
         self.check_dict_equal(out_single_array_p, out_single_file_p)
         out_single_array_t = trainer.predict(input_, transforms=transforms)
@@ -164,7 +169,7 @@ class TestClasPredictor(TestPredictor):
         trainer.labels = labels
         predictor._model.labels = labels
 
-        # Single input (file paths)
+        # Single input (file path)
         input_ = single_input
         out_single_file_p = predictor.predict(input_, transforms=transforms)
         out_single_file_t = trainer.predict(input_, transforms=transforms)
@@ -178,7 +183,7 @@ class TestClasPredictor(TestPredictor):
         self.check_dict_equal(out_single_file_list_p[0],
                               out_single_file_list_t[0])
 
-        # Single input (ndarrays)
+        # Single input (ndarray)
         input_ = cv2.imread(single_input).astype(
             'float32')  # Reuse the name `input_`
         out_single_array_p = predictor.predict(input_, transforms=transforms)
@@ -227,7 +232,7 @@ class TestDetPredictor(TestPredictor):
         trainer.labels = labels
         predictor._model.labels = labels
 
-        # Single input (file paths)
+        # Single input (file path)
         input_ = single_input
         out_single_file_p = predictor.predict(input_, transforms=transforms)
         out_single_file_t = trainer.predict(input_, transforms=transforms)
@@ -241,23 +246,7 @@ class TestDetPredictor(TestPredictor):
         self.check_dict_equal(out_single_file_list_p[0],
                               out_single_file_list_t[0])
 
-        # Single input (ndarrays)
-        input_ = cv2.imread(single_input).astype(
-            'float32')  # Reuse the name `input_`
-        out_single_array_p = predictor.predict(input_, transforms=transforms)
-        self.check_dict_equal(out_single_array_p, out_single_file_p)
-        out_single_array_t = trainer.predict(input_, transforms=transforms)
-        self.check_dict_equal(out_single_array_p, out_single_array_t)
-        out_single_array_list_p = predictor.predict(
-            [input_], transforms=transforms)
-        self.assertEqual(len(out_single_array_list_p), 1)
-        self.check_dict_equal(out_single_array_list_p[0], out_single_array_p)
-        out_single_array_list_t = trainer.predict(
-            [input_], transforms=transforms)
-        self.check_dict_equal(out_single_array_list_p[0],
-                              out_single_array_list_t[0])
-
-        # Single input (ndarrays)
+        # Single input (ndarray)
         input_ = cv2.imread(single_input).astype(
             'float32')  # Reuse the name `input_`
         out_single_array_p = predictor.predict(input_, transforms=transforms)
@@ -303,7 +292,7 @@ class TestSegPredictor(TestPredictor):
         num_inputs = 2
         transforms = pdrs.transforms.Compose([pdrs.transforms.Normalize()])
 
-        # Single input (file paths)
+        # Single input (file path)
         input_ = single_input
         out_single_file_p = predictor.predict(input_, transforms=transforms)
         out_single_file_t = trainer.predict(input_, transforms=transforms)
@@ -317,7 +306,7 @@ class TestSegPredictor(TestPredictor):
         self.check_dict_equal(out_single_file_list_p[0],
                               out_single_file_list_t[0])
 
-        # Single input (ndarrays)
+        # Single input (ndarray)
         input_ = cv2.imread(single_input).astype(
             'float32')  # Reuse the name `input_`
         out_single_array_p = predictor.predict(input_, transforms=transforms)
