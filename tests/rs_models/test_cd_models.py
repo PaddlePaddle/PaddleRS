@@ -69,6 +69,9 @@ class TestCDModel(TestModel):
         model = super().build_model(spec)
         return _CDModelAdapter(model)
 
+    def convert_to_static(self, model, input):
+        return super().convert_to_static(model.cd_model, input)
+
 
 class TestBITModel(TestCDModel):
     MODEL_CLASS = paddlers.custom_models.cd.BIT
@@ -127,7 +130,7 @@ class TestDSAMNetModel(TestCDModel):
             dict(in_channels=8, num_classes=2), 
             dict(in_channels=3, num_classes=8), 
             dict(**base_spec, ca_ratio=4, sa_kernel=5), 
-            dict(*base_spec, _phase='eval', _stop_grad=True)
+            dict(**base_spec, _phase='eval', _stop_grad=True)
         ]
 
     def set_targets(self):

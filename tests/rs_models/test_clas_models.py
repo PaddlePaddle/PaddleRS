@@ -32,4 +32,5 @@ class TestCDModel(TestModel):
         self.inputs = _gen_data(self.specs)
 
     def set_targets(self):
-        self.targets = [[2, spec.get('num_classes', 2)] for spec in self.specs]
+        self.targets = [[self.DEFAULT_BATCH_SIZE, spec.get('num_classes', 2)]
+                        for spec in self.specs]
