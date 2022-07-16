@@ -21,9 +21,23 @@ from paddlers.tasks import load_model
 
 def get_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model_dir', '-m', type=str, default=None, help='model directory path')
-    parser.add_argument('--save_dir', '-s', type=str, default=None, help='path to save inference model')
-    parser.add_argument('--fixed_input_shape', '-fs', type=str, default=None,
+    parser.add_argument(
+        '--model_dir',
+        '-m',
+        type=str,
+        default=None,
+        help='model directory path')
+    parser.add_argument(
+        '--save_dir',
+        '-s',
+        type=str,
+        default=None,
+        help='path to save inference model')
+    parser.add_argument(
+        '--fixed_input_shape',
+        '-fs',
+        type=str,
+        default=None,
         help="export inference model with fixed input shape: [w,h] or [n,c,w,h]")
     return parser
 
@@ -39,13 +53,17 @@ if __name__ == '__main__':
         fixed_input_shape = literal_eval(args.fixed_input_shape)
         # Check validaty
         if not isinstance(fixed_input_shape, list):
-            raise ValueError("fixed_input_shape should be of None or list type.")
+            raise ValueError(
+                "fixed_input_shape should be of None or list type.")
         if len(fixed_input_shape) not in (2, 4):
-            raise ValueError("fixed_input_shape contains an incorrect number of elements.")
+            raise ValueError(
+                "fixed_input_shape contains an incorrect number of elements.")
         if fixed_input_shape[-1] <= 0 or fixed_input_shape[-2] <= 0:
-            raise ValueError("the input width and height must be positive integers.")
-        if len(fixed_input_shape)==4 and fixed_input_shape[1] <= 0:
-            raise ValueError("the number of input channels must be a positive integer.")
+            raise ValueError(
+                "Input width and height must be positive integers.")
+        if len(fixed_input_shape) == 4 and fixed_input_shape[1] <= 0:
+            raise ValueError(
+                "The number of input channels must be a positive integer.")
 
     # Set environment variables
     os.environ['PADDLEX_EXPORT_STAGE'] = 'True'

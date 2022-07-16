@@ -468,6 +468,7 @@ class BaseClassifier(BaseModel):
             sample = {'image': im}
             if isinstance(sample['image'], str):
                 sample = DecodeImg(to_rgb=False)(sample)
+                sample['image'] = sample['image'].astype('float32')
             ori_shape = sample['image'].shape[:2]
             im = transforms(sample)
             batch_im.append(im)

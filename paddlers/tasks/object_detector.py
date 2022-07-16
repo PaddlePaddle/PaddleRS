@@ -27,7 +27,7 @@ import paddlers.models.ppdet as ppdet
 from paddlers.models.ppdet.modeling.proposal_generator.target_layer import BBoxAssigner, MaskAssigner
 import paddlers
 import paddlers.utils.logging as logging
-from paddlers.transforms.operators import _NormalizeBox, _PadBox, _BboxXYXY2XYWH, Resize, Pad
+from paddlers.transforms.operators import _NormalizeBox, _PadBox, _BboxXYXY2XYWH, Resize, Pad, DecodeImg
 from paddlers.transforms.batch_operators import BatchCompose, BatchRandomResize, BatchRandomResizeByShort, \
     _BatchPad, _Gt2YoloTarget
 from paddlers.transforms import arrange_transforms
@@ -550,7 +550,11 @@ class BaseDetector(BaseModel):
         batch_samples = list()
         for im in images:
             sample = {'image': im}
-            batch_samples.append(transforms(sample))
+            if isinstance(sample['image'], str):
+                sample = DecodeImg(to_rgb=False)(sample)
+                sample['image'] = sample['image'].astype('float32')
+            sample = transforms(sample)
+            batch_samples.append(sample)
         batch_transforms = self._compose_batch_transform(transforms, 'test')
         batch_samples = batch_transforms(batch_samples)
         if to_tensor:

@@ -21,4 +21,4 @@ class TestOIF(CpuCommonTest):
     def test_script(self):
         run_script(
             f"python oif.py --im_path ../tests/data/ssst/multispectral.tif",
-            wd='../tools')
+            wd="../tools")

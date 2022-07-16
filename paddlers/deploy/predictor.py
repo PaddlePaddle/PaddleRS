@@ -175,9 +175,9 @@ class Predictor(object):
             if self._model._postprocess is None:
                 self._model.build_postprocess_from_labels(topk)
             # XXX: Convert ndarray to tensor as self._model._postprocess requires
-            net_outputs = paddle.to_tensor(net_outputs)
-            assert net_outputs.shape[1] == 1
-            outputs = self._model._postprocess(net_outputs.squeeze(1))
+            assert len(net_outputs) == 1
+            net_outputs = paddle.to_tensor(net_outputs[0])
+            outputs = self._model._postprocess(net_outputs)
             class_ids = map(itemgetter('class_ids'), outputs)
             scores = map(itemgetter('scores'), outputs)
             label_names = map(itemgetter('label_names'), outputs)

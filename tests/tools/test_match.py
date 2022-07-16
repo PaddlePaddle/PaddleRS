@@ -22,4 +22,4 @@ class TestMatch(CpuCommonTest):
         with tempfile.TemporaryDirectory() as td:
             run_script(
                 f"python match.py --im1_path ../tests/data/ssmt/multispectral_t1.tif --im2_path ../tests/data/ssmt/multispectral_t1.tif --save_path {td}/out.tiff",
-                wd='../tools')
+                wd="../tools")

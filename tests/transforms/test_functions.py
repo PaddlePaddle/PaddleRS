@@ -23,7 +23,7 @@ class TestMatchHistograms(CpuCommonTest):
     def setUp(self):
         self.inputs = [
             build_input_from_file(
-                'data/ssmt/test_mixed_binary.txt', prefix='./data/ssmt')
+                "data/ssmt/test_mixed_binary.txt", prefix="./data/ssmt")
         ]
 
     def test_output_shape(self):
@@ -43,7 +43,7 @@ class TestMatchByRegression(CpuCommonTest):
     def setUp(self):
         self.inputs = [
             build_input_from_file(
-                'data/ssmt/test_mixed_binary.txt', prefix='./data/ssmt')
+                "data/ssmt/test_mixed_binary.txt", prefix="./data/ssmt")
         ]
 
     def test_output_shape(self):

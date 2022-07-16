@@ -22,4 +22,4 @@ class TestPCA(CpuCommonTest):
         with tempfile.TemporaryDirectory() as td:
             run_script(
                 f"python pca.py --im_path ../tests/data/ssst/multispectral.tif --save_dir {td} --dim 5",
-                wd='../tools')
+                wd="../tools")

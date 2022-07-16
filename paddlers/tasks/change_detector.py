@@ -650,6 +650,8 @@ class BaseChangeDetector(BaseModel):
             if isinstance(sample['image_t1'], str) or \
                 isinstance(sample['image_t2'], str):
                 sample = DecodeImg(to_rgb=False)(sample)
+                sample['image'] = sample['image'].astype('float32')
+                sample['image2'] = sample['image2'].astype('float32')
                 ori_shape = sample['image'].shape[:2]
             else:
                 ori_shape = im1.shape[:2]

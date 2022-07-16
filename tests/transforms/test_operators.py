@@ -136,47 +136,47 @@ class TestTransform(CpuCommonTest):
     def setUp(self):
         self.inputs = [
             build_input_from_file(
-                'data/ssst/test_optical_clas.txt',
-                prefix='./data/ssst'), 
+                "data/ssst/test_optical_clas.txt",
+                prefix="./data/ssst"), 
             build_input_from_file(
-                'data/ssst/test_sar_clas.txt',
-                prefix='./data/ssst'), 
+                "data/ssst/test_sar_clas.txt",
+                prefix="./data/ssst"), 
             build_input_from_file(
-                'data/ssst/test_multispectral_clas.txt',
-                prefix='./data/ssst'), 
+                "data/ssst/test_multispectral_clas.txt",
+                prefix="./data/ssst"), 
             build_input_from_file(
-                'data/ssst/test_optical_seg.txt',
-                prefix='./data/ssst'), 
+                "data/ssst/test_optical_seg.txt",
+                prefix="./data/ssst"), 
             build_input_from_file(
-                'data/ssst/test_sar_seg.txt',
-                prefix='./data/ssst'), 
+                "data/ssst/test_sar_seg.txt",
+                prefix="./data/ssst"), 
             build_input_from_file(
-                'data/ssst/test_multispectral_seg.txt',
-                prefix='./data/ssst'),
+                "data/ssst/test_multispectral_seg.txt",
+                prefix="./data/ssst"),
             build_input_from_file(
-                'data/ssst/test_optical_det.txt',
-                prefix='./data/ssst',
-                label_list='data/ssst/labels_det.txt'), 
+                "data/ssst/test_optical_det.txt",
+                prefix="./data/ssst",
+                label_list="data/ssst/labels_det.txt"), 
             build_input_from_file(
-                'data/ssst/test_sar_det.txt',
-                prefix='./data/ssst',
-                label_list='data/ssst/labels_det.txt'),
+                "data/ssst/test_sar_det.txt",
+                prefix="./data/ssst",
+                label_list="data/ssst/labels_det.txt"),
             build_input_from_file(
-                'data/ssst/test_multispectral_det.txt',
-                prefix='./data/ssst',
-                label_list='data/ssst/labels_det.txt'), 
+                "data/ssst/test_multispectral_det.txt",
+                prefix="./data/ssst",
+                label_list="data/ssst/labels_det.txt"), 
             build_input_from_file(
-                'data/ssst/test_det_coco.txt',
-                prefix='./data/ssst'), 
+                "data/ssst/test_det_coco.txt",
+                prefix="./data/ssst"), 
             build_input_from_file(
-                'data/ssmt/test_mixed_binary.txt',
-                prefix='./data/ssmt'), 
+                "data/ssmt/test_mixed_binary.txt",
+                prefix="./data/ssmt"), 
             build_input_from_file(
-                'data/ssmt/test_mixed_multiclass.txt',
-                prefix='./data/ssmt'), 
+                "data/ssmt/test_mixed_multiclass.txt",
+                prefix="./data/ssmt"), 
             build_input_from_file(
-                'data/ssmt/test_mixed_multitask.txt',
-                prefix='./data/ssmt')
+                "data/ssmt/test_mixed_multitask.txt",
+                prefix="./data/ssmt")
         ]
 
     def test_DecodeImg(self):
