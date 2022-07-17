@@ -1,13 +1,16 @@
 name: build and test
 
 on:
-  pull_request:
+  push:
     branches:
       - develop
     paths-ignore:
       - ".github/**"
       - "docs/**"
       - "README.md"
+  pull_request:
+    branches:
+      - develop
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
