@@ -21,6 +21,7 @@ class AvgPool2D(nn.Layer):
     Peplace avg_pool2d because paddle.grad will cause avg_pool2d to report an error when training.
     In the future Paddle framework will supports avg_pool2d and remove this class.
     """
+
     def __init__(self):
         super(AvgPool2D, self).__init__()
         self.filter = paddle.to_tensor([[1, 1], [1, 1]], dtype='float32')
@@ -49,12 +50,10 @@ class ResBlk(nn.Layer):
         self.conv1 = nn.Conv2D(dim_in, dim_in, 3, 1, 1)
         self.conv2 = nn.Conv2D(dim_in, dim_out, 3, 1, 1)
         if self.normalize:
-            self.norm1 = nn.InstanceNorm2D(dim_in,
-                                           weight_attr=True,
-                                           bias_attr=True)
-            self.norm2 = nn.InstanceNorm2D(dim_in,
-                                           weight_attr=True,
-                                           bias_attr=True)
+            self.norm1 = nn.InstanceNorm2D(
+                dim_in, weight_attr=True, bias_attr=True)
+            self.norm2 = nn.InstanceNorm2D(
+                dim_in, weight_attr=True, bias_attr=True)
         if self.learned_sc:
             self.conv1x1 = nn.Conv2D(dim_in, dim_out, 1, 1, 0, bias_attr=False)
 
@@ -86,9 +85,8 @@ class ResBlk(nn.Layer):
 class AdaIN(nn.Layer):
     def __init__(self, style_dim, num_features):
         super().__init__()
-        self.norm = nn.InstanceNorm2D(num_features,
-                                      weight_attr=False,
-                                      bias_attr=False)
+        self.norm = nn.InstanceNorm2D(
+            num_features, weight_attr=False, bias_attr=False)
         self.fc = nn.Linear(style_dim, num_features * 2)
 
     def forward(self, x, s):
@@ -170,8 +168,10 @@ class StarGANv2Generator(nn.Layer):
         self.encode = nn.LayerList()
         self.decode = nn.LayerList()
         self.to_rgb = nn.Sequential(
-            nn.InstanceNorm2D(dim_in, weight_attr=True, bias_attr=True),
-            nn.LeakyReLU(0.2), nn.Conv2D(dim_in, 3, 1, 1, 0))
+            nn.InstanceNorm2D(
+                dim_in, weight_attr=True, bias_attr=True),
+            nn.LeakyReLU(0.2),
+            nn.Conv2D(dim_in, 3, 1, 1, 0))
 
         # down/up-sampling blocks
         repeat_num = int(np.log2(img_size)) - 4
@@ -180,28 +180,26 @@ class StarGANv2Generator(nn.Layer):
         for _ in range(repeat_num):
             dim_out = min(dim_in * 2, max_conv_dim)
             self.encode.append(
-                ResBlk(dim_in, dim_out, normalize=True, downsample=True))
+                ResBlk(
+                    dim_in, dim_out, normalize=True, downsample=True))
             if len(self.decode) == 0:
                 self.decode.append(
-                    AdainResBlk(dim_out,
-                                dim_in,
-                                style_dim,
-                                w_hpf=w_hpf,
-                                upsample=True))
+                    AdainResBlk(
+                        dim_out, dim_in, style_dim, w_hpf=w_hpf, upsample=True))
             else:
-                self.decode.insert(0,
-                                   AdainResBlk(dim_out,
-                                               dim_in,
-                                               style_dim,
-                                               w_hpf=w_hpf,
-                                               upsample=True))  # stack-like
+                self.decode.insert(
+                    0,
+                    AdainResBlk(
+                        dim_out, dim_in, style_dim, w_hpf=w_hpf,
+                        upsample=True))  # stack-like
             dim_in = dim_out
 
         # bottleneck blocks
         for _ in range(2):
             self.encode.append(ResBlk(dim_out, dim_out, normalize=True))
             self.decode.insert(
-                0, AdainResBlk(dim_out, dim_out, style_dim, w_hpf=w_hpf))
+                0, AdainResBlk(
+                    dim_out, dim_out, style_dim, w_hpf=w_hpf))
 
         if w_hpf > 0:
             self.hpf = HighPass(w_hpf)
@@ -217,9 +215,8 @@ class StarGANv2Generator(nn.Layer):
             x = block(x, s)
             if (masks is not None) and (x.shape[2] in [32, 64, 128]):
                 mask = masks[0] if x.shape[2] in [32] else masks[1]
-                mask = F.interpolate(mask,
-                                     size=[x.shape[2], x.shape[2]],
-                                     mode='bilinear')
+                mask = F.interpolate(
+                    mask, size=[x.shape[2], x.shape[2]], mode='bilinear')
                 x = x + self.hpf(mask * cache[x.shape[2]])
         return self.to_rgb(x)
 
@@ -239,10 +236,12 @@ class StarGANv2Mapping(nn.Layer):
         self.unshared = nn.LayerList()
         for _ in range(num_domains):
             self.unshared.append(
-                nn.Sequential(nn.Linear(512, 512),
-                              nn.ReLU(), nn.Linear(512, 512), nn.ReLU(),
-                              nn.Linear(512, 512), nn.ReLU(),
-                              nn.Linear(512, style_dim)))
+                nn.Sequential(
+                    nn.Linear(512, 512),
+                    nn.ReLU(),
+                    nn.Linear(512, 512),
+                    nn.ReLU(),
+                    nn.Linear(512, 512), nn.ReLU(), nn.Linear(512, style_dim)))
 
     def forward(self, z, y):
         h = self.shared(z)
@@ -254,8 +253,8 @@ class StarGANv2Mapping(nn.Layer):
         s = []
         for i in range(idx.shape[0]):
             s += [
-                out[idx[i].numpy().astype(np.int).tolist()[0],
-                    y[i].numpy().astype(np.int).tolist()[0]]
+                out[idx[i].numpy().astype(np.int).tolist()[0], y[i].numpy()
+                    .astype(np.int).tolist()[0]]
             ]
         s = paddle.stack(s)
         s = paddle.reshape(s, (s.shape[0], -1))
@@ -300,8 +299,8 @@ class StarGANv2Style(nn.Layer):
         s = []
         for i in range(idx.shape[0]):
             s += [
-                out[idx[i].numpy().astype(np.int).tolist()[0],
-                    y[i].numpy().astype(np.int).tolist()[0]]
+                out[idx[i].numpy().astype(np.int).tolist()[0], y[i].numpy()
+                    .astype(np.int).tolist()[0]]
             ]
         s = paddle.stack(s)
         s = paddle.reshape(s, (s.shape[0], -1))
@@ -320,15 +319,16 @@ class FAN(nn.Layer):
         self.end_relu = end_relu
 
         # Base part
-        self.conv1 = CoordConvTh(256,
-                                 256,
-                                 True,
-                                 False,
-                                 in_channels=3,
-                                 out_channels=64,
-                                 kernel_size=7,
-                                 stride=2,
-                                 padding=3)
+        self.conv1 = CoordConvTh(
+            256,
+            256,
+            True,
+            False,
+            in_channels=3,
+            out_channels=64,
+            kernel_size=7,
+            stride=2,
+            padding=3)
         self.bn1 = nn.BatchNorm2D(64)
         self.conv2 = ConvBlock(64, 128)
         self.conv3 = ConvBlock(128, 128)
@@ -395,9 +395,10 @@ class FAN(nn.Layer):
         heatmaps = outputs[-1][:, :-1, :, :]
         scale_factor = x.shape[2] // heatmaps.shape[2]
         if b_preprocess:
-            heatmaps = F.interpolate(heatmaps,
-                                     scale_factor=scale_factor,
-                                     mode='bilinear',
-                                     align_corners=True)
+            heatmaps = F.interpolate(
+                heatmaps,
+                scale_factor=scale_factor,
+                mode='bilinear',
+                align_corners=True)
             heatmaps = preprocess(heatmaps)
         return heatmaps

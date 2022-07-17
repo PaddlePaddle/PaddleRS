@@ -170,12 +170,10 @@ class ConvNormLayer(nn.Layer):
         norm_lr = 0. if freeze_norm else 1.
         param_attr = ParamAttr(
             learning_rate=norm_lr,
-            regularizer=L2Decay(norm_decay)
-            if norm_decay is not None else None)
+            regularizer=L2Decay(norm_decay) if norm_decay is not None else None)
         bias_attr = ParamAttr(
             learning_rate=norm_lr,
-            regularizer=L2Decay(norm_decay)
-            if norm_decay is not None else None)
+            regularizer=L2Decay(norm_decay) if norm_decay is not None else None)
         if norm_type in ['bn', 'sync_bn']:
             self.norm = nn.BatchNorm2D(
                 ch_out, weight_attr=param_attr, bias_attr=bias_attr)
@@ -293,19 +291,18 @@ class DropBlock(nn.Layer):
 @register
 @serializable
 class AnchorGeneratorSSD(object):
-    def __init__(
-            self,
-            steps=[8, 16, 32, 64, 100, 300],
-            aspect_ratios=[[2.], [2., 3.], [2., 3.], [2., 3.], [2.], [2.]],
-            min_ratio=15,
-            max_ratio=90,
-            base_size=300,
-            min_sizes=[30.0, 60.0, 111.0, 162.0, 213.0, 264.0],
-            max_sizes=[60.0, 111.0, 162.0, 213.0, 264.0, 315.0],
-            offset=0.5,
-            flip=True,
-            clip=False,
-            min_max_aspect_ratios_order=False):
+    def __init__(self,
+                 steps=[8, 16, 32, 64, 100, 300],
+                 aspect_ratios=[[2.], [2., 3.], [2., 3.], [2., 3.], [2.], [2.]],
+                 min_ratio=15,
+                 max_ratio=90,
+                 base_size=300,
+                 min_sizes=[30.0, 60.0, 111.0, 162.0, 213.0, 264.0],
+                 max_sizes=[60.0, 111.0, 162.0, 213.0, 264.0, 315.0],
+                 offset=0.5,
+                 flip=True,
+                 clip=False,
+                 min_max_aspect_ratios_order=False):
         self.steps = steps
         self.aspect_ratios = aspect_ratios
         self.min_ratio = min_ratio
@@ -1035,19 +1032,16 @@ class MaskMatrixNMS(object):
 
         seg_masks = paddle.flatten(seg_masks, start_axis=1, stop_axis=-1)
         # inter.
-        inter_matrix = paddle.mm(seg_masks,
-                                 paddle.transpose(seg_masks, [1, 0]))
+        inter_matrix = paddle.mm(seg_masks, paddle.transpose(seg_masks, [1, 0]))
         n_samples = paddle.shape(cate_labels)
         # union.
         sum_masks_x = paddle.expand(sum_masks, shape=[n_samples, n_samples])
         # iou.
         iou_matrix = (inter_matrix / (
-            sum_masks_x + paddle.transpose(sum_masks_x, [1, 0]) - inter_matrix)
-                      )
+            sum_masks_x + paddle.transpose(sum_masks_x, [1, 0]) - inter_matrix))
         iou_matrix = paddle.triu(iou_matrix, diagonal=1)
         # label_specific matrix.
-        cate_labels_x = paddle.expand(
-            cate_labels, shape=[n_samples, n_samples])
+        cate_labels_x = paddle.expand(cate_labels, shape=[n_samples, n_samples])
         label_matrix = paddle.cast(
             (cate_labels_x == paddle.transpose(cate_labels_x, [1, 0])),
             'float32')
@@ -1304,8 +1298,8 @@ class MultiHeadAttention(nn.Layer):
         if self._qkv_same_embed_dim:
             tensor = F.linear(
                 x=tensor,
-                weight=self.in_proj_weight[:, index * self.embed_dim:(
-                    index + 1) * self.embed_dim],
+                weight=self.in_proj_weight[:, index * self.embed_dim:(index + 1)
+                                           * self.embed_dim],
                 bias=self.in_proj_bias[index * self.embed_dim:(index + 1) *
                                        self.embed_dim]
                 if self.in_proj_bias is not None else None)

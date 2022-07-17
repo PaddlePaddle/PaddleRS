@@ -170,9 +170,9 @@ def get_dataset_path(path, annotation, image_dir):
     if _dataset_exists(path, annotation, image_dir):
         return path
 
-    logger.info(
-        "Dataset {} is not valid for reason above, try searching {} or "
-        "downloading dataset...".format(osp.realpath(path), DATASET_HOME))
+    logger.info("Dataset {} is not valid for reason above, try searching {} or "
+                "downloading dataset...".format(
+                    osp.realpath(path), DATASET_HOME))
 
     data_name = os.path.split(path.strip().lower())[-1]
     for name, dataset in DATASETS.items():

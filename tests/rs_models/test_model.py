@@ -38,7 +38,10 @@ class _TestModelNamespace:
                     input, model, target
             ) in enumerate(zip(self.inputs, self.models, self.targets)):
                 with self.subTest(i=i):
-                    output = model(input)
+                    if isinstance(input, list):
+                        output = model(*input)
+                    else:
+                        output = model(input)
                     self.check_output(output, target)
 
         def test_to_static(self):
@@ -46,9 +49,8 @@ class _TestModelNamespace:
                     input, model, target
             ) in enumerate(zip(self.inputs, self.models, self.targets)):
                 with self.subTest(i=i):
-                    static_model = self.convert_to_static(model, input)
-                    output = static_model(output)
-                    self.check_output(output, target)
+                    static_model = paddle.jit.to_static(
+                        model, input_spec=self.get_input_spec(model, input))
 
         def check_output(self, output, target):
             pass
@@ -113,10 +115,6 @@ class _TestModelNamespace:
                     InputSpec(
                         shape=tensor.shape, name=param_name, dtype='float32'))
             return input_spec
-
-        def convert_to_static(self, model, input):
-            return paddle.jit.to_static(
-                model, input_spec=self.get_input_spec(model, input))
 
 
 TestModel = _TestModelNamespace.TestModel

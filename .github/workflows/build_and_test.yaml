@@ -5,7 +5,6 @@ on:
     branches:
       - develop
     paths-ignore:
-      - ".github/**"
       - "docs/**"
       - "README.md"
   pull_request:
@@ -23,6 +22,19 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
         python-version: ["3.7", "3.8"]
+        include:
+          - python-version: "3.7"
+            os: windows-latest
+            gdal-whl-url: https://download.lfd.uci.edu/pythonlibs/archived/cp37/GDAL-3.3.3-cp37-cp37m-win_amd64.whl
+          - python-version: "3.7"
+            os: ubuntu-latest
+            gdal-whl-url: https://versaweb.dl.sourceforge.net/project/gdal-wheels-for-linux/GDAL-3.4.1-cp37-cp37m-manylinux_2_5_x86_64.manylinux1_x86_64.whl
+          - python-version: "3.8"
+            os: windows-latest
+            gdal-whl-url: https://download.lfd.uci.edu/pythonlibs/archived/GDAL-3.3.3-cp38-cp38-win_amd64.whl
+          - python-version: "3.8"
+            os: ubuntu-latest
+            gdal-whl-url: https://versaweb.dl.sourceforge.net/project/gdal-wheels-for-linux/GDAL-3.4.1-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.whl
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
@@ -35,40 +47,44 @@ jobs:
         run: python -m pip install paddlepaddle==2.3.1 -i https://mirror.baidu.com/pypi/simple
       - name: Install PaddleRS
         run: |
-          pip install -r requirements.txt
-          pip install -e .
-      - name: Install pre-commit hooks
-        run: |
-          pip install pre-commit
-          pre-commit install
-      - name: Lint
-        run: pre-commit run --all-files
+          python -m pip install -r requirements.txt
+          python -m pip install -e .
+      - name: Install GDAL
+        run: python -m pip install ${{ matrix.gdal-whl-url }}
       - name: Run unittests
         run: |
           cd tests
-          bash check_coverage.sh
+          bash run_fast_tests.sh
         shell: bash
 
   build_and_test_cuda102:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     container:
-      image: registry.baidubce.com/paddlepaddle/paddle:2.3.1-gpu-cuda10.2-cudnn7
+      image: pytorch/pytorch:1.9.0-cuda10.2-cudnn7-devel
     steps:
       - uses: actions/checkout@v3
+      - name: Fetch GPG keys
+        run: |
+          apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/3bf863cc.pub
+          apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1804/x86_64/7fa2af80.pub
       - name: Upgrade pip
         run: python -m pip install pip --upgrade --user
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install ffmpeg libsm6 libxext6 git ninja-build libglib2.0-0 libsm6 libxrender-dev libxext6 -y
+      - name: Install PaddlePaddle
+        run: python -m pip install paddlepaddle-gpu==2.3.1 -i https://mirror.baidu.com/pypi/simple
       - name: Install PaddleRS
         run: |
-          pip install -r requirements.txt
-          pip install -e .
-      - name: Install pre-commit hooks
-        run: |
-          pip install pre-commit
-          pre-commit install
-      - name: Lint
-        run: pre-commit run --all-files
-      - name: Run unittests
-        run: |
-          cd tests
-          bash check_coverage.sh
-        shell: bash
+          python -m pip install -r requirements.txt
+          python -m pip install -e .
+          python --version
+      - name: Install GDAL
+        run: python -m pip install https://versaweb.dl.sourceforge.net/project/gdal-wheels-for-linux/GDAL-3.4.1-cp37-cp37m-manylinux_2_5_x86_64.manylinux1_x86_64.whl
+      # Do not run unittests, because there is NO GPU in the machine.
+      # - name: Run unittests
+      #   run: |
+      #     cd tests
+      #     bash run_fast_tests.sh
+      #   shell: bash

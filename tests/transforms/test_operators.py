@@ -21,6 +21,8 @@ import paddlers.transforms as T
 from testing_utils import CpuCommonTest
 from data import build_input_from_file
 
+__all__ = ['TestTransform', 'TestCompose', 'TestArrange']
+
 WHITE_LIST = []
 
 
@@ -137,26 +139,26 @@ class TestTransform(CpuCommonTest):
         self.inputs = [
             build_input_from_file(
                 "data/ssst/test_optical_clas.txt",
-                prefix="./data/ssst"), 
+                prefix="./data/ssst"),
             build_input_from_file(
                 "data/ssst/test_sar_clas.txt",
-                prefix="./data/ssst"), 
+                prefix="./data/ssst"),
             build_input_from_file(
                 "data/ssst/test_multispectral_clas.txt",
-                prefix="./data/ssst"), 
+                prefix="./data/ssst"),
             build_input_from_file(
                 "data/ssst/test_optical_seg.txt",
-                prefix="./data/ssst"), 
+                prefix="./data/ssst"),
             build_input_from_file(
                 "data/ssst/test_sar_seg.txt",
-                prefix="./data/ssst"), 
+                prefix="./data/ssst"),
             build_input_from_file(
                 "data/ssst/test_multispectral_seg.txt",
                 prefix="./data/ssst"),
             build_input_from_file(
                 "data/ssst/test_optical_det.txt",
                 prefix="./data/ssst",
-                label_list="data/ssst/labels_det.txt"), 
+                label_list="data/ssst/labels_det.txt"),
             build_input_from_file(
                 "data/ssst/test_sar_det.txt",
                 prefix="./data/ssst",
@@ -164,20 +166,20 @@ class TestTransform(CpuCommonTest):
             build_input_from_file(
                 "data/ssst/test_multispectral_det.txt",
                 prefix="./data/ssst",
-                label_list="data/ssst/labels_det.txt"), 
+                label_list="data/ssst/labels_det.txt"),
             build_input_from_file(
                 "data/ssst/test_det_coco.txt",
-                prefix="./data/ssst"), 
+                prefix="./data/ssst"),
             build_input_from_file(
                 "data/ssmt/test_mixed_binary.txt",
-                prefix="./data/ssmt"), 
+                prefix="./data/ssmt"),
             build_input_from_file(
                 "data/ssmt/test_mixed_multiclass.txt",
-                prefix="./data/ssmt"), 
+                prefix="./data/ssmt"),
             build_input_from_file(
                 "data/ssmt/test_mixed_multitask.txt",
                 prefix="./data/ssmt")
-        ]
+        ]   # yapf: disable
 
     def test_DecodeImg(self):
         decoder = T.DecodeImg(to_rgb=True)

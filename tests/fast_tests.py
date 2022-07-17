@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .test_cd_models import *
-from .test_clas_models import *
-from .test_det_models import *
-from .test_seg_models import *
+from deploy import *
+from rs_models import *
+from transforms import *

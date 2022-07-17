@@ -49,6 +49,7 @@ class BaseModel(ABC):
     #         save checkpoint (model.nets)                     \/
 
     """
+
     def __init__(self, params=None):
         """Initialize the BaseModel class.
 
@@ -126,8 +127,8 @@ class BaseModel(ABC):
                 parameters = []
                 for net_name in net_names:
                     parameters += self.nets[net_name].parameters()
-                self.optimizers[opt_name] = build_optimizer(
-                    cfg_, lr, parameters)
+                self.optimizers[opt_name] = build_optimizer(cfg_, lr,
+                                                            parameters)
 
         return self.optimizers
 
@@ -187,17 +188,15 @@ class BaseModel(ABC):
         inputs_num = 0
         for net in export_model:
             input_spec = [
-                paddle.static.InputSpec(shape=inputs_size[inputs_num + i],
-                                        dtype="float32")
+                paddle.static.InputSpec(
+                    shape=inputs_size[inputs_num + i], dtype="float32")
                 for i in range(net["inputs_num"])
             ]
             inputs_num = inputs_num + net["inputs_num"]
-            static_model = paddle.jit.to_static(self.nets[net["name"]],
-                                                input_spec=input_spec)
+            static_model = paddle.jit.to_static(
+                self.nets[net["name"]], input_spec=input_spec)
             if output_dir is None:
                 output_dir = 'inference_model'
-            paddle.jit.save(
-                static_model,
-                os.path.join(
-                    output_dir, '{}_{}'.format(self.__class__.__name__.lower(),
-                                               net["name"])))
+            paddle.jit.save(static_model,
+                            os.path.join(output_dir, '{}_{}'.format(
+                                self.__class__.__name__.lower(), net["name"])))

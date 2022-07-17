@@ -16,6 +16,8 @@ from itertools import cycle
 
 from rs_models.test_model import TestModel
 
+__all__ = []
+
 
 class TestDetModel(TestModel):
     DEFAULT_HW = (608, 608)

@@ -18,6 +18,8 @@ import paddlers.transforms as T
 from testing_utils import CpuCommonTest
 from data import build_input_from_file
 
+__all__ = ['TestMatchHistograms', 'TestMatchByRegression']
+
 
 class TestMatchHistograms(CpuCommonTest):
     def setUp(self):

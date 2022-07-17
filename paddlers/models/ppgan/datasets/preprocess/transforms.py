@@ -61,8 +61,8 @@ class Transforms():
         data = tuple(data)
         for transform in self.transforms:
             data = transform(data)
-            if hasattr(transform, 'params') and isinstance(
-                    transform.params, dict):
+            if hasattr(transform, 'params') and isinstance(transform.params,
+                                                           dict):
                 datas.update(transform.params)
 
         if len(self.input_keys) > 1:
@@ -176,6 +176,7 @@ class PairedRandomTransposeHW(T.BaseTransform):
         prob (float): The propability to transpose the images.
         keys (list[str]): The images to be transposed.
     """
+
     def __init__(self, prob=0.5, keys=None):
         self.keys = keys
         self.prob = prob
@@ -220,6 +221,7 @@ class TransposeSequence(T.Transpose):
             fake_img_seq = transform(fake_img_seq)
 
     """
+
     def _apply_image(self, img):
         if isinstance(img, list):
             imgs = []
@@ -277,6 +279,7 @@ class NormalizeSequence(T.Normalize):
             fake_img_seq = normalize_seq(fake_img_seq)
 
     """
+
     def _apply_image(self, img):
         if isinstance(img, list):
             imgs = [
@@ -302,6 +305,7 @@ class SRPairedRandomCrop(T.BaseTransform):
         scale (int): model upscale factor.
         gt_patch_size (int): cropped gt patch size.
     """
+
     def __init__(self, scale, gt_patch_size, scale_list=False, keys=None):
         self.gt_patch_size = gt_patch_size
         self.scale = scale
@@ -339,16 +343,16 @@ class SRPairedRandomCrop(T.BaseTransform):
             ]
             top_gt, left_gt = int(top * scale), int(left * scale)
             gt = [
-                v[top_gt:top_gt + self.gt_patch_size,
-                  left_gt:left_gt + self.gt_patch_size, ...] for v in gt
+                v[top_gt:top_gt + self.gt_patch_size, left_gt:left_gt +
+                  self.gt_patch_size, ...] for v in gt
             ]
         else:
             # crop lq patch
             lq = lq[top:top + lq_patch_size, left:left + lq_patch_size, ...]
             # crop corresponding gt patch
             top_gt, left_gt = int(top * scale), int(left * scale)
-            gt = gt[top_gt:top_gt + self.gt_patch_size,
-                    left_gt:left_gt + self.gt_patch_size, ...]
+            gt = gt[top_gt:top_gt + self.gt_patch_size, left_gt:left_gt +
+                    self.gt_patch_size, ...]
 
             if self.scale_list and self.scale == 4:
                 lqx2 = F.resize(gt, (lq_patch_size * 2, lq_patch_size * 2),
@@ -368,14 +372,14 @@ class SRNoise(T.BaseTransform):
         noise_path (str): directory of noise image.
         size (int): cropped noise patch size.
     """
+
     def __init__(self, noise_path, size, keys=None):
         self.noise_path = noise_path
         self.noise_imgs = sorted(glob.glob(noise_path + '*.png'))
         self.size = size
         self.keys = keys
         self.transform = T.Compose([
-            T.RandomCrop(size),
-            T.Transpose(),
+            T.RandomCrop(size), T.Transpose(),
             T.Normalize([0., 0., 0.], [255., 255., 255.])
         ])
 
@@ -396,6 +400,7 @@ class RandomResizedCropProb(T.RandomResizedCrop):
         prob (float): probabilty of using random-resized cropping.
         size (int): cropped size.
     """
+
     def __init__(self, prob, size, scale, ratio, interpolation, keys=None):
         super().__init__(size, scale, ratio, interpolation)
         self.prob = prob
@@ -480,21 +485,14 @@ class ResizeToScale(T.BaseTransform):
 
 @TRANSFORMS.register()
 class PairedColorJitter(T.BaseTransform):
-    def __init__(self,
-                 brightness=0,
-                 contrast=0,
-                 saturation=0,
-                 hue=0,
+    def __init__(self, brightness=0, contrast=0, saturation=0, hue=0,
                  keys=None):
         super().__init__(keys=keys)
         self.brightness = T.transforms._check_input(brightness, 'brightness')
         self.contrast = T.transforms._check_input(contrast, 'contrast')
         self.saturation = T.transforms._check_input(saturation, 'saturation')
-        self.hue = T.transforms._check_input(hue,
-                                             'hue',
-                                             center=0,
-                                             bound=(-0.5, 0.5),
-                                             clip_first_on_zero=False)
+        self.hue = T.transforms._check_input(
+            hue, 'hue', center=0, bound=(-0.5, 0.5), clip_first_on_zero=False)
 
     def _get_params(self, input):
         """Get a randomized transform to be applied on image.
@@ -545,6 +543,7 @@ class MirrorVideoSequence:
     Args:
         keys (list[str]): The frame lists to be extended.
     """
+
     def __init__(self, keys=None):
         self.keys = keys
 

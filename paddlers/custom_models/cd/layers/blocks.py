@@ -140,12 +140,14 @@ class Conv7x7(BasicConv):
 
 class MaxPool2x2(nn.MaxPool2D):
     def __init__(self, **kwargs):
-        super(MaxPool2x2, self).__init__(kernel_size=2, stride=(2, 2), padding=(0, 0), **kwargs)
+        super(MaxPool2x2, self).__init__(
+            kernel_size=2, stride=(2, 2), padding=(0, 0), **kwargs)
 
 
 class MaxUnPool2x2(nn.MaxUnPool2D):
     def __init__(self, **kwargs):
-        super(MaxUnPool2x2, self).__init__(kernel_size=2, stride=(2, 2), padding=(0, 0), **kwargs)
+        super(MaxUnPool2x2, self).__init__(
+            kernel_size=2, stride=(2, 2), padding=(0, 0), **kwargs)
 
 
 class ConvTransposed3x3(nn.Layer):

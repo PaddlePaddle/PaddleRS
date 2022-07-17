@@ -15,6 +15,8 @@
 import paddlers
 from rs_models.test_model import TestModel
 
+__all__ = []
+
 
 class TestCDModel(TestModel):
     DEFAULT_HW = (224, 224)

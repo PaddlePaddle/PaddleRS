@@ -172,7 +172,7 @@ class BIT(nn.Layer):
         else:
             token1 = self._get_reshaped_tokens(x1)
             token2 = self._get_reshaped_tokens(x2)
-            
+
         # Transformer encoder forward
         token = paddle.concat([token1, token2], axis=1)
         token = self.encode(token)

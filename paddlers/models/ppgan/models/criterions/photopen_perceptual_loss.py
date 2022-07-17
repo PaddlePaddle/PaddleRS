@@ -9,6 +9,7 @@ from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from ppgan.utils.download import get_path_from_url
 from .builder import CRITERIONS
 
+
 class ConvBlock(nn.Layer):
     def __init__(self, input_channels, output_channels, groups, name=None):
         super(ConvBlock, self).__init__()
@@ -63,6 +64,7 @@ class ConvBlock(nn.Layer):
         x = self._pool(x)
         return x
 
+
 class VGG19(nn.Layer):
     def __init__(self, layers=19, class_dim=1000):
         super(VGG19, self).__init__()
@@ -88,13 +90,13 @@ class VGG19(nn.Layer):
         self._drop = Dropout(p=0.5, mode="downscale_in_infer")
         self._fc1 = Linear(
             7 * 7 * 512,
-            4096,)
+            4096, )
         self._fc2 = Linear(
             4096,
-            4096,)
+            4096, )
         self._out = Linear(
             4096,
-            class_dim,)
+            class_dim, )
 
     def forward(self, inputs):
         features = []
@@ -119,14 +121,16 @@ class VGG19(nn.Layer):
         x = self._out(x)
         return x, features
 
+
 @CRITERIONS.register()
 class PhotoPenPerceptualLoss(nn.Layer):
-    def __init__(self, 
-                 crop_size, 
-                 lambda_vgg, 
-#                  pretrained='test/vgg19pretrain.pdparams',
-                 pretrained='https://paddlegan.bj.bcebos.com/models/vgg19pretrain.pdparams',
-                ):
+    def __init__(
+            self,
+            crop_size,
+            lambda_vgg,
+            #                  pretrained='test/vgg19pretrain.pdparams',
+            pretrained='https://paddlegan.bj.bcebos.com/models/vgg19pretrain.pdparams',
+    ):
         super(PhotoPenPerceptualLoss, self).__init__()
         self.model = VGG19()
         weight_path = get_path_from_url(pretrained)
@@ -136,7 +140,7 @@ class PhotoPenPerceptualLoss(nn.Layer):
         self.rates = [1.0 / 32, 1.0 / 16, 1.0 / 8, 1.0 / 4, 1.0]
         self.crop_size = crop_size
         self.lambda_vgg = lambda_vgg
-        
+
     def forward(self, img_r, img_f):
         img_r = F.interpolate(img_r, (self.crop_size, self.crop_size))
         img_f = F.interpolate(img_f, (self.crop_size, self.crop_size))
@@ -146,5 +150,5 @@ class PhotoPenPerceptualLoss(nn.Layer):
         for i in range(len(feat_r)):
             g_vggloss += self.rates[i] * nn.L1Loss()(feat_r[i], feat_f[i])
         g_vggloss *= self.lambda_vgg
-        
+
         return g_vggloss

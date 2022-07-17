@@ -22,6 +22,11 @@ import paddle
 import paddlers as pdrs
 from testing_utils import CommonTest, run_script
 
+__all__ = [
+    'TestCDPredictor', 'TestClasPredictor', 'TestDetPredictor',
+    'TestSegPredictor'
+]
+
 
 class TestPredictor(CommonTest):
     MODULE = pdrs.tasks

@@ -77,8 +77,7 @@ class AnchorGenerator(nn.Layer):
 
     def _calculate_anchors(self, num_features):
         sizes = self._broadcast_params(self.anchor_sizes, num_features)
-        aspect_ratios = self._broadcast_params(self.aspect_ratios,
-                                               num_features)
+        aspect_ratios = self._broadcast_params(self.aspect_ratios, num_features)
         cell_anchors = [
             self.generate_cell_anchors(s, a)
             for s, a in zip(sizes, aspect_ratios)
@@ -94,10 +93,7 @@ class AnchorGenerator(nn.Layer):
         shifts_x = paddle.arange(
             offset * stride, grid_width * stride, step=stride, dtype='float32')
         shifts_y = paddle.arange(
-            offset * stride,
-            grid_height * stride,
-            step=stride,
-            dtype='float32')
+            offset * stride, grid_height * stride, step=stride, dtype='float32')
         shift_y, shift_x = paddle.meshgrid(shifts_y, shifts_x)
         shift_x = paddle.reshape(shift_x, [-1])
         shift_y = paddle.reshape(shift_y, [-1])

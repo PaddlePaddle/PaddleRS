@@ -85,7 +85,7 @@ Args_show = True
 
 ------------------------------------------------Info------------------------------------------------
 json read...
-json keys: dict_keys(['info', 'licenses', 'images', 'annotations', 'categories']) 
+json keys: dict_keys(['info', 'licenses', 'images', 'annotations', 'categories'])
 
 ***********************info***********************
  Content Type: dict
@@ -409,7 +409,7 @@ Args_show = True
 
 ------------------------------------------------Info------------------------------------------------
 json read...
-json keys: dict_keys(['images', 'categories']) 
+json keys: dict_keys(['images', 'categories'])
 
 **********************images**********************
  Content Type: list

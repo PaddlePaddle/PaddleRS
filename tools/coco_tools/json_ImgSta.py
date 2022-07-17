@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 '''
 @File Description:
 # 统计json文件images信息，生成统计结果csv，同时生成图像shape、图像shape比例的二维分布图
@@ -30,7 +29,8 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-def check_dir(check_path,show=True):
+
+def check_dir(check_path, show=True):
     if os.path.isdir(check_path):
         check_directory = check_path
     else:
@@ -38,9 +38,11 @@ def check_dir(check_path,show=True):
     if not os.path.exists(check_directory):
         os.makedirs(check_directory)
         if show:
-            print('make dir:',check_directory)
+            print('make dir:', check_directory)
 
-def js_img_sta(js_path, csv_path, png_shape_path, png_shapeRate_path, image_keyname):
+
+def js_img_sta(js_path, csv_path, png_shape_path, png_shapeRate_path,
+               image_keyname):
     print('json read...\n')
     with open(js_path, 'r') as load_f:
         data = json.load(load_f)
@@ -56,7 +58,8 @@ def js_img_sta(js_path, csv_path, png_shape_path, png_shapeRate_path, image_keyn
     if png_shapeRate_path is not None:
         check_dir(png_shapeRate_path)
         df_img['shape_rate'] = (df_img['width'] / df_img['height']).round(1)
-        df_img['shape_rate'].value_counts().sort_index().plot(kind='bar', title='images shape rate')
+        df_img['shape_rate'].value_counts().sort_index().plot(
+            kind='bar', title='images shape rate')
         plt.savefig(png_shapeRate_path)
         plt.close()
         print('png save to', png_shapeRate_path)
@@ -68,21 +71,43 @@ def js_img_sta(js_path, csv_path, png_shape_path, png_shapeRate_path, image_keyn
 
 
 def get_args():
-    parser = argparse.ArgumentParser(description='Json Images Infomation Statistic')
+    parser = argparse.ArgumentParser(
+        description='Json Images Infomation Statistic')
 
     # parameters
-    parser.add_argument('--json_path', type=str,
-                        help='json path to statistic images information')
-    parser.add_argument('--csv_path', type=str, default=None,
-                        help='csv path to save statistic images information, default None, do not save')
-    parser.add_argument('--png_shape_path', type=str, default=None,
-                        help='png path to save statistic images shape information, default None, do not save')
-    parser.add_argument('--png_shapeRate_path', type=str, default=None,
-                        help='png path to save statistic images shape rate information, default None, do not save')
-    parser.add_argument('--image_keyname', type=str, default='images',
-                        help='image key name in json, default images')
-    parser.add_argument('-Args_show', '--Args_show', type=bool, default=True,
-                        help='Args_show(default: True), if True, show args info')
+    parser.add_argument(
+        '--json_path',
+        type=str,
+        help='json path to statistic images information')
+    parser.add_argument(
+        '--csv_path',
+        type=str,
+        default=None,
+        help='csv path to save statistic images information, default None, do not save'
+    )
+    parser.add_argument(
+        '--png_shape_path',
+        type=str,
+        default=None,
+        help='png path to save statistic images shape information, default None, do not save'
+    )
+    parser.add_argument(
+        '--png_shapeRate_path',
+        type=str,
+        default=None,
+        help='png path to save statistic images shape rate information, default None, do not save'
+    )
+    parser.add_argument(
+        '--image_keyname',
+        type=str,
+        default='images',
+        help='image key name in json, default images')
+    parser.add_argument(
+        '-Args_show',
+        '--Args_show',
+        type=bool,
+        default=True,
+        help='Args_show(default: True), if True, show args info')
 
     args = parser.parse_args()
 
@@ -96,5 +121,5 @@ def get_args():
 
 if __name__ == '__main__':
     args = get_args()
-    js_img_sta(args.json_path, args.csv_path, args.png_shape_path, args.png_shapeRate_path, args.image_keyname)
-
+    js_img_sta(args.json_path, args.csv_path, args.png_shape_path,
+               args.png_shapeRate_path, args.image_keyname)

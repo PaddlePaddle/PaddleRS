@@ -15,6 +15,8 @@
 import paddlers
 from rs_models.test_model import TestModel
 
+__all__ = ['TestFarSegModel']
+
 
 class TestSegModel(TestModel):
     DEFAULT_HW = (512, 512)

@@ -35,6 +35,7 @@ class Compose(object):
         object will call each given :attr:`transforms` sequencely.
 
     """
+
     def __init__(self, functions):
         self.functions = functions
 

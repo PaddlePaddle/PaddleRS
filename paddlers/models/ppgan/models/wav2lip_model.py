@@ -54,6 +54,7 @@ class Wav2LipModel(BaseModel):
     By default, it uses a '--netG Wav2lip' generator,
     a '--netD SyncNetColor' discriminator.
     """
+
     def __init__(self,
                  generator,
                  discriminator=None,
@@ -110,8 +111,8 @@ class Wav2LipModel(BaseModel):
         self.losses['sync_loss'] = self.sync_loss
         self.losses['l1_loss'] = self.l1_loss
 
-        self.loss_G = self.syncnet_wt * self.sync_loss + (
-            1 - self.syncnet_wt) * self.l1_loss
+        self.loss_G = self.syncnet_wt * self.sync_loss + (1 - self.syncnet_wt
+                                                          ) * self.l1_loss
         self.loss_G.backward()
 
     def train_iter(self, optimizers=None):

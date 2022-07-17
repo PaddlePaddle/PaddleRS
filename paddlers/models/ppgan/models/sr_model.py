@@ -27,6 +27,7 @@ from ..modules.init import reset_parameters
 class BaseSRModel(BaseModel):
     """Base SR model for single image super-resolution.
     """
+
     def __init__(self, generator, pixel_criterion=None, use_init_weight=False):
         """
         Args:
@@ -85,8 +86,8 @@ class BaseSRModel(BaseModel):
 
 def init_sr_weight(net):
     def reset_func(m):
-        if hasattr(m, 'weight') and (not isinstance(
-                m, (nn.BatchNorm, nn.BatchNorm2D))):
+        if hasattr(m, 'weight') and (
+                not isinstance(m, (nn.BatchNorm, nn.BatchNorm2D))):
             reset_parameters(m)
 
     net.apply(reset_func)

@@ -44,6 +44,7 @@ class ResidualDenseBlock_5C(nn.Layer):
 
 class RRDB(nn.Layer):
     '''Residual in Residual Dense Block'''
+
     def __init__(self, nf, gc=32):
         super(RRDB, self).__init__()
         self.RDB1 = ResidualDenseBlock_5C(nf, gc)
@@ -87,9 +88,11 @@ class RRDBNet(nn.Layer):
         fea = fea + trunk
 
         fea = self.lrelu(
-            self.upconv1(F.interpolate(fea, scale_factor=2, mode='nearest')))
+            self.upconv1(F.interpolate(
+                fea, scale_factor=2, mode='nearest')))
         fea = self.lrelu(
-            self.upconv2(F.interpolate(fea, scale_factor=2, mode='nearest')))
+            self.upconv2(F.interpolate(
+                fea, scale_factor=2, mode='nearest')))
         out = self.conv_last(self.lrelu(self.HRconv(fea)))
 
         return out

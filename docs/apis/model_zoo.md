@@ -4,18 +4,18 @@ PaddleRS的基础模型库来自[PaddleClas](https://github.com/PaddlePaddle/Pad
 
 ## 自定义模型库
 
-| 模型名称        | 用途     | 
-| --------------- | -------- | 
+| 模型名称        | 用途     |
+| --------------- | -------- |
 | FarSeg          | 语义分割 |
 | BIT             | 变化检测 |
 | CDNet           | 变化检测 |
 | DSIFN           | 变化检测 |
 | STANet          | 变化检测 |
-| SNUNet          | 变化检测 | 
+| SNUNet          | 变化检测 |
 | DSAMNet         | 变化检测 |
-| FCEarlyFusion | 变化检测 | 
-| FCSiamConc    | 变化检测 | 
-| FCSiamDiff    | 变化检测 | 
+| FCEarlyFusion | 变化检测 |
+| FCSiamConc    | 变化检测 |
+| FCSiamDiff    | 变化检测 |
 
 
 ## 如何导入

@@ -57,9 +57,8 @@ def scandir(dir_path, suffix=None, recursive=False):
                     yield rel_path
             else:
                 if recursive:
-                    yield from _scandir(entry.path,
-                                        suffix=suffix,
-                                        recursive=recursive)
+                    yield from _scandir(
+                        entry.path, suffix=suffix, recursive=recursive)
                 else:
                     continue
 
@@ -79,6 +78,7 @@ class BaseDataset(Dataset, metaclass=ABCMeta):
         preprocess (list[dict]): A sequence of data preprocess config.
 
     """
+
     def __init__(self, preprocess=None):
         super(BaseDataset, self).__init__()
 

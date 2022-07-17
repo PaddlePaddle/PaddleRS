@@ -25,8 +25,7 @@ class BaseArch(nn.Layer):
         self.scale = 1.
         self.mean = paddle.to_tensor([0.485, 0.456, 0.406]).reshape(
             (1, 3, 1, 1))
-        self.std = paddle.to_tensor([0.229, 0.224, 0.225]).reshape(
-            (1, 3, 1, 1))
+        self.std = paddle.to_tensor([0.229, 0.224, 0.225]).reshape((1, 3, 1, 1))
         for item in cfg_transform:
             if 'NormalizeImage' in item:
                 self.mean = paddle.to_tensor(item['NormalizeImage'][
@@ -83,8 +82,7 @@ class BaseArch(nn.Layer):
         nms_threshold = 0.5
         keep_top_k = 100
 
-        if self.__class__.__name__ in ('CascadeRCNN', 'FasterRCNN', 'MaskRCNN'
-                                       ):
+        if self.__class__.__name__ in ('CascadeRCNN', 'FasterRCNN', 'MaskRCNN'):
             num_classes = self.bbox_head.num_classes
             keep_top_k = self.bbox_post_process.nms.keep_top_k
             nms_threshold = self.bbox_post_process.nms.nms_threshold

@@ -21,6 +21,7 @@ from paddle.nn.utils import spectral_norm
 from ...utils.photopen import build_norm_layer, simam, Dict
 from .builder import GENERATORS
 
+
 class SPADE(nn.Layer):
     def __init__(self, config_text, norm_nc, label_nc):
         super(SPADE, self).__init__()
@@ -57,6 +58,7 @@ class SPADE(nn.Layer):
 
         return out
 
+
 class SPADEResnetBlock(nn.Layer):
     def __init__(self, fin, fout, opt):
         super(SPADEResnetBlock, self).__init__()
@@ -64,7 +66,7 @@ class SPADEResnetBlock(nn.Layer):
         # Attributes
         self.learned_shortcut = (fin != fout)
         fmiddle = min(fin, fout)
-        
+
         # define spade layers
         spade_config_str = opt.norm_G.replace('spectral', '')
         self.spade_0 = SPADE(spade_config_str, fin, opt.semantic_nc)
@@ -75,22 +77,22 @@ class SPADEResnetBlock(nn.Layer):
         # define act_conv layers
         self.act_conv_0 = nn.Sequential(*[
             nn.GELU(),
-            spectral_norm(nn.Conv2D(fin, fmiddle, 3, 1, 1, 
-                weight_attr=None,
-                bias_attr=None)),
-            ])
+            spectral_norm(
+                nn.Conv2D(
+                    fin, fmiddle, 3, 1, 1, weight_attr=None, bias_attr=None)),
+        ])
         self.act_conv_1 = nn.Sequential(*[
             nn.GELU(),
-            spectral_norm(nn.Conv2D(fmiddle, fout, 3, 1, 1, 
-                weight_attr=None,
-                bias_attr=None)),
-            ])
+            spectral_norm(
+                nn.Conv2D(
+                    fmiddle, fout, 3, 1, 1, weight_attr=None, bias_attr=None)),
+        ])
         if self.learned_shortcut:
             self.act_conv_s = nn.Sequential(*[
-                spectral_norm(nn.Conv2D(fin, fout, 1, 1, 0, bias_attr=False,
-                    weight_attr=None)),
-                ])
-
+                spectral_norm(
+                    nn.Conv2D(
+                        fin, fout, 1, 1, 0, bias_attr=False, weight_attr=None)),
+            ])
 
     def forward(self, x, seg):
         x_s = self.shortcut(x, seg)
@@ -107,32 +109,33 @@ class SPADEResnetBlock(nn.Layer):
             x_s = x
         return x_s
 
+
 @GENERATORS.register()
 class SPADEGenerator(nn.Layer):
-    def __init__(self, 
-                 ngf,
-                 num_upsampling_layers,
-                 crop_size,
-                 aspect_ratio,
-                 norm_G,
-                 semantic_nc,
-                 use_vae,
-                 nef,
-                 ):
+    def __init__(
+            self,
+            ngf,
+            num_upsampling_layers,
+            crop_size,
+            aspect_ratio,
+            norm_G,
+            semantic_nc,
+            use_vae,
+            nef, ):
         super(SPADEGenerator, self).__init__()
-        
+
         opt = {
-             'ngf': ngf,
-             'num_upsampling_layers': num_upsampling_layers,
-             'crop_size': crop_size,
-             'aspect_ratio': aspect_ratio,
-             'norm_G': norm_G,
-             'semantic_nc': semantic_nc,
-             'use_vae': use_vae,
-             'nef': nef,
-            }
+            'ngf': ngf,
+            'num_upsampling_layers': num_upsampling_layers,
+            'crop_size': crop_size,
+            'aspect_ratio': aspect_ratio,
+            'norm_G': norm_G,
+            'semantic_nc': semantic_nc,
+            'use_vae': use_vae,
+            'nef': nef,
+        }
         self.opt = Dict(opt)
-        
+
         nf = self.opt.ngf
         self.sw, self.sh = self.compute_latent_vector_size(self.opt)
 
@@ -213,7 +216,8 @@ class SPADEGenerator(nn.Layer):
         sh = round(sw / opt.aspect_ratio)
 
         return sw, sh
-    
+
+
 class VAE_Encoder(nn.Layer):
     def __init__(self, opt):
         super(VAE_Encoder, self).__init__()
@@ -224,31 +228,51 @@ class VAE_Encoder(nn.Layer):
 
         InstanceNorm = build_norm_layer('instance')
         model = [
-            spectral_norm(nn.Conv2D(3, ndf, kw, 2, pw,
-                    weight_attr=None,
-                    bias_attr=None)),
+            spectral_norm(
+                nn.Conv2D(
+                    3, ndf, kw, 2, pw, weight_attr=None, bias_attr=None)),
             InstanceNorm(ndf),
-
             nn.GELU(),
-            spectral_norm(nn.Conv2D(ndf * 1, ndf * 2, kw, 2, pw,
+            spectral_norm(
+                nn.Conv2D(
+                    ndf * 1,
+                    ndf * 2,
+                    kw,
+                    2,
+                    pw,
                     weight_attr=None,
                     bias_attr=None)),
             InstanceNorm(ndf * 2),
-
             nn.GELU(),
-            spectral_norm(nn.Conv2D(ndf * 2, ndf * 4, kw, 2, pw,
+            spectral_norm(
+                nn.Conv2D(
+                    ndf * 2,
+                    ndf * 4,
+                    kw,
+                    2,
+                    pw,
                     weight_attr=None,
                     bias_attr=None)),
             InstanceNorm(ndf * 4),
-
             nn.GELU(),
-            spectral_norm(nn.Conv2D(ndf * 4, ndf * 8, kw, 2, pw,
+            spectral_norm(
+                nn.Conv2D(
+                    ndf * 4,
+                    ndf * 8,
+                    kw,
+                    2,
+                    pw,
                     weight_attr=None,
                     bias_attr=None)),
             InstanceNorm(ndf * 8),
-
             nn.GELU(),
-            spectral_norm(nn.Conv2D(ndf * 8, ndf * 8, kw, 2, pw,
+            spectral_norm(
+                nn.Conv2D(
+                    ndf * 8,
+                    ndf * 8,
+                    kw,
+                    2,
+                    pw,
                     weight_attr=None,
                     bias_attr=None)),
             InstanceNorm(ndf * 8),
@@ -256,12 +280,18 @@ class VAE_Encoder(nn.Layer):
         if opt.crop_size >= 256:
             model += [
                 nn.GELU(),
-                spectral_norm(nn.Conv2D(ndf * 8, ndf * 8, kw, 2, pw,
+                spectral_norm(
+                    nn.Conv2D(
+                        ndf * 8,
+                        ndf * 8,
+                        kw,
+                        2,
+                        pw,
                         weight_attr=None,
                         bias_attr=None)),
                 InstanceNorm(ndf * 8),
             ]
-        model += [nn.GELU(),]
+        model += [nn.GELU(), ]
 
         self.flatten = nn.Flatten(1, -1)
         self.so = 4
@@ -272,8 +302,7 @@ class VAE_Encoder(nn.Layer):
 
     def forward(self, x):
         x = self.model(x)
-        
+
         x = self.flatten(x)
 
         return self.fc_mu(x), self.fc_var(x)
-

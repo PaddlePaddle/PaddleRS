@@ -15,6 +15,7 @@
 import paddle
 import paddle.nn as nn
 
+
 class DSHSDLoss(nn.Layer):
     """
     # DSHSD(IEEE ACCESS 2019)
@@ -23,6 +24,7 @@ class DSHSDLoss(nn.Layer):
     # [DSHSD] epoch:250, bit:48,  dataset:nuswide_21, MAP:0.809, Best MAP: 0.815
     # [DSHSD] epoch:135, bit:48,  dataset:imagenet,   MAP:0.647, Best MAP: 0.647
     """
+
     def __init__(self, alpha, multi_label=False):
         super(DSHSDLoss, self).__init__()
         self.alpha = alpha
@@ -65,6 +67,7 @@ class LCDSHLoss(nn.Layer):
     # [LCDSH] epoch:145, bit:48, dataset:cifar10-1,  MAP:0.798, Best MAP: 0.798
     # [LCDSH] epoch:183, bit:48, dataset:nuswide_21, MAP:0.833, Best MAP: 0.834
     """
+
     def __init__(self, n_class, _lambda):
         super(LCDSHLoss, self).__init__()
         self._lambda = _lambda
@@ -75,9 +78,11 @@ class LCDSHLoss(nn.Layer):
 
         # label to ont-hot
         label = paddle.flatten(label)
-        label = paddle.nn.functional.one_hot(label,  self.n_class).astype("float32")
-        
-        s = 2 * (paddle.matmul(label, label, transpose_y=True) > 0).astype("float32") - 1
+        label = paddle.nn.functional.one_hot(label,
+                                             self.n_class).astype("float32")
+
+        s = 2 * (paddle.matmul(
+            label, label, transpose_y=True) > 0).astype("float32") - 1
         inner_product = paddle.matmul(feature, feature, transpose_y=True) * 0.5
 
         inner_product = inner_product.clip(min=-50, max=50)
@@ -89,4 +94,3 @@ class LCDSHLoss(nn.Layer):
         L2 = (sigmoid(inner_product) - sigmoid(inner_product_)).pow(2).mean()
 
         return {"lcdshloss": L1 + self._lambda * L2}
-
