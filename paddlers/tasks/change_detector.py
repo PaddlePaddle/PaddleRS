@@ -29,7 +29,7 @@ import paddlers.custom_models.cd as cmcd
 import paddlers.utils.logging as logging
 import paddlers.models.ppseg as paddleseg
 from paddlers.transforms import arrange_transforms
-from paddlers.transforms import DecodeImg, Resize
+from paddlers.transforms import Resize, decode_image
 from paddlers.utils import get_single_card_bs, DisablePrint
 from paddlers.utils.checkpoint import seg_pretrain_weights_dict
 from .base import BaseModel
@@ -502,8 +502,8 @@ class BaseChangeDetector(BaseModel):
         Args:
             Args:
             img_file(List[tuple], Tuple[str or np.ndarray]):
-                Tuple of image paths or decoded image data in a BGR format for bi-temporal images, which also could constitute 
-                a list, meaning all image pairs to be predicted as a mini-batch.
+                Tuple of image paths or decoded image data for bi-temporal images, which also could constitute a list,
+                meaning all image pairs to be predicted as a mini-batch.
             transforms(paddlers.transforms.Compose or None, optional):
                 Transforms for inputs. If None, the transforms for evaluation process will be used. Defaults to None.
 
@@ -646,15 +646,12 @@ class BaseChangeDetector(BaseModel):
         batch_im1, batch_im2 = list(), list()
         batch_ori_shape = list()
         for im1, im2 in images:
-            sample = {'image_t1': im1, 'image_t2': im2}
-            if isinstance(sample['image_t1'], str) or \
-                isinstance(sample['image_t2'], str):
-                sample = DecodeImg(to_rgb=False)(sample)
-                sample['image'] = sample['image'].astype('float32')
-                sample['image2'] = sample['image2'].astype('float32')
-                ori_shape = sample['image'].shape[:2]
-            else:
-                ori_shape = im1.shape[:2]
+            if isinstance(im1, str) or isinstance(im2, str):
+                im1 = decode_image(im1, to_rgb=False)
+                im2 = decode_image(im2, to_rgb=False)
+            ori_shape = im1.shape[:2]
+            # XXX: sample do not contain 'image_t1' and 'image_t2'.
+            sample = {'image': im1, 'image2': im2}
             im1, im2 = transforms(sample)[:2]
             batch_im1.append(im1)
             batch_im2.append(im2)

@@ -39,7 +39,7 @@ class SELayer(nn.Layer):
         b, c, _, _ = x.shape
         y = self.avg_pool(x).reshape((b, c))
         y = self.fc(y).reshape((b, c, 1, 1))
-        return x * y.expand_as(x)
+        return x * paddle.expand(y, shape=x.shape)
 
 
 class HS(nn.Layer):
@@ -92,7 +92,7 @@ def ShuffleLayer(x, groups):
     # transpose
     x = x.transpose((0, 2, 1, 3, 4))
     # reshape
-    x = x.reshape((batchsize, -1, height, width))
+    x = x.reshape((batchsize, groups * channels_per_group, height, width))
     return x
 
 
@@ -104,7 +104,7 @@ def ShuffleLayerTrans(x, groups):
     # transpose
     x = x.transpose((0, 2, 1, 3, 4))
     # reshape
-    x = x.reshape((batchsize, -1, height, width))
+    x = x.reshape((batchsize, channels_per_group * groups, height, width))
     return x
 
 
@@ -374,7 +374,8 @@ class CondenseNetV2(nn.Layer):
 
     def forward(self, x):
         features = self.features(x)
-        out = features.reshape((features.shape[0], -1))
+        out = features.reshape((features.shape[0], features.shape[1] *
+                                features.shape[2] * features.shape[3]))
         out = self.fc(out)
         out = self.fc_act(out)
 

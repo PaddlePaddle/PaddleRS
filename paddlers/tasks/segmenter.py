@@ -32,7 +32,7 @@ import paddlers.utils.logging as logging
 from .base import BaseModel
 from .utils import seg_metrics as metrics
 from paddlers.utils.checkpoint import seg_pretrain_weights_dict
-from paddlers.transforms import DecodeImg, Resize
+from paddlers.transforms import Resize, decode_image
 
 __all__ = ["UNet", "DeepLabV3P", "FastSCNN", "HRNet", "BiSeNetV2", "FarSeg"]
 
@@ -479,8 +479,8 @@ class BaseSegmenter(BaseModel):
         Args:
             Args:
             img_file(List[np.ndarray or str], str or np.ndarray):
-                Image path or decoded image data in a BGR format, which also could constitute a list,
-                meaning all images to be predicted as a mini-batch.
+                Image path or decoded image data, which also could constitute a list,meaning all images to be 
+                predicted as a mini-batch.
             transforms(paddlers.transforms.Compose or None, optional):
                 Transforms for inputs. If None, the transforms for evaluation process will be used. Defaults to None.
 
@@ -611,11 +611,10 @@ class BaseSegmenter(BaseModel):
         batch_im = list()
         batch_ori_shape = list()
         for im in images:
+            if isinstance(im, str):
+                im = decode_image(im, to_rgb=False)
+            ori_shape = im.shape[:2]
             sample = {'image': im}
-            if isinstance(sample['image'], str):
-                sample = DecodeImg(to_rgb=False)(sample)
-                sample['image'] = sample['image'].astype('float32')
-            ori_shape = sample['image'].shape[:2]
             im = transforms(sample)[0]
             batch_im.append(im)
             batch_ori_shape.append(ori_shape)

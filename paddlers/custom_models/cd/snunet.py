@@ -132,7 +132,7 @@ class SNUNet(nn.Layer, KaimingInitMixin):
 
         out = paddle.concat([x0_1, x0_2, x0_3, x0_4], 1)
 
-        intra = paddle.sum(paddle.stack([x0_1, x0_2, x0_3, x0_4]), axis=0)
+        intra = x0_1 + x0_2 + x0_3 + x0_4
         m_intra = self.ca_intra(intra)
         out = self.ca_inter(out) * (out + paddle.tile(m_intra, (1, 4, 1, 1)))
 

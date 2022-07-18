@@ -27,7 +27,8 @@ import paddlers.models.ppdet as ppdet
 from paddlers.models.ppdet.modeling.proposal_generator.target_layer import BBoxAssigner, MaskAssigner
 import paddlers
 import paddlers.utils.logging as logging
-from paddlers.transforms.operators import _NormalizeBox, _PadBox, _BboxXYXY2XYWH, Resize, Pad, DecodeImg
+from paddlers.transforms import decode_image
+from paddlers.transforms.operators import _NormalizeBox, _PadBox, _BboxXYXY2XYWH, Resize, Pad
 from paddlers.transforms.batch_operators import BatchCompose, BatchRandomResize, BatchRandomResizeByShort, \
     _BatchPad, _Gt2YoloTarget
 from paddlers.transforms import arrange_transforms
@@ -37,8 +38,7 @@ from paddlers.models.ppdet.optimizer import ModelEMA
 from paddlers.utils.checkpoint import det_pretrain_weights_dict
 
 __all__ = [
-    "YOLOv3", "FasterRCNN", "PPYOLO", "PPYOLOTiny", "PPYOLOv2", "MaskRCNN",
-    "PicoDet"
+    "YOLOv3", "FasterRCNN", "PPYOLO", "PPYOLOTiny", "PPYOLOv2", "MaskRCNN"
 ]
 
 
@@ -512,8 +512,8 @@ class BaseDetector(BaseModel):
         Do inference.
         Args:
             img_file(List[np.ndarray or str], str or np.ndarray):
-                Image path or decoded image data in a BGR format, which also could constitute a list,
-                meaning all images to be predicted as a mini-batch.
+                Image path or decoded image data, which also could constitute a list,meaning all images to be 
+                predicted as a mini-batch.
             transforms(paddlers.transforms.Compose or None, optional):
                 Transforms for inputs. If None, the transforms for evaluation process will be used. Defaults to None.
         Returns:
@@ -549,10 +549,9 @@ class BaseDetector(BaseModel):
             model_type=self.model_type, transforms=transforms, mode='test')
         batch_samples = list()
         for im in images:
+            if isinstance(im, str):
+                im = decode_image(im, to_rgb=False)
             sample = {'image': im}
-            if isinstance(sample['image'], str):
-                sample = DecodeImg(to_rgb=False)(sample)
-                sample['image'] = sample['image'].astype('float32')
             sample = transforms(sample)
             batch_samples.append(sample)
         batch_transforms = self._compose_batch_transform(transforms, 'test')

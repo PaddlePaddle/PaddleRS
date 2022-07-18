@@ -12,9 +12,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import copy
+import os.path as osp
+
 from .operators import *
 from .batch_operators import BatchRandomResize, BatchRandomResizeByShort, _BatchPad
 from paddlers import transforms as T
+
+
+def decode_image(im_path,
+                 to_rgb=True,
+                 to_uint8=True,
+                 decode_rgb=True,
+                 decode_sar=False):
+    # Do a presence check. `osp.exists` assumes `im_path` is a path-like object.
+    if not osp.exists(im_path):
+        raise ValueError(f"{im_path} does not exist!")
+    decoder = T.DecodeImg(
+        to_rgb=to_rgb,
+        to_uint8=to_uint8,
+        decode_rgb=decode_rgb,
+        decode_sar=decode_sar)
+    # Deepcopy to avoid inplace modification
+    sample = {'image': copy.deepcopy(im_path)}
+    sample = decoder(sample)
+    return sample['image']
 
 
 def arrange_transforms(model_type, transforms, mode='train'):

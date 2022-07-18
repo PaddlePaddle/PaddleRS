@@ -209,7 +209,7 @@ class MaskPostProcess(object):
         # TODO: support bs > 1 and mask output dtype is bool
         pred_result = paddle.zeros(
             [num_mask, origin_shape[0][0], origin_shape[0][1]], dtype='int32')
-        if bbox_num == 1 and bboxes[0][0] == -1:
+        if (len(bbox_num) == 1 and bbox_num[0] == 1) and bboxes[0][0] == -1:
             return pred_result
 
         # TODO: optimize chunk paste

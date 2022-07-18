@@ -124,15 +124,24 @@ class DecodeImg(Transform):
     Decode image(s) in input.
     
     Args:
-        to_rgb (bool, optional): If True, convert input images from BGR format to RGB format. Defaults to True.
+        to_rgb (bool, optional): If True, convert input image(s) from BGR format to RGB format. Defaults to True.
+        to_uint8 (bool, optional): If True, quantize and convert decoded image(s) to uint8 type. Defaults to True.
+        decode_rgb (bool, optional): If the image to decode is a non-geo RGB image (e.g., jpeg images), set this argument to True. Defaults to True.
+        decode_sar (bool, optional): If the image to decode is a SAR image, set this argument to True. Defaults to False.
     """
 
-    def __init__(self, to_rgb=True, to_uint8=True):
+    def __init__(self,
+                 to_rgb=True,
+                 to_uint8=True,
+                 decode_rgb=True,
+                 decode_sar=False):
         super(DecodeImg, self).__init__()
         self.to_rgb = to_rgb
         self.to_uint8 = to_uint8
+        self.decode_rgb = decode_rgb
+        self.decode_sar = decode_sar
 
-    def read_img(self, img_path, input_channel=3):
+    def read_img(self, img_path):
         img_format = imghdr.what(img_path)
         name, ext = os.path.splitext(img_path)
         if img_format == 'tiff' or ext == '.img':
@@ -141,24 +150,28 @@ class DecodeImg(Transform):
             except:
                 try:
                     from osgeo import gdal
-                except:
-                    raise Exception(
-                        "Failed to import gdal! You can try use conda to install gdal"
+                except ImportError:
+                    raise ImportError(
+                        "Failed to import gdal! Please install GDAL library according to the document."
                     )
-                    six.reraise(*sys.exc_info())
 
             dataset = gdal.Open(img_path)
             if dataset == None:
-                raise Exception('Can not open', img_path)
+                raise IOError('Can not open', img_path)
             im_data = dataset.ReadAsArray()
-            if im_data.ndim == 2:
+            if self.decode_sar:
+                if im_data.ndim != 2:
+                    raise ValueError(
+                        f"SAR images should have exactly 2 channels, but the image has {im_data.ndim} channels."
+                    )
                 im_data = to_intensity(im_data)  # is read SAR
                 im_data = im_data[:, :, np.newaxis]
-            elif im_data.ndim == 3:
-                im_data = im_data.transpose((1, 2, 0))
+            else:
+                if im_data.ndim == 3:
+                    im_data = im_data.transpose((1, 2, 0))
             return im_data
         elif img_format in ['jpeg', 'bmp', 'png', 'jpg']:
-            if input_channel == 3:
+            if self.decode_rgb:
                 return cv2.imread(img_path, cv2.IMREAD_ANYDEPTH |
                                   cv2.IMREAD_ANYCOLOR | cv2.IMREAD_COLOR)
             else:
@@ -167,7 +180,7 @@ class DecodeImg(Transform):
         elif ext == '.npy':
             return np.load(img_path)
         else:
-            raise Exception('Image format {} is not supported!'.format(ext))
+            raise TypeError('Image format {} is not supported!'.format(ext))
 
     def apply_im(self, im_path):
         if isinstance(im_path, str):
@@ -193,7 +206,7 @@ class DecodeImg(Transform):
         except:
             raise ValueError("Cannot read the mask file {}!".format(mask))
         if len(mask.shape) != 2:
-            raise Exception(
+            raise ValueError(
                 "Mask should be a 1-channel image, but recevied is a {}-channel image.".
                 format(mask.shape[2]))
         return mask
@@ -202,6 +215,7 @@ class DecodeImg(Transform):
         """
         Args:
             sample (dict): Input sample.
+
         Returns:
             dict: Decoded sample.
         """
@@ -219,8 +233,8 @@ class DecodeImg(Transform):
             im_height, im_width, _ = sample['image'].shape
             se_height, se_width = sample['mask'].shape
             if im_height != se_height or im_width != se_width:
-                raise Exception(
-                    "The height or width of the im is not same as the mask")
+                raise ValueError(
+                    "The height or width of the image is not same as the mask.")
         if 'aux_masks' in sample:
             sample['aux_masks'] = list(
                 map(self.apply_mask, sample['aux_masks']))
@@ -595,6 +609,16 @@ class RandomFlipOrRotate(Transform):
             mask = img_simple_rotate(mask, mode_id)
         return mask
 
+    def apply_bbox(self, bbox, mode_id, flip_mode=True):
+        raise TypeError(
+            "Currently, `paddlers.transforms.RandomFlipOrRotate` is not available for object detection tasks."
+        )
+
+    def apply_segm(self, bbox, mode_id, flip_mode=True):
+        raise TypeError(
+            "Currently, `paddlers.transforms.RandomFlipOrRotate` is not available for object detection tasks."
+        )
+
     def get_probs_range(self, probs):
         '''
         Change various probabilities into cumulative probabilities
@@ -638,14 +662,43 @@ class RandomFlipOrRotate(Transform):
             mode_p = random.random()
             mode_id = self.judge_probs_range(mode_p, self.probsf)
             sample['image'] = self.apply_im(sample['image'], mode_id, True)
+            if 'image2' in sample:
+                sample['image2'] = self.apply_im(sample['image2'], mode_id,
+                                                 True)
             if 'mask' in sample:
                 sample['mask'] = self.apply_mask(sample['mask'], mode_id, True)
+            if 'aux_masks' in sample:
+                sample['aux_masks'] = [
+                    self.apply_mask(aux_mask, mode_id, True)
+                    for aux_mask in sample['aux_masks']
+                ]
+            if 'gt_bbox' in sample and len(sample['gt_bbox']) > 0:
+                sample['gt_bbox'] = self.apply_bbox(sample['gt_bbox'], mode_id,
+                                                    True)
+            if 'gt_poly' in sample and len(sample['gt_poly']) > 0:
+                sample['gt_poly'] = self.apply_segm(sample['gt_poly'], mode_id,
+                                                    True)
         elif p_m < self.probs[1]:
             mode_p = random.random()
             mode_id = self.judge_probs_range(mode_p, self.probsr)
             sample['image'] = self.apply_im(sample['image'], mode_id, False)
+            if 'image2' in sample:
+                sample['image2'] = self.apply_im(sample['image2'], mode_id,
+                                                 False)
             if 'mask' in sample:
                 sample['mask'] = self.apply_mask(sample['mask'], mode_id, False)
+            if 'aux_masks' in sample:
+                sample['aux_masks'] = [
+                    self.apply_mask(aux_mask, mode_id, False)
+                    for aux_mask in sample['aux_masks']
+                ]
+            if 'gt_bbox' in sample and len(sample['gt_bbox']) > 0:
+                sample['gt_bbox'] = self.apply_bbox(sample['gt_bbox'], mode_id,
+                                                    False)
+            if 'gt_poly' in sample and len(sample['gt_poly']) > 0:
+                sample['gt_poly'] = self.apply_segm(sample['gt_poly'], mode_id,
+                                                    False)
+
         return sample
 
 
