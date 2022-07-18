@@ -100,13 +100,9 @@ class TestPredictor(CommonTest):
             for key in dict_.keys():
                 if key in ignore_keys:
                     continue
-                if isinstance(dict_[key], (list, dict)):
-                    self.check_dict_equal(
-                        dict_[key], expected_dict[key], ignore_keys=ignore_keys)
-                else:
-                    # Use higher tolerance
-                    self.check_output_equal(
-                        dict_[key], expected_dict[key], rtol=1.e-4, atol=1.e-6)
+                # Use higher tolerance
+                self.check_output_equal(
+                    dict_[key], expected_dict[key], rtol=1.e-4, atol=1.e-6)
 
 
 @TestPredictor.add_tests

@@ -126,19 +126,21 @@ class DecodeImg(Transform):
     Args:
         to_rgb (bool, optional): If True, convert input image(s) from BGR format to RGB format. Defaults to True.
         to_uint8 (bool, optional): If True, quantize and convert decoded image(s) to uint8 type. Defaults to True.
-        decode_rgb (bool, optional): If the image to decode is a non-geo RGB image (e.g., jpeg images), set this argument to True. Defaults to True.
-        decode_sar (bool, optional): If the image to decode is a SAR image, set this argument to True. Defaults to False.
+        decode_bgr (bool, optional): If True, automatically interpret a non-geo image (e.g., jpeg images) as a BGR image. 
+            Defaults to True.
+        decode_sar (bool, optional): If True, automatically interpret a two-channel geo image (e.g. geotiff images) as a 
+            SAR image, set this argument to True. Defaults to True.
     """
 
     def __init__(self,
                  to_rgb=True,
                  to_uint8=True,
-                 decode_rgb=True,
-                 decode_sar=False):
+                 decode_bgr=True,
+                 decode_sar=True):
         super(DecodeImg, self).__init__()
         self.to_rgb = to_rgb
         self.to_uint8 = to_uint8
-        self.decode_rgb = decode_rgb
+        self.decode_bgr = decode_bgr
         self.decode_sar = decode_sar
 
     def read_img(self, img_path):
@@ -159,11 +161,7 @@ class DecodeImg(Transform):
             if dataset == None:
                 raise IOError('Can not open', img_path)
             im_data = dataset.ReadAsArray()
-            if self.decode_sar:
-                if im_data.ndim != 2:
-                    raise ValueError(
-                        f"SAR images should have exactly 2 channels, but the image has {im_data.ndim} channels."
-                    )
+            if im_data.ndim == 2 and self.decode_sar:
                 im_data = to_intensity(im_data)  # is read SAR
                 im_data = im_data[:, :, np.newaxis]
             else:
@@ -171,7 +169,7 @@ class DecodeImg(Transform):
                     im_data = im_data.transpose((1, 2, 0))
             return im_data
         elif img_format in ['jpeg', 'bmp', 'png', 'jpg']:
-            if self.decode_rgb:
+            if self.decode_bgr:
                 return cv2.imread(img_path, cv2.IMREAD_ANYDEPTH |
                                   cv2.IMREAD_ANYCOLOR | cv2.IMREAD_COLOR)
             else:

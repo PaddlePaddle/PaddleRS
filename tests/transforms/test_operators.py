@@ -116,6 +116,18 @@ def _is_mt(sample):
     return 'image2' in sample
 
 
+def _is_seg(sample):
+    return 'mask' in sample and 'image2' not in sample
+
+
+def _is_det(sample):
+    return 'gt_bbox' in sample or 'gt_poly' in sample
+
+
+def _is_clas(sample):
+    return 'label' in sample
+
+
 _filter_only_optical = _InputFilter([_is_optical])
 _filter_only_sar = _InputFilter([_is_sar])
 _filter_only_multispectral = _InputFilter([_is_multispectral])
@@ -123,6 +135,7 @@ _filter_no_multispectral = _filter_only_optical | _filter_only_sar
 _filter_no_sar = _filter_only_optical | _filter_only_multispectral
 _filter_no_optical = _filter_only_sar | _filter_only_multispectral
 _filter_only_mt = _InputFilter([_is_mt])
+_filter_no_det = _InputFilter([_is_seg, _is_clas, _is_mt])
 
 OP2FILTER = {
     'RandomSwap': _filter_only_mt,
@@ -261,6 +274,35 @@ class TestTransform(CpuCommonTest):
             target_size=TARGET_SIZE,
             keep_ratio=True)
         test_func_keep_ratio(self)
+
+    def test_RandomFlipOrRotate(self):
+        def _in_hook(sample):
+            if 'image2' in sample:
+                self.im_diff = (
+                    sample['image'] - sample['image2']).astype('float64')
+            elif 'mask' in sample:
+                self.im_diff = (
+                    sample['image'][..., 0] - sample['mask']).astype('float64')
+            return sample
+
+        def _out_hook(sample):
+            im_diff = None
+            if 'image2' in sample:
+                im_diff = (sample['image'] - sample['image2']).astype('float64')
+            elif 'mask' in sample:
+                im_diff = (
+                    sample['image'][..., 0] - sample['mask']).astype('float64')
+            if im_diff is not None:
+                self.check_output_equal(im_diff.max(), self.im_diff.max())
+                self.check_output_equal(im_diff.min(), self.im_diff.min())
+            return sample
+
+        test_func = make_test_func(
+            T.RandomFlipOrRotate,
+            in_hook=_in_hook,
+            out_hook=_out_hook,
+            filter_=_filter_no_det)
+        test_func(self)
 
 
 class TestCompose(CpuCommonTest):
