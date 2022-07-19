@@ -478,7 +478,7 @@ class BaseSegmenter(BaseModel):
         Do inference.
         Args:
             Args:
-            img_file(List[np.ndarray or str], str or np.ndarray):
+            img_file(list[np.ndarray | str] | str | np.ndarray):
                 Image path or decoded image data, which also could constitute a list,meaning all images to be 
                 predicted as a mini-batch.
             transforms(paddlers.transforms.Compose or None, optional):
@@ -533,10 +533,10 @@ class BaseSegmenter(BaseModel):
                 Image path.
             save_dir(str):
                 Directory that contains saved geotiff file.
-            block_size(List[int] or Tuple[int], int):
-                The size of block.
-            overlap(List[int] or Tuple[int], int):
-                The overlap between two blocks. Defaults to 36.
+            block_size(list[int] | tuple[int] | int):
+                Size of block.
+            overlap(list[int] | tuple[int] | int, optional):
+                Overlap between two blocks. Defaults to 36.
             transforms(paddlers.transforms.Compose or None, optional):
                 Transforms for inputs. If None, the transforms for evaluation process will be used. Defaults to None.
         """

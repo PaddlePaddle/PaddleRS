@@ -58,9 +58,10 @@ class _CommonTestNamespace:
 
         @classmethod
         def setUpClass(cls):
-            '''
+            """
             Set the decorators for all test function
-            '''
+            """
+
             for key, value in cls.__dict__.items():
                 if key.startswith('test'):
                     decorator_func_list = ["_test_places"]
@@ -72,9 +73,9 @@ class _CommonTestNamespace:
                     setattr(cls, key, value)
 
         def _catch_warnings(func):
-            '''
+            """
             Catch the warnings and treat them as errors for each test.
-            '''
+            """
 
             def wrapper(self, *args, **kwargs):
                 with warnings.catch_warnings(record=True) as w:
@@ -90,9 +91,9 @@ class _CommonTestNamespace:
             return wrapper
 
         def _test_places(func):
-            '''
+            """
             Setting the running place for each test.
-            '''
+            """
 
             def wrapper(self, *args, **kwargs):
                 places = self.places
@@ -150,7 +151,7 @@ class _CommonTestNamespace:
                                expected_result,
                                rtol=1.e-5,
                                atol=1.e-8):
-            '''
+            """
             Check whether result and expected result are equal, including shape. 
             
             Args:
@@ -162,7 +163,8 @@ class _CommonTestNamespace:
                     relative tolerance, default 1.e-5.
                 atol: float
                     absolute tolerance, default 1.e-8
-            '''
+            """
+
             self._check_output_impl(result, expected_result, rtol, atol)
 
         def check_output_not_equal(self,
@@ -170,7 +172,7 @@ class _CommonTestNamespace:
                                    expected_result,
                                    rtol=1.e-5,
                                    atol=1.e-8):
-            '''
+            """
             Check whether result and expected result are not equal, including shape. 
 
             Args:
@@ -182,7 +184,8 @@ class _CommonTestNamespace:
                     relative tolerance, default 1.e-5.
                 atol: float
                     absolute tolerance, default 1.e-8
-            '''
+            """
+
             self._check_output_impl(
                 result, expected_result, rtol, atol, equal=False)
 

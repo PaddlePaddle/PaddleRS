@@ -501,7 +501,7 @@ class BaseChangeDetector(BaseModel):
         Do inference.
         Args:
             Args:
-            img_file(List[tuple], Tuple[str or np.ndarray]):
+            img_file (list[tuple] | tuple[str | np.ndarray]):
                 Tuple of image paths or decoded image data for bi-temporal images, which also could constitute a list,
                 meaning all image pairs to be predicted as a mini-batch.
             transforms(paddlers.transforms.Compose or None, optional):
@@ -556,14 +556,14 @@ class BaseChangeDetector(BaseModel):
         Do inference.
         Args:
             Args:
-            img_file(List[str]):
+            img_file(list[str]):
                 List of image paths.
             save_dir(str):
                 Directory that contains saved geotiff file.
-            block_size(List[int] or Tuple[int], int):
-                The size of block.
-            overlap(List[int] or Tuple[int], int):
-                The overlap between two blocks. Defaults to 36.
+            block_size(list[int] | tuple[int] | int, optional):
+                Size of block.
+            overlap(list[int] | tuple[int] | int, optional):
+                Overlap between two blocks. Defaults to 36.
             transforms(paddlers.transforms.Compose or None, optional):
                 Transforms for inputs. If None, the transforms for evaluation process will be used. Defaults to None.
         """

@@ -410,7 +410,7 @@ class BaseClassifier(BaseModel):
         Do inference.
         Args:
             Args:
-            img_file(List[np.ndarray or str], str or np.ndarray):
+            img_file(list[np.ndarray | str] | str | np.ndarray):
                 Image path or decoded image data, which also could constitute a list, meaning all images to be 
                 predicted as a mini-batch.
             transforms(paddlers.transforms.Compose or None, optional):

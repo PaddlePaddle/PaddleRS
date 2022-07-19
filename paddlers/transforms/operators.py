@@ -250,7 +250,7 @@ class Compose(Transform):
     All input images are in Height-Width-Channel ([H, W, C]) format.
 
     Args:
-        transforms (List[paddlers.transforms.Transform]): List of data preprocess or augmentations.
+        transforms (list[paddlers.transforms.Transform]): List of data preprocess or augmentations.
     Raises:
         TypeError: Invalid type of transforms.
         ValueError: Invalid length of transforms.
@@ -260,7 +260,7 @@ class Compose(Transform):
         super(Compose, self).__init__()
         if not isinstance(transforms, list):
             raise TypeError(
-                'Type of transforms is invalid. Must be List, but received is {}'
+                'Type of transforms is invalid. Must be a list, but received is {}'
                 .format(type(transforms)))
         if len(transforms) < 1:
             raise ValueError(
@@ -308,7 +308,7 @@ class Resize(Transform):
     Attention: If interp is 'RANDOM', the interpolation method will be chose randomly.
 
     Args:
-        target_size (int, List[int] or Tuple[int]): Target size. If int, the height and width share the same target_size.
+        target_size (int, list[int] | tuple[int]): Target size. If int, the height and width share the same target_size.
             Otherwise, target_size represents [target height, target width].
         interp ({'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}, optional):
             Interpolation method of resize. Defaults to 'LINEAR'.
@@ -427,7 +427,7 @@ class RandomResize(Transform):
     Attention: If interp is 'RANDOM', the interpolation method will be chose randomly.
 
     Args:
-        target_sizes (List[int], List[list or tuple] or Tuple[list or tuple]):
+        target_sizes (list[int] | list[list | tuple] | tuple[list | tuple]):
             Multiple target sizes, each target size is an int or list/tuple.
         interp ({'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}, optional):
             Interpolation method of resize. Defaults to 'LINEAR'.
@@ -447,7 +447,7 @@ class RandomResize(Transform):
                 interp_dict.keys()))
         self.interp = interp
         assert isinstance(target_sizes, list), \
-            "target_size must be List"
+            "target_size must be a list."
         for i, item in enumerate(target_sizes):
             if isinstance(item, int):
                 target_sizes[i] = (item, item)
@@ -507,7 +507,7 @@ class RandomResizeByShort(Transform):
     Attention: If interp is 'RANDOM', the interpolation method will be chose randomly.
 
     Args:
-        short_sizes (List[int]): Target size of the shorter side of the image(s).
+        short_sizes (list[int]): Target size of the shorter side of the image(s).
         max_size (int, optional): The upper bound of longer side of the image(s). If max_size is -1, no upper bound is applied. Defaults to -1.
         interp ({'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}, optional): Interpolation method of resize. Defaults to 'LINEAR'.
 
@@ -526,7 +526,7 @@ class RandomResizeByShort(Transform):
                 interp_dict.keys()))
         self.interp = interp
         assert isinstance(short_sizes, list), \
-            "short_sizes must be List"
+            "short_sizes must be a list."
 
         self.short_sizes = short_sizes
         self.max_size = max_size
@@ -818,16 +818,16 @@ class RandomVerticalFlip(Transform):
 
 class Normalize(Transform):
     """
-    Apply min-max normalization to the image(s) in input.
+    Apply normalization to the input image(s). The normalization steps are:
     1. im = (im - min_value) * 1 / (max_value - min_value)
     2. im = im - mean
     3. im = im / std
 
     Args:
-        mean(List[float] or Tuple[float], optional): Mean of input image(s). Defaults to [0.485, 0.456, 0.406].
-        std(List[float] or Tuple[float], optional): Standard deviation of input image(s). Defaults to [0.229, 0.224, 0.225].
-        min_val(List[float] or Tuple[float], optional): Minimum value of input image(s). Defaults to [0, 0, 0, ].
-        max_val(List[float] or Tuple[float], optional): Max value of input image(s). Defaults to [255., 255., 255.].
+        mean(list[float] | tuple[float], optional): Mean of input image(s). Defaults to [0.485, 0.456, 0.406].
+        std(list[float] | tuple[float], optional): Standard deviation of input image(s). Defaults to [0.229, 0.224, 0.225].
+        min_val(list[float] | tuple[float], optional): Minimum value of input image(s). Defaults to [0, 0, 0, ].
+        max_val(list[float] | tuple[float], optional): Max value of input image(s). Defaults to [255., 255., 255.].
     """
 
     def __init__(self,
@@ -917,12 +917,12 @@ class RandomCrop(Transform):
     4. Resize the cropped area to crop_size by crop_size.
 
     Args:
-        crop_size(int, List[int] or Tuple[int]): Target size of the cropped area. If None, the cropped area will not be
+        crop_size(int, list[int] | tuple[int]): Target size of the cropped area. If None, the cropped area will not be
             resized. Defaults to None.
-        aspect_ratio (List[float], optional): Aspect ratio of cropped region in [min, max] format. Defaults to [.5, 2.].
-        thresholds (List[float], optional): Iou thresholds to decide a valid bbox crop.
+        aspect_ratio (list[float], optional): Aspect ratio of cropped region in [min, max] format. Defaults to [.5, 2.].
+        thresholds (list[float], optional): Iou thresholds to decide a valid bbox crop.
             Defaults to [.0, .1, .3, .5, .7, .9].
-        scaling (List[float], optional): Ratio between the cropped region and the original image in [min, max] format.
+        scaling (list[float], optional): Ratio between the cropped region and the original image in [min, max] format.
             Defaults to [.3, 1.].
         num_attempts (int, optional): The number of tries before giving up. Defaults to 50.
         allow_no_crop (bool, optional): Whether returning without doing crop is allowed. Defaults to True.
@@ -1140,7 +1140,7 @@ class RandomExpand(Transform):
     Args:
         upper_ratio(float, optional): The maximum ratio to which the original image is expanded. Defaults to 4..
         prob(float, optional): The probability of apply expanding. Defaults to .5.
-        im_padding_value(List[float] or Tuple[float], optional): RGB filling value for the image. Defaults to (127.5, 127.5, 127.5).
+        im_padding_value(list[float] | tuple[float], optional): RGB filling value for the image. Defaults to (127.5, 127.5, 127.5).
         label_padding_value(int, optional): Filling value for the mask. Defaults to 255.
 
     See Also:

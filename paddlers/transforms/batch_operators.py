@@ -74,7 +74,7 @@ class BatchRandomResize(Transform):
     Attention: If interp is 'RANDOM', the interpolation method will be chose randomly.
 
     Args:
-        target_sizes (List[int], List[list or tuple] or Tuple[list or tuple]):
+        target_sizes (list[int] | list[list | tuple] | tuple[list | tuple]):
             Multiple target sizes, each target size is an int or list/tuple of length 2.
         interp ({'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}, optional):
             Interpolation method of resize. Defaults to 'LINEAR'.
@@ -93,7 +93,7 @@ class BatchRandomResize(Transform):
                 interp_dict.keys()))
         self.interp = interp
         assert isinstance(target_sizes, list), \
-            "target_size must be List"
+            "target_size must be a list."
         for i, item in enumerate(target_sizes):
             if isinstance(item, int):
                 target_sizes[i] = (item, item)
@@ -113,7 +113,7 @@ class BatchRandomResizeByShort(Transform):
     Attention: If interp is 'RANDOM', the interpolation method will be chose randomly.
 
     Args:
-        short_sizes (List[int], Tuple[int]): Target sizes of the shorter side of the image(s).
+        short_sizes (list[int] | tuple[int]): Target sizes of the shorter side of the image(s).
         max_size (int, optional): The upper bound of longer side of the image(s).
             If max_size is -1, no upper bound is applied. Defaults to -1.
         interp ({'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}, optional):
@@ -134,7 +134,7 @@ class BatchRandomResizeByShort(Transform):
                 interp_dict.keys()))
         self.interp = interp
         assert isinstance(short_sizes, list), \
-            "short_sizes must be List"
+            "short_sizes must be a list."
 
         self.short_sizes = short_sizes
         self.max_size = max_size
