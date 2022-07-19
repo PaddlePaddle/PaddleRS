@@ -6,9 +6,9 @@
 
   **基于飞桨框架开发的高性能遥感图像处理开发套件，端到端地完成从训练到部署的全流程遥感深度学习应用。**
 
-  <!-- [![Build Status](https://travis-ci.org/PaddleCV-SIG/PaddleRS.svg?branch=release/0.1)](https://travis-ci.org/PaddleCV-SIG/PaddleRS) -->
-  <!-- [![Version](https://img.shields.io/github/release/PaddleCV-SIG/PaddleRS.svg)](https://github.com/PaddleCV-SIG/PaddleRS/releases) -->
-  [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](LICENSE)
+  <!-- [![version](https://img.shields.io/github/release/PaddleCV-SIG/PaddleRS.svg)](https://github.com/PaddleCV-SIG/PaddleRS/releases) -->
+  [![license](https://img.shields.io/badge/license-Apache%202-blue.svg)](LICENSE)
+  [![build status](https://github.com/PaddleCV-SIG/PaddleRS/workflows/build_and_test.yaml/badge.svg?branch=develop)](https://github.com/PaddleCV-SIG/PaddleRS/actions)
   ![python version](https://img.shields.io/badge/python-3.7+-orange.svg)
   ![support os](https://img.shields.io/badge/os-linux%2C%20win%2C%20mac-yellow.svg)
 </div>
