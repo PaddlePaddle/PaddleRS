@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import os.path as osp
+import re
 import tempfile
 import shutil
 from glob import iglob
@@ -23,7 +24,7 @@ from testing_utils import run_script, CpuCommonTest
 class TestTutorial(CpuCommonTest):
     SUBDIR = "./"
     TIMEOUT = 300
-    PATTERN = "*.py"
+    REGEX = ".*"
 
     @classmethod
     def setUpClass(cls):
@@ -52,7 +53,9 @@ class TestTutorial(CpuCommonTest):
 
             return _test_tutorial_impl
 
-        for script_path in iglob(osp.join(cls.SUBDIR, cls.PATTERN)):
+        for script_path in filter(
+                re.compile(cls.REGEX).match,
+                iglob(osp.join(cls.SUBDIR, '*.py'))):
             script_name = osp.basename(script_path)
             if osp.normpath(osp.join(cls.SUBDIR, script_name)) != osp.normpath(
                     script_path):
@@ -82,3 +85,4 @@ class TestDetTutorial(TestTutorial):
 @TestTutorial.add_tests
 class TestSegTutorial(TestTutorial):
     SUBDIR = "../tutorials/train/semantic_segmentation"
+    REGEX = r".*(?<!run_with_clean_log\.py)$"
