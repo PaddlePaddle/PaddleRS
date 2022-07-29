@@ -1,1 +1,0 @@
-sar_t1.tiff sar_t2.tiff binary_gt.bmp binary_gt.bmp binary_gt.bmp

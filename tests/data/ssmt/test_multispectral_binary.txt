@@ -1,1 +1,0 @@
-multispectral_t1.tif multispectral_t2.tif binary_gt.bmp

@@ -1,2 +1,0 @@
-multispectral_t1.tif multispectral_t2.tif multiclass_gt.png
-multispectral_t1.tif multispectral_t2.tif multiclass_gt2.png

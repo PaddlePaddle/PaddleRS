@@ -1,3 +1,0 @@
-optical.bmp 0
-sar.tiff 1
-multispectral.tif 2

@@ -1,1 +1,0 @@
-optical.bmp det_gt_voc.xml

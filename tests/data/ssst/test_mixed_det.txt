@@ -1,3 +1,0 @@
-optical.bmp det_gt_voc.xml
-sar.tiff det_gt_voc.xml
-multispectral.tif det_gt_voc.xml

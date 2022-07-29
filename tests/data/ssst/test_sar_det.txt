@@ -1,1 +1,0 @@
-sar.tiff det_gt_voc.xml

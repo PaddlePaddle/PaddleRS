@@ -1,2 +1,0 @@
-optical.bmp multiclass_gt.png
-optical.bmp multiclass_gt2.png

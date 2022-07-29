@@ -1,6 +1,0 @@
-optical.bmp multiclass_gt.png
-sar.tiff multiclass_gt.png
-multispectral.tif multiclass_gt.png
-optical.bmp multiclass_gt2.png
-sar.tiff multiclass_gt2.png
-multispectral.tif multiclass_gt2.png

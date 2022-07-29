@@ -1,1 +1,0 @@
-multispectral.tif det_gt_voc.xml

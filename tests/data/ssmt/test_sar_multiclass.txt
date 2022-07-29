@@ -1,2 +1,0 @@
-sar_t1.tiff sar_t2.tiff multiclass_gt.png
-sar_t1.tiff sar_t2.tiff multiclass_gt2.png
