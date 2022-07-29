@@ -60,28 +60,17 @@ jobs:
   build_and_test_cuda102:
     runs-on: ubuntu-18.04
     container:
-      image: pytorch/pytorch:1.9.0-cuda10.2-cudnn7-devel
+      image: registry.baidubce.com/paddlepaddle/paddle:2.3.1-gpu-cuda10.2-cudnn7
     steps:
       - uses: actions/checkout@v3
-      - name: Fetch GPG keys
-        run: |
-          apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/3bf863cc.pub
-          apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1804/x86_64/7fa2af80.pub
       - name: Upgrade pip
-        run: python -m pip install pip --upgrade --user
-      - name: Install dependencies
-        run: |
-          apt-get update
-          apt-get install ffmpeg libsm6 libxext6 git ninja-build libglib2.0-0 libsm6 libxrender-dev libxext6 -y
-      - name: Install PaddlePaddle
-        run: python -m pip install paddlepaddle-gpu==2.3.1 -i https://mirror.baidu.com/pypi/simple
+        run: python3.7 -m pip install pip --upgrade --user
       - name: Install PaddleRS
         run: |
-          python -m pip install -r requirements.txt
-          python -m pip install -e .
-          python --version
+          python3.7 -m pip install -r requirements.txt
+          python3.7 -m pip install -e .
       - name: Install GDAL
-        run: python -m pip install https://versaweb.dl.sourceforge.net/project/gdal-wheels-for-linux/GDAL-3.4.1-cp37-cp37m-manylinux_2_5_x86_64.manylinux1_x86_64.whl
+        run: python3.7 -m pip install https://versaweb.dl.sourceforge.net/project/gdal-wheels-for-linux/GDAL-3.4.1-cp37-cp37m-manylinux_2_5_x86_64.manylinux1_x86_64.whl
       # Do not run unittests, because there is NO GPU in the machine.
       # - name: Run unittests
       #   run: |
