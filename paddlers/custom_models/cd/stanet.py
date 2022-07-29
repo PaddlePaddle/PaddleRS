@@ -215,7 +215,8 @@ class BAM(nn.Layer):
 
         out = F.interpolate(out, scale_factor=self.ds)
         out = out + x
-        return out.reshape(tuple(out.shape[:-1]) + (out.shape[-1] // 2, 2))
+        return out.reshape(
+            tuple(paddle.shape(out)[:-1]) + (paddle.shape(out)[-1] // 2, 2))
 
 
 class PAMBlock(nn.Layer):
@@ -241,7 +242,7 @@ class PAMBlock(nn.Layer):
         value = self.conv_v(x_rs)
 
         # Split the whole image into subregions.
-        b, c, h, w = x_rs.shape
+        b, c, h, w = paddle.shape(x_rs)
 
         query = self._split_subregions(query)
         key = self._split_subregions(key)
@@ -264,7 +265,7 @@ class PAMBlock(nn.Layer):
         return out
 
     def _split_subregions(self, x):
-        b, c, h, w = x.shape
+        b, c, h, w = paddle.shape(x)
         assert h % self.scale == 0 and w % self.scale == 0
         x = x.reshape(
             (b, c, self.scale, h // self.scale, self.scale, w // self.scale))
@@ -296,7 +297,8 @@ class PAM(nn.Layer):
 
         out = self.conv_out(paddle.concat(res, axis=1))
 
-        return out.reshape(tuple(out.shape[:-1]) + (out.shape[-1] // 2, 2))
+        return out.reshape(
+            tuple(paddle.shape(out)[:-1]) + (paddle.shape(out)[-1] // 2, 2))
 
 
 class Attention(nn.Layer):

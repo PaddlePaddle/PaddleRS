@@ -154,8 +154,8 @@ class FCSiamDiff(nn.Layer):
         # Decode
         # Stage 4d
         x4d = self.upconv4(x4p)
-        pad4 = (0, x43_1.shape[3] - x4d.shape[3], 0,
-                x43_1.shape[2] - x4d.shape[2])
+        pad4 = (0, paddle.shape(x43_1)[3] - paddle.shape(x4d)[3], 0,
+                paddle.shape(x43_1)[2] - paddle.shape(x4d)[2])
         x4d = F.pad(x4d, pad=pad4, mode='replicate')
         x4d = paddle.concat([x4d, paddle.abs(x43_1 - x43_2)], 1)
         x43d = self.do43d(self.conv43d(x4d))
@@ -164,8 +164,8 @@ class FCSiamDiff(nn.Layer):
 
         # Stage 3d
         x3d = self.upconv3(x41d)
-        pad3 = (0, x33_1.shape[3] - x3d.shape[3], 0,
-                x33_1.shape[2] - x3d.shape[2])
+        pad3 = (0, paddle.shape(x33_1)[3] - paddle.shape(x3d)[3], 0,
+                paddle.shape(x33_1)[2] - paddle.shape(x3d)[2])
         x3d = F.pad(x3d, pad=pad3, mode='replicate')
         x3d = paddle.concat([x3d, paddle.abs(x33_1 - x33_2)], 1)
         x33d = self.do33d(self.conv33d(x3d))
@@ -174,8 +174,8 @@ class FCSiamDiff(nn.Layer):
 
         # Stage 2d
         x2d = self.upconv2(x31d)
-        pad2 = (0, x22_1.shape[3] - x2d.shape[3], 0,
-                x22_1.shape[2] - x2d.shape[2])
+        pad2 = (0, paddle.shape(x22_1)[3] - paddle.shape(x2d)[3], 0,
+                paddle.shape(x22_1)[2] - paddle.shape(x2d)[2])
         x2d = F.pad(x2d, pad=pad2, mode='replicate')
         x2d = paddle.concat([x2d, paddle.abs(x22_1 - x22_2)], 1)
         x22d = self.do22d(self.conv22d(x2d))
@@ -183,8 +183,8 @@ class FCSiamDiff(nn.Layer):
 
         # Stage 1d
         x1d = self.upconv1(x21d)
-        pad1 = (0, x12_1.shape[3] - x1d.shape[3], 0,
-                x12_1.shape[2] - x1d.shape[2])
+        pad1 = (0, paddle.shape(x12_1)[3] - paddle.shape(x1d)[3], 0,
+                paddle.shape(x12_1)[2] - paddle.shape(x1d)[2])
         x1d = F.pad(x1d, pad=pad1, mode='replicate')
         x1d = paddle.concat([x1d, paddle.abs(x12_1 - x12_2)], 1)
         x12d = self.do12d(self.conv12d(x1d))

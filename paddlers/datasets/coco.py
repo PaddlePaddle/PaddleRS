@@ -336,7 +336,7 @@ class COCODetection(Dataset):
             max_img_id += 1
             im_fname = osp.join(image_dir, image)
             img_data = cv2.imread(im_fname, cv2.IMREAD_UNCHANGED)
-            im_h, im_w, im_c = img_data.shape
+            im_h, im_w, im_c = paddle.shape(img_data)
 
             im_info = {
                 'im_id': np.asarray([max_img_id]),

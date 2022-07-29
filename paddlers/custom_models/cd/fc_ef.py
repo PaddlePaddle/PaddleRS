@@ -131,7 +131,8 @@ class FCEarlyFusion(nn.Layer):
 
         # Stage 4d
         x4d = self.upconv4(x4p)
-        pad4 = (0, x43.shape[3] - x4d.shape[3], 0, x43.shape[2] - x4d.shape[2])
+        pad4 = (0, paddle.shape(x43)[3] - paddle.shape(x4d)[3], 0,
+                paddle.shape(x43)[2] - paddle.shape(x4d)[2])
         x4d = paddle.concat([F.pad(x4d, pad=pad4, mode='replicate'), x43], 1)
         x43d = self.do43d(self.conv43d(x4d))
         x42d = self.do42d(self.conv42d(x43d))
@@ -139,7 +140,8 @@ class FCEarlyFusion(nn.Layer):
 
         # Stage 3d
         x3d = self.upconv3(x41d)
-        pad3 = (0, x33.shape[3] - x3d.shape[3], 0, x33.shape[2] - x3d.shape[2])
+        pad3 = (0, paddle.shape(x33)[3] - paddle.shape(x3d)[3], 0,
+                paddle.shape(x33)[2] - paddle.shape(x3d)[2])
         x3d = paddle.concat([F.pad(x3d, pad=pad3, mode='replicate'), x33], 1)
         x33d = self.do33d(self.conv33d(x3d))
         x32d = self.do32d(self.conv32d(x33d))
@@ -147,14 +149,16 @@ class FCEarlyFusion(nn.Layer):
 
         # Stage 2d
         x2d = self.upconv2(x31d)
-        pad2 = (0, x22.shape[3] - x2d.shape[3], 0, x22.shape[2] - x2d.shape[2])
+        pad2 = (0, paddle.shape(x22)[3] - paddle.shape(x2d)[3], 0,
+                paddle.shape(x22)[2] - paddle.shape(x2d)[2])
         x2d = paddle.concat([F.pad(x2d, pad=pad2, mode='replicate'), x22], 1)
         x22d = self.do22d(self.conv22d(x2d))
         x21d = self.do21d(self.conv21d(x22d))
 
         # Stage 1d
         x1d = self.upconv1(x21d)
-        pad1 = (0, x12.shape[3] - x1d.shape[3], 0, x12.shape[2] - x1d.shape[2])
+        pad1 = (0, paddle.shape(x12)[3] - paddle.shape(x1d)[3], 0,
+                paddle.shape(x12)[2] - paddle.shape(x1d)[2])
         x1d = paddle.concat([F.pad(x1d, pad=pad1, mode='replicate'), x12], 1)
         x12d = self.do12d(self.conv12d(x1d))
         x11d = self.conv11d(x12d)

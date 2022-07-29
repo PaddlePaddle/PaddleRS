@@ -36,10 +36,10 @@ class SELayer(nn.Layer):
             nn.Sigmoid(), )
 
     def forward(self, x):
-        b, c, _, _ = x.shape
+        b, c, _, _ = paddle.shape(x)
         y = self.avg_pool(x).reshape((b, c))
         y = self.fc(y).reshape((b, c, 1, 1))
-        return x * paddle.expand(y, shape=x.shape)
+        return x * paddle.expand(y, shape=paddle.shape(x))
 
 
 class HS(nn.Layer):
@@ -85,7 +85,7 @@ class Conv(nn.Sequential):
 
 
 def ShuffleLayer(x, groups):
-    batchsize, num_channels, height, width = x.shape
+    batchsize, num_channels, height, width = paddle.shape(x)
     channels_per_group = num_channels // groups
     # reshape
     x = x.reshape((batchsize, groups, channels_per_group, height, width))
@@ -97,7 +97,7 @@ def ShuffleLayer(x, groups):
 
 
 def ShuffleLayerTrans(x, groups):
-    batchsize, num_channels, height, width = x.shape
+    batchsize, num_channels, height, width = paddle.shape(x)
     channels_per_group = num_channels // groups
     # reshape
     x = x.reshape((batchsize, channels_per_group, groups, height, width))
@@ -188,7 +188,7 @@ class CondenseSFR(nn.Layer):
         x = self.activation(x)
         x = ShuffleLayerTrans(x, self.groups)
         x = self.conv(x)  # SIZE: N, C, H, W
-        N, C, H, W = x.shape
+        N, C, H, W = paddle.shape(x)
         x = x.reshape((N, C, H * W))
         x = x.transpose((0, 2, 1))  # SIZE: N, HW, C
         # x SIZE: N, HW, C; self.index SIZE: C, C; OUTPUT SIZE: N, HW, C
@@ -374,8 +374,8 @@ class CondenseNetV2(nn.Layer):
 
     def forward(self, x):
         features = self.features(x)
-        out = features.reshape((features.shape[0], features.shape[1] *
-                                features.shape[2] * features.shape[3]))
+        shape = paddle.shape(features)
+        out = features.reshape((shape[0], shape[1] * shape[2] * shape[3]))
         out = self.fc(out)
         out = self.fc_act(out)
 
