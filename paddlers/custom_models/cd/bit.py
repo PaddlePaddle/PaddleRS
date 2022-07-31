@@ -138,12 +138,12 @@ class BIT(nn.Layer):
             Conv3x3(EBD_DIM, num_classes))
 
     def _get_semantic_tokens(self, x):
-        b, c = paddle.shape(x)[:2]
+        b, c = x.shape[:2]
         att_map = self.conv_att(x)
         att_map = att_map.reshape(
-            (b, self.token_len, 1, calc_product(*paddle.shape(att_map)[2:])))
+            (b, self.token_len, 1, calc_product(*att_map.shape[2:])))
         att_map = F.softmax(att_map, axis=-1)
-        x = x.reshape((b, 1, c, paddle.shape(att_map)[-1]))
+        x = x.reshape((b, 1, c, att_map.shape[-1]))
         tokens = (x * att_map).sum(-1)
         return tokens
 
@@ -164,7 +164,7 @@ class BIT(nn.Layer):
         return x
 
     def decode(self, x, m):
-        b, c, h, w = paddle.shape(x)
+        b, c, h, w = x.shape
         x = x.transpose((0, 2, 3, 1)).flatten(1, 2)
         x = self.decoder(x, m)
         x = x.transpose((0, 2, 1)).reshape((b, c, h, w))
@@ -276,7 +276,7 @@ class CrossAttention(nn.Layer):
             nn.Linear(inner_dim, dim), nn.Dropout(dropout_rate))
 
     def forward(self, x, ref):
-        b, n = paddle.shape(x)[:2]
+        b, n = x.shape[:2]
         h = self.n_heads
 
         q = self.fc_q(x)
@@ -284,7 +284,7 @@ class CrossAttention(nn.Layer):
         v = self.fc_v(ref)
 
         q = q.reshape((b, n, h, self.head_dim)).transpose((0, 2, 1, 3))
-        rn = paddle.shape(ref)[1]
+        rn = ref.shape[1]
         k = k.reshape((b, rn, h, self.head_dim)).transpose((0, 2, 1, 3))
         v = v.reshape((b, rn, h, self.head_dim)).transpose((0, 2, 1, 3))
 
