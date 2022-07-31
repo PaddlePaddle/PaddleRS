@@ -62,7 +62,8 @@ class TestTutorial(CpuCommonTest):
                 raise ValueError(
                     f"{script_name} should be directly contained in {cls.SUBDIR}"
                 )
-            setattr(cls, 'test_' + script_name, _test_tutorial(script_name))
+            setattr(cls, 'test_' + osp.splitext(script_name)[0],
+                    _test_tutorial(script_name))
 
         return cls
 

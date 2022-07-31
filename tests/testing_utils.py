@@ -24,13 +24,15 @@ import paddle
 __all__ = ['CommonTest', 'CpuCommonTest', 'run_script']
 
 
-def run_script(cmd, silent=True, wd=None, timeout=None):
+def run_script(cmd, silent=True, wd=None, timeout=None, echo=True):
     # XXX: This function is not safe!!!
     cfg = dict(check=True, shell=True, timeout=timeout)
     if silent:
         cfg['stdout'] = subprocess.DEVNULL
     if wd is not None:
         cmd = f"cd {wd} && {cmd}"
+    if echo:
+        print(cmd)
     return subprocess.run(cmd, **cfg)
 
 
