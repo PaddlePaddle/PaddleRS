@@ -13,8 +13,8 @@ remove_dir_if_exist 'data/ssst'
 remove_dir_if_exist 'data/ssmt'
 
 ## Download and unzip
-wget -nc -P data/ https://paddlers.bj.bcebos.com/tests/data/ssst.tar.gz --no-check-certificate
+curl -kL https://paddlers.bj.bcebos.com/tests/data/ssst.tar.gz -o data/ssst.tar.gz
 tar -zxf data/ssst.tar.gz -C data/
 
-wget -nc -P data/ https://paddlers.bj.bcebos.com/tests/data/ssmt.tar.gz --no-check-certificate
+curl -kL https://paddlers.bj.bcebos.com/tests/data/ssmt.tar.gz -o data/ssmt.tar.gz
 tar -zxf data/ssmt.tar.gz -C data/
