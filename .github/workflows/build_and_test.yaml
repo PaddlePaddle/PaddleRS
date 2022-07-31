@@ -36,6 +36,7 @@ jobs:
           - python-version: "3.8"
             os: ubuntu-latest
             gdal-whl-url: https://versaweb.dl.sourceforge.net/project/gdal-wheels-for-linux/GDAL-3.4.1-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.whl
+      fail-fast: false
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
@@ -55,7 +56,7 @@ jobs:
       - name: Run unittests
         run: |
           cd tests
-          bash run_fast_tests.sh
+          bash run_tests.sh
         shell: bash
 
   build_and_test_cuda102:
