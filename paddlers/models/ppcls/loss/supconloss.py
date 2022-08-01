@@ -58,8 +58,7 @@ class SupConLoss(nn.Layer):
         elif labels is not None:
             labels = labels.reshape([-1, 1])
             if labels.shape[0] != batch_size:
-                raise ValueError(
-                    'Num of labels does not match num of features')
+                raise ValueError('Num of labels does not match num of features')
             mask = paddle.cast(
                 paddle.equal(labels, paddle.t(labels)), 'float32')
         else:

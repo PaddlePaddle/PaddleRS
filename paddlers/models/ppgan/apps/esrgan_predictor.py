@@ -28,6 +28,7 @@ from .base_predictor import BasePredictor
 
 SR_WEIGHT_URL = 'https://paddlegan.bj.bcebos.com/models/esrgan_x4.pdparams'
 
+
 class ESRGANPredictor(BasePredictor):
     def __init__(self, output='output', weight_path=None):
         self.input = input

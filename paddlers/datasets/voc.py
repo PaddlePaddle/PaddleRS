@@ -25,7 +25,7 @@ import numpy as np
 from paddle.io import Dataset
 
 from paddlers.utils import logging, get_num_workers, get_encoding, path_normalization, is_pic
-from paddlers.transforms import ImgDecoder, MixupImage
+from paddlers.transforms import DecodeImg, MixupImage
 from paddlers.tools import YOLOAnchorCluster
 
 
@@ -320,8 +320,8 @@ class VOCDetection(Dataset):
             if self.data_fields is not None:
                 sample_mix = {k: sample_mix[k] for k in self.data_fields}
             sample = self.mixup_op(sample=[
-                ImgDecoder(to_rgb=False)(sample),
-                ImgDecoder(to_rgb=False)(sample_mix)
+                DecodeImg(to_rgb=False)(sample),
+                DecodeImg(to_rgb=False)(sample_mix)
             ])
         sample = self.transforms(sample)
         return sample

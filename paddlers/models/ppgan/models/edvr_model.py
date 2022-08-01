@@ -27,6 +27,7 @@ class EDVRModel(BaseSRModel):
 
     Paper: EDVR: Video Restoration with Enhanced Deformable Convolutional Networks.
     """
+
     def __init__(self, generator, tsa_iter, pixel_criterion=None):
         """Initialize the EDVR class.
 
@@ -77,8 +78,8 @@ class EDVRModel(BaseSRModel):
 
 def init_edvr_weight(net):
     def reset_func(m):
-        if hasattr(m, 'weight') and (not isinstance(
-                m, (nn.BatchNorm, nn.BatchNorm2D))) and (
+        if hasattr(m, 'weight') and (
+                not isinstance(m, (nn.BatchNorm, nn.BatchNorm2D))) and (
                     not isinstance(m, ResidualBlockNoBN) and
                     (not isinstance(m, DCNPack))):
             reset_parameters(m)

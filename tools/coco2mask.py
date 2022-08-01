@@ -25,7 +25,7 @@ import glob
 from tqdm import tqdm
 from PIL import Image
 
-from utils import timer
+from utils import time_it
 
 
 def _mkdir_p(path):
@@ -69,30 +69,30 @@ def _read_geojson(json_path):
         return annotations, sizes
 
 
-@timer
-def convert_data(raw_folder, end_folder):
+@time_it
+def convert_data(raw_dir, end_dir):
     print("-- Initializing --")
-    img_folder = osp.join(raw_folder, "images")
-    save_img_folder = osp.join(end_folder, "img")
-    save_lab_folder = osp.join(end_folder, "gt")
-    _mkdir_p(save_img_folder)
-    _mkdir_p(save_lab_folder)
-    names = os.listdir(img_folder)
+    img_dir = osp.join(raw_dir, "images")
+    save_img_dir = osp.join(end_dir, "img")
+    save_lab_dir = osp.join(end_dir, "gt")
+    _mkdir_p(save_img_dir)
+    _mkdir_p(save_lab_dir)
+    names = os.listdir(img_dir)
     print("-- Loading annotations --")
     anns = {}
     sizes = {}
-    jsons = glob.glob(osp.join(raw_folder, "*.json"))
+    jsons = glob.glob(osp.join(raw_dir, "*.json"))
     for json in jsons:
         j_ann, j_size = _read_geojson(json)
         anns.update(j_ann)
         sizes.update(j_size)
-    print("-- Converting datas --")
+    print("-- Converting data --")
     for k in tqdm(names):
         # for k in tqdm(anns.keys()):
-        img_path = osp.join(img_folder, k)
-        img_save_path = osp.join(save_img_folder, k)
+        img_path = osp.join(img_dir, k)
+        img_save_path = osp.join(save_img_dir, k)
         ext = "." + k.split(".")[-1]
-        lab_save_path = osp.join(save_lab_folder, k.replace(ext, ".png"))
+        lab_save_path = osp.join(save_lab_dir, k.replace(ext, ".png"))
         shutil.copy(img_path, img_save_path)
         if k in anns.keys():
             _save_mask(anns[k], sizes[k], lab_save_path)
@@ -101,12 +101,12 @@ def convert_data(raw_folder, end_folder):
                           lab_save_path)
 
 
-parser = argparse.ArgumentParser(description="input parameters")
-parser.add_argument("--raw_folder", type=str, required=True, \
-                    help="The folder path about original data, where `images` saves the original image, `annotation.json` saves the corresponding annotation information.")
-parser.add_argument("--save_folder", type=str, required=True, \
-                    help="The folder path to save the results, where `img` saves the image and `gt` saves the label.")
+parser = argparse.ArgumentParser()
+parser.add_argument("--raw_dir", type=str, required=True, \
+                    help="Directory that contains original data, where `images` stores the original image and `annotation.json` stores the corresponding annotation information.")
+parser.add_argument("--save_dir", type=str, required=True, \
+                    help="Directory to save the results, where `img` stores the image and `gt` stores the label.")
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    convert_data(args.raw_folder, args.save_folder)
+    convert_data(args.raw_dir, args.save_dir)

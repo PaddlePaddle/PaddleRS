@@ -480,7 +480,7 @@ class Normalize:
 
 
 @manager.TRANSFORMS.add_component
-class Padding:
+class Pad:
     """
     Add bottom-right padding to a raw image or annotation image.
 
@@ -560,7 +560,7 @@ class Padding:
 
 
 @manager.TRANSFORMS.add_component
-class PaddingByAspectRatio:
+class PadByAspectRatio:
     """
 
     Args:
@@ -597,15 +597,14 @@ class PaddingByAspectRatio:
             img_height = int(img_width / self.aspect_ratio)
         else:
             img_width = int(img_height * self.aspect_ratio)
-        padding = Padding(
-            (img_width, img_height),
-            im_padding_value=self.im_padding_value,
-            label_padding_value=self.label_padding_value)
+        padding = Pad((img_width, img_height),
+                      im_padding_value=self.im_padding_value,
+                      label_padding_value=self.label_padding_value)
         return padding(im, label)
 
 
 @manager.TRANSFORMS.add_component
-class RandomPaddingCrop:
+class RandomPadCrop:
     """
     Crop a sub-image from a raw image and annotation image randomly. If the target cropping size
     is larger than original image, then the bottom-right padding will be added.
@@ -768,7 +767,7 @@ class RandomCenterCrop:
 
 
 @manager.TRANSFORMS.add_component
-class ScalePadding:
+class ScalePad:
     """
         Add center padding to a raw image or annotation image,then scale the
         image to target size.

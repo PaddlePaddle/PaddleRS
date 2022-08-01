@@ -29,6 +29,7 @@ class MPRModel(BaseModel):
     Paper: MPR: Multi-Stage Progressive Image Restoration (CVPR 2021).
     https://arxiv.org/abs/2102.02808
     """
+
     def __init__(self, generator, char_criterion=None, edge_criterion=None):
         """Initialize the MPR class.
 

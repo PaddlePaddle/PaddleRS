@@ -64,10 +64,10 @@ def get_reverse_list(ori_shape, transforms):
             else:
                 w = long_edge
                 h = short_edge
-        if op.__class__.__name__ in ['Padding']:
+        if op.__class__.__name__ in ['Pad']:
             reverse_list.append(('padding', (h, w)))
             w, h = op.target_size[0], op.target_size[1]
-        if op.__class__.__name__ in ['PaddingByAspectRatio']:
+        if op.__class__.__name__ in ['PadByAspectRatio']:
             reverse_list.append(('padding', (h, w)))
             ratio = w / h
             if ratio == op.aspect_ratio:

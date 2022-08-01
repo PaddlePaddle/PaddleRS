@@ -31,6 +31,7 @@ class L1Loss():
         loss_weight (float): Loss weight for L1 loss. Default: 1.0.
 
     """
+
     def __init__(self, reduction='mean', loss_weight=1.0):
         # when loss weight less than zero return None
         if loss_weight <= 0:
@@ -59,6 +60,7 @@ class CharbonnierLoss():
         eps (float): Default: 1e-12.
 
     """
+
     def __init__(self, eps=1e-12, reduction='sum'):
         self.eps = eps
         self.reduction = reduction
@@ -90,6 +92,7 @@ class MSELoss():
         loss_weight (float): Loss weight for MSE loss. Default: 1.0.
 
     """
+
     def __init__(self, reduction='mean', loss_weight=1.0):
         # when loss weight less than zero return None
         if loss_weight <= 0:
@@ -119,6 +122,7 @@ class BCEWithLogitsLoss():
             Supported choices are 'none' | 'mean' | 'sum'. Default: 'mean'.
         loss_weight (float): Loss weight for MSE loss. Default: 1.0.
     """
+
     def __init__(self, reduction='mean', loss_weight=1.0):
         # when loss weight less than zero return None
         if loss_weight <= 0:
@@ -161,6 +165,7 @@ def calc_emd_loss(pred, target):
 class CalcStyleEmdLoss():
     """Calc Style Emd Loss.
     """
+
     def __init__(self):
         super(CalcStyleEmdLoss, self).__init__()
 
@@ -183,6 +188,7 @@ class CalcStyleEmdLoss():
 class CalcContentReltLoss():
     """Calc Content Relt Loss.
     """
+
     def __init__(self):
         super(CalcContentReltLoss, self).__init__()
 
@@ -207,6 +213,7 @@ class CalcContentReltLoss():
 class CalcContentLoss():
     """Calc Content Loss.
     """
+
     def __init__(self):
         self.mse_loss = nn.MSELoss()
 
@@ -221,14 +228,15 @@ class CalcContentLoss():
         if (norm == False):
             return self.mse_loss(pred, target)
         else:
-            return self.mse_loss(mean_variance_norm(pred),
-                                 mean_variance_norm(target))
+            return self.mse_loss(
+                mean_variance_norm(pred), mean_variance_norm(target))
 
 
 @CRITERIONS.register()
 class CalcStyleLoss():
     """Calc Style Loss.
     """
+
     def __init__(self):
         self.mse_loss = nn.MSELoss()
 
@@ -241,28 +249,28 @@ class CalcStyleLoss():
         """
         pred_mean, pred_std = calc_mean_std(pred)
         target_mean, target_std = calc_mean_std(target)
-        return self.mse_loss(pred_mean, target_mean) + self.mse_loss(
-            pred_std, target_std)
+        return self.mse_loss(pred_mean, target_mean) + self.mse_loss(pred_std,
+                                                                     target_std)
 
 
 @CRITERIONS.register()
 class EdgeLoss():
     def __init__(self):
         k = paddle.to_tensor([[.05, .25, .4, .25, .05]])
-        self.kernel = paddle.matmul(k.t(),k).unsqueeze(0).tile([3,1,1,1])
+        self.kernel = paddle.matmul(k.t(), k).unsqueeze(0).tile([3, 1, 1, 1])
         self.loss = CharbonnierLoss()
 
     def conv_gauss(self, img):
         n_channels, _, kw, kh = self.kernel.shape
-        img = F.pad(img, [kw//2, kh//2, kw//2, kh//2], mode='replicate')
+        img = F.pad(img, [kw // 2, kh // 2, kw // 2, kh // 2], mode='replicate')
         return F.conv2d(img, self.kernel, groups=n_channels)
 
     def laplacian_kernel(self, current):
-        filtered    = self.conv_gauss(current)    # filter
-        down        = filtered[:,:,::2,::2]               # downsample
-        new_filter  = paddle.zeros_like(filtered)
-        new_filter[:,:,::2,::2] = down*4                  # upsample
-        filtered    = self.conv_gauss(new_filter) # filter
+        filtered = self.conv_gauss(current)  # filter
+        down = filtered[:, :, ::2, ::2]  # downsample
+        new_filter = paddle.zeros_like(filtered)
+        new_filter[:, :, ::2, ::2] = down * 4  # upsample
+        filtered = self.conv_gauss(new_filter)  # filter
         diff = current - filtered
         return diff
 

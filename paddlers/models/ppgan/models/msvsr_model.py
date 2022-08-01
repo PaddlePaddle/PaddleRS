@@ -30,6 +30,7 @@ class MultiStageVSRModel(BaseSRModel):
     Paper:
         PP-MSVSR: Multi-Stage Video Super-Resolution, 2021
     """
+
     def __init__(self, generator, fix_iter, pixel_criterion=None):
         """Initialize the PP-MSVSR class.
 

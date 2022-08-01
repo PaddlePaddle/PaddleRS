@@ -1,0 +1,81 @@
+name: build and test
+
+on:
+  push:
+    branches:
+      - develop
+      - "tests/**"
+    paths-ignore:
+      - "docs/**"
+      - "README.md"
+  pull_request:
+    branches:
+      - develop
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build_and_test_cpu:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.7", "3.8"]
+        include:
+          - python-version: "3.7"
+            os: windows-latest
+            gdal-whl-url: https://download.lfd.uci.edu/pythonlibs/archived/cp37/GDAL-3.3.3-cp37-cp37m-win_amd64.whl
+          - python-version: "3.7"
+            os: ubuntu-latest
+            gdal-whl-url: https://versaweb.dl.sourceforge.net/project/gdal-wheels-for-linux/GDAL-3.4.1-cp37-cp37m-manylinux_2_5_x86_64.manylinux1_x86_64.whl
+          - python-version: "3.8"
+            os: windows-latest
+            gdal-whl-url: https://download.lfd.uci.edu/pythonlibs/archived/GDAL-3.3.3-cp38-cp38-win_amd64.whl
+          - python-version: "3.8"
+            os: ubuntu-latest
+            gdal-whl-url: https://versaweb.dl.sourceforge.net/project/gdal-wheels-for-linux/GDAL-3.4.1-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.whl
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Upgrade pip
+        run: python -m pip install pip --upgrade --user
+      - name: Install PaddlePaddle
+        run: python -m pip install paddlepaddle==2.3.1 -i https://mirror.baidu.com/pypi/simple
+      - name: Install PaddleRS
+        run: |
+          python -m pip install -r requirements.txt
+          python -m pip install -e .
+      - name: Install GDAL
+        run: python -m pip install ${{ matrix.gdal-whl-url }}
+      - name: Run unittests
+        run: |
+          cd tests
+          bash run_fast_tests.sh
+        shell: bash
+
+  build_and_test_cuda102:
+    runs-on: ubuntu-18.04
+    container:
+      image: registry.baidubce.com/paddlepaddle/paddle:2.3.1-gpu-cuda10.2-cudnn7
+    steps:
+      - uses: actions/checkout@v3
+      - name: Upgrade pip
+        run: python3.7 -m pip install pip --upgrade --user
+      - name: Install PaddleRS
+        run: |
+          python3.7 -m pip install -r requirements.txt
+          python3.7 -m pip install -e .
+      - name: Install GDAL
+        run: python3.7 -m pip install https://versaweb.dl.sourceforge.net/project/gdal-wheels-for-linux/GDAL-3.4.1-cp37-cp37m-manylinux_2_5_x86_64.manylinux1_x86_64.whl
+      # Do not run unittests, because there is NO GPU in the machine.
+      # - name: Run unittests
+      #   run: |
+      #     cd tests
+      #     bash run_fast_tests.sh
+      #   shell: bash

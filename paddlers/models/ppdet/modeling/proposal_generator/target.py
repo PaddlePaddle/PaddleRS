@@ -40,14 +40,12 @@ def rpn_anchor_target(anchors,
             anchors, gt_bbox, rpn_positive_overlap, rpn_negative_overlap, True,
             ignore_thresh, is_crowd_i, assign_on_cpu)
         # Step2: sample anchor
-        fg_inds, bg_inds = subsample_labels(match_labels,
-                                            rpn_batch_size_per_im,
+        fg_inds, bg_inds = subsample_labels(match_labels, rpn_batch_size_per_im,
                                             rpn_fg_fraction, 0, use_random)
         # Fill with the ignore label (-1), then set positive and negative labels
         labels = paddle.full(match_labels.shape, -1, dtype='int32')
         if bg_inds.shape[0] > 0:
-            labels = paddle.scatter(labels, bg_inds,
-                                    paddle.zeros_like(bg_inds))
+            labels = paddle.scatter(labels, bg_inds, paddle.zeros_like(bg_inds))
         if fg_inds.shape[0] > 0:
             labels = paddle.scatter(labels, fg_inds, paddle.ones_like(fg_inds))
         # Step3: make output
@@ -261,15 +259,14 @@ def sample_bbox(matches,
                                   paddle.ones_like(gt_classes) * num_classes,
                                   gt_classes)
         gt_classes = paddle.where(match_labels == -1,
-                                  paddle.ones_like(gt_classes) * -1,
-                                  gt_classes)
+                                  paddle.ones_like(gt_classes) * -1, gt_classes)
     if is_cascade:
         index = paddle.arange(matches.shape[0])
         return index, gt_classes
     rois_per_image = int(batch_size_per_im)
 
-    fg_inds, bg_inds = subsample_labels(gt_classes, rois_per_image,
-                                        fg_fraction, num_classes, use_random)
+    fg_inds, bg_inds = subsample_labels(gt_classes, rois_per_image, fg_fraction,
+                                        num_classes, use_random)
     if fg_inds.shape[0] == 0 and bg_inds.shape[0] == 0:
         # fake output labeled with -1 when all boxes are neither
         # foreground nor background
@@ -364,9 +361,7 @@ def generate_mask_target(gt_segms, rois, labels_int32, sampled_gt_inds,
                     rasterize_polygons_within_box(new_segm[j], boxes[j],
                                                   resolution))
         else:
-            results.append(
-                paddle.ones(
-                    [resolution, resolution], dtype='int32'))
+            results.append(paddle.ones([resolution, resolution], dtype='int32'))
 
         fg_classes = paddle.gather(labels_per_im, fg_inds)
         weight = paddle.ones([fg_rois.shape[0]], dtype='float32')
@@ -484,8 +479,8 @@ def libra_sample_neg(max_overlaps,
         if floor_thr > 0:
             floor_set = set(
                 np.where(
-                    np.logical_and(max_overlaps >= 0, max_overlaps <
-                                   floor_thr))[0])
+                    np.logical_and(max_overlaps >= 0, max_overlaps < floor_thr))
+                [0])
             iou_sampling_set = set(np.where(max_overlaps >= floor_thr)[0])
         elif floor_thr == 0:
             floor_set = set(np.where(max_overlaps == 0)[0])
@@ -614,8 +609,7 @@ def libra_sample_bbox(matches,
                                   paddle.ones_like(gt_classes) * num_classes,
                                   gt_classes)
         gt_classes = paddle.where(match_labels == -1,
-                                  paddle.ones_like(gt_classes) * -1,
-                                  gt_classes)
+                                  paddle.ones_like(gt_classes) * -1, gt_classes)
         sampled_gt_classes = paddle.gather(gt_classes, sampled_inds)
 
         return sampled_inds, sampled_gt_classes

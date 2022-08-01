@@ -19,7 +19,8 @@ from easydict import EasyDict as edict
 import numpy as np
 import pandas as pd
 
-from utils import Raster, timer
+from utils import Raster, time_it
+
 
 def _calcOIF(rgb, stds, rho):
     r, g, b = rgb
@@ -32,7 +33,7 @@ def _calcOIF(rgb, stds, rho):
     return (s1 + s2 + s3) / (abs(r12) + abs(r23) + abs(r31))
 
 
-@timer
+@time_it
 def oif(img_path, topk=5):
     raster = Raster(img_path)
     img = raster.getArray()
@@ -54,11 +55,11 @@ def oif(img_path, topk=5):
         print("Bands: {0}, OIF value: {1}.".format(k, v))
 
 
-parser = argparse.ArgumentParser(description="input parameters")
+parser = argparse.ArgumentParser()
 parser.add_argument("--im_path", type=str, required=True, \
-                    help="The path of HSIs image.")
+                    help="Path of HSIs image.")
 parser.add_argument("--topk", type=int, default=5, \
-                    help="Number of top results, `5` is the default.")
+                    help="Number of top results. The default value is 5.")
 
 if __name__ == "__main__":
     args = parser.parse_args()

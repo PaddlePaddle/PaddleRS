@@ -76,9 +76,8 @@ class LapStyleDraModel(BaseModel):
         """content loss"""
         self.loss_c = 0
         for layer in self.content_layers:
-            self.loss_c += self.calc_content_loss(self.tF[layer],
-                                                  self.cF[layer],
-                                                  norm=True)
+            self.loss_c += self.calc_content_loss(
+                self.tF[layer], self.cF[layer], norm=True)
         self.losses['loss_c'] = self.loss_c
         """style loss"""
         self.loss_s = 0
@@ -242,9 +241,8 @@ class LapStyleRevFirstModel(BaseModel):
         """content loss"""
         self.loss_c = 0
         for layer in self.content_layers:
-            self.loss_c += self.calc_content_loss(self.tF[layer],
-                                                  self.cF[layer],
-                                                  norm=True)
+            self.loss_c += self.calc_content_loss(
+                self.tF[layer], self.cF[layer], norm=True)
         self.losses['loss_c'] = self.loss_c
         """style loss"""
         self.loss_s = 0
@@ -389,9 +387,8 @@ class LapStyleRevSecondModel(BaseModel):
         """content loss"""
         self.loss_c = 0
         for layer in self.content_layers:
-            self.loss_c += self.calc_content_loss(self.tF[layer],
-                                                  self.cF[layer],
-                                                  norm=True)
+            self.loss_c += self.calc_content_loss(
+                self.tF[layer], self.cF[layer], norm=True)
         self.losses['loss_c'] = self.loss_c
         """style loss"""
         self.loss_s = 0
@@ -401,8 +398,8 @@ class LapStyleRevSecondModel(BaseModel):
         """relative loss"""
         self.loss_style_remd = self.calc_style_emd_loss(self.tF['r41'],
                                                         self.sF['r41'])
-        self.loss_content_relt = self.calc_content_relt_loss(
-            self.tF['r41'], self.cF['r41'])
+        self.loss_content_relt = self.calc_content_relt_loss(self.tF['r41'],
+                                                             self.cF['r41'])
         self.losses['loss_style_remd'] = self.loss_style_remd
         self.losses['loss_content_relt'] = self.loss_content_relt
         """gan loss"""

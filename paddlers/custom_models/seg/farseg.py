@@ -32,7 +32,7 @@ class FPN(nn.Layer):
     """
     Module that adds FPN on top of a list of feature maps.
     The feature maps are currently supposed to be in increasing depth
-    order, and must be consecutive
+        order, and must be consecutive
     """
 
     def __init__(self,
@@ -41,38 +41,35 @@ class FPN(nn.Layer):
                  conv_block=ConvReLU,
                  top_blocks=None):
         super(FPN, self).__init__()
-        self.inner_blocks = []
-        self.layer_blocks = []
+
+        inner_blocks = []
+        layer_blocks = []
         for idx, in_channels in enumerate(in_channels_list, 1):
-            inner_block = "fpn_inner{}".format(idx)
-            layer_block = "fpn_layer{}".format(idx)
             if in_channels == 0:
                 continue
             inner_block_module = conv_block(in_channels, out_channels, 1)
             layer_block_module = conv_block(out_channels, out_channels, 3, 1)
-            self.add_sublayer(inner_block, inner_block_module)
-            self.add_sublayer(layer_block, layer_block_module)
             for module in [inner_block_module, layer_block_module]:
                 for m in module.sublayers():
                     if isinstance(m, nn.Conv2D):
                         kaiming_normal_init(m.weight)
-            self.inner_blocks.append(inner_block)
-            self.layer_blocks.append(layer_block)
+            inner_blocks.append(inner_block_module)
+            layer_blocks.append(layer_block_module)
+        self.inner_blocks = nn.LayerList(inner_blocks)
+        self.layer_blocks = nn.LayerList(layer_blocks)
         self.top_blocks = top_blocks
 
     def forward(self, x):
-        last_inner = getattr(self, self.inner_blocks[-1])(x[-1])
-        results = [getattr(self, self.layer_blocks[-1])(last_inner)]
-        for feature, inner_block, layer_block in zip(
-                x[:-1][::-1], self.inner_blocks[:-1][::-1],
-                self.layer_blocks[:-1][::-1]):
-            if not inner_block:
-                continue
+        last_inner = self.inner_blocks[-1](x[-1])
+        results = [self.layer_blocks[-1](last_inner)]
+        for i, feature in enumerate(x[-2::-1]):
+            inner_block = self.inner_blocks[len(self.inner_blocks) - 2 - i]
+            layer_block = self.layer_blocks[len(self.layer_blocks) - 2 - i]
             inner_top_down = F.interpolate(
                 last_inner, scale_factor=2, mode="nearest")
-            inner_lateral = getattr(self, inner_block)(feature)
+            inner_lateral = inner_block(feature)
             last_inner = inner_lateral + inner_top_down
-            results.insert(0, getattr(self, layer_block)(last_inner))
+            results.insert(0, layer_block(last_inner))
         if isinstance(self.top_blocks, LastLevelP6P7):
             last_results = self.top_blocks(x[-1], results[-1])
             results.extend(last_results)

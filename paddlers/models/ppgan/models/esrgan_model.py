@@ -29,6 +29,7 @@ class ESRGAN(BaseSRModel):
 
     ESRGAN paper: https://arxiv.org/pdf/1809.00219.pdf
     """
+
     def __init__(self,
                  generator,
                  discriminator=None,
@@ -71,8 +72,8 @@ class ESRGAN(BaseSRModel):
             l_total += l_pix
             self.losses['loss_pix'] = l_pix
         if self.perceptual_criterion:
-            l_g_percep, l_g_style = self.perceptual_criterion(
-                self.output, self.gt)
+            l_g_percep, l_g_style = self.perceptual_criterion(self.output,
+                                                              self.gt)
             # l_total += l_pix
             if l_g_percep is not None:
                 l_total += l_g_percep
@@ -86,14 +87,10 @@ class ESRGAN(BaseSRModel):
             self.set_requires_grad(self.nets['discriminator'], False)
             real_d_pred = self.nets['discriminator'](self.gt).detach()
             fake_g_pred = self.nets['discriminator'](self.output)
-            l_g_real = self.gan_criterion(real_d_pred -
-                                          paddle.mean(fake_g_pred),
-                                          False,
-                                          is_disc=False)
-            l_g_fake = self.gan_criterion(fake_g_pred -
-                                          paddle.mean(real_d_pred),
-                                          True,
-                                          is_disc=False)
+            l_g_real = self.gan_criterion(
+                real_d_pred - paddle.mean(fake_g_pred), False, is_disc=False)
+            l_g_fake = self.gan_criterion(
+                fake_g_pred - paddle.mean(real_d_pred), True, is_disc=False)
             l_g_gan = (l_g_real + l_g_fake) / 2
 
             l_total += l_g_gan

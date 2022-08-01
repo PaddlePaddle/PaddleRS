@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 '''
 @File Description:
 # 合并json文件，可以通过merge_keys控制合并的字段, 默认合并'images', 'annotations'字段
@@ -58,16 +57,21 @@ def get_args():
     parser = argparse.ArgumentParser(description='Json Merge')
 
     # parameters
-    parser.add_argument('--json1_path', type=str,
-                        help='json path1 to merge')
-    parser.add_argument('--json2_path', type=str,
-                        help='json path2 to merge')
-    parser.add_argument('--save_path', type=str,
-                        help='json path to save the merge result')
-    parser.add_argument('--merge_keys', type=list, default=['images', 'annotations'],
-                        help='json keys that need to merge')
-    parser.add_argument('-Args_show', '--Args_show', type=bool, default=True,
-                        help='Args_show(default: True), if True, show args info')
+    parser.add_argument('--json1_path', type=str, help='json path1 to merge')
+    parser.add_argument('--json2_path', type=str, help='json path2 to merge')
+    parser.add_argument(
+        '--save_path', type=str, help='json path to save the merge result')
+    parser.add_argument(
+        '--merge_keys',
+        type=list,
+        default=['images', 'annotations'],
+        help='json keys that need to merge')
+    parser.add_argument(
+        '-Args_show',
+        '--Args_show',
+        type=bool,
+        default=True,
+        help='Args_show(default: True), if True, show args info')
 
     args = parser.parse_args()
 
@@ -82,4 +86,3 @@ def get_args():
 if __name__ == '__main__':
     args = get_args()
     js_merge(args.json1_path, args.json2_path, args.save_path, args.merge_keys)
-

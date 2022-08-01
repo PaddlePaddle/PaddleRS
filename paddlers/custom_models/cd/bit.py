@@ -22,6 +22,15 @@ from .layers import Conv3x3, Conv1x1, get_norm_layer, Identity
 from .param_init import KaimingInitMixin
 
 
+def calc_product(*args):
+    if len(args) < 1:
+        raise ValueError
+    ret = args[0]
+    for arg in args[1:]:
+        ret *= arg
+    return ret
+
+
 class BIT(nn.Layer):
     """
     The BIT implementation based on PaddlePaddle.
@@ -131,9 +140,10 @@ class BIT(nn.Layer):
     def _get_semantic_tokens(self, x):
         b, c = x.shape[:2]
         att_map = self.conv_att(x)
-        att_map = att_map.reshape((b, self.token_len, 1, -1))
+        att_map = att_map.reshape(
+            (b, self.token_len, 1, calc_product(*att_map.shape[2:])))
         att_map = F.softmax(att_map, axis=-1)
-        x = x.reshape((b, 1, c, -1))
+        x = x.reshape((b, 1, c, att_map.shape[-1]))
         tokens = (x * att_map).sum(-1)
         return tokens
 
@@ -172,7 +182,7 @@ class BIT(nn.Layer):
         else:
             token1 = self._get_reshaped_tokens(x1)
             token2 = self._get_reshaped_tokens(x2)
-            
+
         # Transformer encoder forward
         token = paddle.concat([token1, token2], axis=1)
         token = self.encode(token)
@@ -253,6 +263,7 @@ class CrossAttention(nn.Layer):
 
         inner_dim = head_dim * n_heads
         self.n_heads = n_heads
+        self.head_dim = head_dim
         self.scale = dim**-0.5
 
         self.apply_softmax = apply_softmax
@@ -272,9 +283,10 @@ class CrossAttention(nn.Layer):
         k = self.fc_k(ref)
         v = self.fc_v(ref)
 
-        q = q.reshape((b, n, h, -1)).transpose((0, 2, 1, 3))
-        k = k.reshape((b, paddle.shape(ref)[1], h, -1)).transpose((0, 2, 1, 3))
-        v = v.reshape((b, paddle.shape(ref)[1], h, -1)).transpose((0, 2, 1, 3))
+        q = q.reshape((b, n, h, self.head_dim)).transpose((0, 2, 1, 3))
+        rn = ref.shape[1]
+        k = k.reshape((b, rn, h, self.head_dim)).transpose((0, 2, 1, 3))
+        v = v.reshape((b, rn, h, self.head_dim)).transpose((0, 2, 1, 3))
 
         mult = paddle.matmul(q, k, transpose_y=True) * self.scale
 

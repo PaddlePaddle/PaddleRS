@@ -32,12 +32,12 @@ from joblib import load
 import paddlers
 from .functions import normalize, horizontal_flip, permute, vertical_flip, center_crop, is_poly, \
     horizontal_flip_poly, horizontal_flip_rle, vertical_flip_poly, vertical_flip_rle, crop_poly, \
-    crop_rle, expand_poly, expand_rle, resize_poly, resize_rle, de_haze, select_bands, \
+    crop_rle, expand_poly, expand_rle, resize_poly, resize_rle, dehaze, select_bands, \
     to_intensity, to_uint8, img_flip, img_simple_rotate
 
 __all__ = [
     "Compose",
-    "ImgDecoder",
+    "DecodeImg",
     "Resize",
     "RandomResize",
     "ResizeByShort",
@@ -50,19 +50,19 @@ __all__ = [
     "RandomCrop",
     "RandomScaleAspect",
     "RandomExpand",
-    "Padding",
+    "Pad",
     "MixupImage",
     "RandomDistort",
     "RandomBlur",
     "RandomSwap",
-    "Defogging",
-    "DimReducing",
-    "BandSelecting",
+    "Dehaze",
+    "ReduceDim",
+    "SelectBand",
     "ArrangeSegmenter",
     "ArrangeChangeDetector",
     "ArrangeClassifier",
     "ArrangeDetector",
-    "RandomFlipOrRotation",
+    "RandomFlipOrRotate",
 ]
 
 interp_dict = {
@@ -119,19 +119,31 @@ class Transform(object):
         return sample
 
 
-class ImgDecoder(Transform):
+class DecodeImg(Transform):
     """
     Decode image(s) in input.
+    
     Args:
-        to_rgb (bool, optional): If True, convert input images from BGR format to RGB format. Defaults to True.
+        to_rgb (bool, optional): If True, convert input image(s) from BGR format to RGB format. Defaults to True.
+        to_uint8 (bool, optional): If True, quantize and convert decoded image(s) to uint8 type. Defaults to True.
+        decode_bgr (bool, optional): If True, automatically interpret a non-geo image (e.g., jpeg images) as a BGR image. 
+            Defaults to True.
+        decode_sar (bool, optional): If True, automatically interpret a two-channel geo image (e.g. geotiff images) as a 
+            SAR image, set this argument to True. Defaults to True.
     """
 
-    def __init__(self, to_rgb=True, to_uint8=True):
-        super(ImgDecoder, self).__init__()
+    def __init__(self,
+                 to_rgb=True,
+                 to_uint8=True,
+                 decode_bgr=True,
+                 decode_sar=True):
+        super(DecodeImg, self).__init__()
         self.to_rgb = to_rgb
         self.to_uint8 = to_uint8
+        self.decode_bgr = decode_bgr
+        self.decode_sar = decode_sar
 
-    def read_img(self, img_path, input_channel=3):
+    def read_img(self, img_path):
         img_format = imghdr.what(img_path)
         name, ext = os.path.splitext(img_path)
         if img_format == 'tiff' or ext == '.img':
@@ -140,24 +152,24 @@ class ImgDecoder(Transform):
             except:
                 try:
                     from osgeo import gdal
-                except:
-                    raise Exception(
-                        "Failed to import gdal! You can try use conda to install gdal"
+                except ImportError:
+                    raise ImportError(
+                        "Failed to import gdal! Please install GDAL library according to the document."
                     )
-                    six.reraise(*sys.exc_info())
 
             dataset = gdal.Open(img_path)
             if dataset == None:
-                raise Exception('Can not open', img_path)
+                raise IOError('Can not open', img_path)
             im_data = dataset.ReadAsArray()
-            if im_data.ndim == 2:
+            if im_data.ndim == 2 and self.decode_sar:
                 im_data = to_intensity(im_data)  # is read SAR
                 im_data = im_data[:, :, np.newaxis]
-            elif im_data.ndim == 3:
-                im_data = im_data.transpose((1, 2, 0))
+            else:
+                if im_data.ndim == 3:
+                    im_data = im_data.transpose((1, 2, 0))
             return im_data
         elif img_format in ['jpeg', 'bmp', 'png', 'jpg']:
-            if input_channel == 3:
+            if self.decode_bgr:
                 return cv2.imread(img_path, cv2.IMREAD_ANYDEPTH |
                                   cv2.IMREAD_ANYCOLOR | cv2.IMREAD_COLOR)
             else:
@@ -166,7 +178,7 @@ class ImgDecoder(Transform):
         elif ext == '.npy':
             return np.load(img_path)
         else:
-            raise Exception('Image format {} is not supported!'.format(ext))
+            raise TypeError('Image format {} is not supported!'.format(ext))
 
     def apply_im(self, im_path):
         if isinstance(im_path, str):
@@ -192,7 +204,7 @@ class ImgDecoder(Transform):
         except:
             raise ValueError("Cannot read the mask file {}!".format(mask))
         if len(mask.shape) != 2:
-            raise Exception(
+            raise ValueError(
                 "Mask should be a 1-channel image, but recevied is a {}-channel image.".
                 format(mask.shape[2]))
         return mask
@@ -201,6 +213,7 @@ class ImgDecoder(Transform):
         """
         Args:
             sample (dict): Input sample.
+
         Returns:
             dict: Decoded sample.
         """
@@ -218,8 +231,8 @@ class ImgDecoder(Transform):
             im_height, im_width, _ = sample['image'].shape
             se_height, se_width = sample['mask'].shape
             if im_height != se_height or im_width != se_width:
-                raise Exception(
-                    "The height or width of the im is not same as the mask")
+                raise ValueError(
+                    "The height or width of the image is not same as the mask.")
         if 'aux_masks' in sample:
             sample['aux_masks'] = list(
                 map(self.apply_mask, sample['aux_masks']))
@@ -237,7 +250,7 @@ class Compose(Transform):
     All input images are in Height-Width-Channel ([H, W, C]) format.
 
     Args:
-        transforms (List[paddlers.transforms.Transform]): List of data preprocess or augmentations.
+        transforms (list[paddlers.transforms.Transform]): List of data preprocess or augmentations.
     Raises:
         TypeError: Invalid type of transforms.
         ValueError: Invalid length of transforms.
@@ -247,14 +260,14 @@ class Compose(Transform):
         super(Compose, self).__init__()
         if not isinstance(transforms, list):
             raise TypeError(
-                'Type of transforms is invalid. Must be List, but received is {}'
+                'Type of transforms is invalid. Must be a list, but received is {}'
                 .format(type(transforms)))
         if len(transforms) < 1:
             raise ValueError(
                 'Length of transforms must not be less than 1, but received is {}'
                 .format(len(transforms)))
         self.transforms = transforms
-        self.decode_image = ImgDecoder(to_uint8=to_uint8)
+        self.decode_image = DecodeImg(to_uint8=to_uint8)
         self.arrange_outputs = None
         self.apply_im_only = False
 
@@ -295,7 +308,7 @@ class Resize(Transform):
     Attention: If interp is 'RANDOM', the interpolation method will be chose randomly.
 
     Args:
-        target_size (int, List[int] or Tuple[int]): Target size. If int, the height and width share the same target_size.
+        target_size (int, list[int] | tuple[int]): Target size. If int, the height and width share the same target_size.
             Otherwise, target_size represents [target height, target width].
         interp ({'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}, optional):
             Interpolation method of resize. Defaults to 'LINEAR'.
@@ -414,7 +427,7 @@ class RandomResize(Transform):
     Attention: If interp is 'RANDOM', the interpolation method will be chose randomly.
 
     Args:
-        target_sizes (List[int], List[list or tuple] or Tuple[list or tuple]):
+        target_sizes (list[int] | list[list | tuple] | tuple[list | tuple]):
             Multiple target sizes, each target size is an int or list/tuple.
         interp ({'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}, optional):
             Interpolation method of resize. Defaults to 'LINEAR'.
@@ -434,7 +447,7 @@ class RandomResize(Transform):
                 interp_dict.keys()))
         self.interp = interp
         assert isinstance(target_sizes, list), \
-            "target_size must be List"
+            "target_size must be a list."
         for i, item in enumerate(target_sizes):
             if isinstance(item, int):
                 target_sizes[i] = (item, item)
@@ -494,7 +507,7 @@ class RandomResizeByShort(Transform):
     Attention: If interp is 'RANDOM', the interpolation method will be chose randomly.
 
     Args:
-        short_sizes (List[int]): Target size of the shorter side of the image(s).
+        short_sizes (list[int]): Target size of the shorter side of the image(s).
         max_size (int, optional): The upper bound of longer side of the image(s). If max_size is -1, no upper bound is applied. Defaults to -1.
         interp ({'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}, optional): Interpolation method of resize. Defaults to 'LINEAR'.
 
@@ -513,7 +526,7 @@ class RandomResizeByShort(Transform):
                 interp_dict.keys()))
         self.interp = interp
         assert isinstance(short_sizes, list), \
-            "short_sizes must be List"
+            "short_sizes must be a list."
 
         self.short_sizes = short_sizes
         self.max_size = max_size
@@ -544,7 +557,7 @@ class ResizeByLong(Transform):
         return sample
 
 
-class RandomFlipOrRotation(Transform):
+class RandomFlipOrRotate(Transform):
     """
     Flip or Rotate an image in different ways with a certain probability.
 
@@ -561,7 +574,7 @@ class RandomFlipOrRotation(Transform):
 
         # 定义数据增强
         train_transforms = T.Compose([
-            T.RandomFlipOrRotation(
+            T.RandomFlipOrRotate(
                 probs  = [0.3, 0.2]             # 进行flip增强的概率是0.3，进行rotate增强的概率是0.2，不变的概率是0.5
                 probsf = [0.3, 0.25, 0, 0, 0]   # flip增强时，使用水平flip、垂直flip的概率分别是0.3、0.25，水平且垂直flip、对角线flip、反对角线flip概率均为0，不变的概率是0.45
                 probsr = [0, 0.65, 0]),         # rotate增强时，顺时针旋转90度的概率是0，顺时针旋转180度的概率是0.65，顺时针旋转90度的概率是0，不变的概率是0.35
@@ -574,7 +587,7 @@ class RandomFlipOrRotation(Transform):
                  probs=[0.35, 0.25],
                  probsf=[0.3, 0.3, 0.2, 0.1, 0.1],
                  probsr=[0.25, 0.5, 0.25]):
-        super(RandomFlipOrRotation, self).__init__()
+        super(RandomFlipOrRotate, self).__init__()
         # Change various probabilities into probability intervals, to judge in which mode to flip or rotate
         self.probs = [probs[0], probs[0] + probs[1]]
         self.probsf = self.get_probs_range(probsf)
@@ -593,6 +606,16 @@ class RandomFlipOrRotation(Transform):
         else:
             mask = img_simple_rotate(mask, mode_id)
         return mask
+
+    def apply_bbox(self, bbox, mode_id, flip_mode=True):
+        raise TypeError(
+            "Currently, `paddlers.transforms.RandomFlipOrRotate` is not available for object detection tasks."
+        )
+
+    def apply_segm(self, bbox, mode_id, flip_mode=True):
+        raise TypeError(
+            "Currently, `paddlers.transforms.RandomFlipOrRotate` is not available for object detection tasks."
+        )
 
     def get_probs_range(self, probs):
         '''
@@ -637,14 +660,43 @@ class RandomFlipOrRotation(Transform):
             mode_p = random.random()
             mode_id = self.judge_probs_range(mode_p, self.probsf)
             sample['image'] = self.apply_im(sample['image'], mode_id, True)
+            if 'image2' in sample:
+                sample['image2'] = self.apply_im(sample['image2'], mode_id,
+                                                 True)
             if 'mask' in sample:
                 sample['mask'] = self.apply_mask(sample['mask'], mode_id, True)
+            if 'aux_masks' in sample:
+                sample['aux_masks'] = [
+                    self.apply_mask(aux_mask, mode_id, True)
+                    for aux_mask in sample['aux_masks']
+                ]
+            if 'gt_bbox' in sample and len(sample['gt_bbox']) > 0:
+                sample['gt_bbox'] = self.apply_bbox(sample['gt_bbox'], mode_id,
+                                                    True)
+            if 'gt_poly' in sample and len(sample['gt_poly']) > 0:
+                sample['gt_poly'] = self.apply_segm(sample['gt_poly'], mode_id,
+                                                    True)
         elif p_m < self.probs[1]:
             mode_p = random.random()
             mode_id = self.judge_probs_range(mode_p, self.probsr)
             sample['image'] = self.apply_im(sample['image'], mode_id, False)
+            if 'image2' in sample:
+                sample['image2'] = self.apply_im(sample['image2'], mode_id,
+                                                 False)
             if 'mask' in sample:
                 sample['mask'] = self.apply_mask(sample['mask'], mode_id, False)
+            if 'aux_masks' in sample:
+                sample['aux_masks'] = [
+                    self.apply_mask(aux_mask, mode_id, False)
+                    for aux_mask in sample['aux_masks']
+                ]
+            if 'gt_bbox' in sample and len(sample['gt_bbox']) > 0:
+                sample['gt_bbox'] = self.apply_bbox(sample['gt_bbox'], mode_id,
+                                                    False)
+            if 'gt_poly' in sample and len(sample['gt_poly']) > 0:
+                sample['gt_poly'] = self.apply_segm(sample['gt_poly'], mode_id,
+                                                    False)
+
         return sample
 
 
@@ -766,16 +818,16 @@ class RandomVerticalFlip(Transform):
 
 class Normalize(Transform):
     """
-    Apply min-max normalization to the image(s) in input.
+    Apply normalization to the input image(s). The normalization steps are:
     1. im = (im - min_value) * 1 / (max_value - min_value)
     2. im = im - mean
     3. im = im / std
 
     Args:
-        mean(List[float] or Tuple[float], optional): Mean of input image(s). Defaults to [0.485, 0.456, 0.406].
-        std(List[float] or Tuple[float], optional): Standard deviation of input image(s). Defaults to [0.229, 0.224, 0.225].
-        min_val(List[float] or Tuple[float], optional): Minimum value of input image(s). Defaults to [0, 0, 0, ].
-        max_val(List[float] or Tuple[float], optional): Max value of input image(s). Defaults to [255., 255., 255.].
+        mean(list[float] | tuple[float], optional): Mean of input image(s). Defaults to [0.485, 0.456, 0.406].
+        std(list[float] | tuple[float], optional): Standard deviation of input image(s). Defaults to [0.229, 0.224, 0.225].
+        min_val(list[float] | tuple[float], optional): Minimum value of input image(s). Defaults to [0, 0, 0, ].
+        max_val(list[float] | tuple[float], optional): Max value of input image(s). Defaults to [255., 255., 255.].
     """
 
     def __init__(self,
@@ -865,12 +917,12 @@ class RandomCrop(Transform):
     4. Resize the cropped area to crop_size by crop_size.
 
     Args:
-        crop_size(int, List[int] or Tuple[int]): Target size of the cropped area. If None, the cropped area will not be
+        crop_size(int, list[int] | tuple[int]): Target size of the cropped area. If None, the cropped area will not be
             resized. Defaults to None.
-        aspect_ratio (List[float], optional): Aspect ratio of cropped region in [min, max] format. Defaults to [.5, 2.].
-        thresholds (List[float], optional): Iou thresholds to decide a valid bbox crop.
+        aspect_ratio (list[float], optional): Aspect ratio of cropped region in [min, max] format. Defaults to [.5, 2.].
+        thresholds (list[float], optional): Iou thresholds to decide a valid bbox crop.
             Defaults to [.0, .1, .3, .5, .7, .9].
-        scaling (List[float], optional): Ratio between the cropped region and the original image in [min, max] format.
+        scaling (list[float], optional): Ratio between the cropped region and the original image in [min, max] format.
             Defaults to [.3, 1.].
         num_attempts (int, optional): The number of tries before giving up. Defaults to 50.
         allow_no_crop (bool, optional): Whether returning without doing crop is allowed. Defaults to True.
@@ -1088,11 +1140,11 @@ class RandomExpand(Transform):
     Args:
         upper_ratio(float, optional): The maximum ratio to which the original image is expanded. Defaults to 4..
         prob(float, optional): The probability of apply expanding. Defaults to .5.
-        im_padding_value(List[float] or Tuple[float], optional): RGB filling value for the image. Defaults to (127.5, 127.5, 127.5).
+        im_padding_value(list[float] | tuple[float], optional): RGB filling value for the image. Defaults to (127.5, 127.5, 127.5).
         label_padding_value(int, optional): Filling value for the mask. Defaults to 255.
 
     See Also:
-        paddlers.transforms.Padding
+        paddlers.transforms.Pad
     """
 
     def __init__(self,
@@ -1120,7 +1172,7 @@ class RandomExpand(Transform):
                 x = np.random.randint(0, w - im_w)
                 target_size = (h, w)
                 offsets = (x, y)
-                sample = Padding(
+                sample = Pad(
                     target_size=target_size,
                     pad_mode=-1,
                     offsets=offsets,
@@ -1129,7 +1181,7 @@ class RandomExpand(Transform):
         return sample
 
 
-class Padding(Transform):
+class Pad(Transform):
     def __init__(self,
                  target_size=None,
                  pad_mode=0,
@@ -1148,7 +1200,7 @@ class Padding(Transform):
             label_padding_value(int, optional): Filling value for the mask. Defaults to 255.
             size_divisor(int): Image width and height after padding is a multiple of coarsest_stride.
         """
-        super(Padding, self).__init__()
+        super(Pad, self).__init__()
         if isinstance(target_size, (list, tuple)):
             if len(target_size) != 2:
                 raise ValueError(
@@ -1525,20 +1577,20 @@ class RandomBlur(Transform):
         return sample
 
 
-class Defogging(Transform):
+class Dehaze(Transform):
     """
-    Defog input image(s).
+    Dehaze input image(s).
 
     Args: 
         gamma (bool, optional): Use gamma correction or not. Defaults to False.
     """
 
     def __init__(self, gamma=False):
-        super(Defogging, self).__init__()
+        super(Dehaze, self).__init__()
         self.gamma = gamma
 
     def apply_im(self, image):
-        image = de_haze(image, self.gamma)
+        image = dehaze(image, self.gamma)
         return image
 
     def apply(self, sample):
@@ -1548,19 +1600,20 @@ class Defogging(Transform):
         return sample
 
 
-class DimReducing(Transform):
+class ReduceDim(Transform):
     """
-    Use PCA to reduce input image(s) dimension.
+    Use PCA to reduce the dimension of input image(s).
 
     Args: 
-        joblib_path (str): Path of *.joblib about PCA.
+        joblib_path (str): Path of *.joblib file of PCA.
     """
 
     def __init__(self, joblib_path):
-        super(DimReducing, self).__init__()
+        super(ReduceDim, self).__init__()
         ext = joblib_path.split(".")[-1]
         if ext != "joblib":
-            raise ValueError("`joblib_path` must be *.joblib, not *.{}.".format(ext))
+            raise ValueError("`joblib_path` must be *.joblib, not *.{}.".format(
+                ext))
         self.pca = load(joblib_path)
 
     def apply_im(self, image):
@@ -1577,16 +1630,16 @@ class DimReducing(Transform):
         return sample
 
 
-class BandSelecting(Transform):
+class SelectBand(Transform):
     """
-    Select the band of the input image(s).
+    Select a set of bands of input image(s).
 
     Args: 
-        band_list (list, optional): Bands of selected (Start with 1). Defaults to [1, 2, 3].
+        band_list (list, optional): Bands to select (the band index starts with 1). Defaults to [1, 2, 3].
     """
 
     def __init__(self, band_list=[1, 2, 3]):
-        super(BandSelecting, self).__init__()
+        super(SelectBand, self).__init__()
         self.band_list = band_list
 
     def apply_im(self, image):

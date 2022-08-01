@@ -29,6 +29,7 @@ from ..utils.filesystem import makedirs, save, load
 from ..utils.timer import TimeAverager
 from ..utils.profiler import add_profiler_step
 
+
 class IterLoader:
     def __init__(self, dataloader):
         self._dataloader = dataloader
@@ -71,6 +72,7 @@ class Trainer:
     #                     |                                    ||
     #         save checkpoint (model.nets)                     \/
     """
+
     def __init__(self, cfg):
         # base config
         self.logger = logging.getLogger(__name__)
@@ -220,8 +222,8 @@ class Trainer:
 
     def test(self):
         if not hasattr(self, 'test_dataloader'):
-            self.test_dataloader = build_dataloader(self.cfg.dataset.test,
-                                                    is_train=False)
+            self.test_dataloader = build_dataloader(
+                self.cfg.dataset.test, is_train=False)
         iter_loader = IterLoader(self.test_dataloader)
         if self.max_eval_steps is None:
             self.max_eval_steps = len(self.test_dataloader)
@@ -235,9 +237,8 @@ class Trainer:
 
         for i in range(self.max_eval_steps):
             if self.max_eval_steps < self.log_interval or i % self.log_interval == 0:
-                self.logger.info('Test iter: [%d/%d]' %
-                                 (i * self.world_size,
-                                  self.max_eval_steps * self.world_size))
+                self.logger.info('Test iter: [%d/%d]' % (
+                    i * self.world_size, self.max_eval_steps * self.world_size))
 
             data = next(iter_loader)
             self.model.setup_input(data)
@@ -248,8 +249,8 @@ class Trainer:
                 current_paths = self.model.get_image_paths()
                 current_visuals = self.model.get_current_visuals()
 
-                if len(current_visuals) > 0 and list(
-                        current_visuals.values())[0].shape == 4:
+                if len(current_visuals) > 0 and list(current_visuals.values())[
+                        0].shape == 4:
                     num_samples = list(current_visuals.values())[0].shape[0]
                 else:
                     num_samples = 1
@@ -267,10 +268,11 @@ class Trainer:
                         else:
                             visual_results.update({name: img_tensor})
 
-                self.visual('visual_test',
-                            visual_results=visual_results,
-                            step=self.batch_id,
-                            is_save_image=True)
+                self.visual(
+                    'visual_test',
+                    visual_results=visual_results,
+                    step=self.batch_id,
+                    is_save_image=True)
 
         if self.metrics:
             for metric_name, metric in self.metrics.items():
@@ -398,9 +400,9 @@ class Trainer:
             try:
                 if self.by_epoch:
                     checkpoint_name_to_be_removed = os.path.join(
-                        self.output_dir, 'epoch_%s_%s.pdparams' %
-                        ((epoch - keep * self.weight_interval) //
-                         self.iters_per_epoch, name))
+                        self.output_dir, 'epoch_%s_%s.pdparams' % (
+                            (epoch - keep * self.weight_interval) //
+                            self.iters_per_epoch, name))
                 else:
                     checkpoint_name_to_be_removed = os.path.join(
                         self.output_dir, 'iter_%s_%s.pdparams' %
@@ -432,8 +434,8 @@ class Trainer:
         for net_name, net in self.model.nets.items():
             if net_name in state_dicts:
                 net.set_state_dict(state_dicts[net_name])
-                self.logger.info(
-                    'Loaded pretrained weight for net {}'.format(net_name))
+                self.logger.info('Loaded pretrained weight for net {}'.format(
+                    net_name))
             else:
                 self.logger.warning(
                     'Can not find state dict of net {}. Skip load pretrained weight for net {}'

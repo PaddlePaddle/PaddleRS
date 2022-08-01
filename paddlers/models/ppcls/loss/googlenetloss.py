@@ -19,10 +19,11 @@ class GoogLeNetLoss(nn.Layer):
     """
     Cross entropy loss used after googlenet
     """
+
     def __init__(self, epsilon=None):
         super().__init__()
-        assert (epsilon is None or epsilon <= 0 or epsilon >= 1), "googlenet is not support label_smooth"
-            
+        assert (epsilon is None or epsilon <= 0 or
+                epsilon >= 1), "googlenet is not support label_smooth"
 
     def forward(self, inputs, label):
         input0, input1, input2 = inputs

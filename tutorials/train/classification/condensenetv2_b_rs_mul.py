@@ -3,7 +3,7 @@ from paddlers import transforms as T
 
 # 定义训练和验证时的transforms
 train_transforms = T.Compose([
-    T.BandSelecting([5, 10, 15, 20, 25]),  # for tet
+    T.SelectBand([5, 10, 15, 20, 25]),  # for tet
     T.Resize(target_size=224),
     T.RandomHorizontalFlip(),
     T.Normalize(
@@ -11,7 +11,7 @@ train_transforms = T.Compose([
 ])
 
 eval_transforms = T.Compose([
-    T.BandSelecting([5, 10, 15, 20, 25]),
+    T.SelectBand([5, 10, 15, 20, 25]),
     T.Resize(target_size=224),
     T.Normalize(
         mean=[0.5, 0.5, 0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5, 0.5, 0.5]),

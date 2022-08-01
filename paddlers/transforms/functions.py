@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import cv2
 import copy
 
+import cv2
 import numpy as np
 import shapely.ops
 from shapely.geometry import Polygon, MultiPolygon, GeometryCollection
@@ -126,30 +126,34 @@ def img_flip(im, method=0):
     """
     if not len(im.shape) >= 2:
         raise ValueError("Shape of image should 2d, 3d or more")
-    if method==0 or method=='h':
+    if method == 0 or method == 'h':
         return horizontal_flip(im)
-    elif method==1 or method=='v':
+    elif method == 1 or method == 'v':
         return vertical_flip(im)
-    elif method==2 or method=='hv':
+    elif method == 2 or method == 'hv':
         return hv_flip(im)
-    elif method==3 or method=='rt2lb' or method=='dia':
+    elif method == 3 or method == 'rt2lb' or method == 'dia':
         return rt2lb_flip(im)
-    elif method==4 or method=='lt2rb' or method=='adia':
+    elif method == 4 or method == 'lt2rb' or method == 'adia':
         return lt2rb_flip(im)
     else:
         return im
+
 
 def horizontal_flip(im):
     im = im[:, ::-1, ...]
     return im
 
+
 def vertical_flip(im):
     im = im[::-1, :, ...]
     return im
 
+
 def hv_flip(im):
     im = im[::-1, ::-1, ...]
     return im
+
 
 def rt2lb_flip(im):
     axs_list = list(range(len(im.shape)))
@@ -157,13 +161,16 @@ def rt2lb_flip(im):
     im = im.transpose(axs_list)
     return im
 
+
 def lt2rb_flip(im):
     axs_list = list(range(len(im.shape)))
     axs_list[:2] = [1, 0]
     im = im[::-1, ::-1, ...].transpose(axs_list)
     return im
 
+
 # endregion
+
 
 # region rotation
 def img_simple_rotate(im, method=0):
@@ -223,14 +230,15 @@ def img_simple_rotate(im, method=0):
     """
     if not len(im.shape) >= 2:
         raise ValueError("Shape of image should 2d, 3d or more")
-    if method==0 or method==90:
+    if method == 0 or method == 90:
         return rot_90(im)
-    elif method==1 or method==180:
+    elif method == 1 or method == 180:
         return rot_180(im)
-    elif method==2 or method==270:
+    elif method == 2 or method == 270:
         return rot_270(im)
     else:
         return im
+
 
 def rot_90(im):
     axs_list = list(range(len(im.shape)))
@@ -238,15 +246,19 @@ def rot_90(im):
     im = im[::-1, :, ...].transpose(axs_list)
     return im
 
+
 def rot_180(im):
     im = im[::-1, ::-1, ...]
     return im
+
 
 def rot_270(im):
     axs_list = list(range(len(im.shape)))
     axs_list[:2] = [1, 0]
     im = im[:, ::-1, ...].transpose(axs_list)
     return im
+
+
 # endregion
 
 
@@ -477,15 +489,16 @@ def select_bands(im, band_list=[1, 2, 3]):
     return ima
 
 
-def de_haze(im, gamma=False):
-    """ Priori defogging of dark channel. (Just RGB)
+def dehaze(im, gamma=False):
+    """
+    Single image haze removal using dark channel prior.
 
     Args:
-        im (np.ndarray): The image.
+        im (np.ndarray): Input image.
         gamma (bool, optional): Use gamma correction or not. Defaults to False.
 
     Returns:
-        np.ndarray: The image after defogged.
+        np.ndarray: The image after dehazed.
     """
 
     def _guided_filter(I, p, r, eps):
@@ -501,7 +514,7 @@ def de_haze(im, gamma=False):
         m_b = cv2.boxFilter(b, -1, (r, r))
         return m_a * I + m_b
 
-    def _de_fog(im, r, w, maxatmo_mask, eps):
+    def _dehaze(im, r, w, maxatmo_mask, eps):
         # im is RGB and range[0, 1]
         atmo_mask = np.min(im, 2)
         dark_channel = cv2.erode(atmo_mask, np.ones((15, 15)))
@@ -519,7 +532,7 @@ def de_haze(im, gamma=False):
     if np.max(im) > 1:
         im = im / 255.
     result = np.zeros(im.shape)
-    mask_img, atmo_illum = _de_fog(
+    mask_img, atmo_illum = _dehaze(
         im, r=81, w=0.95, maxatmo_mask=0.80, eps=1e-8)
     for k in range(3):
         result[:, :, k] = (im[:, :, k] - mask_img) / (1 - mask_img / atmo_illum)
@@ -534,11 +547,11 @@ def match_histograms(im, ref):
     Match the cumulative histogram of one image to another.
 
     Args:
-        im (np.ndarray): The input image.
-        ref (np.ndarray): The reference image to match histogram of. `ref` must have the same number of channels as `im`.
+        im (np.ndarray): Input image.
+        ref (np.ndarray): Reference image to match histogram of. `ref` must have the same number of channels as `im`.
 
     Returns:
-        np.ndarray: The transformed input image.
+        np.ndarray: Transformed input image.
 
     Raises:
         ValueError: When the number of channels of `ref` differs from that of im`.
@@ -553,14 +566,14 @@ def match_by_regression(im, ref, pif_loc=None):
     Match the brightness values of two images using a linear regression method.
 
     Args:
-        im (np.ndarray): The input image.
-        ref (np.ndarray): The reference image to match. `ref` must have the same shape as `im`.
-        pif_loc (tuple|None, optional): The spatial locations where pseudo-invariant features (PIFs) are obtained. If 
+        im (np.ndarray): Input image.
+        ref (np.ndarray): Reference image to match. `ref` must have the same shape as `im`.
+        pif_loc (tuple|None, optional): Spatial locations where pseudo-invariant features (PIFs) are obtained. If 
             `pif_loc` is set to None, all pixels in the image will be used as training samples for the regression model. 
             In other cases, `pif_loc` should be a tuple of np.ndarrays. Default: None.
 
     Returns:
-        np.ndarray: The transformed input image.
+        np.ndarray: Transformed input image.
 
     Raises:
         ValueError: When the shape of `ref` differs from that of `im`.

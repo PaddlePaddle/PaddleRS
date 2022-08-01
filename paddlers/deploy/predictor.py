@@ -175,9 +175,9 @@ class Predictor(object):
             if self._model._postprocess is None:
                 self._model.build_postprocess_from_labels(topk)
             # XXX: Convert ndarray to tensor as self._model._postprocess requires
-            net_outputs = paddle.to_tensor(net_outputs)
-            assert net_outputs.shape[1] == 1
-            outputs = self._model._postprocess(net_outputs.squeeze(1))
+            assert len(net_outputs) == 1
+            net_outputs = paddle.to_tensor(net_outputs[0])
+            outputs = self._model._postprocess(net_outputs)
             class_ids = map(itemgetter('class_ids'), outputs)
             scores = map(itemgetter('scores'), outputs)
             label_names = map(itemgetter('label_names'), outputs)
@@ -252,22 +252,26 @@ class Predictor(object):
                 transforms=None,
                 warmup_iters=0,
                 repeats=1):
-        """ 图片预测
+        """
+            Do prediction.
+
             Args:
-                img_file(List[str or tuple or np.ndarray], str, tuple, or np.ndarray):
-                    对于场景分类、图像复原、目标检测和语义分割任务来说，该参数可为单一图像路径，或是解码后的、排列格式为（H, W, C）
-                    且具有float32类型的BGR图像（表示为numpy的ndarray形式），或者是一组图像路径或np.ndarray对象构成的列表；对于变化检测
-                    任务来说，该参数可以为图像路径二元组（分别表示前后两个时相影像路径），或是两幅图像组成的二元组，或者是上述两种二元组
-                    之一构成的列表。
-                topk(int): 场景分类模型预测时使用，表示预测前topk的结果。默认值为1。
-                transforms (paddlers.transforms): 数据预处理操作。默认值为None, 即使用`model.yml`中保存的数据预处理操作。
-                warmup_iters (int): 预热轮数，用于评估模型推理以及前后处理速度。若大于1，会预先重复预测warmup_iters，而后才开始正式的预测及其速度评估。默认为0。
-                repeats (int): 重复次数，用于评估模型推理以及前后处理速度。若大于1，会预测repeats次取时间平均值。默认值为1。
+                img_file(list[str | tuple | np.ndarray] | str | tuple | np.ndarray): For scene classification, image restoration, 
+                    object detection and semantic segmentation tasks, `img_file` should be either the path of the image to predict
+                    , a decoded image (a `np.ndarray`, which should be consistent with what you get from passing image path to
+                    `paddlers.transforms.decode_image()`), or a list of image paths or decoded images. For change detection tasks,
+                    `img_file` should be a tuple of image paths, a tuple of decoded images, or a list of tuples.
+                topk(int, optional): Top-k values to reserve in a classification result. Defaults to 1.
+                transforms (paddlers.transforms.Compose | None, optional): Pipeline of data preprocessing. If None, load transforms
+                    from `model.yml`. Defaults to None.
+                warmup_iters (int, optional): Warm-up iterations before measuring the execution time. Defaults to 0.
+                repeats (int, optional): Number of repetitions to evaluate model inference and data processing speed. If greater than
+                    1, the reported time consumption is the average of all repeats. Defaults to 1.
         """
         if repeats < 1:
             logging.error("`repeats` must be greater than 1.", exit=True)
         if transforms is None and not hasattr(self._model, 'test_transforms'):
-            raise Exception("Transforms need to be defined, now is None.")
+            raise ValueError("Transforms need to be defined, now is None.")
         if transforms is None:
             transforms = self._model.test_transforms
         if isinstance(img_file, tuple) and len(img_file) != 2:

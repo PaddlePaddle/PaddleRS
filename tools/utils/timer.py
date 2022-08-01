@@ -16,11 +16,12 @@ import time
 from functools import wraps
 
 
-def timer(func):
+def time_it(func):
     @wraps(func)
-    def wrapper(*args,**kwargs):
+    def wrapper(*args, **kwargs):
         start_time = time.time()
-        result = func(*args,**kwargs)
-        print("Total time: {0}.".format(time.time() - start_time))
+        result = func(*args, **kwargs)
+        print("Total time consumed: {0}.".format(time.time() - start_time))
         return result
+
     return wrapper

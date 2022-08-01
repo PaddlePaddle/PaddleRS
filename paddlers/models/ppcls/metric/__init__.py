@@ -34,8 +34,7 @@ class CombinedMetrics(nn.Layer):
             metric_name = list(config)[0]
             metric_params = config[metric_name]
             if metric_params is not None:
-                self.metric_func_list.append(
-                    eval(metric_name)(**metric_params))
+                self.metric_func_list.append(eval(metric_name)(**metric_params))
             else:
                 self.metric_func_list.append(eval(metric_name)())
 

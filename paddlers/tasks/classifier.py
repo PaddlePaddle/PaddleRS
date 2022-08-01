@@ -33,7 +33,7 @@ from paddlers.models.ppcls.metric import build_metrics
 from paddlers.models.ppcls.loss import build_loss
 from paddlers.models.ppcls.data.postprocess import build_postprocess
 from paddlers.utils.checkpoint import cls_pretrain_weights_dict
-from paddlers.transforms import ImgDecoder, Resize
+from paddlers.transforms import Resize, decode_image
 
 __all__ = [
     "ResNet50_vd", "MobileNetV3_small_x1_0", "HRNet_W18_C", "CondenseNetV2_b"
@@ -410,9 +410,9 @@ class BaseClassifier(BaseModel):
         Do inference.
         Args:
             Args:
-            img_file(List[np.ndarray or str], str or np.ndarray):
-                Image path or decoded image data in a BGR format, which also could constitute a list,
-                meaning all images to be predicted as a mini-batch.
+            img_file(list[np.ndarray | str] | str | np.ndarray):
+                Image path or decoded image data, which also could constitute a list, meaning all images to be 
+                predicted as a mini-batch.
             transforms(paddlers.transforms.Compose or None, optional):
                 Transforms for inputs. If None, the transforms for evaluation process will be used. Defaults to None.
 
@@ -465,10 +465,10 @@ class BaseClassifier(BaseModel):
         batch_im = list()
         batch_ori_shape = list()
         for im in images:
+            if isinstance(im, str):
+                im = decode_image(im, to_rgb=False)
+            ori_shape = im.shape[:2]
             sample = {'image': im}
-            if isinstance(sample['image'], str):
-                sample = ImgDecoder(to_rgb=False)(sample)
-            ori_shape = sample['image'].shape[:2]
             im = transforms(sample)
             batch_im.append(im)
             batch_ori_shape.append(ori_shape)
@@ -504,7 +504,7 @@ class BaseClassifier(BaseModel):
                     scale = float(op.long_size) / float(im_long_size)
                     h = int(round(h * scale))
                     w = int(round(w * scale))
-                elif op.__class__.__name__ == 'Padding':
+                elif op.__class__.__name__ == 'Pad':
                     if op.target_size:
                         target_h, target_w = op.target_size
                     else:

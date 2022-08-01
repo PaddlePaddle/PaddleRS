@@ -26,11 +26,9 @@ class MultiLabelLoss(nn.Layer):
     def _binary_crossentropy(self, input, target, class_num):
         if self.epsilon is not None:
             target = self._labelsmoothing(target, class_num)
-            cost = F.binary_cross_entropy_with_logits(
-                logit=input, label=target)
+            cost = F.binary_cross_entropy_with_logits(logit=input, label=target)
         else:
-            cost = F.binary_cross_entropy_with_logits(
-                logit=input, label=target)
+            cost = F.binary_cross_entropy_with_logits(logit=input, label=target)
 
         return cost
 

@@ -31,6 +31,7 @@ class CycleGANModel(BaseModel):
 
     CycleGAN paper: https://arxiv.org/pdf/1703.10593.pdf
     """
+
     def __init__(self,
                  generator,
                  discriminator=None,
