@@ -24,7 +24,7 @@ import xml.etree.ElementTree as ET
 import numpy as np
 
 from .base import BaseDataset
-from paddlers.utils import logging, get_encoding, path_normalization, is_pic
+from paddlers.utils import logging, get_encoding, norm_path, is_pic
 from paddlers.transforms import DecodeImg, MixupImage
 from paddlers.tools import YOLOAnchorCluster
 
@@ -115,8 +115,8 @@ class VOCDetection(BaseDataset):
                 img_file, xml_file = [
                     osp.join(data_dir, x) for x in line.strip().split()[:2]
                 ]
-                img_file = path_normalization(img_file)
-                xml_file = path_normalization(xml_file)
+                img_file = norm_path(img_file)
+                xml_file = norm_path(xml_file)
                 if not is_pic(img_file):
                     continue
                 if not osp.isfile(xml_file):

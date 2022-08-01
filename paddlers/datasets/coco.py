@@ -22,7 +22,7 @@ from collections import OrderedDict
 import numpy as np
 
 from .base import BaseDataset
-from paddlers.utils import logging, get_encoding, path_normalization, is_pic
+from paddlers.utils import logging, get_encoding, norm_path, is_pic
 from paddlers.transforms import DecodeImg, MixupImage
 from paddlers.tools import YOLOAnchorCluster
 
@@ -102,8 +102,8 @@ class COCODetection(BaseDataset):
                 'name': k
             })
 
-        anno_path = path_normalization(os.path.join(self.data_dir, anno_path))
-        image_dir = path_normalization(os.path.join(self.data_dir, image_dir))
+        anno_path = norm_path(os.path.join(self.data_dir, anno_path))
+        image_dir = norm_path(os.path.join(self.data_dir, image_dir))
 
         assert anno_path.endswith('.json'), \
             'invalid coco annotation file: ' + anno_path

@@ -17,7 +17,7 @@ from enum import IntEnum
 import os.path as osp
 
 from .base import BaseDataset
-from paddlers.utils import logging, get_encoding, path_normalization, is_pic
+from paddlers.utils import logging, get_encoding, norm_path, is_pic
 
 
 class CDDataset(BaseDataset):
@@ -81,7 +81,7 @@ class CDDataset(BaseDataset):
                         "Line[{}] in file_list[{}] has an incorrect number of file paths.".
                         format(line.strip(), file_list))
 
-                items = list(map(path_normalization, items))
+                items = list(map(norm_path, items))
 
                 full_path_im_t1 = osp.join(data_dir, items[0])
                 full_path_im_t2 = osp.join(data_dir, items[1])

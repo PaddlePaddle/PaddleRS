@@ -16,7 +16,7 @@ import os.path as osp
 import copy
 
 from .base import BaseDataset
-from paddlers.utils import logging, get_encoding, path_normalization, is_pic
+from paddlers.utils import logging, get_encoding, norm_path, is_pic
 
 
 class SegDataset(BaseDataset):
@@ -62,8 +62,8 @@ class SegDataset(BaseDataset):
                         "A space is defined as the delimiter to separate the image and label path, " \
                         "so the space cannot be in the image or label path, but the line[{}] of " \
                         " file_list[{}] has a space in the image or label path.".format(line, file_list))
-                items[0] = path_normalization(items[0])
-                items[1] = path_normalization(items[1])
+                items[0] = norm_path(items[0])
+                items[1] = norm_path(items[1])
                 full_path_im = osp.join(data_dir, items[0])
                 full_path_label = osp.join(data_dir, items[1])
                 if not is_pic(full_path_im) or not is_pic(full_path_label):
