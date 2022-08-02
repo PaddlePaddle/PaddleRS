@@ -141,7 +141,10 @@ class CDDataset(Dataset):
 
 
 class MaskType(IntEnum):
-    """Enumeration of the mask types used in the change detection task."""
+    """
+    Enumeration of the mask types used in the change detection task.
+    """
+
     CD = 0
     SEG_T1 = 1
     SEG_T2 = 2

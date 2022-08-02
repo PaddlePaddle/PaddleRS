@@ -25,7 +25,8 @@ from ...models.ppgan.modules.init import reset_parameters
 
 @MODELS.register()
 class RCANModel(BaseModel):
-    """Base SR model for single image super-resolution.
+    """
+    Base SR model for single image super-resolution.
     """
 
     def __init__(self, generator, pixel_criterion=None, use_init_weight=False):

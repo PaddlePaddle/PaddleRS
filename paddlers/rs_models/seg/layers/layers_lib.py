@@ -32,9 +32,10 @@ class Activation(nn.Layer):
     The wrapper of activations.
 
     Args:
-        act (str, optional): The activation name in lowercase. It must be one of ['elu', 'gelu',
-            'hardshrink', 'tanh', 'hardtanh', 'prelu', 'relu', 'relu6', 'selu', 'leakyrelu', 'sigmoid',
-            'softmax', 'softplus', 'softshrink', 'softsign', 'tanhshrink', 'logsigmoid', 'logsoftmax',
+        act (str, optional): The activation name in lowercase. It must be one of 
+            ['elu', 'gelu', 'hardshrink', 'tanh', 'hardtanh', 'prelu', 'relu', 
+            'relu6', 'selu', 'leakyrelu', 'sigmoid', 'softmax', 'softplus', 
+            'softshrink', 'softsign', 'tanhshrink', 'logsigmoid', 'logsoftmax',
             'hsigmoid']. Default: None, means identical transformation.
 
     Returns:

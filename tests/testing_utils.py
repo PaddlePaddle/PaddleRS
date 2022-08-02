@@ -118,7 +118,7 @@ class _CommonTestNamespace:
                 assertForFloat = self.assertTrue
 
             result_t = type(result)
-            error_msg = 'Output has diff at place:{}. \nExpect: {} \nBut Got: {} in class {}'
+            error_msg = "Output has diff at place:{}. \nExpect: {} \nBut Got: {} in class {}"
             if result_t in [list, tuple]:
                 result_t = get_container_type(result)
             if result_t in [
@@ -144,8 +144,8 @@ class _CommonTestNamespace:
                             result.shape, self.__class__.__name__))
             else:
                 raise ValueError(
-                    'result type must be str, int, bool, set, np.bool, np.int32, '
-                    'np.int64, np.str, float, np.ndarray, np.float32, np.float64'
+                    "result type must be str, int, bool, set, np.bool, np.int32, "
+                    "np.int64, np.str, float, np.ndarray, np.float32, np.float64"
                 )
 
         def check_output_equal(self,
@@ -157,13 +157,13 @@ class _CommonTestNamespace:
             Check whether result and expected result are equal, including shape. 
             
             Args:
-                result: str, int, bool, set, np.ndarray.
+                result (str | int | bool | set |np.ndarray):
                     The result needs to be checked.
-                expected_result: str, int, bool, set, np.ndarray. The type has to be same as result's.
-                    Use the expected result to check result.
-                rtol: float
+                expected_result (str | int | bool | set |np.ndarray): The type has to be same as
+                    result's. Use the expected result to check result.
+                rtol (float, optional):
                     relative tolerance, default 1.e-5.
-                atol: float
+                atol (float, optional):
                     absolute tolerance, default 1.e-8
             """
 
@@ -178,13 +178,13 @@ class _CommonTestNamespace:
             Check whether result and expected result are not equal, including shape. 
 
             Args:
-                result: str, int, bool, set, np.ndarray.
+                result (str | int | bool | set |np.ndarray):
                     The result needs to be checked.
-                expected_result: str, int, bool, set, np.ndarray. The type has to be same as result's.
-                    Use the expected result to check result.
-                rtol: float
+                expected_result (str | int | bool | set | np.ndarray): The type has to be same 
+                    as result's. Use the expected result to check result.
+                rtol (float, optional):
                     relative tolerance, default 1.e-5.
-                atol: float
+                atol (float, optional):
                     absolute tolerance, default 1.e-8
             """
 

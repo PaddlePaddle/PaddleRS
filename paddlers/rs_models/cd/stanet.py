@@ -26,23 +26,29 @@ class STANet(nn.Layer):
     The STANet implementation based on PaddlePaddle.
 
     The original article refers to
-        H. Chen and Z. Shi, "A Spatial-Temporal Attention-Based Method and a New Dataset for Remote Sensing Image Change Detection"
+        H. Chen and Z. Shi, "A Spatial-Temporal Attention-Based Method and a New 
+        Dataset for Remote Sensing Image Change Detection"
         (https://www.mdpi.com/2072-4292/12/10/1662).
 
     Note that this implementation differs from the original work in two aspects:
     1. We do not use multiple dilation rates in layer 4 of the ResNet backbone.
-    2. A classification head is used in place of the original metric learning-based head to stablize the training process.
+    2. A classification head is used in place of the original metric learning-based 
+        head to stablize the training process.
 
     Args:
         in_channels (int): The number of bands of the input images.
         num_classes (int): The number of target classes.
-        att_type (str, optional): The attention module used in the model. Options are 'PAM' and 'BAM'. Default: 'BAM'.
-        ds_factor (int, optional): The downsampling factor of the attention modules. When `ds_factor` is set to values 
-            greater than 1, the input features will first be processed by an average pooling layer with the kernel size of 
-            `ds_factor`, before being used to calculate the attention scores. Default: 1.
+        att_type (str, optional): The attention module used in the model. Options 
+            are 'PAM' and 'BAM'. Default: 'BAM'.
+        ds_factor (int, optional): The downsampling factor of the attention modules. 
+            When `ds_factor` is set to values greater than 1, the input features 
+            will first be processed by an average pooling layer with the kernel size 
+            of `ds_factor`, before being used to calculate the attention scores. 
+            Default: 1.
 
     Raises:
-        ValueError: When `att_type` has an illeagal value (unsupported attention type).
+        ValueError: When `att_type` has an illeagal value (unsupported attention 
+            type).
     """
 
     def __init__(self, in_channels, num_classes, att_type='BAM', ds_factor=1):

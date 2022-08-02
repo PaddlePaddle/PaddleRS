@@ -28,16 +28,17 @@ class DSIFN(nn.Layer):
     The DSIFN implementation based on PaddlePaddle.
 
     The original article refers to
-        C. Zhang, et al., "A deeply supervised image fusion network for change detection in high resolution bi-temporal remote 
-        sensing images"
+        C. Zhang, et al., "A deeply supervised image fusion network for change 
+        detection in high resolution bi-temporal remote sensing images"
         (https://www.sciencedirect.com/science/article/pii/S0924271620301532).
 
     Note that in this implementation, there is a flexible number of target classes.
 
     Args:
         num_classes (int): The number of target classes.
-        use_dropout (bool, optional): A bool value that indicates whether to use dropout layers. When the model is trained 
-            on a relatively small dataset, the dropout layers help prevent overfitting. Default: False.
+        use_dropout (bool, optional): A bool value that indicates whether to use 
+            dropout layers. When the model is trained on a relatively small dataset, 
+            the dropout layers help prevent overfitting. Default: False.
     """
 
     def __init__(self, num_classes, use_dropout=False):

@@ -19,8 +19,8 @@ import numpy as np
 
 
 class SmoothedValue(object):
-    """Track a series of values and provide access to smoothed values over a
-    window.
+    """
+    Track a series of values and provide access to smoothed values over window.
     """
 
     def __init__(self, window_size=20):

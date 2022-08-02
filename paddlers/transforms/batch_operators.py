@@ -71,11 +71,13 @@ class BatchRandomResize(Transform):
     """
     Resize a batch of input to random sizes.
 
-    Attention: If interp is 'RANDOM', the interpolation method will be chose randomly.
+    Attention: If interp is 'RANDOM', the interpolation method will be chose 
+        randomly.
 
     Args:
         target_sizes (list[int] | list[list | tuple] | tuple[list | tuple]):
-            Multiple target sizes, each target size is an int or list/tuple of length 2.
+            Multiple target sizes, each target size is an int or list/tuple of 
+            length 2.
         interp ({'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}, optional):
             Interpolation method of resize. Defaults to 'LINEAR'.
     Raises:
@@ -108,12 +110,15 @@ class BatchRandomResize(Transform):
 
 
 class BatchRandomResizeByShort(Transform):
-    """Resize a batch of input to random sizes with keeping the aspect ratio.
+    """
+    Resize a batch of input to random sizes with keeping the aspect ratio.
 
-    Attention: If interp is 'RANDOM', the interpolation method will be chose randomly.
+    Attention: If interp is 'RANDOM', the interpolation method will be chose 
+        randomly.
 
     Args:
-        short_sizes (list[int] | tuple[int]): Target sizes of the shorter side of the image(s).
+        short_sizes (list[int] | tuple[int]): Target sizes of the shorter side of 
+            the image(s).
         max_size (int, optional): The upper bound of longer side of the image(s).
             If max_size is -1, no upper bound is applied. Defaults to -1.
         interp ({'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}, optional):
@@ -124,7 +129,8 @@ class BatchRandomResizeByShort(Transform):
         ValueError: Invalid interpolation method.
 
     See Also:
-        RandomResizeByShort: Resize input to random sizes with keeping the aspect ratio.
+        RandomResizeByShort: Resize input to random sizes with keeping the aspect 
+            ratio.
     """
 
     def __init__(self, short_sizes, max_size=-1, interp='NEAREST'):

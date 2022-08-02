@@ -22,7 +22,9 @@ import paddle
 
 
 def get_environ_info():
-    """collect environment information"""
+    """
+    collect environment information.
+    """
 
     env_info = dict()
     # TODO is_compiled_with_cuda() has not been moved

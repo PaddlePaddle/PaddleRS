@@ -23,7 +23,8 @@ class CDNet(nn.Layer):
     The CDNet implementation based on PaddlePaddle.
 
     The original article refers to
-        Pablo F. Alcantarilla, et al., "Street-View Change Detection with Deconvolutional Networks"
+        Pablo F. Alcantarilla, et al., "Street-View Change Detection with Deconvolut
+        ional Networks"
         (https://link.springer.com/article/10.1007/s10514-018-9734-5).
 
     Args:

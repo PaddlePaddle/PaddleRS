@@ -50,10 +50,11 @@ def visualize_segmentation(image, result, weight=0.6, save_dir='./',
     Convert segment result to color image, and save added image.
 
     Args:
-        image: the path of origin image
-        result: the predict result of image
-        weight: the image weight of visual image, and the result weight is (1 - weight)
-        save_dir: the directory for saving visual image
+        image: the path of origin image.
+        result: the predict result of image.
+        weight: the image weight of visual image, and the result weight is 
+            (1 - weight).
+        save_dir: the directory for saving visual image.
         color: the list of a BGR-mode color for each label.
     """
 
@@ -106,8 +107,9 @@ def visualize_segmentation(image, result, weight=0.6, save_dir='./',
 
 
 def get_color_map_list(num_classes):
-    """ 
-    Returns the color map for visualizing the segmentation mask, which can support arbitrary number of classes.
+    """
+    Returns the color map for visualizing the segmentation mask, which can support 
+        arbitrary number of classes.
 
     Args:
         num_classes: Number of classes
@@ -297,7 +299,8 @@ def draw_pr_curve(eval_details_file=None,
 
     def _summarize(coco_gt, ap=1, iouThr=None, areaRng='all', maxDets=100):
         """
-        This function has the same functionality as _summarize() in pycocotools.COCOeval.summarize().
+        This function has the same functionality as _summarize() in 
+            pycocotools.COCOeval.summarize().
 
         Refer to
         https://github.com/cocodataset/cocoapi/blob/8c9bcc3cf640524c4c20a9c40e89cb6a2f2fa0e9/PythonAPI/pycocotools/cocoeval.py#L427,

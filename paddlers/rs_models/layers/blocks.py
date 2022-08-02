@@ -191,7 +191,9 @@ class ConvTransposed3x3(nn.Layer):
 
 
 class Identity(nn.Layer):
-    """A placeholder identity operator that accepts exactly one argument."""
+    """
+    A placeholder identity operator that accepts exactly one argument.
+    """
 
     def __init__(self, *args, **kwargs):
         super(Identity, self).__init__()

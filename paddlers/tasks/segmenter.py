@@ -224,29 +224,38 @@ class BaseSegmenter(BaseModel):
               resume_checkpoint=None):
         """
         Train the model.
+
         Args:
             num_epochs(int): The number of epochs.
             train_dataset(paddlers.dataset): Training dataset.
-            train_batch_size(int, optional): Total batch size among all cards used in training. Defaults to 2.
-            eval_dataset(paddlers.dataset, optional):
-                Evaluation dataset. If None, the model will not be evaluated furing training process. Defaults to None.
-            optimizer(paddle.optimizer.Optimizer or None, optional):
-                Optimizer used in training. If None, a default optimizer is used. Defaults to None.
-            save_interval_epochs(int, optional): Epoch interval for saving the model. Defaults to 1.
-            log_interval_steps(int, optional): Step interval for printing training information. Defaults to 10.
+            train_batch_size(int, optional): Total batch size among all cards used in 
+                training. Defaults to 2.
+            eval_dataset(paddlers.dataset, optional): Evaluation dataset. If None, the 
+                model will not be evaluated furing training process. Defaults to None.
+            optimizer(paddle.optimizer.Optimizer or None, optional): Optimizer used in 
+                training. If None, a default optimizer is used. Defaults to None.
+            save_interval_epochs(int, optional): Epoch interval for saving the model. 
+                Defaults to 1.
+            log_interval_steps(int, optional): Step interval for printing training 
+                information. Defaults to 10.
             save_dir(str, optional): Directory to save the model. Defaults to 'output'.
-            pretrain_weights(str or None, optional):
-                None or name/path of pretrained weights. If None, no pretrained weights will be loaded. Defaults to 'CITYSCAPES'.
-            learning_rate(float, optional): Learning rate for training. Defaults to .025.
+            pretrain_weights(str or None, optional): None or name/path of pretrained 
+                weights. If None, no pretrained weights will be loaded. 
+                Defaults to 'CITYSCAPES'.
+            learning_rate(float, optional): Learning rate for training. 
+                Defaults to .025.
             lr_decay_power(float, optional): Learning decay power. Defaults to .9.
-            early_stop(bool, optional): Whether to adopt early stop strategy. Defaults to False.
+            early_stop(bool, optional): Whether to adopt early stop strategy. 
+                Defaults to False.
             early_stop_patience(int, optional): Early stop patience. Defaults to 5.
-            use_vdl(bool, optional): Whether to use VisualDL to monitor the training process. Defaults to True.
-            resume_checkpoint(str or None, optional): The path of the checkpoint to resume training from.
-                If None, no training checkpoint will be resumed. At most one of `resume_checkpoint` and
-                `pretrain_weights` can be set simultaneously. Defaults to None.
-
+            use_vdl(bool, optional): Whether to use VisualDL to monitor the training 
+                process. Defaults to True.
+            resume_checkpoint(str or None, optional): The path of the checkpoint to 
+                resume training from. If None, no training checkpoint will be resumed.
+                At most one of `resume_checkpoint` and `pretrain_weights` can be set 
+                simultaneously. Defaults to None.
         """
+
         if self.status == 'Infer':
             logging.error(
                 "Exported inference model does not support training.",
@@ -322,28 +331,36 @@ class BaseSegmenter(BaseModel):
                           quant_config=None):
         """
         Quantization-aware training.
+
         Args:
             num_epochs(int): The number of epochs.
             train_dataset(paddlers.dataset): Training dataset.
-            train_batch_size(int, optional): Total batch size among all cards used in training. Defaults to 2.
-            eval_dataset(paddlers.dataset, optional):
-                Evaluation dataset. If None, the model will not be evaluated furing training process. Defaults to None.
-            optimizer(paddle.optimizer.Optimizer or None, optional):
-                Optimizer used in training. If None, a default optimizer is used. Defaults to None.
-            save_interval_epochs(int, optional): Epoch interval for saving the model. Defaults to 1.
-            log_interval_steps(int, optional): Step interval for printing training information. Defaults to 10.
+            train_batch_size(int, optional): Total batch size among all cards used in 
+                training. Defaults to 2.
+            eval_dataset(paddlers.dataset, optional): Evaluation dataset. If None, the 
+                model will not be evaluated furing training process. Defaults to None.
+            optimizer(paddle.optimizer.Optimizer or None, optional): Optimizer used in 
+                training. If None, a default optimizer is used. Defaults to None.
+            save_interval_epochs(int, optional): Epoch interval for saving the model. 
+                Defaults to 1.
+            log_interval_steps(int, optional): Step interval for printing training 
+                information. Defaults to 10.
             save_dir(str, optional): Directory to save the model. Defaults to 'output'.
-            learning_rate(float, optional): Learning rate for training. Defaults to .025.
+            learning_rate(float, optional): Learning rate for training. 
+                Defaults to .025.
             lr_decay_power(float, optional): Learning decay power. Defaults to .9.
-            early_stop(bool, optional): Whether to adopt early stop strategy. Defaults to False.
+            early_stop(bool, optional): Whether to adopt early stop strategy. 
+                Defaults to False.
             early_stop_patience(int, optional): Early stop patience. Defaults to 5.
-            use_vdl(bool, optional): Whether to use VisualDL to monitor the training process. Defaults to True.
-            quant_config(dict or None, optional): Quantization configuration. If None, a default rule of thumb
-                configuration will be used. Defaults to None.
-            resume_checkpoint(str or None, optional): The path of the checkpoint to resume quantization-aware training
-                from. If None, no training checkpoint will be resumed. Defaults to None.
-
+            use_vdl(bool, optional): Whether to use VisualDL to monitor the training 
+                process. Defaults to True.
+            quant_config(dict or None, optional): Quantization configuration. If None, 
+                a default rule of thumb configuration will be used. Defaults to None.
+            resume_checkpoint(str or None, optional): The path of the checkpoint to 
+                resume quantization-aware training from. If None, no training 
+                checkpoint will be resumed. Defaults to None.
         """
+
         self._prepare_qat(quant_config)
         self.train(
             num_epochs=num_epochs,
@@ -365,10 +382,13 @@ class BaseSegmenter(BaseModel):
     def evaluate(self, eval_dataset, batch_size=1, return_details=False):
         """
         Evaluate the model.
+
         Args:
             eval_dataset(paddlers.dataset): Evaluation dataset.
-            batch_size(int, optional): Total batch size among all cards used for evaluation. Defaults to 1.
-            return_details(bool, optional): Whether to return evaluation details. Defaults to False.
+            batch_size(int, optional): Total batch size among all cards used for 
+                evaluation. Defaults to 1.
+            return_details(bool, optional): Whether to return evaluation details. 
+                Defaults to False.
 
         Returns:
             collections.OrderedDict with key-value pairs:
@@ -380,6 +400,7 @@ class BaseSegmenter(BaseModel):
                  "category_F1-score": `F1 score`}.
 
         """
+
         arrange_transforms(
             model_type=self.model_type,
             transforms=eval_dataset.transforms,
@@ -476,22 +497,26 @@ class BaseSegmenter(BaseModel):
     def predict(self, img_file, transforms=None):
         """
         Do inference.
+
         Args:
             Args:
-            img_file(list[np.ndarray | str] | str | np.ndarray):
-                Image path or decoded image data, which also could constitute a list,meaning all images to be 
+            img_file(list[np.ndarray | str] | str | np.ndarray): Image path or decoded 
+                image data, which also could constitute a list, meaning all images to be 
                 predicted as a mini-batch.
-            transforms(paddlers.transforms.Compose or None, optional):
-                Transforms for inputs. If None, the transforms for evaluation process will be used. Defaults to None.
+            transforms(paddlers.transforms.Compose or None, optional): Transforms for 
+                inputs. If None, the transforms for evaluation process will be used. 
+                Defaults to None.
 
         Returns:
-            If img_file is a string or np.array, the result is a dict with key-value pairs:
-            {"label map": `label map`, "score_map": `score map`}.
-            If img_file is a list, the result is a list composed of dicts with the corresponding fields:
-            label_map(np.ndarray): the predicted label map (HW)
-            score_map(np.ndarray): the prediction score map (HWC)
-
+            If `img_file` is a string or np.array, the result is a dict with key-value 
+                pairs:
+                {"label map": `label map`, "score_map": `score map`}.
+            If `img_file` is a list, the result is a list composed of dicts with the 
+                corresponding fields:
+                label_map(np.ndarray): the predicted label map (HW)
+                score_map(np.ndarray): the prediction score map (HWC)
         """
+
         if transforms is None and not hasattr(self, 'test_transforms'):
             raise Exception("transforms need to be defined, now is None.")
         if transforms is None:
@@ -527,6 +552,7 @@ class BaseSegmenter(BaseModel):
                        transforms=None):
         """
         Do inference.
+
         Args:
             Args:
             img_file(str):
@@ -537,9 +563,11 @@ class BaseSegmenter(BaseModel):
                 Size of block.
             overlap(list[int] | tuple[int] | int, optional):
                 Overlap between two blocks. Defaults to 36.
-            transforms(paddlers.transforms.Compose or None, optional):
-                Transforms for inputs. If None, the transforms for evaluation process will be used. Defaults to None.
+            transforms(paddlers.transforms.Compose or None, optional): Transforms for 
+                inputs. If None, the transforms for evaluation process will be used. 
+                Defaults to None.
         """
+
         try:
             from osgeo import gdal
         except:
