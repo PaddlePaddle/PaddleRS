@@ -42,7 +42,7 @@ def _get_type(type_name: str) -> int:
     elif type_name == "complex64":
         gdal_type = gdal.GDT_CFloat64
     else:
-        raise TypeError("Non-suported data type `{}`.".format(type_name))
+        raise TypeError("Non-suported data type {}.".format(type_name))
     return gdal_type
 
 
@@ -76,7 +76,7 @@ class Raster:
                         # https://www.osgeo.cn/gdal/drivers/raster/index.html
                         self._src_data = gdal.Open(path)
                     except:
-                        raise TypeError("Unsupported data format: `{}`".format(
+                        raise TypeError("Unsupported data format: {}".format(
                             self.ext_type))
             else:
                 raise ValueError("The path {0} not exists.".format(path))

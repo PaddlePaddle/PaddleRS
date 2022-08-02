@@ -36,10 +36,12 @@ from paddlers.datasets import CDDataset
 
 
 train_transforms = T.Compose([
+    T.DecodeImg(),
     T.Resize(target_size=512),
     T.RandomHorizontalFlip(),
     T.Normalize(
         mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
+    T.ArrangeChangeDetector('train')
 ])
 
 train_dataset = CDDataset(
