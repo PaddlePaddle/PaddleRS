@@ -69,19 +69,18 @@ class BatchCompose(Transform):
 
 class BatchRandomResize(Transform):
     """
-    Resize a batch of input to random sizes.
+    Resize a batch of inputs to random sizes.
 
-    Attention: If interp is 'RANDOM', the interpolation method will be chose 
-        randomly.
+    Attention: If `interp` is 'RANDOM', the interpolation method will be chosen randomly.
 
     Args:
-        target_sizes (list[int] | list[list | tuple] | tuple[list | tuple]):
-            Multiple target sizes, each target size is an int or list/tuple of 
-            length 2.
-        interp ({'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}, optional):
-            Interpolation method of resize. Defaults to 'LINEAR'.
+        target_sizes (list[int] | list[list|tuple] | tuple[list|tuple]):
+            Multiple target sizes, each of which should be an int or list/tuple of length 2.
+        interp (str, optional): Interpolation method for resizing image(s). One of 
+            {'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}. 
+            Defaults to 'LINEAR'.
     Raises:
-        TypeError: Invalid type of target_size.
+        TypeError: Invalid type of `target_size`.
         ValueError: Invalid interpolation method.
 
     See Also:
@@ -111,25 +110,25 @@ class BatchRandomResize(Transform):
 
 class BatchRandomResizeByShort(Transform):
     """
-    Resize a batch of input to random sizes with keeping the aspect ratio.
+    Resize a batch of inputs to random sizes while keeping the aspect ratio.
 
-    Attention: If interp is 'RANDOM', the interpolation method will be chose 
-        randomly.
+    Attention: If `interp` is 'RANDOM', the interpolation method will be chosen randomly.
 
     Args:
         short_sizes (list[int] | tuple[int]): Target sizes of the shorter side of 
             the image(s).
-        max_size (int, optional): The upper bound of longer side of the image(s).
-            If max_size is -1, no upper bound is applied. Defaults to -1.
-        interp ({'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}, optional):
-            Interpolation method of resize. Defaults to 'LINEAR'.
+        max_size (int, optional): Upper bound of longer side of the image(s).
+            If `max_size` is -1, no upper bound will be applied. Defaults to -1.
+        interp (str, optional): Interpolation method for resizing image(s). One of 
+            {'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}. 
+            Defaults to 'LINEAR'.
 
     Raises:
-        TypeError: Invalid type of target_size.
+        TypeError: Invalid type of `target_size`.
         ValueError: Invalid interpolation method.
 
     See Also:
-        RandomResizeByShort: Resize input to random sizes with keeping the aspect 
+        RandomResizeByShort: Resize input to random sizes while keeping the aspect 
             ratio.
     """
 
@@ -183,7 +182,7 @@ class _BatchPad(Transform):
 class _Gt2YoloTarget(Transform):
     """
     Generate YOLOv3 targets by groud truth data, this operator is only used in
-    fine grained YOLOv3 loss mode
+        fine grained YOLOv3 loss mode.
     """
 
     def __init__(self,

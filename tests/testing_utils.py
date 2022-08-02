@@ -157,9 +157,9 @@ class _CommonTestNamespace:
             Check whether result and expected result are equal, including shape. 
             
             Args:
-                result (str | int | bool | set |np.ndarray):
+                result (str|int|bool|set|np.ndarray):
                     The result needs to be checked.
-                expected_result (str | int | bool | set |np.ndarray): The type has to be same as
+                expected_result (str|int|bool|set|np.ndarray): The type has to be same as
                     result's. Use the expected result to check result.
                 rtol (float, optional):
                     relative tolerance, default 1.e-5.
@@ -178,9 +178,9 @@ class _CommonTestNamespace:
             Check whether result and expected result are not equal, including shape. 
 
             Args:
-                result (str | int | bool | set |np.ndarray):
+                result (str|int|bool|set|np.ndarray):
                     The result needs to be checked.
-                expected_result (str | int | bool | set | np.ndarray): The type has to be same 
+                expected_result (str|int|bool|set|np.ndarray): The type has to be same 
                     as result's. Use the expected result to check result.
                 rtol (float, optional):
                     relative tolerance, default 1.e-5.

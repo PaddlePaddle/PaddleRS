@@ -39,20 +39,20 @@ class Predictor(object):
                  max_trt_batch_size=1,
                  trt_precision_mode='float32'):
         """ 
-        创建Paddle Predictor
-
         Args:
-            model_dir: 模型路径（必须是导出的部署或量化模型）。
-            use_gpu: 是否使用GPU，默认为False。
-            gpu_id: 使用GPU的ID，默认为0。
-            cpu_thread_num：使用cpu进行预测时的线程数，默认为1。
-            use_mkl: 是否使用mkldnn计算库，CPU情况下使用，默认为False。
-            mkl_thread_num: mkldnn计算线程数，默认为4。
-            use_trt: 是否使用TensorRT，默认为False。
-            use_glog: 是否启用glog日志, 默认为False。
-            memory_optimize: 是否启动内存优化，默认为True。
-            max_trt_batch_size: 在使用TensorRT时配置的最大batch size，默认为1。
-            trt_precision_mode：在使用TensorRT时采用的精度，可选值['float32', 'float16']。默认为'float32'。
+            model_dir (str): Path of the exported model.
+            use_gpu (bool, optional): Whether to use a GPU. Defaults to False。
+            gpu_id (int, optional): GPU ID. Defaults to 0。
+            cpu_thread_num (int, optional): Number of threads to use when making predictions using CPUs. 
+                Defaults to 1。
+            use_mkl (bool, optional): Whether to use MKL-DNN. Defaults to False。
+            mkl_thread_num (int, optional): Number of MKL threads. Defaults to 4。
+            use_trt (bool, optional): Whether to use TensorRT. Defaults to False。
+            use_glog (bool, optional): Whether to enable glog logs. Defaults to False。
+            memory_optimize (bool, optional): Whether to enable memory optimization. Defaults to True。
+            max_trt_batch_size (int, optional): Maximum batch size when configured with TensorRT. Defaults to 1。
+            trt_precision_mode (str, optional)：Precision to use when configured with TensorRT. Possible values 
+                are ['float32', 'float16']。Defaults to 'float32'。
         """
 
         self.model_dir = model_dir
@@ -209,10 +209,13 @@ class Predictor(object):
         return preds
 
     def raw_predict(self, inputs):
-        """ 接受预处理过后的数据进行预测
-            Args:
-                inputs(dict): 预处理过后的数据
+        """ 
+        Predict according to preprocessed inputs.
+
+        Args:
+            inputs (dict): Preprocessed inputs.
         """
+
         input_names = self.predictor.get_input_names()
         for name in input_names:
             input_tensor = self.predictor.get_input_handle(name)
@@ -253,21 +256,22 @@ class Predictor(object):
                 warmup_iters=0,
                 repeats=1):
         """
-            Do prediction.
+        Do prediction.
 
-            Args:
-                img_file(list[str | tuple | np.ndarray] | str | tuple | np.ndarray): For scene classification, image restoration, 
-                    object detection and semantic segmentation tasks, `img_file` should be either the path of the image to predict
-                    , a decoded image (a np.ndarray, which should be consistent with what you get from passing image path to
-                    paddlers.transforms.decode_image()), or a list of image paths or decoded images. For change detection tasks,
-                    img_file should be a tuple of image paths, a tuple of decoded images, or a list of tuples.
-                topk(int, optional): Top-k values to reserve in a classification result. Defaults to 1.
-                transforms (paddlers.transforms.Compose | None, optional): Pipeline of data preprocessing. If None, load transforms
-                    from `model.yml`. Defaults to None.
-                warmup_iters (int, optional): Warm-up iterations before measuring the execution time. Defaults to 0.
-                repeats (int, optional): Number of repetitions to evaluate model inference and data processing speed. If greater than
-                    1, the reported time consumption is the average of all repeats. Defaults to 1.
+        Args:
+            img_file(list[str|tuple|np.ndarray] | str | tuple | np.ndarray): For scene classification, image restoration, 
+                object detection and semantic segmentation tasks, `img_file` should be either the path of the image to predict
+                , a decoded image (a np.ndarray, which should be consistent with what you get from passing image path to
+                paddlers.transforms.decode_image()), or a list of image paths or decoded images. For change detection tasks,
+                img_file should be a tuple of image paths, a tuple of decoded images, or a list of tuples.
+            topk(int, optional): Top-k values to reserve in a classification result. Defaults to 1.
+            transforms (paddlers.transforms.Compose|None, optional): Pipeline of data preprocessing. If None, load transforms
+                from `model.yml`. Defaults to None.
+            warmup_iters (int, optional): Warm-up iterations before measuring the execution time. Defaults to 0.
+            repeats (int, optional): Number of repetitions to evaluate model inference and data processing speed. If greater than
+                1, the reported time consumption is the average of all repeats. Defaults to 1.
         """
+
         if repeats < 1:
             logging.error("`repeats` must be greater than 1.", exit=True)
         if transforms is None and not hasattr(self._model, 'test_transforms'):

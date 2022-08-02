@@ -58,24 +58,20 @@ def center_crop(im, crop_size=224):
 # region flip
 def img_flip(im, method=0):
     """
-    Flip an image. This function provides 5 flipping methods and can be applied to
-        2D or 3D numpy arrays.
+    Flip an image. 
+    This function provides 5 flipping methods and can be applied to 2D or 3D numpy arrays.
 
     Args:
         im (np.ndarray): Input image.
-        method (int | string): Flipping method, it must be one of [
+        method (int|string): Flipping method. Must be one of [
                                 0, 1, 2, 3, 4, 'h', 'v', 'hv', 'rt2lb', 'lt2rb', 
                                 'dia', 'adia'].
-            0 or 'h': flipped in horizontal direction, which is the most frequently 
+            0 or 'h': flip the image in horizontal direction, which is the most frequently 
                 used method;
-            1 or 'v': flipped in vertical direction;
-            2 or 'hv': flipped in both horizontal diction and vertical direction;
-            3 or 'rt2lb' or 'dia': flipped around the diagonal, which also can be 
-                thought as changing the RightTop part with LeftBottom part, so it 
-                is called 'rt2lb' as well;
-            4 or 'lt2rb' or 'adia': flipped around the anti-diagonal which also can 
-                be regarded as changing the LeftTop part with RightBottom part, so 
-                it is called 'lt2rb' as well.
+            1 or 'v': flip the image in vertical direction;
+            2 or 'hv': flip the image in both horizontal diction and vertical direction;
+            3 or 'rt2lb' or 'dia': flip the image across the diagonal;
+            4 or 'lt2rb' or 'adia': flip the image across the anti-diagonal.
 
     Returns:
         np.ndarray: Flipped image.
@@ -178,17 +174,17 @@ def lt2rb_flip(im):
 # region rotation
 def img_simple_rotate(im, method=0):
     """
-    Rotate an image. This function provides 3 rotating methods and can 
-        be applied to 2D or 3D numpy arrays.
+    Rotate an image. 
+    This function provides 3 rotating methods and can be applied to 2D or 3D numpy arrays.
 
     Args:
         im (np.ndarray): Input image.
-        method (int | string): Rotating method, which must be one of [
+        method (int|string): Rotating method, which must be one of [
                                 0, 1, 2, 90, 180, 270
                                 ].
-            0 or 90 : rotated in 90 degree, clockwise;
-            1 or 180: rotated in 180 degree, clockwise;
-            2 or 270: rotated in 270 degree, clockwise.
+            0 or 90 : rotate the image by 90 degrees, clockwise;
+            1 or 180: rotate the image by 180 degrees, clockwise;
+            2 or 270: rotate the image by 270 degrees, clockwise.
 
     Returns:
         np.ndarray: Rotated image.
@@ -449,13 +445,13 @@ def to_uint8(im, is_linear=False):
 
 def to_intensity(im):
     """
-    Calculate the intensity diagram of SAR data.
+    Calculate the intensity of SAR data.
 
     Args:
         im (np.ndarray): SAR image.
 
     Returns:
-        np.ndarray: Intensity diagram.
+        np.ndarray: Intensity image.
     """
 
     if len(im.shape) != 2:

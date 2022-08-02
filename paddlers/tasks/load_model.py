@@ -52,7 +52,7 @@ def load_model(model_dir, **params):
     Load saved model from a given directory.
 
     Args:
-        model_dir(str): The directory where the model is saved.
+        model_dir(str): Directory where the model is saved.
 
     Returns:
         The model loaded from the directory.

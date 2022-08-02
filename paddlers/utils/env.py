@@ -23,7 +23,7 @@ import paddle
 
 def get_environ_info():
     """
-    collect environment information.
+    Collect environment information.
     """
 
     env_info = dict()

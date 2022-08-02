@@ -48,7 +48,7 @@ def _get_type(type_name: str) -> int:
 
 class Raster:
     def __init__(self,
-                 path: Optional[str],
+                 path: str,
                  gdal_obj: Optional[gdal.Dataset]=None,
                  band_list: Union[List[int], Tuple[int], None]=None,
                  to_uint8: bool=False) -> None:
@@ -56,9 +56,9 @@ class Raster:
         Reader of raster files.
         
         Args:
-            path (Optional[str]): Path of raster file.
-            gdal_obj (Optional[Any], optional): GDAL dataset. Defaults to None.
-            band_list (Union[List[int], Tuple[int], None], optional): Select a set of 
+            path (str): Path of raster file.
+            gdal_obj (gdal.Dataset|None, optional): GDAL dataset. Defaults to None.
+            band_list (list[int] | tuple[int] | None, optional): Select a set of 
                 bands (the band index starts from 1). If None, read all bands. 
                 Defaults to None.
             to_uint8 (bool, optional): Whether to convert data type to uint8. 
@@ -98,7 +98,7 @@ class Raster:
         Set bands of data.
         
         Args:
-            band_list (List[int] | tuple[int] | None, optional): Select a set of 
+            band_list (list[int] | tuple[int] | None, optional): Select a set of 
                 bands (the band index starts from 1). If None, read all bands. 
                 Defaults to None.
         """
@@ -121,9 +121,9 @@ class Raster:
         Fetch data in a ndarray.
         
         Args:
-            start_loc (Union[List[int], Tuple[int], None], optional): Coordinates of the 
+            start_loc (list[int] | tuple[int] | None, optional): Coordinates of the 
                 upper left corner of the block. None value means returning full image.
-            block_size (Union[List[int], Tuple[int]], optional): Block size. 
+            block_size (list[int] | tuple[int], optional): Block size. 
                 Defaults to [512, 512].
 
         Returns:

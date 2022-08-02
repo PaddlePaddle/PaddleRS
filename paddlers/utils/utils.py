@@ -113,7 +113,7 @@ class EarlyStop:
         self.max = 0
         self.thresh = thresh
         if patience < 1:
-            raise Exception("Argument patience should be a positive integer.")
+            raise ValueError("Argument patience should be a positive integer.")
 
     def __call__(self, current_score):
         if self.score is None:

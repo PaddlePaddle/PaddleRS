@@ -32,7 +32,7 @@ class Activation(nn.Layer):
     The wrapper of activations.
 
     Args:
-        act (str, optional): The activation name in lowercase. It must be one of 
+        act (str, optional): Activation name in lowercase, which must be one of 
             ['elu', 'gelu', 'hardshrink', 'tanh', 'hardtanh', 'prelu', 'relu', 
             'relu6', 'selu', 'leakyrelu', 'sigmoid', 'softmax', 'softplus', 
             'softshrink', 'softsign', 'tanhshrink', 'logsigmoid', 'logsoftmax',
@@ -45,7 +45,7 @@ class Activation(nn.Layer):
         KeyError: When parameter `act` is not in the optional range.
         
     Examples:
-        from paddleseg.models.common.activation import Activation
+        from paddlers.rs_models.seg.layers import Activation
         relu = Activation("relu")
         print(relu)
         # <class 'paddle.nn.layer.activation.ReLU'>

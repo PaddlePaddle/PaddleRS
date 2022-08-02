@@ -30,9 +30,9 @@ class BaseAnchorCluster(object):
         Base Anchor Cluster
         
         Args:
-            num_anchors (int): number of clusters
-            cache (bool): whether using cache
-            cache_path (str): cache directory path
+            num_anchors (int): Number of clusters.
+            cache (bool): Whether to use cache.
+            cache_path (str): Cache directory path.
         """
         super(BaseAnchorCluster, self).__init__()
         self.num_anchors = num_anchors
@@ -99,16 +99,15 @@ class YOLOAnchorCluster(BaseAnchorCluster):
             https://github.com/ultralytics/yolov5/blob/master/utils/autoanchor.py
 
         Args:
-            num_anchors (int): number of clusters
-            dataset (DataSet): DataSet instance, VOC or COCO
-            image_size (list or int): [h, w], being an int means image height and image 
-                width are the same.
-            cache (bool): whether using cache. Defaults to True.
-            cache_path (str or None, optional): cache directory path. If None, use 
-                `data_dir` of dataset. Defaults to None.
-            iters (int, optional): iters of kmeans algorithm. Defaults to 300.
-            gen_iters (int, optional): iters of genetic algorithm. Defaults to 1000.
-            thresh (float, optional): anchor scale threshold. Defaults to 0.25.
+            num_anchors (int): Number of clusters.
+            dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset): Dataset instance.
+            image_size (list[int] | int): [h, w] or an int value that corresponds to the shape [image_size, image_size].
+            cache (bool, optional): Whether to use cache. Defaults to True.
+            cache_path (str|None, optional): Path of cache directory. If None, use `dataset.data_dir`. 
+                Defaults to None.
+            iters (int, optional): Iterations of k-means algorithm. Defaults to 300.
+            gen_iters (int, optional): Iterations of genetic algorithm. Defaults to 1000.
+            thresh (float, optional): Anchor scale threshold. Defaults to 0.25.
         """
         self.dataset = dataset
         if cache_path is None:

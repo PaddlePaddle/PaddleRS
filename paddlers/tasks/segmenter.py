@@ -230,34 +230,34 @@ class BaseSegmenter(BaseModel):
         Train the model.
 
         Args:
-            num_epochs(int): The number of epochs.
-            train_dataset(paddlers.dataset): Training dataset.
-            train_batch_size(int, optional): Total batch size among all cards used in 
+            num_epochs (int): Number of epochs.
+            train_dataset (paddlers.datasets.SegDataset): Training dataset.
+            train_batch_size (int, optional): Total batch size among all cards used in 
                 training. Defaults to 2.
-            eval_dataset(paddlers.dataset, optional): Evaluation dataset. If None, the 
-                model will not be evaluated furing training process. Defaults to None.
-            optimizer(paddle.optimizer.Optimizer or None, optional): Optimizer used in 
-                training. If None, a default optimizer is used. Defaults to None.
-            save_interval_epochs(int, optional): Epoch interval for saving the model. 
+            eval_dataset (paddlers.datasets.SegDataset|None, optional): Evaluation dataset. 
+                If None, the model will not be evaluated during training process. 
+                Defaults to None.
+            optimizer (paddle.optimizer.Optimizer|None, optional): Optimizer used in 
+                training. If None, a default optimizer will be used. Defaults to None.
+            save_interval_epochs (int, optional): Epoch interval for saving the model. 
                 Defaults to 1.
-            log_interval_steps(int, optional): Step interval for printing training 
-                information. Defaults to 10.
-            save_dir(str, optional): Directory to save the model. Defaults to 'output'.
-            pretrain_weights(str or None, optional): None or name/path of pretrained 
+            log_interval_steps (int, optional): Step interval for printing training 
+                information. Defaults to 2.
+            save_dir (str, optional): Directory to save the model. Defaults to 'output'.
+            pretrain_weights (str|None, optional): None or name/path of pretrained 
                 weights. If None, no pretrained weights will be loaded. 
                 Defaults to 'CITYSCAPES'.
-            learning_rate(float, optional): Learning rate for training. 
-                Defaults to .025.
-            lr_decay_power(float, optional): Learning decay power. Defaults to .9.
-            early_stop(bool, optional): Whether to adopt early stop strategy. 
-                Defaults to False.
-            early_stop_patience(int, optional): Early stop patience. Defaults to 5.
-            use_vdl(bool, optional): Whether to use VisualDL to monitor the training 
+            learning_rate (float, optional): Learning rate for training. Defaults to .025.
+            lr_decay_power (float, optional): Learning decay power. Defaults to .9.
+            early_stop (bool, optional): Whether to adopt early stop strategy. Defaults 
+                to False.
+            early_stop_patience (int, optional): Early stop patience. Defaults to 5.
+            use_vdl (bool, optional): Whether to use VisualDL to monitor the training 
                 process. Defaults to True.
-            resume_checkpoint(str or None, optional): The path of the checkpoint to 
-                resume training from. If None, no training checkpoint will be resumed.
-                At most one of `resume_checkpoint` and `pretrain_weights` can be set 
-                simultaneously. Defaults to None.
+            resume_checkpoint (str|None, optional): Path of the checkpoint to resume
+                training from. If None, no training checkpoint will be resumed. At most
+                Aone of `resume_checkpoint` and `pretrain_weights` can be set simultaneously.
+                Defaults to None.
         """
 
         if self.status == 'Infer':
@@ -337,32 +337,33 @@ class BaseSegmenter(BaseModel):
         Quantization-aware training.
 
         Args:
-            num_epochs(int): The number of epochs.
-            train_dataset(paddlers.dataset): Training dataset.
-            train_batch_size(int, optional): Total batch size among all cards used in 
+            num_epochs (int): Number of epochs.
+            train_dataset (paddlers.datasets.SegDataset): Training dataset.
+            train_batch_size (int, optional): Total batch size among all cards used in 
                 training. Defaults to 2.
-            eval_dataset(paddlers.dataset, optional): Evaluation dataset. If None, the 
-                model will not be evaluated furing training process. Defaults to None.
-            optimizer(paddle.optimizer.Optimizer or None, optional): Optimizer used in 
-                training. If None, a default optimizer is used. Defaults to None.
-            save_interval_epochs(int, optional): Epoch interval for saving the model. 
+            eval_dataset (paddlers.datasets.SegDataset|None, optional): Evaluation dataset.
+                If None, the model will not be evaluated during training process. 
+                Defaults to None.
+            optimizer (paddle.optimizer.Optimizer|None, optional): Optimizer used in 
+                training. If None, a default optimizer will be used. Defaults to None.
+            save_interval_epochs (int, optional): Epoch interval for saving the model. 
                 Defaults to 1.
-            log_interval_steps(int, optional): Step interval for printing training 
-                information. Defaults to 10.
-            save_dir(str, optional): Directory to save the model. Defaults to 'output'.
-            learning_rate(float, optional): Learning rate for training. 
-                Defaults to .025.
-            lr_decay_power(float, optional): Learning decay power. Defaults to .9.
-            early_stop(bool, optional): Whether to adopt early stop strategy. 
+            log_interval_steps (int, optional): Step interval for printing training 
+                information. Defaults to 2.
+            save_dir (str, optional): Directory to save the model. Defaults to 'output'.
+            learning_rate (float, optional): Learning rate for training. 
+                Defaults to .0001.
+            lr_decay_power (float, optional): Learning decay power. Defaults to .9.
+            early_stop (bool, optional): Whether to adopt early stop strategy. 
                 Defaults to False.
-            early_stop_patience(int, optional): Early stop patience. Defaults to 5.
-            use_vdl(bool, optional): Whether to use VisualDL to monitor the training 
+            early_stop_patience (int, optional): Early stop patience. Defaults to 5.
+            use_vdl (bool, optional): Whether to use VisualDL to monitor the training 
                 process. Defaults to True.
-            quant_config(dict or None, optional): Quantization configuration. If None, 
+            quant_config (dict|None, optional): Quantization configuration. If None, 
                 a default rule of thumb configuration will be used. Defaults to None.
-            resume_checkpoint(str or None, optional): The path of the checkpoint to 
-                resume quantization-aware training from. If None, no training 
-                checkpoint will be resumed. Defaults to None.
+            resume_checkpoint (str|None, optional): Path of the checkpoint to resume
+                quantization-aware training from. If None, no training checkpoint will
+                be resumed. Defaults to None.
         """
 
         self._prepare_qat(quant_config)
@@ -388,10 +389,10 @@ class BaseSegmenter(BaseModel):
         Evaluate the model.
 
         Args:
-            eval_dataset(paddlers.dataset): Evaluation dataset.
-            batch_size(int, optional): Total batch size among all cards used for 
+            eval_dataset (paddlers.datasets.SegDataset): Evaluation dataset.
+            batch_size (int, optional): Total batch size among all cards used for 
                 evaluation. Defaults to 1.
-            return_details(bool, optional): Whether to return evaluation details. 
+            return_details (bool, optional): Whether to return evaluation details. 
                 Defaults to False.
 
         Returns:
@@ -500,11 +501,10 @@ class BaseSegmenter(BaseModel):
         Do inference.
 
         Args:
-            Args:
-            img_file(list[np.ndarray | str] | str | np.ndarray): Image path or decoded 
+            img_file (list[np.ndarray|str] | str | np.ndarray): Image path or decoded 
                 image data, which also could constitute a list, meaning all images to be 
                 predicted as a mini-batch.
-            transforms(paddlers.transforms.Compose or None, optional): Transforms for 
+            transforms (paddlers.transforms.Compose|None, optional): Transforms for 
                 inputs. If None, the transforms for evaluation process will be used. 
                 Defaults to None.
 
@@ -514,8 +514,8 @@ class BaseSegmenter(BaseModel):
                 {"label map": `label map`, "score_map": `score map`}.
             If `img_file` is a list, the result is a list composed of dicts with the 
                 corresponding fields:
-                label_map(np.ndarray): the predicted label map (HW)
-                score_map(np.ndarray): the prediction score map (HWC)
+                label_map (np.ndarray): the predicted label map (HW)
+                score_map (np.ndarray): the prediction score map (HWC)
         """
 
         if transforms is None and not hasattr(self, 'test_transforms'):
@@ -555,16 +555,13 @@ class BaseSegmenter(BaseModel):
         Do inference.
 
         Args:
-            Args:
-            img_file(str):
-                Image path.
-            save_dir(str):
-                Directory that contains saved geotiff file.
-            block_size(list[int] | tuple[int] | int):
+            img_file (str): Image path.
+            save_dir (str): Directory that contains saved geotiff file.
+            block_size (list[int] | tuple[int] | int):
                 Size of block.
-            overlap(list[int] | tuple[int] | int, optional):
+            overlap (list[int] | tuple[int] | int, optional):
                 Overlap between two blocks. Defaults to 36.
-            transforms(paddlers.transforms.Compose or None, optional): Transforms for 
+            transforms (paddlers.transforms.Compose|None, optional): Transforms for 
                 inputs. If None, the transforms for evaluation process will be used. 
                 Defaults to None.
         """

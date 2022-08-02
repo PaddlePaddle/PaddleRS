@@ -22,28 +22,33 @@ from paddlers.utils import logging, get_encoding, norm_path, is_pic
 
 class CDDataset(BaseDataset):
     """
-    读取变化检测任务数据集，并对样本进行相应的处理（来自SegDataset，图像标签需要两个）。
+    Dataset for change detection tasks.
 
     Args:
-        data_dir (str): 数据集所在的目录路径。
-        file_list (str): 描述数据集图片文件和对应标注文件的文件路径（文本内每行路径为相对data_dir的相对路径）。当`with_seg_labels`为
-            False（默认设置）时，文件中每一行应依次包含第一时相影像、第二时相影像以及变化检测标签的路径；当`with_seg_labels`为True时，
-            文件中每一行应依次包含第一时相影像、第二时相影像、变化检测标签、第一时相建筑物标签以及第二时相建筑物标签的路径。
-        label_list (str): 描述数据集包含的类别信息文件路径。默认值为None。
-        transforms (paddlers.transforms.Compose): 数据集中每个样本的预处理/增强算子。
-        num_workers (int|str): 数据集中样本在预处理过程中的线程或进程数。默认为'auto'。当设为'auto'时，根据
-            系统的实际CPU核数设置`num_workers`: 如果CPU核数的一半大于8，则`num_workers`为8，否则为CPU核数的
-            一半。
-        shuffle (bool): 是否需要对数据集中样本打乱顺序。默认为False。
-        with_seg_labels (bool, optional): 数据集中是否包含两个时相的语义分割标签。默认为False。
-        binarize_labels (bool, optional): 是否对数据集中的标签进行二值化操作。默认为False。
+        data_dir (str): Root directory of the dataset.
+        file_list (str): Path of the file that contains relative paths of images and annotation files. When 
+            `with_seg_labels` False, each line in the file contains the paths of the bi-temporal images and
+            the change mask. When `with_seg_labels` is True, each line in the file contains the paths of the
+            bi-temporal images, the path of the change mask, and the paths of the segmentation masks in both
+            temporal phases.
+        transforms (paddlers.transforms.Compose): Data preprocessing and data augmentation operators to apply.
+        label_list (str, optional): Path of the file that contains the category names. Defaults to None.
+        num_workers (int|str, optional): Number of processes used for data loading。If `num_workers` is 'auto',
+            the number of workers will be automatically determined according to the number of CPU cores: If 
+            there are more than 16 cores，8 workers will be used. Otherwise, the number of workers will be half 
+            the number of CPU cores. Defaults: 'auto'.
+        shuffle (bool, optional): Whether to shuffle the samples. Defaults to False.
+        with_seg_labels (bool, optional): Set `with_seg_labels` to True if the datasets provides segmentation 
+            masks (e.g., building masks in each temporal phase). Defaults to False.
+        binarize_labels (bool, optional): Whether to binarize change masks and segmentation masks. 
+            Defaults to False.
     """
 
     def __init__(self,
                  data_dir,
                  file_list,
+                 transforms,
                  label_list=None,
-                 transforms=None,
                  num_workers='auto',
                  shuffle=False,
                  with_seg_labels=False,
@@ -64,8 +69,7 @@ class CDDataset(BaseDataset):
             num_items = 3  # RGB1, RGB2, CD
         self.binarize_labels = binarize_labels
 
-        # TODO：非None时，让用户跳转数据集分析生成label_list
-        # 不要在此处分析label file
+        # TODO: If `label_list` is not None, let the user parse `label_list`.
         if label_list is not None:
             with open(label_list, encoding=get_encoding(label_list)) as f:
                 for line in f:
