@@ -28,3 +28,8 @@ class BaseDataset(Dataset):
         self.transforms = deepcopy(transforms)
         self.num_workers = get_num_workers(num_workers)
         self.shuffle = shuffle
+
+    def __getitem__(self, idx):
+        sample = deepcopy(self.file_list[idx])
+        outputs = self.transforms(sample)
+        return outputs

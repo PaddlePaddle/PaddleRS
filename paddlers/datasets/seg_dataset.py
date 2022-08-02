@@ -17,6 +17,7 @@ import copy
 
 from .base import BaseDataset
 from paddlers.utils import logging, get_encoding, norm_path, is_pic
+from paddlers.transforms import decode_seg_mask
 
 
 class SegDataset(BaseDataset):
@@ -31,6 +32,7 @@ class SegDataset(BaseDataset):
             系统的实际CPU核数设置`num_workers`: 如果CPU核数的一半大于8，则`num_workers`为8，否则为CPU核数的
             一半。
         shuffle (bool): 是否需要对数据集中样本打乱顺序。默认为False。
+        apply_im_only (bool, optional): 是否绕过对标签的数据增强和预处理。在模型验证和推理阶段一般指定此选项为True。默认为False。
     """
 
     def __init__(self,
@@ -39,13 +41,15 @@ class SegDataset(BaseDataset):
                  label_list=None,
                  transforms=None,
                  num_workers='auto',
-                 shuffle=False):
+                 shuffle=False,
+                 apply_im_only=False):
         super(SegDataset, self).__init__(data_dir, label_list, transforms,
                                          num_workers, shuffle)
         # TODO batch padding
         self.batch_transforms = None
         self.file_list = list()
         self.labels = list()
+        self.apply_im_only = apply_im_only
 
         # TODO：非None时，让用户跳转数据集分析生成label_list
         # 不要在此处分析label file
@@ -84,7 +88,18 @@ class SegDataset(BaseDataset):
 
     def __getitem__(self, idx):
         sample = copy.deepcopy(self.file_list[idx])
-        outputs = self.transforms(sample)
+        if self.apply_im_only:
+            has_mask = False
+            if 'mask' in sample:
+                has_mask = True
+                mask = decode_seg_mask(sample['mask'])
+                del sample['mask']
+            sample = self.transforms.apply_transforms(sample)
+            if has_mask:
+                sample['mask'] = mask
+            outputs = self.transforms.arrange_outputs(sample)
+        else:
+            outputs = super().__getitem__(idx)
         return outputs
 
     def __len__(self):

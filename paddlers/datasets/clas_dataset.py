@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import os.path as osp
-import copy
 
 from .base import BaseDataset
 from paddlers.utils import logging, get_encoding, norm_path, is_pic
@@ -81,11 +80,6 @@ class ClasDataset(BaseDataset):
         self.num_samples = len(self.file_list)
         logging.info("{} samples in file {}".format(
             len(self.file_list), file_list))
-
-    def __getitem__(self, idx):
-        sample = copy.deepcopy(self.file_list[idx])
-        outputs = self.transforms(sample)
-        return outputs
 
     def __len__(self):
         return len(self.file_list)

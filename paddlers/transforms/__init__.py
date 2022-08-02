@@ -15,6 +15,9 @@
 import copy
 import os.path as osp
 
+import numpy as np
+from PIL import Image
+
 from .operators import *
 from .batch_operators import BatchRandomResize, BatchRandomResizeByShort, _BatchPad
 from paddlers import transforms as T
@@ -29,6 +32,7 @@ def decode_image(im_path,
     Decode an image.
     
     Args:
+        im_path (str): Path of the image to decode.
         to_rgb (bool, optional): If True, convert input image(s) from BGR format to RGB format. Defaults to True.
         to_uint8 (bool, optional): If True, quantize and convert decoded image(s) to uint8 type. Defaults to True.
         decode_bgr (bool, optional): If True, automatically interpret a non-geo image (e.g. jpeg images) as a BGR image. 
@@ -37,7 +41,7 @@ def decode_image(im_path,
             SAR image, set this argument to True. Defaults to True.
     """
 
-    # Do a presence check. `osp.exists` assumes `im_path` is a path-like object.
+    # Do a presence check. osp.exists() assumes `im_path` is a path-like object.
     if not osp.exists(im_path):
         raise ValueError(f"{im_path} does not exist!")
     decoder = T.DecodeImg(
@@ -51,27 +55,17 @@ def decode_image(im_path,
     return sample['image']
 
 
-def arrange_transforms(model_type, transforms, mode='train'):
-    # 给transforms添加arrange操作
-    if model_type == 'segmenter':
-        if mode == 'eval':
-            transforms.apply_im_only = True
-        else:
-            transforms.apply_im_only = False
-        arrange_transform = ArrangeSegmenter(mode)
-    elif model_type == 'changedetector':
-        if mode == 'eval':
-            transforms.apply_im_only = True
-        else:
-            transforms.apply_im_only = False
-        arrange_transform = ArrangeChangeDetector(mode)
-    elif model_type == 'classifier':
-        arrange_transform = ArrangeClassifier(mode)
-    elif model_type == 'detector':
-        arrange_transform = ArrangeDetector(mode)
-    else:
-        raise Exception("Unrecognized model type: {}".format(model_type))
-    transforms.arrange_outputs = arrange_transform
+def decode_seg_mask(mask_path):
+    """
+    Decode a segmentation mask image.
+    
+    Args:
+        mask_path (str): Path of the mask image to decode.
+    """
+
+    mask = np.asarray(Image.open(mask_path))
+    mask = mask.astype('int64')
+    return mask
 
 
 def build_transforms(transforms_info):
@@ -80,7 +74,8 @@ def build_transforms(transforms_info):
         op_name = list(op_info.keys())[0]
         op_attr = op_info[op_name]
         if not hasattr(T, op_name):
-            raise Exception("There's no transform named '{}'".format(op_name))
+            raise ValueError(
+                "There is no transform operator named '{}'.".format(op_name))
         transforms.append(getattr(T, op_name)(**op_attr))
     eval_transforms = T.Compose(transforms)
     return eval_transforms
