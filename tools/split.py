@@ -75,7 +75,7 @@ parser.add_argument("--mask_path", type=str, default=None, \
 parser.add_argument("--block_size", type=int, default=512, \
                     help="Size of image block. Default value is 512.")
 parser.add_argument("--save_dir", type=str, default="dataset", \
-                    help="Directory to save the results. Default value is `dataset`.")
+                    help="Directory to save the results. Default value is 'dataset'.")
 
 if __name__ == "__main__":
     args = parser.parse_args()

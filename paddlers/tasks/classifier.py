@@ -25,7 +25,6 @@ from paddle.static import InputSpec
 import paddlers.models.ppcls as paddleclas
 import paddlers.custom_models.cls as cmcls
 import paddlers
-from paddlers.transforms import arrange_transforms
 from paddlers.utils import get_single_card_bs, DisablePrint
 import paddlers.utils.logging as logging
 from .base import BaseModel
@@ -358,10 +357,7 @@ class BaseClassifier(BaseModel):
                  "top5": `acc of top5`}.
 
         """
-        arrange_transforms(
-            model_type=self.model_type,
-            transforms=eval_dataset.transforms,
-            mode='eval')
+        self._check_transforms(eval_dataset.transforms, 'eval')
 
         self.net.eval()
         nranks = paddle.distributed.get_world_size()
@@ -460,8 +456,7 @@ class BaseClassifier(BaseModel):
         return prediction
 
     def _preprocess(self, images, transforms, to_tensor=True):
-        arrange_transforms(
-            model_type=self.model_type, transforms=transforms, mode='test')
+        self._check_transforms(transforms, 'test')
         batch_im = list()
         batch_ori_shape = list()
         for im in images:
@@ -526,6 +521,13 @@ class BaseClassifier(BaseModel):
 
             batch_restore_list.append(restore_list)
         return batch_restore_list
+
+    def _check_transforms(self, transforms, mode):
+        super()._check_transforms(transforms, mode)
+        if not isinstance(transforms.arrange,
+                          paddlers.transforms.ArrangeClassifier):
+            raise TypeError(
+                "`transforms.arrange` must be an ArrangeClassifier object.")
 
 
 class ResNet50_vd(BaseClassifier):

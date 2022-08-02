@@ -26,7 +26,6 @@ from paddle.static import InputSpec
 import paddlers.models.ppseg as paddleseg
 import paddlers.custom_models.seg as cmseg
 import paddlers
-from paddlers.transforms import arrange_transforms
 from paddlers.utils import get_single_card_bs, DisablePrint
 import paddlers.utils.logging as logging
 from .base import BaseModel
@@ -136,6 +135,11 @@ class BaseSegmenter(BaseModel):
             else:
                 pred = paddle.argmax(logit, axis=1, keepdim=True, dtype='int32')
             label = inputs[1]
+            if label.ndim == 3:
+                paddle.unsqueeze_(label, axis=1)
+            if label.ndim != 4:
+                raise ValueError("Expected label.ndim == 4 but got {}".format(
+                    label.ndim))
             origin_shape = [label.shape[-2:]]
             pred = self._postprocess(
                 pred, origin_shape, transforms=inputs[2])[0]  # NCHW
@@ -380,10 +384,7 @@ class BaseSegmenter(BaseModel):
                  "category_F1-score": `F1 score`}.
 
         """
-        arrange_transforms(
-            model_type=self.model_type,
-            transforms=eval_dataset.transforms,
-            mode='eval')
+        self._check_transforms(eval_dataset.transforms, 'eval')
 
         self.net.eval()
         nranks = paddle.distributed.get_world_size()
@@ -606,8 +607,7 @@ class BaseSegmenter(BaseModel):
         print("GeoTiff saved in {}.".format(save_file))
 
     def _preprocess(self, images, transforms, to_tensor=True):
-        arrange_transforms(
-            model_type=self.model_type, transforms=transforms, mode='test')
+        self._check_transforms(transforms, 'test')
         batch_im = list()
         batch_ori_shape = list()
         for im in images:
@@ -745,6 +745,13 @@ class BaseSegmenter(BaseModel):
             label_maps.append(label_map.squeeze())
             score_maps.append(score_map.squeeze())
         return label_maps, score_maps
+
+    def _check_transforms(self, transforms, mode):
+        super()._check_transforms(transforms, mode)
+        if not isinstance(transforms.arrange,
+                          paddlers.transforms.ArrangeSegmenter):
+            raise TypeError(
+                "`transforms.arrange` must be an ArrangeSegmenter object.")
 
 
 class UNet(BaseSegmenter):

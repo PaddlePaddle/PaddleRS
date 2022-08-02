@@ -365,7 +365,7 @@ class InferDataset(paddle.io.Dataset):
         names = []
         for line in lines:
             items = line.strip().split(' ')
-            items = list(map(pdrs.utils.path_normalization, items))
+            items = list(map(pdrs.utils.norm_path, items))
             item_dict = {
                 'image_t1': osp.join(data_dir, items[0]),
                 'image_t2': osp.join(data_dir, items[1])

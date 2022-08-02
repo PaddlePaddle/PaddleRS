@@ -23,6 +23,8 @@ pdrs.utils.download_and_decompress(airchange_dataset, path=DATA_DIR)
 # 使用Compose组合多种变换方式。Compose中包含的变换将按顺序串行执行
 # API说明：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/transforms.md
 train_transforms = T.Compose([
+    # 读取影像
+    T.DecodeImg(),
     # 随机裁剪
     T.RandomCrop(
         # 裁剪区域将被缩放到256x256
@@ -36,12 +38,16 @@ train_transforms = T.Compose([
     # 将数据归一化到[-1,1]
     T.Normalize(
         mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
+    T.ArrangeChangeDetector('train')
 ])
 
 eval_transforms = T.Compose([
+    T.DecodeImg(),
     # 验证阶段与训练阶段的数据归一化方式必须相同
     T.Normalize(
         mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
+    T.ReloadMask(),
+    T.ArrangeChangeDetector('eval')
 ])
 
 # 分别构建训练和验证所用的数据集

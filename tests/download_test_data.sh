@@ -4,7 +4,7 @@ function remove_dir_if_exist() {
     local dir="$1"
     if [ -d "${dir}" ]; then
         rm -rf "${dir}"
-        echo "\033[0;31mDirectory ${dir} has been removed.\033[0m"
+        echo -e "\033[0;31mDirectory ${dir} has been removed.\033[0m"
     fi
 }
 

@@ -31,6 +31,8 @@ if not os.path.exists(DATA_DIR):
 # 使用Compose组合多种变换方式。Compose中包含的变换将按顺序串行执行
 # API说明：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/transforms.md
 train_transforms = T.Compose([
+    # 读取影像
+    T.DecodeImg(),
     # 对输入影像施加随机色彩扰动
     T.RandomDistort(),
     # 在影像边界进行随机padding
@@ -45,16 +47,19 @@ train_transforms = T.Compose([
         interp='RANDOM'),
     # 影像归一化
     T.Normalize(
-        mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    T.ArrangeDetector('train')
 ])
 
 eval_transforms = T.Compose([
+    T.DecodeImg(),
     # 使用双三次插值将输入影像缩放到固定大小
     T.Resize(
         target_size=608, interp='CUBIC'),
     # 验证阶段与训练阶段的归一化方式必须相同
     T.Normalize(
-        mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    T.ArrangeDetector('eval')
 ])
 
 # 分别构建训练和验证所用的数据集

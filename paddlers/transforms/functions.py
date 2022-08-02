@@ -21,6 +21,7 @@ from shapely.geometry import Polygon, MultiPolygon, GeometryCollection
 from sklearn.linear_model import LinearRegression
 from skimage import exposure
 from joblib import load
+from PIL import Image
 
 
 def normalize(im, mean, std, min_value=[0, 0, 0], max_value=[255, 255, 255]):
@@ -623,3 +624,19 @@ def inv_pca(im, joblib_path):
     r_im = pca.inverse_transform(n_im)
     r_im = np.reshape(r_im, (H, W, -1))
     return r_im
+
+
+def decode_seg_mask(mask_path):
+    """
+    Decode a segmentation mask image.
+    
+    Args:
+        mask_path (str): Path of the mask image to decode.
+
+    Returns:
+        np.ndarray: Decoded mask image.
+    """
+
+    mask = np.asarray(Image.open(mask_path))
+    mask = mask.astype('int64')
+    return mask
