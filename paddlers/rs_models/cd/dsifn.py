@@ -20,7 +20,7 @@ import paddle.nn as nn
 import paddle.nn.functional as F
 from paddle.vision.models import vgg16
 
-from .layers import Conv1x1, make_norm, ChannelAttention, SpatialAttention
+from .layers import Conv1x1, make_bn, ChannelAttention, SpatialAttention
 
 
 class DSIFN(nn.Layer):
@@ -52,19 +52,19 @@ class DSIFN(nn.Layer):
         self.sa5 = SpatialAttention()
 
         self.ca1 = ChannelAttention(in_ch=1024)
-        self.bn_ca1 = make_norm(1024)
+        self.bn_ca1 = make_bn(1024)
         self.o1_conv1 = conv2d_bn(1024, 512, use_dropout)
         self.o1_conv2 = conv2d_bn(512, 512, use_dropout)
-        self.bn_sa1 = make_norm(512)
+        self.bn_sa1 = make_bn(512)
         self.o1_conv3 = Conv1x1(512, num_classes)
         self.trans_conv1 = nn.Conv2DTranspose(512, 512, kernel_size=2, stride=2)
 
         self.ca2 = ChannelAttention(in_ch=1536)
-        self.bn_ca2 = make_norm(1536)
+        self.bn_ca2 = make_bn(1536)
         self.o2_conv1 = conv2d_bn(1536, 512, use_dropout)
         self.o2_conv2 = conv2d_bn(512, 256, use_dropout)
         self.o2_conv3 = conv2d_bn(256, 256, use_dropout)
-        self.bn_sa2 = make_norm(256)
+        self.bn_sa2 = make_bn(256)
         self.o2_conv4 = Conv1x1(256, num_classes)
         self.trans_conv2 = nn.Conv2DTranspose(256, 256, kernel_size=2, stride=2)
 
@@ -72,7 +72,7 @@ class DSIFN(nn.Layer):
         self.o3_conv1 = conv2d_bn(768, 256, use_dropout)
         self.o3_conv2 = conv2d_bn(256, 128, use_dropout)
         self.o3_conv3 = conv2d_bn(128, 128, use_dropout)
-        self.bn_sa3 = make_norm(128)
+        self.bn_sa3 = make_bn(128)
         self.o3_conv4 = Conv1x1(128, num_classes)
         self.trans_conv3 = nn.Conv2DTranspose(128, 128, kernel_size=2, stride=2)
 
@@ -80,7 +80,7 @@ class DSIFN(nn.Layer):
         self.o4_conv1 = conv2d_bn(384, 128, use_dropout)
         self.o4_conv2 = conv2d_bn(128, 64, use_dropout)
         self.o4_conv3 = conv2d_bn(64, 64, use_dropout)
-        self.bn_sa4 = make_norm(64)
+        self.bn_sa4 = make_bn(64)
         self.o4_conv4 = Conv1x1(64, num_classes)
         self.trans_conv4 = nn.Conv2DTranspose(64, 64, kernel_size=2, stride=2)
 
@@ -88,7 +88,7 @@ class DSIFN(nn.Layer):
         self.o5_conv1 = conv2d_bn(192, 64, use_dropout)
         self.o5_conv2 = conv2d_bn(64, 32, use_dropout)
         self.o5_conv3 = conv2d_bn(32, 16, use_dropout)
-        self.bn_sa5 = make_norm(16)
+        self.bn_sa5 = make_bn(16)
         self.o5_conv4 = Conv1x1(16, num_classes)
 
         self.init_weight()
@@ -211,7 +211,7 @@ def conv2d_bn(in_ch, out_ch, with_dropout=True):
         nn.Conv2D(
             in_ch, out_ch, kernel_size=3, stride=1, padding=1),
         nn.PReLU(),
-        make_norm(out_ch),
+        make_bn(out_ch),
     ]
     if with_dropout:
         lst.append(nn.Dropout(p=0.6))

@@ -16,7 +16,7 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from .layers import make_norm, Conv3x3, CBAM
+from .layers import make_bn, Conv3x3, CBAM
 from .stanet import Backbone, Decoder
 
 
@@ -93,7 +93,7 @@ class DSLayer(nn.Sequential):
         super(DSLayer, self).__init__(
             nn.Conv2DTranspose(
                 in_ch, itm_ch, kernel_size=3, padding=1, **convd_kwargs),
-            make_norm(itm_ch),
+            make_bn(itm_ch),
             nn.ReLU(),
             nn.Dropout2D(p=0.2),
             nn.Conv2DTranspose(

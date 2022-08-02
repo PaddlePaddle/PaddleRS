@@ -20,6 +20,8 @@ Apache License [see LICENSE for details]
 import paddle
 import paddle.nn as nn
 
+from ...layers.blocks import make_bn
+
 __all__ = ["CondenseNetV2_a", "CondenseNetV2_b", "CondenseNetV2_c"]
 
 
@@ -63,9 +65,7 @@ class Conv(nn.Sequential):
             activation="ReLU",
             bn_momentum=0.9, ):
         super(Conv, self).__init__()
-        self.add_sublayer(
-            "norm", nn.BatchNorm2D(
-                in_channels, momentum=bn_momentum))
+        self.add_sublayer("norm", make_bn(in_channels, momentum=bn_momentum))
         if activation == "ReLU":
             self.add_sublayer("activation", nn.ReLU())
         elif activation == "HS":
@@ -122,7 +122,7 @@ class CondenseLGC(nn.Layer):
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.groups = groups
-        self.norm = nn.BatchNorm2D(self.in_channels)
+        self.norm = make_bn(self.in_channels)
         if activation == "ReLU":
             self.activation = nn.ReLU()
         elif activation == "HS":
@@ -164,7 +164,7 @@ class CondenseSFR(nn.Layer):
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.groups = groups
-        self.norm = nn.BatchNorm2D(self.in_channels)
+        self.norm = make_bn(self.in_channels)
         if activation == "ReLU":
             self.activation = nn.ReLU()
         elif activation == "HS":
@@ -361,8 +361,7 @@ class CondenseNetV2(nn.Layer):
             trans = _Transition()
             self.features.add_sublayer("transition_%d" % (i + 1), trans)
         else:
-            self.features.add_sublayer("norm_last",
-                                       nn.BatchNorm2D(self.num_features))
+            self.features.add_sublayer("norm_last", make_bn(self.num_features))
             self.features.add_sublayer("relu_last", nn.ReLU())
             self.features.add_sublayer("pool_last",
                                        nn.AvgPool2D(self.pool_size))
@@ -389,7 +388,7 @@ class CondenseNetV2(nn.Layer):
         for m in self.sublayers():
             if isinstance(m, nn.Conv2D):
                 nn.initializer.KaimingNormal()(m.weight)
-            elif isinstance(m, nn.BatchNorm2D):
+            elif isinstance(m, (nn.BatchNorm2D, nn.SyncBatchNorm)):
                 nn.initializer.Constant(value=1.0)(m.weight)
                 nn.initializer.Constant(value=0.0)(m.bias)
 

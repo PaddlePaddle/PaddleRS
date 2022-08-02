@@ -12,18 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+
+import paddle
 import paddle.nn as nn
 
 __all__ = [
     'BasicConv', 'Conv1x1', 'Conv3x3', 'Conv7x7', 'MaxPool2x2', 'MaxUnPool2x2',
-    'ConvTransposed3x3', 'Identity', 'get_norm_layer', 'get_act_layer',
-    'make_norm', 'make_act'
+    'ConvTransposed3x3', 'Identity', 'get_bn_layer', 'get_act_layer', 'make_bn',
+    'make_act'
 ]
 
 
-def get_norm_layer():
-    # TODO: select appropriate norm layer.
-    return nn.BatchNorm2D
+def get_bn_layer():
+    if paddle.get_device() == 'cpu' or os.environ.get('PADDLESEG_EXPORT_STAGE'):
+        return nn.BatchNorm2D
+    elif paddle.distributed.ParallelEnv().nranks == 1:
+        return nn.BatchNorm2D
+    else:
+        return nn.SyncBatchNorm
 
 
 def get_act_layer():
@@ -31,8 +38,8 @@ def get_act_layer():
     return nn.ReLU
 
 
-def make_norm(*args, **kwargs):
-    norm_layer = get_norm_layer()
+def make_bn(*args, **kwargs):
+    norm_layer = get_bn_layer()
     return norm_layer(*args, **kwargs)
 
 
@@ -66,7 +73,7 @@ class BasicConv(nn.Layer):
                 **kwargs))
         if norm:
             if norm is True:
-                norm = make_norm(out_ch)
+                norm = make_bn(out_ch)
             seq.append(norm)
         if act:
             if act is True:
@@ -171,7 +178,7 @@ class ConvTransposed3x3(nn.Layer):
                 **kwargs))
         if norm:
             if norm is True:
-                norm = make_norm(out_ch)
+                norm = make_bn(out_ch)
             seq.append(norm)
         if act:
             if act is True:

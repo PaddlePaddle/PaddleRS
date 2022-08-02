@@ -17,7 +17,7 @@ import paddle.nn as nn
 import paddle.nn.functional as F
 
 from .backbones import resnet
-from .layers import Conv1x1, Conv3x3, get_norm_layer, Identity
+from .layers import Conv1x1, Conv3x3, get_bn_layer, Identity
 from .param_init import KaimingInitMixin
 
 
@@ -100,17 +100,17 @@ class Backbone(nn.Layer, KaimingInitMixin):
             self.resnet = resnet.resnet18(
                 pretrained=pretrained,
                 strides=strides,
-                norm_layer=get_norm_layer())
+                norm_layer=get_bn_layer())
         elif arch == 'resnet34':
             self.resnet = resnet.resnet34(
                 pretrained=pretrained,
                 strides=strides,
-                norm_layer=get_norm_layer())
+                norm_layer=get_bn_layer())
         elif arch == 'resnet50':
             self.resnet = resnet.resnet50(
                 pretrained=pretrained,
                 strides=strides,
-                norm_layer=get_norm_layer())
+                norm_layer=get_bn_layer())
         else:
             raise ValueError
 

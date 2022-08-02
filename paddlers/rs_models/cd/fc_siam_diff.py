@@ -26,7 +26,7 @@ class FCSiamDiff(nn.Layer):
     The FC-Siam-diff implementation based on PaddlePaddle.
 
     The original article refers to
-        Caye Daudt, R., et al. "Fully convolutional siamese networks for change detection"
+        Rodrigo Caye Daudt, et al. "Fully convolutional siamese networks for change detection"
         (https://arxiv.org/abs/1810.08462).
 
     Args:
