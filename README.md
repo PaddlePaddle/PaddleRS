@@ -6,16 +6,16 @@
 
   **基于飞桨框架开发的高性能遥感图像处理开发套件，端到端地完成从训练到部署的全流程遥感深度学习应用。**
 
-  <!-- [![version](https://img.shields.io/github/release/PaddleCV-SIG/PaddleRS.svg)](https://github.com/PaddleCV-SIG/PaddleRS/releases) -->
+  <!-- [![version](https://img.shields.io/github/release/PaddlePaddle/PaddleRS.svg)](https://github.com/PaddlePaddle/PaddleRS/releases) -->
   [![license](https://img.shields.io/badge/license-Apache%202-blue.svg)](LICENSE)
-  [![build status](https://github.com/PaddleCV-SIG/PaddleRS/workflows/build_and_test.yaml/badge.svg?branch=develop)](https://github.com/PaddleCV-SIG/PaddleRS/actions)
+  [![build status](https://github.com/PaddlePaddle/PaddleRS/workflows/build_and_test.yaml/badge.svg?branch=develop)](https://github.com/PaddlePaddle/PaddleRS/actions)
   ![python version](https://img.shields.io/badge/python-3.7+-orange.svg)
   ![support os](https://img.shields.io/badge/os-linux%2C%20win%2C%20mac-yellow.svg)
 </div>
 
 ## 最新动态 <img src="docs/images/seg_news_icon.png" width="30"/>
 
-*  [2022-05-19] 🔥 PaddleRS发布1.0-beta版本，全面支持遥感领域深度学习任务。详细发版信息请参考[Release Note](https://github.com/PaddleCV-SIG/PaddleRS/releases)。
+*  [2022-05-19] 🔥 PaddleRS发布1.0-beta版本，全面支持遥感领域深度学习任务。详细发版信息请参考[Release Note](https://github.com/PaddlePaddle/PaddleRS/releases)。
 
 ## 简介
 
@@ -173,7 +173,7 @@ PaddleRS是遥感科研院所、相关高校共同基于飞桨开发的遥感处
 
 ## 技术交流 <img src="./docs/images/chat.png" width="30"/>
 
-* 如果你发现任何PaddleRS存在的问题或者是建议, 欢迎通过[GitHub Issues](https://github.com/PaddleCV-SIG/PaddleRS/issues)给我们提issues。
+* 如果你发现任何PaddleRS存在的问题或者是建议, 欢迎通过[GitHub Issues](https://github.com/PaddlePaddle/PaddleRS/issues)给我们提issues。
 * 欢迎加入PaddleRS 微信群
 <div align="center">
 <img src="./docs/images/wechat.png"  width = "150" />  
@@ -199,7 +199,7 @@ PaddleRS是遥感科研院所、相关高校共同基于飞桨开发的遥感处
   * [变化检测示例](./docs/cases/csc_cd_cn.md)
   * [超分模块示例](./docs/cases/sr_seg_cn.md)
 * 代码贡献
-  * [PaddleRS代码注释规范](https://github.com/PaddleCV-SIG/PaddleRS/wiki/PaddleRS代码注释规范)
+  * [PaddleRS代码注释规范](https://github.com/PaddlePaddle/PaddleRS/wiki/PaddleRS代码注释规范)
 
 
 ## 开源贡献 <img src="./docs/images/love.png" width="30"/>
@@ -219,7 +219,7 @@ PaddleRS是遥感科研院所、相关高校共同基于飞桨开发的遥感处
 @misc{paddlers2022,
     title={PaddleRS, Awesome Remote Sensing Toolkit based on PaddlePaddle},
     author={PaddlePaddle Authors},
-    howpublished = {\url{https://github.com/PaddleCV-SIG/PaddleRS}},
+    howpublished = {\url{https://github.com/PaddlePaddle/PaddleRS}},
     year={2022}
 }
 ```
