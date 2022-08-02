@@ -61,8 +61,8 @@ def load_model(model_dir, **params):
     if not osp.exists(model_dir):
         logging.error("Directory '{}' does not exist!".format(model_dir))
     if not osp.exists(osp.join(model_dir, "model.yml")):
-        raise Exception("There is no file named model.yml in {}.".format(
-            model_dir))
+        raise FileNotFoundError(
+            "There is no file named model.yml in {}.".format(model_dir))
 
     with open(osp.join(model_dir, "model.yml")) as f:
         model_info = yaml.load(f.read(), Loader=yaml.Loader)
@@ -76,7 +76,7 @@ def load_model(model_dir, **params):
     model_type = model_info['_Attributes']['model_type']
     mod = getattr(paddlers.tasks, model_type)
     if not hasattr(mod, model_info['Model']):
-        raise Exception("There is no {} attribute in {}.".format(model_info[
+        raise ValueError("There is no {} attribute in {}.".format(model_info[
             'Model'], mod))
     if 'model_name' in model_info['_init_params']:
         del model_info['_init_params']['model_name']

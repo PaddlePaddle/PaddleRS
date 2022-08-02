@@ -38,7 +38,7 @@ class VOCDetDataset(BaseDataset):
         file_list (str): Path of the file that contains relative paths of images and annotation files.
         transforms (paddlers.transforms.Compose): Data preprocessing and data augmentation operators to apply.
         label_list (str, optional): Path of the file that contains the category names. Defaults to None.
-        num_workers (int|str, optional): Number of processes used for data loading。If `num_workers` is 'auto',
+        num_workers (int|str, optional): Number of processes used for data loading. If `num_workers` is 'auto',
             the number of workers will be automatically determined according to the number of CPU cores: If 
             there are more than 16 cores，8 workers will be used. Otherwise, the number of workers will be half 
             the number of CPU cores. Defaults: 'auto'.
@@ -112,9 +112,9 @@ class VOCDetDataset(BaseDataset):
                 if not line:
                     break
                 if len(line.strip().split()) > 2:
-                    raise Exception("A space is defined as the separator, "
-                                    "but it exists in image or label name {}."
-                                    .format(line))
+                    raise ValueError("A space is defined as the separator, "
+                                     "but it exists in image or label name {}."
+                                     .format(line))
                 img_file, xml_file = [
                     osp.join(data_dir, x) for x in line.strip().split()[:2]
                 ]
@@ -384,7 +384,7 @@ class VOCDetDataset(BaseDataset):
 
         import cv2
         if not osp.isdir(image_dir):
-            raise Exception("{} is not a valid image directory.".format(
+            raise ValueError("{} is not a valid image directory.".format(
                 image_dir))
         if empty_ratio is not None:
             self.empty_ratio = empty_ratio

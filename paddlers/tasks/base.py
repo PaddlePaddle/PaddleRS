@@ -126,18 +126,18 @@ class BaseModel(metaclass=ModelMeta):
             if not osp.exists(osp.join(resume_checkpoint, 'model.pdparams')):
                 logging.error(
                     "Model parameter state dictionary file 'model.pdparams' "
-                    "not found under given checkpoint path {}".format(
+                    "was not found in given checkpoint path {}!".format(
                         resume_checkpoint),
                     exit=True)
             if not osp.exists(osp.join(resume_checkpoint, 'model.pdopt')):
                 logging.error(
                     "Optimizer state dictionary file 'model.pdparams' "
-                    "not found under given checkpoint path {}".format(
+                    "was not found in given checkpoint path {}!".format(
                         resume_checkpoint),
                     exit=True)
             if not osp.exists(osp.join(resume_checkpoint, 'model.yml')):
                 logging.error(
-                    "'model.yml' not found under given checkpoint path {}".
+                    "'model.yml' was not found in given checkpoint path {}!".
                     format(resume_checkpoint),
                     exit=True)
             with open(osp.join(resume_checkpoint, "model.yml")) as f:
@@ -259,7 +259,7 @@ class BaseModel(metaclass=ModelMeta):
 
     def build_data_loader(self, dataset, batch_size, mode='train'):
         if dataset.num_samples < batch_size:
-            raise Exception(
+            raise ValueError(
                 'The volume of dataset({}) must be larger than batch size({}).'
                 .format(dataset.num_samples, batch_size))
         batch_size_each_card = get_single_card_bs(batch_size=batch_size)
@@ -483,11 +483,11 @@ class BaseModel(metaclass=ModelMeta):
         """
 
         if self.__class__.__name__ in {'FasterRCNN', 'MaskRCNN', 'PicoDet'}:
-            raise Exception("{} does not support pruning currently!".format(
+            raise ValueError("{} does not support pruning currently!".format(
                 self.__class__.__name__))
 
         assert criterion in {'l1_norm', 'fpgm'}, \
-            "Pruning criterion {} is not supported. Please choose from ['l1_norm', 'fpgm']"
+            "Pruning criterion {} is not supported. Please choose from {'l1_norm', 'fpgm'}."
         self._check_transforms(dataset.transforms, 'eval')
         if self.model_type == 'detector':
             self.net.eval()
@@ -520,8 +520,8 @@ class BaseModel(metaclass=ModelMeta):
                 Defaults to None.
         """
         if self.status == "Pruned":
-            raise Exception(
-                "A pruned model cannot be done model pruning again!")
+            raise ValueError(
+                "A pruned model cannot be pruned for a second time!")
         pre_pruning_flops = flops(self.net, self.pruner.inputs)
         logging.info("Pre-pruning FLOPs: {}. Pruning starts...".format(
             pre_pruning_flops))
@@ -529,8 +529,8 @@ class BaseModel(metaclass=ModelMeta):
         post_pruning_flops = flops(self.net, self.pruner.inputs)
         logging.info("Pruning is complete. Post-pruning FLOPs: {}".format(
             post_pruning_flops))
-        logging.warning("Pruning the model may hurt its performance, "
-                        "retraining is highly recommended")
+        logging.warning("Pruning the model may hurt its performance. "
+                        "Re-training is highly recommended.")
         self.status = 'Pruned'
 
         if save_dir is not None:
@@ -540,7 +540,7 @@ class BaseModel(metaclass=ModelMeta):
     def _prepare_qat(self, quant_config):
         if self.status == 'Infer':
             logging.error(
-                "Exported inference model does not support quantization aware training.",
+                "Exported inference model does not support quantization-aware training.",
                 exit=True)
         if quant_config is None:
             # default quantization configuration
@@ -578,7 +578,7 @@ class BaseModel(metaclass=ModelMeta):
         elif quant_config != self.quant_config:
             logging.error(
                 "The model has been quantized with the following quant_config: {}."
-                "Doing quantization-aware training with a quantized model "
+                "Performing quantization-aware training with a quantized model "
                 "using a different configuration is not supported."
                 .format(self.quant_config),
                 exit=True)
@@ -666,7 +666,7 @@ class BaseModel(metaclass=ModelMeta):
 
         # 模型保存成功的标志
         open(osp.join(save_dir, '.success'), 'w').close()
-        logging.info("The model for the inference deployment is saved in {}.".
+        logging.info("The inference model for deployment is saved in {}.".
                      format(save_dir))
 
     def _check_transforms(self, transforms, mode):

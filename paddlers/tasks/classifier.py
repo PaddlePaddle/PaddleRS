@@ -52,7 +52,7 @@ class BaseClassifier(BaseModel):
         super(BaseClassifier, self).__init__('classifier')
         if not hasattr(paddleclas.arch.backbone, model_name) and \
            not hasattr(cmcls, model_name):
-            raise Exception("ERROR: There's no model named {}.".format(
+            raise ValueError("ERROR: There is no model named {}.".format(
                 model_name))
         self.model_name = model_name
         self.in_channels = in_channels
@@ -447,7 +447,7 @@ class BaseClassifier(BaseModel):
         """
 
         if transforms is None and not hasattr(self, 'test_transforms'):
-            raise Exception("transforms need to be defined, now is None.")
+            raise ValueError("transforms need to be defined, now is None.")
         if transforms is None:
             transforms = self.test_transforms
         if isinstance(img_file, (str, np.ndarray)):

@@ -177,7 +177,7 @@ def draw_bbox_mask(image, results, threshold=0.5, color_map=None):
     else:
         color_map = np.asarray(color_map)
         if color_map.shape[0] != len(labels) or color_map.shape[1] != 3:
-            raise Exception(
+            raise ValueError(
                 "The shape for color_map is required to be {}x3, but recieved shape is {}x{}.".
                 format(len(labels), color_map.shape))
         if np.max(color_map) > 255 or np.min(color_map) < 0:
@@ -339,7 +339,7 @@ def draw_pr_curve(eval_details_file=None,
         stats = _summarize(coco_eval, iouThr=iou_thresh)
         catIds = coco_gt.getCatIds()
         if len(catIds) != coco_eval.eval['precision'].shape[2]:
-            raise Exception(
+            raise ValueError(
                 "The category number must be same as the third dimension of precisions."
             )
         x = np.arange(0.0, 1.01, 0.01)

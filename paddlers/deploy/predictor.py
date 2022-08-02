@@ -41,18 +41,18 @@ class Predictor(object):
         """ 
         Args:
             model_dir (str): Path of the exported model.
-            use_gpu (bool, optional): Whether to use a GPU. Defaults to False。
-            gpu_id (int, optional): GPU ID. Defaults to 0。
+            use_gpu (bool, optional): Whether to use a GPU. Defaults to False.
+            gpu_id (int, optional): GPU ID. Defaults to 0.
             cpu_thread_num (int, optional): Number of threads to use when making predictions using CPUs. 
-                Defaults to 1。
-            use_mkl (bool, optional): Whether to use MKL-DNN. Defaults to False。
-            mkl_thread_num (int, optional): Number of MKL threads. Defaults to 4。
-            use_trt (bool, optional): Whether to use TensorRT. Defaults to False。
-            use_glog (bool, optional): Whether to enable glog logs. Defaults to False。
-            memory_optimize (bool, optional): Whether to enable memory optimization. Defaults to True。
-            max_trt_batch_size (int, optional): Maximum batch size when configured with TensorRT. Defaults to 1。
+                Defaults to 1.
+            use_mkl (bool, optional): Whether to use MKL-DNN. Defaults to False.
+            mkl_thread_num (int, optional): Number of MKL threads. Defaults to 4.
+            use_trt (bool, optional): Whether to use TensorRT. Defaults to False.
+            use_glog (bool, optional): Whether to enable glog logs. Defaults to False.
+            memory_optimize (bool, optional): Whether to enable memory optimization. Defaults to True.
+            max_trt_batch_size (int, optional): Maximum batch size when configured with TensorRT. Defaults to 1.
             trt_precision_mode (str, optional)：Precision to use when configured with TensorRT. Possible values 
-                are ['float32', 'float16']。Defaults to 'float32'。
+                are {'float32', 'float16'}. Defaults to 'float32'.
         """
 
         self.model_dir = model_dir

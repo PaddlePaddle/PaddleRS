@@ -48,7 +48,7 @@ class BaseDetector(BaseModel):
             del self.init_params['with_net']
         super(BaseDetector, self).__init__('detector')
         if not hasattr(ppdet.modeling, model_name):
-            raise Exception("ERROR: There's no model named {}.".format(
+            raise ValueError("ERROR: There's no model named {}.".format(
                 model_name))
 
         self.model_name = model_name
@@ -81,7 +81,7 @@ class BaseDetector(BaseModel):
         if len(image_shape) == 2:
             image_shape = [1, 3] + image_shape
         if image_shape[-2] % 32 > 0 or image_shape[-1] % 32 > 0:
-            raise Exception(
+            raise ValueError(
                 "Height and width in fixed_input_shape must be a multiple of 32, but received {}.".
                 format(image_shape[-2:]))
         return image_shape
@@ -283,7 +283,7 @@ class BaseDetector(BaseModel):
                 self.metric = 'coco'
         else:
             assert metric.lower() in ['coco', 'voc'], \
-                "Evaluation metric {} is not supported, please choose form 'COCO' and 'VOC'"
+                "Evaluation metric {} is not supported. Please choose from 'COCO' and 'VOC'."
             self.metric = metric.lower()
 
         self.labels = train_dataset.labels
@@ -471,7 +471,7 @@ class BaseDetector(BaseModel):
                     self.metric = 'coco'
         else:
             assert metric.lower() in ['coco', 'voc'], \
-                "Evaluation metric {} is not supported, please choose form 'COCO' and 'VOC'"
+                "Evaluation metric {} is not supported. Please choose from 'COCO' and 'VOC'."
             self.metric = metric.lower()
 
         if self.metric == 'voc':
@@ -572,7 +572,7 @@ class BaseDetector(BaseModel):
         """
 
         if transforms is None and not hasattr(self, 'test_transforms'):
-            raise Exception("transforms need to be defined, now is None.")
+            raise ValueError("transforms need to be defined, now is None.")
         if transforms is None:
             transforms = self.test_transforms
         if isinstance(img_file, (str, np.ndarray)):
@@ -698,7 +698,7 @@ class PicoDet(BaseDetector):
         }:
             raise ValueError(
                 "backbone: {} is not supported. Please choose one of "
-                "('ESNet_s', 'ESNet_m', 'ESNet_l', 'LCNet', 'MobileNetV3', 'ResNet18_vd')".
+                "{'ESNet_s', 'ESNet_m', 'ESNet_l', 'LCNet', 'MobileNetV3', 'ResNet18_vd'}.".
                 format(backbone))
         self.backbone_name = backbone
         if params.get('with_net', True):
@@ -821,7 +821,7 @@ class PicoDet(BaseDetector):
         for i, op in enumerate(transforms.transforms):
             if isinstance(op, (BatchRandomResize, BatchRandomResizeByShort)):
                 if mode != 'train':
-                    raise Exception(
+                    raise ValueError(
                         "{} cannot be present in the {} transforms. ".format(
                             op.__class__.__name__, mode) +
                         "Please check the {} transforms.".format(mode))
@@ -1002,8 +1002,8 @@ class YOLOv3(BaseDetector):
         }:
             raise ValueError(
                 "backbone: {} is not supported. Please choose one of "
-                "('MobileNetV1', 'MobileNetV1_ssld', 'MobileNetV3', 'MobileNetV3_ssld', 'DarkNet53', "
-                "'ResNet50_vd_dcn', 'ResNet34')".format(backbone))
+                "{'MobileNetV1', 'MobileNetV1_ssld', 'MobileNetV3', 'MobileNetV3_ssld', 'DarkNet53', "
+                "'ResNet50_vd_dcn', 'ResNet34'}.".format(backbone))
 
         self.backbone_name = backbone
         if params.get('with_net', True):
@@ -1096,7 +1096,7 @@ class YOLOv3(BaseDetector):
         for i, op in enumerate(transforms.transforms):
             if isinstance(op, (BatchRandomResize, BatchRandomResizeByShort)):
                 if mode != 'train':
-                    raise Exception(
+                    raise ValueError(
                         "{} cannot be present in the {} transforms. ".format(
                             op.__class__.__name__, mode) +
                         "Please check the {} transforms.".format(mode))
@@ -1155,8 +1155,8 @@ class FasterRCNN(BaseDetector):
         }:
             raise ValueError(
                 "backbone: {} is not supported. Please choose one of "
-                "('ResNet50', 'ResNet50_vd', 'ResNet50_vd_ssld', 'ResNet34', 'ResNet34_vd', "
-                "'ResNet101', 'ResNet101_vd', 'HRNet_W18')".format(backbone))
+                "{'ResNet50', 'ResNet50_vd', 'ResNet50_vd_ssld', 'ResNet34', 'ResNet34_vd', "
+                "'ResNet101', 'ResNet101_vd', 'HRNet_W18'}.".format(backbone))
         self.backbone_name = backbone
 
         if params.get('with_net', True):
@@ -1460,7 +1460,7 @@ class FasterRCNN(BaseDetector):
         for i, op in enumerate(transforms.transforms):
             if isinstance(op, (BatchRandomResize, BatchRandomResizeByShort)):
                 if mode != 'train':
-                    raise Exception(
+                    raise ValueError(
                         "{} cannot be present in the {} transforms. ".format(
                             op.__class__.__name__, mode) +
                         "Please check the {} transforms.".format(mode))
@@ -1539,7 +1539,7 @@ class PPYOLO(YOLOv3):
         }:
             raise ValueError(
                 "backbone: {} is not supported. Please choose one of "
-                "('ResNet50_vd_dcn', 'ResNet18_vd', 'MobileNetV3_large', 'MobileNetV3_small')".
+                "{'ResNet50_vd_dcn', 'ResNet18_vd', 'MobileNetV3_large', 'MobileNetV3_small'}.".
                 format(backbone))
         self.backbone_name = backbone
         self.downsample_ratios = [
@@ -1852,7 +1852,7 @@ class PPYOLOv2(YOLOv3):
         if backbone not in {'ResNet50_vd_dcn', 'ResNet101_vd_dcn'}:
             raise ValueError(
                 "backbone: {} is not supported. Please choose one of "
-                "('ResNet50_vd_dcn', 'ResNet101_vd_dcn')".format(backbone))
+                "{'ResNet50_vd_dcn', 'ResNet101_vd_dcn'}.".format(backbone))
         self.backbone_name = backbone
         self.downsample_ratios = [32, 16, 8]
 
@@ -1999,7 +1999,7 @@ class MaskRCNN(BaseDetector):
         }:
             raise ValueError(
                 "backbone: {} is not supported. Please choose one of "
-                "('ResNet50', 'ResNet50_vd', 'ResNet50_vd_ssld', 'ResNet101', 'ResNet101_vd')".
+                "{'ResNet50', 'ResNet50_vd', 'ResNet50_vd_ssld', 'ResNet101', 'ResNet101_vd'}.".
                 format(backbone))
 
         self.backbone_name = backbone + '_fpn' if with_fpn else backbone
@@ -2302,7 +2302,7 @@ class MaskRCNN(BaseDetector):
         for i, op in enumerate(transforms.transforms):
             if isinstance(op, (BatchRandomResize, BatchRandomResizeByShort)):
                 if mode != 'train':
-                    raise Exception(
+                    raise ValueError(
                         "{} cannot be present in the {} transforms. ".format(
                             op.__class__.__name__, mode) +
                         "Please check the {} transforms.".format(mode))

@@ -51,7 +51,7 @@ class BaseChangeDetector(BaseModel):
             del self.init_params['with_net']
         super(BaseChangeDetector, self).__init__('change_detector')
         if model_name not in __all__:
-            raise Exception("ERROR: There's no model named {}.".format(
+            raise ValueError("ERROR: There's no model named {}.".format(
                 model_name))
         self.model_name = model_name
         self.num_classes = num_classes
@@ -542,7 +542,7 @@ class BaseChangeDetector(BaseModel):
         """
 
         if transforms is None and not hasattr(self, 'test_transforms'):
-            raise Exception("transforms need to be defined, now is None.")
+            raise ValueError("transforms need to be defined, now is None.")
         if transforms is None:
             transforms = self.test_transforms
         if isinstance(img_file, tuple):

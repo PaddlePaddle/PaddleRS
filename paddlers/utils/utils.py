@@ -53,9 +53,9 @@ def get_single_card_bs(batch_size):
         # Evaluation of detection task only supports single card with batch size 1
         return batch_size
     else:
-        raise Exception("Please support correct batch_size, \
+        raise ValueError("Please support correct batch_size, \
                         which can be divided by available cards({}) in {}"
-                        .format(card_num, place))
+                         .format(card_num, place))
 
 
 def dict2str(dict_input):

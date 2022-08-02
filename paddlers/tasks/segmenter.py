@@ -48,7 +48,7 @@ class BaseSegmenter(BaseModel):
         super(BaseSegmenter, self).__init__('segmenter')
         if not hasattr(paddleseg.models, model_name) and \
            not hasattr(cmseg, model_name):
-            raise Exception("ERROR: There's no model named {}.".format(
+            raise ValueError("ERROR: There's no model named {}.".format(
                 model_name))
         self.model_name = model_name
         self.num_classes = num_classes
@@ -519,7 +519,7 @@ class BaseSegmenter(BaseModel):
         """
 
         if transforms is None and not hasattr(self, 'test_transforms'):
-            raise Exception("transforms need to be defined, now is None.")
+            raise ValueError("transforms need to be defined, now is None.")
         if transforms is None:
             transforms = self.test_transforms
         if isinstance(img_file, (str, np.ndarray)):
@@ -815,7 +815,7 @@ class DeepLabV3P(BaseSegmenter):
         if backbone not in ['ResNet50_vd', 'ResNet101_vd']:
             raise ValueError(
                 "backbone: {} is not supported. Please choose one of "
-                "('ResNet50_vd', 'ResNet101_vd')".format(backbone))
+                "{'ResNet50_vd', 'ResNet101_vd'}.".format(backbone))
         if params.get('with_net', True):
             with DisablePrint():
                 backbone = getattr(paddleseg.models, backbone)(
@@ -859,8 +859,8 @@ class HRNet(BaseSegmenter):
                  **params):
         if width not in (18, 48):
             raise ValueError(
-                "width={} is not supported, please choose from [18, 48]".format(
-                    width))
+                "width={} is not supported, please choose from {18, 48}.".
+                format(width))
         self.backbone_name = 'HRNet_W{}'.format(width)
         if params.get('with_net', True):
             with DisablePrint():

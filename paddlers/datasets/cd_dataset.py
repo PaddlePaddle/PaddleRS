@@ -33,7 +33,7 @@ class CDDataset(BaseDataset):
             temporal phases.
         transforms (paddlers.transforms.Compose): Data preprocessing and data augmentation operators to apply.
         label_list (str, optional): Path of the file that contains the category names. Defaults to None.
-        num_workers (int|str, optional): Number of processes used for data loading。If `num_workers` is 'auto',
+        num_workers (int|str, optional): Number of processes used for data loading. If `num_workers` is 'auto',
             the number of workers will be automatically determined according to the number of CPU cores: If 
             there are more than 16 cores，8 workers will be used. Otherwise, the number of workers will be half 
             the number of CPU cores. Defaults: 'auto'.
@@ -81,7 +81,7 @@ class CDDataset(BaseDataset):
                 items = line.strip().split(DELIMETER)
 
                 if len(items) != num_items:
-                    raise Exception(
+                    raise ValueError(
                         "Line[{}] in file_list[{}] has an incorrect number of file paths.".
                         format(line.strip(), file_list))
 
