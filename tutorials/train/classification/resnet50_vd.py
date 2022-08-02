@@ -65,7 +65,7 @@ eval_dataset = pdrs.datasets.ClasDataset(
 # 使用默认参数构建ResNet50-vd模型
 # 目前已支持的模型请参考：https://github.com/PaddleCV-SIG/PaddleRS/blob/develop/docs/apis/model_zoo.md
 # 模型输入参数请参考：https://github.com/PaddleCV-SIG/PaddleRS/blob/develop/paddlers/tasks/classifier.py
-model = pdrs.tasks.ResNet50_vd(num_classes=len(train_dataset.labels))
+model = pdrs.tasks.clas.ResNet50_vd(num_classes=len(train_dataset.labels))
 
 # 执行模型训练
 model.train(

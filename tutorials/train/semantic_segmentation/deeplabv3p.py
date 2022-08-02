@@ -66,7 +66,7 @@ eval_dataset = pdrs.datasets.SegDataset(
 # 构建DeepLab V3+模型，使用ResNet-50作为backbone
 # 目前已支持的模型请参考：https://github.com/PaddleCV-SIG/PaddleRS/blob/develop/docs/apis/model_zoo.md
 # 模型输入参数请参考：https://github.com/PaddleCV-SIG/PaddleRS/blob/develop/paddlers/tasks/segmenter.py
-model = pdrs.tasks.DeepLabV3P(
+model = pdrs.tasks.seg.DeepLabV3P(
     input_channel=NUM_BANDS,
     num_classes=len(train_dataset.labels),
     backbone='ResNet50_vd')

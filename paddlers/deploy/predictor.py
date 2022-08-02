@@ -157,7 +157,7 @@ class Predictor(object):
             }
         elif self._model.model_type == 'detector':
             pass
-        elif self._model.model_type == 'changedetector':
+        elif self._model.model_type == 'change_detector':
             preprocessed_samples = {
                 'image': preprocessed_samples[0],
                 'image2': preprocessed_samples[1],
@@ -186,7 +186,7 @@ class Predictor(object):
                 'scores_map': s,
                 'label_names_map': n,
             } for l, s, n in zip(class_ids, scores, label_names)]
-        elif self._model.model_type in ('segmenter', 'changedetector'):
+        elif self._model.model_type in ('segmenter', 'change_detector'):
             label_map, score_map = self._model._postprocess(
                 net_outputs,
                 batch_origin_shape=ori_shape,
