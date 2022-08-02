@@ -325,7 +325,7 @@ class ConstrDetSample(ConstrSample):
 
 def build_input_from_file(file_list, prefix='', task='auto', label_list=None):
     """
-    Construct a list of dictionaries from file. Each dict in the list can be used as the input to `paddlers.transforms.Transform` objects.
+    Construct a list of dictionaries from file. Each dict in the list can be used as the input to paddlers.transforms.Transform objects.
 
     Args:
         file_list (str): Path of file_list.

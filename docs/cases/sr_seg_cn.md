@@ -66,7 +66,7 @@ plt.show()
 
 ```python
 # 从github上克隆仓库
-!git clone https://github.com/PaddleCV-SIG/PaddleRS.git
+!git clone https://github.com/PaddlePaddle/PaddleRS.git
 ```
 
 ```python
@@ -221,4 +221,4 @@ for filename in img_list:
 ## 五、总结
 - 本项目调用PaddleRS提供的超分重建接口，选用DRN模型对真实采集的低分辨率影像进行重建，再对重建后的图像进行分割，从结果上看，**超分重建后的图片的分割结果更好**
 - **不足之处**：虽然相对于低分辨率影像，超分重建后的预测精度从目视的角度有所提高，但是并没有达到UDD6测试集中的效果，所以**模型的泛化能力也需要提高才行，光靠超分重建依然不够**
-- **后续工作**：将会把超分重建这一步整合到PaddleRS中的transform模块，在high-level任务预测之前可以进行调用改善图像质量，请大家多多关注[PaddleRS](https://github.com/PaddleCV-SIG/PaddleRS)
+- **后续工作**：将会把超分重建这一步整合到PaddleRS中的transform模块，在high-level任务预测之前可以进行调用改善图像质量，请大家多多关注[PaddleRS](https://github.com/PaddlePaddle/PaddleRS)

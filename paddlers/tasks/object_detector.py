@@ -31,7 +31,6 @@ from paddlers.transforms import decode_image
 from paddlers.transforms.operators import _NormalizeBox, _PadBox, _BboxXYXY2XYWH, Resize, Pad
 from paddlers.transforms.batch_operators import BatchCompose, BatchRandomResize, BatchRandomResizeByShort, \
     _BatchPad, _Gt2YoloTarget
-from paddlers.transforms import arrange_transforms
 from .base import BaseModel
 from .utils.det_metrics import VOCMetric, COCOMetric
 from paddlers.models.ppdet.optimizer import ModelEMA
@@ -487,10 +486,7 @@ class BaseDetector(BaseModel):
                 }
         eval_dataset.batch_transforms = self._compose_batch_transform(
             eval_dataset.transforms, mode='eval')
-        arrange_transforms(
-            model_type=self.model_type,
-            transforms=eval_dataset.transforms,
-            mode='eval')
+        self._check_transforms(eval_dataset.transforms, 'eval')
 
         self.net.eval()
         nranks = paddle.distributed.get_world_size()
@@ -588,8 +584,7 @@ class BaseDetector(BaseModel):
         return prediction
 
     def _preprocess(self, images, transforms, to_tensor=True):
-        arrange_transforms(
-            model_type=self.model_type, transforms=transforms, mode='test')
+        self._check_transforms(transforms, 'test')
         batch_samples = list()
         for im in images:
             if isinstance(im, str):
@@ -672,6 +667,13 @@ class BaseDetector(BaseModel):
             start = end
 
         return results
+
+    def _check_transforms(self, transforms, mode):
+        super()._check_transforms(transforms, mode)
+        if not isinstance(transforms.arrange,
+                          paddlers.transforms.ArrangeDetector):
+            raise TypeError(
+                "`transforms.arrange` must be an ArrangeDetector object.")
 
 
 class PicoDet(BaseDetector):

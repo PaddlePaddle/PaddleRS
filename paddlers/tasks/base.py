@@ -30,7 +30,6 @@ from paddleslim import L1NormFilterPruner, FPGMFilterPruner
 
 import paddlers
 import paddlers.utils.logging as logging
-from paddlers.transforms import arrange_transforms
 from paddlers.utils import (seconds_to_hms, get_single_card_bs, dict2str,
                             get_pretrain_weights, load_pretrain_weights,
                             load_checkpoint, SmoothedValue, TrainingStats,
@@ -302,10 +301,7 @@ class BaseModel(metaclass=ModelMeta):
                    early_stop=False,
                    early_stop_patience=5,
                    use_vdl=True):
-        arrange_transforms(
-            model_type=self.model_type,
-            transforms=train_dataset.transforms,
-            mode='train')
+        self._check_transforms(train_dataset.transforms, 'train')
 
         if "RCNN" in self.__class__.__name__ and train_dataset.pos_num < len(
                 train_dataset.file_list):
@@ -491,10 +487,7 @@ class BaseModel(metaclass=ModelMeta):
 
         assert criterion in {'l1_norm', 'fpgm'}, \
             "Pruning criterion {} is not supported. Please choose from ['l1_norm', 'fpgm']"
-        arrange_transforms(
-            model_type=self.model_type,
-            transforms=dataset.transforms,
-            mode='eval')
+        self._check_transforms(dataset.transforms, 'eval')
         if self.model_type == 'detector':
             self.net.eval()
         else:
@@ -674,3 +667,15 @@ class BaseModel(metaclass=ModelMeta):
         open(osp.join(save_dir, '.success'), 'w').close()
         logging.info("The model for the inference deployment is saved in {}.".
                      format(save_dir))
+
+    def _check_transforms(self, transforms, mode):
+        # NOTE: Check transforms and transforms.arrange and give user-friendly error messages.
+        if not isinstance(transforms, paddlers.transforms.Compose):
+            raise TypeError("`transforms` must be paddlers.transforms.Compose.")
+        arrange_obj = transforms.arrange
+        if not isinstance(arrange_obj, paddlers.transforms.operators.Arrange):
+            raise TypeError("`transforms.arrange` must be an Arrange object.")
+        if arrange_obj.mode != mode:
+            raise ValueError(
+                f"Incorrect arrange mode! Expected {mode} but got {arrange_obj.mode}."
+            )

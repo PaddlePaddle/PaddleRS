@@ -46,7 +46,7 @@ def convert_data(image_path, geojson_path):
             geo_points = geo["coordinates"][0][0]
         else:
             raise TypeError(
-                "Geometry type must be `Polygon` or `MultiPolygon`, not {}.".
+                "Geometry type must be 'Polygon' or 'MultiPolygon', not {}.".
                 format(geo["type"]))
         xy_points = np.array([
             _gt_convert(point[0], point[1], raster.geot) for point in geo_points
