@@ -79,7 +79,7 @@ print("数据集划分已完成。")
 
 ## 模型训练与推理
 
-本项目使用[PaddleRS](https://github.com/PaddleCV-SIG/PaddleRS)套件搭建模型训练与推理框架。PaddleRS是基于飞桨开发的遥感处理平台，支持遥感图像分类、目标检测、图像分割、以及变化检测等常用遥感任务，能够帮助开发者更便捷地完成从训练到部署全流程遥感深度学习应用。在变化检测方面，PaddleRS目前支持9个state-of-the-art（SOTA）模型，且复杂的训练和推理过程被封装到数个API中，能够提供开箱即用的用户体验。
+本项目使用[PaddleRS](https://github.com/PaddlePaddle/PaddleRS)套件搭建模型训练与推理框架。PaddleRS是基于飞桨开发的遥感处理平台，支持遥感图像分类、目标检测、图像分割、以及变化检测等常用遥感任务，能够帮助开发者更便捷地完成从训练到部署全流程遥感深度学习应用。在变化检测方面，PaddleRS目前支持9个state-of-the-art（SOTA）模型，且复杂的训练和推理过程被封装到数个API中，能够提供开箱即用的用户体验。
 
 ```python
 # 安装第三方库
@@ -365,7 +365,7 @@ class InferDataset(paddle.io.Dataset):
         names = []
         for line in lines:
             items = line.strip().split(' ')
-            items = list(map(pdrs.utils.path_normalization, items))
+            items = list(map(pdrs.utils.norm_path, items))
             item_dict = {
                 'image_t1': osp.join(data_dir, items[0]),
                 'image_t2': osp.join(data_dir, items[1])
@@ -588,5 +588,5 @@ Image.frombytes('RGB', fig.canvas.get_width_height(), fig.canvas.tostring_rgb())
 
 ## 参考资料
 
-- [遥感数据介绍](https://github.com/PaddleCV-SIG/PaddleRS/blob/develop/docs/data/rs_data_cn.md)
-- [PaddleRS文档](https://github.com/PaddleCV-SIG/PaddleRS/blob/develop/tutorials/train/README.md)
+- [遥感数据介绍](https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/data/rs_data_cn.md)
+- [PaddleRS文档](https://github.com/PaddlePaddle/PaddleRS/blob/develop/tutorials/train/README.md)

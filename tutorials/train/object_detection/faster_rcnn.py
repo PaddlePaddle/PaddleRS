@@ -28,8 +28,10 @@ if not os.path.exists(DATA_DIR):
 
 # 定义训练和验证时使用的数据变换（数据增强、预处理等）
 # 使用Compose组合多种变换方式。Compose中包含的变换将按顺序串行执行
-# API说明：https://github.com/PaddleCV-SIG/PaddleRS/blob/develop/docs/apis/transforms.md
+# API说明：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/transforms.md
 train_transforms = T.Compose([
+    # 读取影像
+    T.DecodeImg(),
     # 对输入影像施加随机色彩扰动
     T.RandomDistort(),
     # 在影像边界进行随机padding
@@ -44,16 +46,19 @@ train_transforms = T.Compose([
         interp='RANDOM'),
     # 影像归一化
     T.Normalize(
-        mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    T.ArrangeDetector('train')
 ])
 
 eval_transforms = T.Compose([
+    T.DecodeImg(),
     # 使用双三次插值将输入影像缩放到固定大小
     T.Resize(
         target_size=608, interp='CUBIC'),
     # 验证阶段与训练阶段的归一化方式必须相同
     T.Normalize(
-        mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    T.ArrangeDetector('eval')
 ])
 
 # 分别构建训练和验证所用的数据集
@@ -72,9 +77,9 @@ eval_dataset = pdrs.datasets.VOCDetection(
     shuffle=False)
 
 # 构建Faster R-CNN模型
-# 目前已支持的模型请参考：https://github.com/PaddleCV-SIG/PaddleRS/blob/develop/docs/apis/model_zoo.md
-# 模型输入参数请参考：https://github.com/PaddleCV-SIG/PaddleRS/blob/develop/paddlers/tasks/object_detector.py
-model = pdrs.tasks.det.FasterRCNN(num_classes=len(train_dataset.labels))
+# 目前已支持的模型请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/model_zoo.md
+# 模型输入参数请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/object_detector.py
+model = pdrs.tasks.FasterRCNN(num_classes=len(train_dataset.labels))
 
 # 执行模型训练
 model.train(

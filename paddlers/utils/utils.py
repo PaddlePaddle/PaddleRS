@@ -69,7 +69,7 @@ def dict2str(dict_input):
     return out.strip(', ')
 
 
-def path_normalization(path):
+def norm_path(path):
     win_sep = "\\"
     other_sep = "/"
     if platform.system() == "Windows":
