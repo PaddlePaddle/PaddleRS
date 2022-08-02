@@ -189,7 +189,7 @@ class VOCDetDataset(BaseDataset):
                     box_tag = pattern.findall(str(ET.tostringlist(obj)))
                     if len(box_tag) == 0:
                         logging.warning(
-                            "There's no field '<bndbox>' in one of object, "
+                            "There is no field '<bndbox>' in the object, "
                             "so this object will be ignored. xml file: {}".
                             format(xml_file))
                         continue

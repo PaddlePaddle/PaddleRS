@@ -23,7 +23,7 @@ from data import build_input_from_file
 
 __all__ = ['TestTransform', 'TestCompose', 'TestArrange']
 
-WHITE_LIST = []
+WHITE_LIST = ['ReloadMask']
 
 
 def _add_op_tests(cls):
@@ -36,6 +36,9 @@ def _add_op_tests(cls):
         if isinstance(op_class, type) and issubclass(op_class,
                                                      T.operators.Transform):
             if op_class is T.DecodeImg or op_class in WHITE_LIST or op_name in WHITE_LIST:
+                continue
+            if issubclass(op_class, T.Compose) or issubclass(
+                    op_class, T.operators.Arrange):
                 continue
             attr_name = 'test_' + op_name
             if hasattr(cls, attr_name):

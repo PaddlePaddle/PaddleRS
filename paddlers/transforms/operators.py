@@ -287,7 +287,7 @@ class DecodeImg(Transform):
                 raise ValueError(
                     "The height or width of the image is not same as the mask.")
         if 'aux_masks' in sample:
-            sample['aux_masks_ori'] = copy.deepcopy(sample['aux_masks_ori'])
+            sample['aux_masks_ori'] = copy.deepcopy(sample['aux_masks'])
             sample['aux_masks'] = list(
                 map(self.apply_mask, sample['aux_masks']))
             # TODO: check the shape of auxiliary masks

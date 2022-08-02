@@ -48,7 +48,7 @@ class BaseSegmenter(BaseModel):
         super(BaseSegmenter, self).__init__('segmenter')
         if not hasattr(paddleseg.models, model_name) and \
            not hasattr(cmseg, model_name):
-            raise ValueError("ERROR: There's no model named {}.".format(
+            raise ValueError("ERROR: There is no model named {}.".format(
                 model_name))
         self.model_name = model_name
         self.num_classes = num_classes

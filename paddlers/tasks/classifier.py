@@ -23,7 +23,7 @@ import paddle.nn.functional as F
 from paddle.static import InputSpec
 
 import paddlers.models.ppcls as paddleclas
-import paddlers.rs_models.cls as cmcls
+import paddlers.rs_models.clas as cmcls
 import paddlers
 from paddlers.utils import get_single_card_bs, DisablePrint
 import paddlers.utils.logging as logging
