@@ -28,7 +28,6 @@ import paddlers
 import paddlers.custom_models.cd as cmcd
 import paddlers.utils.logging as logging
 import paddlers.models.ppseg as paddleseg
-from paddlers.transforms import arrange_transforms
 from paddlers.transforms import Resize, decode_image
 from paddlers.utils import get_single_card_bs, DisablePrint
 from paddlers.utils.checkpoint import seg_pretrain_weights_dict
@@ -137,6 +136,11 @@ class BaseChangeDetector(BaseModel):
             else:
                 pred = paddle.argmax(logit, axis=1, keepdim=True, dtype='int32')
             label = inputs[2]
+            if label.ndim == 3:
+                paddle.unsqueeze_(label, axis=1)
+            if label.ndim != 4:
+                raise ValueError("Expected label.ndim == 4 but got {}".format(
+                    label.ndim))
             origin_shape = [label.shape[-2:]]
             pred = self._postprocess(
                 pred, origin_shape, transforms=inputs[3])[0]  # NCHW
@@ -396,10 +400,7 @@ class BaseChangeDetector(BaseModel):
                  "category_F1-score": `F1 score`}.
 
         """
-        arrange_transforms(
-            model_type=self.model_type,
-            transforms=eval_dataset.transforms,
-            mode='eval')
+        self._check_transforms(eval_dataset.transforms, 'eval')
 
         self.net.eval()
         nranks = paddle.distributed.get_world_size()
@@ -641,8 +642,7 @@ class BaseChangeDetector(BaseModel):
         print("GeoTiff saved in {}.".format(save_file))
 
     def _preprocess(self, images, transforms, to_tensor=True):
-        arrange_transforms(
-            model_type=self.model_type, transforms=transforms, mode='test')
+        self._check_transforms(transforms, 'test')
         batch_im1, batch_im2 = list(), list()
         batch_ori_shape = list()
         for im1, im2 in images:
@@ -785,6 +785,13 @@ class BaseChangeDetector(BaseModel):
             label_maps.append(label_map.squeeze())
             score_maps.append(score_map.squeeze())
         return label_maps, score_maps
+
+    def _check_transforms(self, transforms, mode):
+        super()._check_transforms(transforms, mode)
+        if not isinstance(transforms.arrange,
+                          paddlers.transforms.ArrangeChangeDetector):
+            raise TypeError(
+                "`transforms.arrange` must be an ArrangeChangeDetector object.")
 
 
 class CDNet(BaseChangeDetector):
