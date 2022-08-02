@@ -26,24 +26,31 @@ pdrs.utils.download_and_decompress(ucmerced_dataset, path=DOWNLOAD_DIR)
 # 定义训练和验证时使用的数据变换（数据增强、预处理等）
 # 使用Compose组合多种变换方式。Compose中包含的变换将按顺序串行执行
 # API说明：https://github.com/PaddleCV-SIG/PaddleRS/blob/develop/docs/apis/transforms.md
-train_transforms = T.Compose([
-    # 将影像缩放到256x256大小
-    T.Resize(target_size=256),
-    # 以50%的概率实施随机水平翻转
-    T.RandomHorizontalFlip(prob=0.5),
-    # 以50%的概率实施随机垂直翻转
-    T.RandomVerticalFlip(prob=0.5),
-    # 将数据归一化到[-1,1]
-    T.Normalize(
-        mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
-])
+train_transforms = T.Compose(
+    [
+        # 读取影像
+        T.DecodeImg(),
+        # 将影像缩放到256x256大小
+        T.Resize(target_size=256),
+        # 以50%的概率实施随机水平翻转
+        T.RandomHorizontalFlip(prob=0.5),
+        # 以50%的概率实施随机垂直翻转
+        T.RandomVerticalFlip(prob=0.5),
+        # 将数据归一化到[-1,1]
+        T.Normalize(
+            mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
+    ],
+    arrange=T.ArrangeClassifier('train'))
 
-eval_transforms = T.Compose([
-    T.Resize(target_size=256),
-    # 验证阶段与训练阶段的数据归一化方式必须相同
-    T.Normalize(
-        mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
-])
+eval_transforms = T.Compose(
+    [
+        T.DecodeImg(),
+        T.Resize(target_size=256),
+        # 验证阶段与训练阶段的数据归一化方式必须相同
+        T.Normalize(
+            mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
+    ],
+    arrange=T.ArrangeClassifier('eval'))
 
 # 分别构建训练和验证所用的数据集
 train_dataset = pdrs.datasets.ClasDataset(
