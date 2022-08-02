@@ -25,7 +25,7 @@ import paddle.nn.functional as F
 from paddle.static import InputSpec
 
 import paddlers
-import paddlers.custom_models.cd as cmcd
+import paddlers.rs_models.cd as cmcd
 import paddlers.utils.logging as logging
 import paddlers.models.ppseg as paddleseg
 from paddlers.transforms import arrange_transforms
