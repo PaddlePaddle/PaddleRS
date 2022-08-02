@@ -28,7 +28,7 @@ if not os.path.exists(DATA_DIR):
 
 # 定义训练和验证时使用的数据变换（数据增强、预处理等）
 # 使用Compose组合多种变换方式。Compose中包含的变换将按顺序串行执行
-# API说明：https://github.com/PaddleCV-SIG/PaddleRS/blob/develop/docs/apis/transforms.md
+# API说明：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/transforms.md
 train_transforms = T.Compose([
     # 读取影像
     T.DecodeImg(),
@@ -77,8 +77,8 @@ eval_dataset = pdrs.datasets.VOCDetection(
     shuffle=False)
 
 # 构建Faster R-CNN模型
-# 目前已支持的模型请参考：https://github.com/PaddleCV-SIG/PaddleRS/blob/develop/docs/apis/model_zoo.md
-# 模型输入参数请参考：https://github.com/PaddleCV-SIG/PaddleRS/blob/develop/paddlers/tasks/object_detector.py
+# 目前已支持的模型请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/model_zoo.md
+# 模型输入参数请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/object_detector.py
 model = pdrs.tasks.FasterRCNN(num_classes=len(train_dataset.labels))
 
 # 执行模型训练

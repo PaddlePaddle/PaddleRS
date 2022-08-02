@@ -17,7 +17,7 @@
 首先需要`clone`此repo并进入到`tools`的文件夹中：
 
 ```shell
-git clone https://github.com/PaddleCV-SIG/PaddleRS.git
+git clone https://github.com/PaddlePaddle/PaddleRS.git
 cd PaddleRS\tools
 ```
 
