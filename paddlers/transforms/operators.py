@@ -30,39 +30,21 @@ from PIL import Image
 from joblib import load
 
 import paddlers
-from .functions import normalize, horizontal_flip, permute, vertical_flip, center_crop, is_poly, \
-    horizontal_flip_poly, horizontal_flip_rle, vertical_flip_poly, vertical_flip_rle, crop_poly, \
-    crop_rle, expand_poly, expand_rle, resize_poly, resize_rle, dehaze, select_bands, \
-    to_intensity, to_uint8, img_flip, img_simple_rotate
+from .functions import (
+    normalize, horizontal_flip, permute, vertical_flip, center_crop, is_poly,
+    horizontal_flip_poly, horizontal_flip_rle, vertical_flip_poly,
+    vertical_flip_rle, crop_poly, crop_rle, expand_poly, expand_rle,
+    resize_poly, resize_rle, dehaze, select_bands, to_intensity, to_uint8,
+    img_flip, img_simple_rotate, decode_seg_mask)
 
 __all__ = [
-    "Compose",
-    "DecodeImg",
-    "Resize",
-    "RandomResize",
-    "ResizeByShort",
-    "RandomResizeByShort",
-    "ResizeByLong",
-    "RandomHorizontalFlip",
-    "RandomVerticalFlip",
-    "Normalize",
-    "CenterCrop",
-    "RandomCrop",
-    "RandomScaleAspect",
-    "RandomExpand",
-    "Pad",
-    "MixupImage",
-    "RandomDistort",
-    "RandomBlur",
-    "RandomSwap",
-    "Dehaze",
-    "ReduceDim",
-    "SelectBand",
-    "ArrangeSegmenter",
-    "ArrangeChangeDetector",
-    "ArrangeClassifier",
-    "ArrangeDetector",
-    "RandomFlipOrRotate",
+    "Compose", "DecodeImg", "Resize", "RandomResize", "ResizeByShort",
+    "RandomResizeByShort", "ResizeByLong", "RandomHorizontalFlip",
+    "RandomVerticalFlip", "Normalize", "CenterCrop", "RandomCrop",
+    "RandomScaleAspect", "RandomExpand", "Pad", "MixupImage", "RandomDistort",
+    "RandomBlur", "RandomSwap", "Dehaze", "ReduceDim", "SelectBand",
+    "ArrangeSegmenter", "ArrangeChangeDetector", "ArrangeClassifier",
+    "ArrangeDetector", "RandomFlipOrRotate", "ReloadMask"
 ]
 
 interp_dict = {
@@ -80,16 +62,15 @@ class Compose(object):
     All input images should be in Height-Width-Channel ([H, W, C]) format.
 
     Args:
-        transforms (list[paddlers.transforms.Transform]): List of data preprocess or augmentation operators.
-        arrange (list[paddlers.transforms.Arrange]|None, optional): If not None, the Arrange operator will be used to 
-            arrange the outputs of `transforms`. Defaults to None. 
+        transforms (list[paddlers.transforms.Transform]): List of data preprocess or
+            augmentation operators.
 
     Raises:
         TypeError: Invalid type of transforms.
         ValueError: Invalid length of transforms.
     """
 
-    def __init__(self, transforms, arrange=None):
+    def __init__(self, transforms):
         super(Compose, self).__init__()
         if not isinstance(transforms, list):
             raise TypeError(
@@ -99,12 +80,14 @@ class Compose(object):
             raise ValueError(
                 "Length of transforms must not be less than 1, but received is {}."
                 .format(len(transforms)))
+        transforms = copy.deepcopy(transforms)
+        self.arrange = self._pick_arrange(transforms)
         self.transforms = transforms
-        self.arrange = arrange
 
     def __call__(self, sample):
         """
-        This is equivalent to sequentially calling compose_obj.apply_transforms() and compose_obj.arrange_outputs().
+        This is equivalent to sequentially calling compose_obj.apply_transforms() 
+            and compose_obj.arrange_outputs().
         """
 
         sample = self.apply_transforms(sample)
@@ -125,6 +108,17 @@ class Compose(object):
         if self.arrange is not None:
             sample = self.arrange(sample)
         return sample
+
+    def _pick_arrange(self, transforms):
+        arrange = None
+        for idx, op in enumerate(transforms):
+            if isinstance(op, Arrange):
+                if idx != len(transforms) - 1:
+                    raise ValueError(
+                        "Arrange operator must be placed at the end of the list."
+                    )
+                arrange = transforms.pop(idx)
+        return arrange
 
 
 class Transform(object):
@@ -270,7 +264,9 @@ class DecodeImg(Transform):
         Returns:
             dict: Decoded sample.
         """
+
         if 'image' in sample:
+            sample['image_ori'] = copy.deepcopy(sample['image'])
             sample['image'] = self.apply_im(sample['image'])
         if 'image2' in sample:
             sample['image2'] = self.apply_im(sample['image2'])
@@ -280,6 +276,7 @@ class DecodeImg(Transform):
             sample['image'] = self.apply_im(sample['image_t1'])
             sample['image2'] = self.apply_im(sample['image_t2'])
         if 'mask' in sample:
+            sample['mask_ori'] = copy.deepcopy(sample['mask'])
             sample['mask'] = self.apply_mask(sample['mask'])
             im_height, im_width, _ = sample['image'].shape
             se_height, se_width = sample['mask'].shape
@@ -287,6 +284,7 @@ class DecodeImg(Transform):
                 raise ValueError(
                     "The height or width of the image is not same as the mask.")
         if 'aux_masks' in sample:
+            sample['aux_masks_ori'] = copy.deepcopy(sample['aux_masks_ori'])
             sample['aux_masks'] = list(
                 map(self.apply_mask, sample['aux_masks']))
             # TODO: check the shape of auxiliary masks
@@ -1756,6 +1754,15 @@ class RandomSwap(Transform):
         if random.random() < self.prob:
             sample['image'], sample['image2'] = sample['image2'], sample[
                 'image']
+        return sample
+
+
+class ReloadMask(Transform):
+    def apply(self, sample):
+        sample['mask'] = decode_seg_mask(sample['mask_ori'])
+        if 'aux_masks' in sample:
+            sample['aux_masks'] = list(
+                map(decode_seg_mask, sample['aux_masks_ori']))
         return sample
 
 

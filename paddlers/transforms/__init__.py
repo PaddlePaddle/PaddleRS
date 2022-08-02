@@ -15,9 +15,6 @@
 import copy
 import os.path as osp
 
-import numpy as np
-from PIL import Image
-
 from .operators import *
 from .batch_operators import BatchRandomResize, BatchRandomResizeByShort, _BatchPad
 from paddlers import transforms as T
@@ -39,6 +36,9 @@ def decode_image(im_path,
             Defaults to True.
         decode_sar (bool, optional): If True, automatically interpret a two-channel geo image (e.g. geotiff images) as a 
             SAR image, set this argument to True. Defaults to True.
+
+    Returns:
+        np.ndarray: Decoded image.
     """
 
     # Do a presence check. osp.exists() assumes `im_path` is a path-like object.
@@ -53,19 +53,6 @@ def decode_image(im_path,
     sample = {'image': copy.deepcopy(im_path)}
     sample = decoder(sample)
     return sample['image']
-
-
-def decode_seg_mask(mask_path):
-    """
-    Decode a segmentation mask image.
-    
-    Args:
-        mask_path (str): Path of the mask image to decode.
-    """
-
-    mask = np.asarray(Image.open(mask_path))
-    mask = mask.astype('int64')
-    return mask
 
 
 def build_transforms(transforms_info):

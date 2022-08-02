@@ -29,29 +29,28 @@ pdrs.utils.download_and_decompress(seg_dataset, path=DOWNLOAD_DIR)
 # 定义训练和验证时使用的数据变换（数据增强、预处理等）
 # 使用Compose组合多种变换方式。Compose中包含的变换将按顺序串行执行
 # API说明：https://github.com/PaddleCV-SIG/PaddleRS/blob/develop/docs/apis/transforms.md
-train_transforms = T.Compose(
-    [
-        # 读取影像
-        T.DecodeImg(),
-        # 将影像缩放到512x512大小
-        T.Resize(target_size=512),
-        # 以50%的概率实施随机水平翻转
-        T.RandomHorizontalFlip(prob=0.5),
-        # 将数据归一化到[-1,1]
-        T.Normalize(
-            mean=[0.5] * NUM_BANDS, std=[0.5] * NUM_BANDS)
-    ],
-    arrange=T.ArrangeSegmenter('train'))
+train_transforms = T.Compose([
+    # 读取影像
+    T.DecodeImg(),
+    # 将影像缩放到512x512大小
+    T.Resize(target_size=512),
+    # 以50%的概率实施随机水平翻转
+    T.RandomHorizontalFlip(prob=0.5),
+    # 将数据归一化到[-1,1]
+    T.Normalize(
+        mean=[0.5] * NUM_BANDS, std=[0.5] * NUM_BANDS),
+    T.ArrangeSegmenter('train')
+])
 
-eval_transforms = T.Compose(
-    [
-        T.DecodeImg(),
-        T.Resize(target_size=512),
-        # 验证阶段与训练阶段的数据归一化方式必须相同
-        T.Normalize(
-            mean=[0.5] * NUM_BANDS, std=[0.5] * NUM_BANDS)
-    ],
-    arrange=T.ArrangeSegmenter('eval'))
+eval_transforms = T.Compose([
+    T.DecodeImg(),
+    T.Resize(target_size=512),
+    # 验证阶段与训练阶段的数据归一化方式必须相同
+    T.Normalize(
+        mean=[0.5] * NUM_BANDS, std=[0.5] * NUM_BANDS),
+    T.ReloadMask(),
+    T.ArrangeSegmenter('eval')
+])
 
 # 分别构建训练和验证所用的数据集
 train_dataset = pdrs.datasets.SegDataset(
@@ -68,8 +67,7 @@ eval_dataset = pdrs.datasets.SegDataset(
     label_list=LABEL_LIST_PATH,
     transforms=eval_transforms,
     num_workers=0,
-    shuffle=False,
-    apply_im_only=True)
+    shuffle=False)
 
 # 构建DeepLab V3+模型，使用ResNet-50作为backbone
 # 目前已支持的模型请参考：https://github.com/PaddleCV-SIG/PaddleRS/blob/develop/docs/apis/model_zoo.md

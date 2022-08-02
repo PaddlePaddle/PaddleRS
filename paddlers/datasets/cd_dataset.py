@@ -18,7 +18,6 @@ import os.path as osp
 
 from .base import BaseDataset
 from paddlers.utils import logging, get_encoding, norm_path, is_pic
-from paddlers.transforms import decode_seg_mask
 
 
 class CDDataset(BaseDataset):
@@ -36,7 +35,6 @@ class CDDataset(BaseDataset):
             系统的实际CPU核数设置`num_workers`: 如果CPU核数的一半大于8，则`num_workers`为8，否则为CPU核数的
             一半。
         shuffle (bool): 是否需要对数据集中样本打乱顺序。默认为False。
-        apply_im_only (bool, optional): 是否绕过对标签的数据增强和预处理。在模型验证和推理阶段一般指定此选项为True。默认为False。
         with_seg_labels (bool, optional): 数据集中是否包含两个时相的语义分割标签。默认为False。
         binarize_labels (bool, optional): 是否对数据集中的标签进行二值化操作。默认为False。
     """
@@ -48,7 +46,6 @@ class CDDataset(BaseDataset):
                  transforms=None,
                  num_workers='auto',
                  shuffle=False,
-                 apply_im_only=False,
                  with_seg_labels=False,
                  binarize_labels=False):
         super(CDDataset, self).__init__(data_dir, label_list, transforms,
@@ -61,7 +58,6 @@ class CDDataset(BaseDataset):
         self.file_list = list()
         self.labels = list()
         self.with_seg_labels = with_seg_labels
-        self.apply_im_only = apply_im_only
         if self.with_seg_labels:
             num_items = 5  # RGB1, RGB2, CD, Seg1, Seg2
         else:
@@ -131,25 +127,7 @@ class CDDataset(BaseDataset):
 
     def __getitem__(self, idx):
         sample = copy.deepcopy(self.file_list[idx])
-
-        if self.apply_im_only:
-            has_mask, has_aux_masks = False, False
-            if 'mask' in sample:
-                has_mask = True
-                mask = decode_seg_mask(sample['mask'])
-                del sample['mask']
-            if 'aux_masks' in sample:
-                has_aux_masks = True
-                aux_masks = list(map(decode_seg_mask, sample['aux_masks']))
-                del sample['aux_masks']
-
         sample = self.transforms.apply_transforms(sample)
-
-        if self.apply_im_only:
-            if has_mask:
-                sample['mask'] = mask
-            if has_aux_masks:
-                sample['aux_masks'] = aux_masks
 
         if self.binarize_labels:
             # Requires 'mask' to exist

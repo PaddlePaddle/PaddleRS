@@ -2,25 +2,23 @@ import paddlers as pdrs
 from paddlers import transforms as T
 
 # 定义训练和验证时的transforms
-train_transforms = T.Compose(
-    [
-        # 读取影像
-        T.DecodeImg(),
-        T.SelectBand([5, 10, 15, 20, 25]),  # for tet
-        T.Resize(target_size=224),
-        T.RandomHorizontalFlip(),
-        T.Normalize(
-            mean=[0.5, 0.5, 0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5, 0.5, 0.5])
-    ],
-    arrange=T.ArrangeClassifier('train'))
+train_transforms = T.Compose([
+    # 读取影像
+    T.DecodeImg(),
+    T.SelectBand([5, 10, 15, 20, 25]),  # for tet
+    T.Resize(target_size=224),
+    T.RandomHorizontalFlip(),
+    T.Normalize(
+        mean=[0.5, 0.5, 0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5, 0.5, 0.5]),
+    T.ArrangeClassifier('train')
+])
 
-eval_transforms = T.Compose(
-    [
-        T.DecodeImg(), T.SelectBand([5, 10, 15, 20, 25]),
-        T.Resize(target_size=224), T.Normalize(
-            mean=[0.5, 0.5, 0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5, 0.5, 0.5])
-    ],
-    arrange=T.ArrangeClassifier('eval'))
+eval_transforms = T.Compose([
+    T.DecodeImg(), T.SelectBand([5, 10, 15, 20, 25]), T.Resize(target_size=224),
+    T.Normalize(
+        mean=[0.5, 0.5, 0.5, 0.5, 0.5],
+        std=[0.5, 0.5, 0.5, 0.5, 0.5]), T.ArrangeClassifier('eval')
+])
 
 # 定义训练和验证所用的数据集
 train_dataset = pdrs.datasets.ClasDataset(

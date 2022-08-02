@@ -29,39 +29,37 @@ if not os.path.exists(DATA_DIR):
 # 定义训练和验证时使用的数据变换（数据增强、预处理等）
 # 使用Compose组合多种变换方式。Compose中包含的变换将按顺序串行执行
 # API说明：https://github.com/PaddleCV-SIG/PaddleRS/blob/develop/docs/apis/transforms.md
-train_transforms = T.Compose(
-    [
-        # 读取影像
-        T.DecodeImg(),
-        # 对输入影像施加随机色彩扰动
-        T.RandomDistort(),
-        # 在影像边界进行随机padding
-        T.RandomExpand(),
-        # 随机裁剪，裁块大小在一定范围内变动
-        T.RandomCrop(),
-        # 随机水平翻转
-        T.RandomHorizontalFlip(),
-        # 对batch进行随机缩放，随机选择插值方式
-        T.BatchRandomResize(
-            target_sizes=[320, 352, 384, 416, 448, 480, 512, 544, 576, 608],
-            interp='RANDOM'),
-        # 影像归一化
-        T.Normalize(
-            mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-    ],
-    arrange=T.ArrangeDetector('train'))
+train_transforms = T.Compose([
+    # 读取影像
+    T.DecodeImg(),
+    # 对输入影像施加随机色彩扰动
+    T.RandomDistort(),
+    # 在影像边界进行随机padding
+    T.RandomExpand(),
+    # 随机裁剪，裁块大小在一定范围内变动
+    T.RandomCrop(),
+    # 随机水平翻转
+    T.RandomHorizontalFlip(),
+    # 对batch进行随机缩放，随机选择插值方式
+    T.BatchRandomResize(
+        target_sizes=[320, 352, 384, 416, 448, 480, 512, 544, 576, 608],
+        interp='RANDOM'),
+    # 影像归一化
+    T.Normalize(
+        mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    T.ArrangeDetector('train')
+])
 
-eval_transforms = T.Compose(
-    [
-        T.DecodeImg(),
-        # 使用双三次插值将输入影像缩放到固定大小
-        T.Resize(
-            target_size=608, interp='CUBIC'),
-        # 验证阶段与训练阶段的归一化方式必须相同
-        T.Normalize(
-            mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-    ],
-    arrange=T.ArrangeDetector('eval'))
+eval_transforms = T.Compose([
+    T.DecodeImg(),
+    # 使用双三次插值将输入影像缩放到固定大小
+    T.Resize(
+        target_size=608, interp='CUBIC'),
+    # 验证阶段与训练阶段的归一化方式必须相同
+    T.Normalize(
+        mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    T.ArrangeDetector('eval')
+])
 
 # 分别构建训练和验证所用的数据集
 train_dataset = pdrs.datasets.VOCDetection(
