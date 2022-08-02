@@ -16,7 +16,7 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from ...layers.blocks import *
+from paddlers.rs_models.layers.blocks import *
 
 
 class Add(nn.Layer):

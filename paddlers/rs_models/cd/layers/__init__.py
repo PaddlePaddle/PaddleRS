@@ -12,5 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from ...layers.blocks import *
+from paddlers.rs_models.layers.blocks import *
 from .attention import ChannelAttention, SpatialAttention, CBAM

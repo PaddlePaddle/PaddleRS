@@ -20,7 +20,7 @@ Apache License [see LICENSE for details]
 import paddle
 import paddle.nn as nn
 
-from ...layers.blocks import make_bn
+from paddlers.rs_models.layers.blocks import make_bn
 
 __all__ = ["CondenseNetV2_a", "CondenseNetV2_b", "CondenseNetV2_c"]
 

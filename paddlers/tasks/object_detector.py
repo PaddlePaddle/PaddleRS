@@ -49,7 +49,7 @@ class BaseDetector(BaseModel):
             del self.init_params['with_net']
         super(BaseDetector, self).__init__('detector')
         if not hasattr(ppdet.modeling, model_name):
-            raise Exception("ERROR: There's no model named {}.".format(
+            raise ValueError("ERROR: There is no model named {}.".format(
                 model_name))
 
         self.model_name = model_name
