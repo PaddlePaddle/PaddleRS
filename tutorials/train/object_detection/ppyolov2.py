@@ -8,24 +8,20 @@ import os
 import paddlers as pdrs
 from paddlers import transforms as T
 
-# 下载文件存放目录
-DOWNLOAD_DIR = './data/sarship/'
 # 数据集存放目录
-DATA_DIR = './data/sarship/sar_ship_1/'
+DATA_DIR = './data/sarship/'
 # 训练集`file_list`文件路径
-TRAIN_FILE_LIST_PATH = './data/sarship/sar_ship_1/train.txt'
+TRAIN_FILE_LIST_PATH = './data/sarship/train.txt'
 # 验证集`file_list`文件路径
-EVAL_FILE_LIST_PATH = './data/sarship/sar_ship_1/valid.txt'
+EVAL_FILE_LIST_PATH = './data/sarship/eval.txt'
 # 数据集类别信息文件路径
-LABEL_LIST_PATH = './data/sarship/sar_ship_1/labels.txt'
+LABEL_LIST_PATH = './data/sarship/labels.txt'
 # 实验目录，保存输出的模型权重和结果
-EXP_DIR = './output/ppyolov2/'
+EXP_DIR = './output/ppyolo2/'
 
 # 下载和解压SAR影像舰船检测数据集
-# 若目录已存在则不重复下载
-sarship_dataset = 'https://paddleseg.bj.bcebos.com/dataset/sar_ship_1.tar.gz'
-if not os.path.exists(DATA_DIR):
-    pdrs.utils.download_and_decompress(sarship_dataset, path=DOWNLOAD_DIR)
+pdrs.utils.download_and_decompress(
+    'https://paddlers.bj.bcebos.com/datasets/sarship.zip', path='./data/')
 
 # 定义训练和验证时使用的数据变换（数据增强、预处理等）
 # 使用Compose组合多种变换方式。Compose中包含的变换将按顺序串行执行

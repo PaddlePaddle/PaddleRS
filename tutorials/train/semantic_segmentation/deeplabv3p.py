@@ -6,16 +6,14 @@
 import paddlers as pdrs
 from paddlers import transforms as T
 
-# 下载文件存放目录
-DOWNLOAD_DIR = './data/rsseg/'
 # 数据集存放目录
-DATA_DIR = './data/rsseg/remote_sensing_seg/'
+DATA_DIR = './data/rsseg/'
 # 训练集`file_list`文件路径
-TRAIN_FILE_LIST_PATH = './data/rsseg/remote_sensing_seg/train.txt'
+TRAIN_FILE_LIST_PATH = './data/rsseg/train.txt'
 # 验证集`file_list`文件路径
-EVAL_FILE_LIST_PATH = './data/rsseg/remote_sensing_seg/val.txt'
+EVAL_FILE_LIST_PATH = './data/rsseg/val.txt'
 # 数据集类别信息文件路径
-LABEL_LIST_PATH = './data/rsseg/remote_sensing_seg/labels.txt'
+LABEL_LIST_PATH = './data/rsseg/labels.txt'
 # 实验目录，保存输出的模型权重和结果
 EXP_DIR = './output/deeplabv3p/'
 
@@ -23,8 +21,8 @@ EXP_DIR = './output/deeplabv3p/'
 NUM_BANDS = 10
 
 # 下载和解压多光谱地块分类数据集
-seg_dataset = 'https://paddleseg.bj.bcebos.com/dataset/remote_sensing_seg.zip'
-pdrs.utils.download_and_decompress(seg_dataset, path=DOWNLOAD_DIR)
+pdrs.utils.download_and_decompress(
+    'https://paddlers.bj.bcebos.com/datasets/rsseg.zip', path='./data/')
 
 # 定义训练和验证时使用的数据变换（数据增强、预处理等）
 # 使用Compose组合多种变换方式。Compose中包含的变换将按顺序串行执行
