@@ -1,0 +1,8 @@
+# Basic configurations of BIT
+
+_base_: ../_base_/airchange.yaml
+
+save_dir: ./output/cd/bit
+
+model: !Node
+       type: BIT
