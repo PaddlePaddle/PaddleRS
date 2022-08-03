@@ -79,7 +79,7 @@ eval_dataset = pdrs.datasets.VOCDetection(
 # 构建Faster R-CNN模型
 # 目前已支持的模型请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/model_zoo.md
 # 模型输入参数请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/object_detector.py
-model = pdrs.tasks.FasterRCNN(num_classes=len(train_dataset.labels))
+model = pdrs.tasks.det.FasterRCNN(num_classes=len(train_dataset.labels))
 
 # 执行模型训练
 model.train(
