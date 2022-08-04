@@ -26,13 +26,13 @@ class FCEarlyFusion(nn.Layer):
     The FC-EF implementation based on PaddlePaddle.
 
     The original article refers to
-        Rodrigo Caye Daudt, et al. "Fully convolutional siamese networks for change detection"
+        Caye Daudt, R., et al. "Fully convolutional siamese networks for change detection"
         (https://arxiv.org/abs/1810.08462).
 
     Args:
         in_channels (int): The number of bands of the input images.
         num_classes (int): The number of target classes.
-        use_dropout (bool, optional): A bool value that indicates whether to use dropout layers. When the model is trained
+        use_dropout (bool, optional): A bool value that indicates whether to use dropout layers. When the model is trained 
             on a relatively small dataset, the dropout layers help prevent overfitting. Default: False.
     """
 
