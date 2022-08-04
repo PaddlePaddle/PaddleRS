@@ -16,7 +16,7 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from paddlers.rs_models.layers.blocks import Conv1x1, BasicConv
+from .blocks import Conv1x1, BasicConv
 
 
 class ChannelAttention(nn.Layer):

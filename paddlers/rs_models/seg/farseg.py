@@ -25,8 +25,7 @@ from paddle.vision.models import resnet50
 from paddle import nn
 import paddle.nn.functional as F
 
-from .layers import (Identity, Conv3x3, Conv1x1, get_bn_layer,
-                     kaiming_normal_init, constant_init)
+from .layers import (Identity, ConvReLU, kaiming_normal_init, constant_init)
 
 
 class FPN(nn.Layer):
@@ -36,7 +35,11 @@ class FPN(nn.Layer):
         order, and must be consecutive.
     """
 
-    def __init__(self, in_channels_list, out_channels, top_blocks=None):
+    def __init__(self,
+                 in_channels_list,
+                 out_channels,
+                 conv_block=ConvReLU,
+                 top_blocks=None):
         super(FPN, self).__init__()
 
         inner_blocks = []
@@ -44,10 +47,8 @@ class FPN(nn.Layer):
         for idx, in_channels in enumerate(in_channels_list, 1):
             if in_channels == 0:
                 continue
-            inner_block_module = Conv1x1(
-                in_channels, out_channels, norm=False, act=True)
-            layer_block_module = Conv3x3(
-                out_channels, out_channels, norm=False, act=True)
+            inner_block_module = conv_block(in_channels, out_channels, 1)
+            layer_block_module = conv_block(out_channels, out_channels, 3, 1)
             for module in [inner_block_module, layer_block_module]:
                 for m in module.sublayers():
                     if isinstance(m, nn.Conv2D):
@@ -130,11 +131,13 @@ class SceneRelation(nn.Layer):
         self.feature_reencoders = nn.LayerList()
         for c in channel_list:
             self.content_encoders.append(
-                Conv1x1(
-                    c, out_channels, norm=True, act=True))
+                nn.Sequential(
+                    nn.Conv2D(c, out_channels, 1),
+                    nn.BatchNorm2D(out_channels), nn.ReLU()))
             self.feature_reencoders.append(
-                Conv1x1(
-                    c, out_channels, norm=True, act=True))
+                nn.Sequential(
+                    nn.Conv2D(c, out_channels, 1),
+                    nn.BatchNorm2D(out_channels), nn.ReLU()))
         self.normalizer = nn.Sigmoid()
 
     def forward(self, scene_feature, features: list):
@@ -167,22 +170,19 @@ class AssymetricDecoder(nn.Layer):
                  out_channels,
                  in_feat_output_strides=(4, 8, 16, 32),
                  out_feat_output_stride=4,
-                 norm_fn='batch_norm',
+                 norm_fn=nn.BatchNorm2D,
                  num_groups_gn=None):
         super(AssymetricDecoder, self).__init__()
-        if norm_fn == 'batch_norm':
-            norm_fn = get_bn_layer()
+        if norm_fn == nn.BatchNorm2D:
             norm_fn_args = dict(num_features=out_channels)
-        elif norm_fn == 'group_norm':
-            norm_fn = nn.GroupNorm
+        elif norm_fn == nn.GroupNorm:
             if num_groups_gn is None:
                 raise ValueError(
-                    'When norm_fn is group_norm, `num_groups_gn` is needed.')
+                    'When norm_fn is nn.GroupNorm, num_groups_gn is needed.')
             norm_fn_args = dict(
                 num_groups=num_groups_gn, num_channels=out_channels)
         else:
-            raise ValueError('{} is not a supported normalization type.'.format(
-                norm_fn))
+            raise ValueError('Type of {} is not support.'.format(type(norm_fn)))
         self.blocks = nn.LayerList()
         for in_feat_os in in_feat_output_strides:
             num_upsample = int(math.log2(int(in_feat_os))) - int(
