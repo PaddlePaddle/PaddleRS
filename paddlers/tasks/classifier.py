@@ -45,6 +45,7 @@ class BaseClassifier(BaseModel):
                  in_channels=3,
                  num_classes=2,
                  use_mixed_loss=False,
+                 losses=None,
                  **params):
         self.init_params = locals()
         if 'with_net' in self.init_params:
@@ -59,7 +60,7 @@ class BaseClassifier(BaseModel):
         self.num_classes = num_classes
         self.use_mixed_loss = use_mixed_loss
         self.metrics = None
-        self.losses = None
+        self.losses = losses
         self.labels = None
         self._postprocess = None
         if params.get('with_net', True):
@@ -531,36 +532,56 @@ class BaseClassifier(BaseModel):
 
 
 class ResNet50_vd(BaseClassifier):
-    def __init__(self, num_classes=2, use_mixed_loss=False, **params):
+    def __init__(self,
+                 num_classes=2,
+                 use_mixed_loss=False,
+                 losses=None,
+                 **params):
         super(ResNet50_vd, self).__init__(
             model_name='ResNet50_vd',
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
+            losses=losses,
             **params)
 
 
 class MobileNetV3_small_x1_0(BaseClassifier):
-    def __init__(self, num_classes=2, use_mixed_loss=False, **params):
+    def __init__(self,
+                 num_classes=2,
+                 use_mixed_loss=False,
+                 losses=None,
+                 **params):
         super(MobileNetV3_small_x1_0, self).__init__(
             model_name='MobileNetV3_small_x1_0',
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
+            losses=losses,
             **params)
 
 
 class HRNet_W18_C(BaseClassifier):
-    def __init__(self, num_classes=2, use_mixed_loss=False, **params):
+    def __init__(self,
+                 num_classes=2,
+                 use_mixed_loss=False,
+                 losses=None,
+                 **params):
         super(HRNet_W18_C, self).__init__(
             model_name='HRNet_W18_C',
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
+            losses=losses,
             **params)
 
 
 class CondenseNetV2_b(BaseClassifier):
-    def __init__(self, num_classes=2, use_mixed_loss=False, **params):
+    def __init__(self,
+                 num_classes=2,
+                 use_mixed_loss=False,
+                 losses=None,
+                 **params):
         super(CondenseNetV2_b, self).__init__(
             model_name='CondenseNetV2_b',
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
+            losses=losses,
             **params)
