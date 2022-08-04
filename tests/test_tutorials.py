@@ -86,4 +86,3 @@ class TestDetTutorial(TestTutorial):
 @TestTutorial.add_tests
 class TestSegTutorial(TestTutorial):
     SUBDIR = "../tutorials/train/semantic_segmentation"
-    REGEX = r".*(?<!run_with_clean_log\.py)$"
