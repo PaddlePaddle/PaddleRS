@@ -127,9 +127,9 @@ def load_model(model_dir, **params):
                 else:
                     net_state_dict = paddle.load(osp.join(model_dir, 'model'))
                     if model.model_type in [
-                            'classifier', 'segmenter', 'changedetector'
+                            'classifier', 'segmenter', 'change_detector'
                     ]:
-                        # When exporting a classifier, segmenter, or changedetector,
+                        # When exporting a classifier, segmenter, or change_detector,
                         # InferNet (or InferCDNet) is defined to append softmax and argmax operators to the model,
                         # so the parameter names all start with 'net.'
                         new_net_state_dict = {}

@@ -45,6 +45,8 @@ transforms:
           args: ['train']
     eval:
         - !Node
+          type: DecodeImg
+        - !Node
           type: Normalize
           args:
             mean: [0.5, 0.5, 0.5]

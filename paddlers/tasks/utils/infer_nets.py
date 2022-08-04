@@ -46,7 +46,7 @@ class InferCDNet(paddle.nn.Layer):
     def __init__(self, net):
         super(InferCDNet, self).__init__()
         self.net = net
-        self.postprocessor = PostProcessor('changedetector')
+        self.postprocessor = PostProcessor('change_detector')
 
     def forward(self, x1, x2):
         net_outputs = self.net(x1, x2)

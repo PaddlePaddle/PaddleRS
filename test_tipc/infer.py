@@ -13,6 +13,16 @@ from paddlers.tasks import load_model
 from paddlers.utils import logging
 
 
+class _bool(object):
+    def __new__(cls, x):
+        if isinstance(x, str):
+            if x.lower() == 'false':
+                return False
+            elif x.lower() == 'true':
+                return True
+        return bool.__new__(x)
+
+
 class TIPCPredictor(object):
     def __init__(self,
                  model_dir,
@@ -24,7 +34,7 @@ class TIPCPredictor(object):
                  use_trt=False,
                  memory_optimize=True,
                  trt_precision_mode='fp32',
-                 bechmark=False,
+                 benchmark=False,
                  model_name='',
                  batch_size=1):
         self.model_dir = model_dir
@@ -47,7 +57,9 @@ class TIPCPredictor(object):
             use_mkl=use_mkl,
             mkl_thread_num=mkl_thread_num,
             use_trt=use_trt,
+            use_glog=False,
             memory_optimize=memory_optimize,
+            max_trt_batch_size=1,
             trt_precision_mode=trt_precision_mode)
         self.predictor = create_predictor(self.config)
 
@@ -69,21 +81,13 @@ class TIPCPredictor(object):
                 time_keys=[
                     'preprocess_time', 'inference_time', 'postprocess_time'
                 ],
-                warmup=5,
+                warmup=0,
                 logger=logging)
-            self.benchmark = True
+        self.benchmark = benchmark
 
-    def get_config(self,
-                   use_gpu=True,
-                   gpu_id=0,
-                   cpu_thread_num=1,
-                   use_mkl=True,
-                   mkl_thread_num=4,
-                   use_trt=False,
-                   use_glog=False,
-                   memory_optimize=True,
-                   max_trt_batch_size=1,
-                   trt_precision_mode=PrecisionType.Float32):
+    def get_config(self, device, gpu_id, cpu_thread_num, use_mkl,
+                   mkl_thread_num, use_trt, use_glog, memory_optimize,
+                   max_trt_batch_size, trt_precision_mode):
         config = Config(
             osp.join(self.model_dir, 'model.pdmodel'),
             osp.join(self.model_dir, 'model.pdiparams'))
@@ -147,7 +151,7 @@ class TIPCPredictor(object):
             }
         elif self._model.model_type == 'detector':
             pass
-        elif self._model.model_type == 'changedetector':
+        elif self._model.model_type == 'change_detector':
             preprocessed_samples = {
                 'image': preprocessed_samples[0],
                 'image2': preprocessed_samples[1],
@@ -176,7 +180,7 @@ class TIPCPredictor(object):
                 'scores_map': s,
                 'label_names_map': n,
             } for l, s, n in zip(class_ids, scores, label_names)]
-        elif self._model.model_type in ('segmenter', 'changedetector'):
+        elif self._model.model_type in ('segmenter', 'change_detector'):
             label_map, score_map = self._model._postprocess(
                 net_outputs,
                 batch_origin_shape=ori_shape,
@@ -198,8 +202,8 @@ class TIPCPredictor(object):
 
         return preds
 
-    def _run(self, images, topk=1, transforms=None):
-        if self.benchmark:
+    def _run(self, images, topk=1, transforms=None, time_it=False):
+        if self.benchmark and time_it:
             self.autolog.times.start()
 
         preprocessed_input = self.preprocess(images, transforms)
@@ -209,7 +213,7 @@ class TIPCPredictor(object):
             input_tensor = self.predictor.get_input_handle(name)
             input_tensor.copy_from_cpu(preprocessed_input[name])
 
-        if self.benchmark:
+        if self.benchmark and time_it:
             self.autolog.times.stamp()
 
         self.predictor.run()
@@ -220,7 +224,7 @@ class TIPCPredictor(object):
             output_tensor = self.predictor.get_output_handle(name)
             net_outputs.append(output_tensor.copy_to_cpu())
 
-        if self.benchmark:
+        if self.benchmark and time_it:
             self.autolog.times.stamp()
 
         res = self.postprocess(
@@ -229,24 +233,43 @@ class TIPCPredictor(object):
             ori_shape=preprocessed_input.get('ori_shape', None),
             transforms=transforms)
 
-        if self.benchmark:
+        if self.benchmark and time_it:
             self.autolog.times.end(stamp=True)
 
         return res
 
-    def predict(self, file_list, topk=1):
+    def predict(self, data_dir, file_list, topk=1, warmup_iters=5):
         transforms = self._model.test_transforms
+
+        # Warm up
+        iters = 0
+        while True:
+            for images in self._parse_lines(data_dir, file_list):
+                if iters >= warmup_iters:
+                    break
+                self._run(
+                    images=images,
+                    topk=topk,
+                    transforms=transforms,
+                    time_it=False)
+                iters += 1
+            else:
+                continue
+            break
+
         results = []
-        for images in self._parse_lines(file_list):
-            res = self._run(images=images, topk=topk, transforms=transforms)
+        for images in self._parse_lines(data_dir, file_list):
+            res = self._run(
+                images=images, topk=topk, transforms=transforms, time_it=True)
             results.append(res)
         return results
 
-    def _parse_lines(self, file_list):
+    def _parse_lines(self, data_dir, file_list):
         with open(file_list, 'r') as f:
             batch = []
             for line in f:
                 items = line.strip().split()
+                items = [osp.join(data_dir, item) for item in items]
                 if self._model.model_type == 'change_detector':
                     batch.append((items[0], items[1]))
                 else:
@@ -254,38 +277,39 @@ class TIPCPredictor(object):
                 if len(batch) == self.batch_size:
                     yield batch
                     batch.clear()
-            if len(batch) < self.batch_size:
+            if 0 < len(batch) < self.batch_size:
                 yield batch
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--file_list', type=str)
-    parser.add_argument('--save_dir', type=str, default='./')
+    parser.add_argument('--file_list', type=str, nargs=2)
+    parser.add_argument('--model_dir', type=str, default='./')
     parser.add_argument(
         '--device', type=str, choices=['cpu', 'gpu'], default='cpu')
-    parser.add_argument('--enable_mkldnn', type=bool, default=False)
+    parser.add_argument('--enable_mkldnn', type=_bool, default=False)
     parser.add_argument('--cpu_threads', type=int, default=10)
-    parser.add_argument('--use_trt', type=bool, default=False)
+    parser.add_argument('--use_trt', type=_bool, default=False)
     parser.add_argument(
         '--precision', type=str, choices=['fp32', 'fp16'], default='fp16')
     parser.add_argument('--batch_size', type=int, default=1)
-    parser.add_argument('--benchmark', type=bool, default=False)
+    parser.add_argument('--benchmark', type=_bool, default=False)
     parser.add_argument('--model_name', type=str, default='')
 
     args = parser.parse_args()
 
     predictor = TIPCPredictor(
-        args.save_dir,
+        args.model_dir,
         device=args.device,
-        cpu_thread_num=args.cpu_threeads,
+        cpu_thread_num=args.cpu_threads,
         use_mkl=args.enable_mkldnn,
-        mkl_thread_num=args.cpu_thread_num,
+        mkl_thread_num=args.cpu_threads,
         use_trt=args.use_trt,
-        trt_precision_mode=args.precision)
+        trt_precision_mode=args.precision,
+        benchmark=args.benchmark)
 
-    predictor.predict(args.file_list)
+    predictor.predict(args.file_list[0], args.file_list[1])
 
     if args.benchmark:
         predictor.autolog.report()

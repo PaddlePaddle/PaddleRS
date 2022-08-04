@@ -14,8 +14,8 @@ dataline=$(cat ${FILENAME})
 # Parse params
 IFS=$'\n'
 lines=(${dataline})
-task_name=$(parse_task_name "${lines[1]}")
-model_name=$(parse_model_name "${lines[1]}")
+task_name=$(parse_first_value "${lines[1]}")
+model_name=$(parse_second_value "${lines[1]}")
 
 # Download pretrained weights
 if [ ${MODE} = 'whole_infer' ]; then

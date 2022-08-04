@@ -2,6 +2,10 @@
 
 import os
 
+# Import cv2 and sklearn before paddlers to solve the
+# "ImportError: dlopen: cannot load any more object with static TLS" issue.
+import cv2
+import sklearn
 import paddle
 import paddlers
 from paddlers import transforms as T
@@ -60,8 +64,7 @@ if __name__ == '__main__':
     # XXX: Late binding of transforms
     eval_dataset.transforms = eval_transforms
 
-    model = build_objects(
-        cfg['model'], mod=getattr(paddlers.tasks, cfg['task']))
+    model = build_objects(cfg['model'], mod=paddlers.tasks)
 
     if cfg['losses']:
         model.losses = {

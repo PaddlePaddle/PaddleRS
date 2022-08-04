@@ -109,16 +109,27 @@ function add_suffix() {
     echo "${ori_path%.*}${suffix}.${ext}"
 }
 
-function parse_task_name() {
-    local key_task_model=$1
+function parse_first_value() {
+    local key_values=$1
     local IFS=":"
-    local arr=(${key_task_model})
+    local arr=(${key_values})
     echo ${arr[1]}
 }
 
-function parse_model_name() {
-    local key_task_model=$1
+function parse_second_value() {
+    local key_values=$1
     local IFS=":"
-    local arr=(${key_task_model})
+    local arr=(${key_values})
     echo ${arr[2]}
+}
+
+function run_command() {
+    local cmd="$1"
+    local log_path="$2"
+    if [ -n "${log_path}" ]; then
+        eval ${cmd} | tee "${log_path}"
+        test ${PIPESTATUS[0]} -eq 0
+    else
+        eval ${cmd}
+    fi
 }

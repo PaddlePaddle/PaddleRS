@@ -194,10 +194,15 @@ class BaseModel(metaclass=ModelMeta):
                 info['Transforms'] = list()
                 for op in self.test_transforms.transforms:
                     name = op.__class__.__name__
-                    if name.startswith('Arrange'):
-                        continue
                     attr = op.__dict__
                     info['Transforms'].append({name: attr})
+                arrange = self.test_transforms.arrange
+                if arrange is not None:
+                    info['Transforms'].append({
+                        arrange.__class__.__name__: {
+                            'mode': 'test'
+                        }
+                    })
         info['completed_epochs'] = self.completed_epochs
         return info
 
@@ -614,7 +619,7 @@ class BaseModel(metaclass=ModelMeta):
     def _build_inference_net(self):
         if self.model_type in ('classifier', 'detector'):
             infer_net = self.net
-        elif self.model_type == 'changedetector':
+        elif self.model_type == 'change_detector':
             infer_net = InferCDNet(self.net)
         else:
             infer_net = InferNet(self.net, self.model_type)
