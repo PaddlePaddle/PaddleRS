@@ -65,7 +65,7 @@ test_dataset = pdrs.datasets.SRdataset(
 # 初始化模型，可以对网络结构的参数进行调整
 # 若loss_type='gan' 使用感知损失、对抗损失和像素损失
 # 若loss_type = 'pixel' 只使用像素损失
-model = pdrs.tasks.ESRGANet(loss_type='pixel')
+model = pdrs.tasks.res.ESRGANet(loss_type='pixel')
 
 model.train(
     total_iters=1000000,

@@ -24,7 +24,7 @@ import paddle.nn.functional as F
 from paddle.static import InputSpec
 
 import paddlers.models.ppseg as paddleseg
-import paddlers.custom_models.seg as cmseg
+import paddlers.rs_models.seg as cmseg
 import paddlers
 from paddlers.utils import get_single_card_bs, DisablePrint
 import paddlers.utils.logging as logging
@@ -48,7 +48,7 @@ class BaseSegmenter(BaseModel):
         super(BaseSegmenter, self).__init__('segmenter')
         if not hasattr(paddleseg.models, model_name) and \
            not hasattr(cmseg, model_name):
-            raise Exception("ERROR: There's no model named {}.".format(
+            raise ValueError("ERROR: There is no model named {}.".format(
                 model_name))
         self.model_name = model_name
         self.num_classes = num_classes

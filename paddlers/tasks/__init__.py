@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .object_detector import *
-from .segmenter import *
-from .change_detector import *
-from .classifier import *
+import paddlers.tasks.object_detector as det
+import paddlers.tasks.segmenter as seg
+import paddlers.tasks.change_detector as cd
+import paddlers.tasks.classifier as clas
+import paddlers.tasks.image_restorer as res
 from .load_model import load_model
-from .image_restorer import *

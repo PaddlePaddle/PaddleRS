@@ -614,7 +614,7 @@ class BaseModel(metaclass=ModelMeta):
     def _build_inference_net(self):
         if self.model_type in ('classifier', 'detector'):
             infer_net = self.net
-        elif self.model_type == 'changedetector':
+        elif self.model_type == 'change_detector':
             infer_net = InferCDNet(self.net)
         else:
             infer_net = InferNet(self.net, self.model_type)

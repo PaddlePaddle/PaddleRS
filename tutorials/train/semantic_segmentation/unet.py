@@ -70,7 +70,7 @@ eval_dataset = pdrs.datasets.SegDataset(
 # 构建UNet模型
 # 目前已支持的模型请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/model_zoo.md
 # 模型输入参数请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/segmenter.py
-model = pdrs.tasks.UNet(
+model = pdrs.tasks.seg.UNet(
     input_channel=NUM_BANDS, num_classes=len(train_dataset.labels))
 
 # 执行模型训练
