@@ -50,8 +50,7 @@ def md5check(fullname, md5sum=None):
 
 def move_and_merge_tree(src, dst):
     """
-    Move src directory to dst, if dst is already exists,
-    merge src to dst
+    Move `src` to `dst`. If `dst` already exists, merge `src` with `dst`.
     """
     if not osp.exists(dst):
         shutil.move(src, dst)
@@ -71,10 +70,10 @@ def move_and_merge_tree(src, dst):
 
 def download(url, path, md5sum=None):
     """
-    Download from url, save to path.
+    Download from `url` and save the result to `path`.
 
-    url (str): download url
-    path (str): download to given path
+    url (str): URL.
+    path (str): Path to save the downloaded result.
     """
     if not osp.exists(path):
         os.makedirs(path)
@@ -135,7 +134,7 @@ def download(url, path, md5sum=None):
 
 def decompress(fname):
     """
-    Decompress for zip and tar file
+    Decompress zip or tar files.
     """
     logging.info("Decompressing {}...".format(fname))
 

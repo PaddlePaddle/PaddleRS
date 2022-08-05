@@ -332,7 +332,7 @@ def build_input_from_file(file_list, prefix='', task='auto', label_list=None):
         prefix (str, optional): A nonempty `prefix` specifies the directory that stores the images and annotation files. Default: ''.
         task (str, optional): Supported values are 'seg', 'det', 'cd', 'clas', and 'auto'. When `task` is set to 'auto', automatically determine the task based on the input. 
             Default: 'auto'.
-        label_list (str | None, optional): Path of label_list. Default: None.
+        label_list (str|None, optional): Path of label_list. Default: None.
 
     Returns:
         list: List of samples.

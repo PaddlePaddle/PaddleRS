@@ -52,7 +52,7 @@ class BaseClassifier(BaseModel):
         super(BaseClassifier, self).__init__('classifier')
         if not hasattr(paddleclas.arch.backbone, model_name) and \
            not hasattr(cmcls, model_name):
-            raise Exception("ERROR: There's no model named {}.".format(
+            raise ValueError("ERROR: There is no model named {}.".format(
                 model_name))
         self.model_name = model_name
         self.in_channels = in_channels
@@ -202,29 +202,39 @@ class BaseClassifier(BaseModel):
               resume_checkpoint=None):
         """
         Train the model.
-        Args:
-            num_epochs(int): The number of epochs.
-            train_dataset(paddlers.dataset): Training dataset.
-            train_batch_size(int, optional): Total batch size among all cards used in training. Defaults to 2.
-            eval_dataset(paddlers.dataset, optional):
-                Evaluation dataset. If None, the model will not be evaluated furing training process. Defaults to None.
-            optimizer(paddle.optimizer.Optimizer or None, optional):
-                Optimizer used in training. If None, a default optimizer is used. Defaults to None.
-            save_interval_epochs(int, optional): Epoch interval for saving the model. Defaults to 1.
-            log_interval_steps(int, optional): Step interval for printing training information. Defaults to 10.
-            save_dir(str, optional): Directory to save the model. Defaults to 'output'.
-            pretrain_weights(str or None, optional):
-                None or name/path of pretrained weights. If None, no pretrained weights will be loaded. Defaults to 'CITYSCAPES'.
-            learning_rate(float, optional): Learning rate for training. Defaults to .025.
-            lr_decay_power(float, optional): Learning decay power. Defaults to .9.
-            early_stop(bool, optional): Whether to adopt early stop strategy. Defaults to False.
-            early_stop_patience(int, optional): Early stop patience. Defaults to 5.
-            use_vdl(bool, optional): Whether to use VisualDL to monitor the training process. Defaults to True.
-            resume_checkpoint(str or None, optional): The path of the checkpoint to resume training from.
-                If None, no training checkpoint will be resumed. At most one of `resume_checkpoint` and
-                `pretrain_weights` can be set simultaneously. Defaults to None.
 
+        Args:
+            num_epochs (int): Number of epochs.
+            train_dataset (paddlers.datasets.ClasDataset): Training dataset.
+            train_batch_size (int, optional): Total batch size among all cards used in 
+                training. Defaults to 2.
+            eval_dataset (paddlers.datasets.ClasDataset, optional): Evaluation dataset. 
+                If None, the model will not be evaluated during training process. 
+                Defaults to None.
+            optimizer (paddle.optimizer.Optimizer|None, optional): Optimizer used in 
+                training. If None, a default optimizer will be used. Defaults to None.
+            save_interval_epochs (int, optional): Epoch interval for saving the model. 
+                Defaults to 1.
+            log_interval_steps (int, optional): Step interval for printing training 
+                information. Defaults to 2.
+            save_dir (str, optional): Directory to save the model. Defaults to 'output'.
+            pretrain_weights (str|None, optional): None or name/path of pretrained 
+                weights. If None, no pretrained weights will be loaded. 
+                Defaults to 'IMAGENET'.
+            learning_rate (float, optional): Learning rate for training. 
+                Defaults to .1.
+            lr_decay_power (float, optional): Learning decay power. Defaults to .9.
+            early_stop (bool, optional): Whether to adopt early stop strategy. 
+                Defaults to False.
+            early_stop_patience (int, optional): Early stop patience. Defaults to 5.
+            use_vdl (bool, optional): Whether to use VisualDL to monitor the training 
+                process. Defaults to True.
+            resume_checkpoint (str|None, optional): Path of the checkpoint to resume
+                training from. If None, no training checkpoint will be resumed. At most
+                Aone of `resume_checkpoint` and `pretrain_weights` can be set simultaneously.
+                Defaults to None.
         """
+
         if self.status == 'Infer':
             logging.error(
                 "Exported inference model does not support training.",
@@ -303,28 +313,37 @@ class BaseClassifier(BaseModel):
                           quant_config=None):
         """
         Quantization-aware training.
-        Args:
-            num_epochs(int): The number of epochs.
-            train_dataset(paddlers.dataset): Training dataset.
-            train_batch_size(int, optional): Total batch size among all cards used in training. Defaults to 2.
-            eval_dataset(paddlers.dataset, optional):
-                Evaluation dataset. If None, the model will not be evaluated furing training process. Defaults to None.
-            optimizer(paddle.optimizer.Optimizer or None, optional):
-                Optimizer used in training. If None, a default optimizer is used. Defaults to None.
-            save_interval_epochs(int, optional): Epoch interval for saving the model. Defaults to 1.
-            log_interval_steps(int, optional): Step interval for printing training information. Defaults to 10.
-            save_dir(str, optional): Directory to save the model. Defaults to 'output'.
-            learning_rate(float, optional): Learning rate for training. Defaults to .025.
-            lr_decay_power(float, optional): Learning decay power. Defaults to .9.
-            early_stop(bool, optional): Whether to adopt early stop strategy. Defaults to False.
-            early_stop_patience(int, optional): Early stop patience. Defaults to 5.
-            use_vdl(bool, optional): Whether to use VisualDL to monitor the training process. Defaults to True.
-            quant_config(dict or None, optional): Quantization configuration. If None, a default rule of thumb
-                configuration will be used. Defaults to None.
-            resume_checkpoint(str or None, optional): The path of the checkpoint to resume quantization-aware training
-                from. If None, no training checkpoint will be resumed. Defaults to None.
 
+        Args:
+            num_epochs (int): Number of epochs.
+            train_dataset (paddlers.datasets.ClasDataset): Training dataset.
+            train_batch_size (int, optional): Total batch size among all cards used in 
+                training. Defaults to 2.
+            eval_dataset (paddlers.datasets.ClasDataset, optional): Evaluation dataset. 
+                If None, the model will not be evaluated during training process. 
+                Defaults to None.
+            optimizer (paddle.optimizer.Optimizer|None, optional): Optimizer used in 
+                training. If None, a default optimizer will be used. Defaults to None.
+            save_interval_epochs (int, optional): Epoch interval for saving the model. 
+                Defaults to 1.
+            log_interval_steps (int, optional): Step interval for printing training 
+                information. Defaults to 2.
+            save_dir (str, optional): Directory to save the model. Defaults to 'output'.
+            learning_rate (float, optional): Learning rate for training. 
+                Defaults to .0001.
+            lr_decay_power (float, optional): Learning decay power. Defaults to .9.
+            early_stop (bool, optional): Whether to adopt early stop strategy. 
+                Defaults to False.
+            early_stop_patience (int, optional): Early stop patience. Defaults to 5.
+            use_vdl (bool, optional): Whether to use VisualDL to monitor the training 
+                process. Defaults to True.
+            quant_config (dict|None, optional): Quantization configuration. If None, 
+                a default rule of thumb configuration will be used. Defaults to None.
+            resume_checkpoint (str|None, optional): Path of the checkpoint to resume
+                quantization-aware training from. If None, no training checkpoint will
+                be resumed. Defaults to None.
         """
+
         self._prepare_qat(quant_config)
         self.train(
             num_epochs=num_epochs,
@@ -346,17 +365,20 @@ class BaseClassifier(BaseModel):
     def evaluate(self, eval_dataset, batch_size=1, return_details=False):
         """
         Evaluate the model.
+
         Args:
-            eval_dataset(paddlers.dataset): Evaluation dataset.
-            batch_size(int, optional): Total batch size among all cards used for evaluation. Defaults to 1.
-            return_details(bool, optional): Whether to return evaluation details. Defaults to False.
+            eval_dataset (paddlers.datasets.ClasDataset): Evaluation dataset.
+            batch_size (int, optional): Total batch size among all cards used for 
+                evaluation. Defaults to 1.
+            return_details (bool, optional): Whether to return evaluation details. 
+                Defaults to False.
 
         Returns:
             collections.OrderedDict with key-value pairs:
                 {"top1": `acc of top1`,
                  "top5": `acc of top5`}.
-
         """
+
         self._check_transforms(eval_dataset.transforms, 'eval')
 
         self.net.eval()
@@ -404,25 +426,28 @@ class BaseClassifier(BaseModel):
     def predict(self, img_file, transforms=None):
         """
         Do inference.
+
         Args:
-            Args:
-            img_file(list[np.ndarray | str] | str | np.ndarray):
-                Image path or decoded image data, which also could constitute a list, meaning all images to be 
+            img_file (list[np.ndarray|str] | str | np.ndarray): Image path or decoded 
+                image data, which also could constitute a list, meaning all images to be 
                 predicted as a mini-batch.
-            transforms(paddlers.transforms.Compose or None, optional):
-                Transforms for inputs. If None, the transforms for evaluation process will be used. Defaults to None.
+            transforms (paddlers.transforms.Compose|None, optional): Transforms for 
+                inputs. If None, the transforms for evaluation process will be used. 
+                Defaults to None.
 
         Returns:
-            If img_file is a string or np.array, the result is a dict with key-value pairs:
-            {"label map": `class_ids_map`, "scores_map": `label_names_map`}.
-            If img_file is a list, the result is a list composed of dicts with the corresponding fields:
-            class_ids_map(np.ndarray): class_ids
-            scores_map(np.ndarray): scores
-            label_names_map(np.ndarray): label_names
-
+            If `img_file` is a string or np.array, the result is a dict with key-value 
+                pairs:
+                {"label map": `class_ids_map`, "scores_map": `label_names_map`}.
+            If `img_file` is a list, the result is a list composed of dicts with the 
+                corresponding fields:
+                class_ids_map (np.ndarray): class_ids
+                scores_map (np.ndarray): scores
+                label_names_map (np.ndarray): label_names
         """
+
         if transforms is None and not hasattr(self, 'test_transforms'):
-            raise Exception("transforms need to be defined, now is None.")
+            raise ValueError("transforms need to be defined, now is None.")
         if transforms is None:
             transforms = self.test_transforms
         if isinstance(img_file, (str, np.ndarray)):

@@ -81,7 +81,7 @@ class BaseDetector(BaseModel):
         if len(image_shape) == 2:
             image_shape = [1, 3] + image_shape
         if image_shape[-2] % 32 > 0 or image_shape[-1] % 32 > 0:
-            raise Exception(
+            raise ValueError(
                 "Height and width in fixed_input_shape must be a multiple of 32, but received {}.".
                 format(image_shape[-2:]))
         return image_shape
@@ -206,34 +206,51 @@ class BaseDetector(BaseModel):
               resume_checkpoint=None):
         """
         Train the model.
+
         Args:
-            num_epochs(int): The number of epochs.
-            train_dataset(paddlers.dataset): Training dataset.
-            train_batch_size(int, optional): Total batch size among all cards used in training. Defaults to 64.
-            eval_dataset(paddlers.dataset, optional):
-                Evaluation dataset. If None, the model will not be evaluated during training process. Defaults to None.
-            optimizer(paddle.optimizer.Optimizer or None, optional):
-                Optimizer used for training. If None, a default optimizer is used. Defaults to None.
-            save_interval_epochs(int, optional): Epoch interval for saving the model. Defaults to 1.
-            log_interval_steps(int, optional): Step interval for printing training information. Defaults to 10.
-            save_dir(str, optional): Directory to save the model. Defaults to 'output'.
-            pretrain_weights(str or None, optional):
-                None or name/path of pretrained weights. If None, no pretrained weights will be loaded. Defaults to 'IMAGENET'.
-            learning_rate(float, optional): Learning rate for training. Defaults to .001.
-            warmup_steps(int, optional): The number of steps of warm-up training. Defaults to 0.
-            warmup_start_lr(float, optional): Start learning rate of warm-up training. Defaults to 0..
-            lr_decay_epochs(list or tuple, optional): Epoch milestones for learning rate decay. Defaults to (216, 243).
-            lr_decay_gamma(float, optional): Gamma coefficient of learning rate decay. Defaults to .1.
-            metric({'VOC', 'COCO', None}, optional):
-                Evaluation metric. If None, determine the metric according to the dataset format. Defaults to None.
-            use_ema(bool, optional): Whether to use exponential moving average strategy. Defaults to False.
-            early_stop(bool, optional): Whether to adopt early stop strategy. Defaults to False.
-            early_stop_patience(int, optional): Early stop patience. Defaults to 5.
-            use_vdl(bool, optional): Whether to use VisualDL to monitor the training process. Defaults to True.
-            resume_checkpoint(str or None, optional): The path of the checkpoint to resume training from.
-                If None, no training checkpoint will be resumed. At most one of `resume_checkpoint` and
-                `pretrain_weights` can be set simultaneously. Defaults to None.
+            num_epochs (int): Number of epochs.
+            train_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset): 
+                Training dataset.
+            train_batch_size (int, optional): Total batch size among all cards used in 
+                training. Defaults to 64.
+            eval_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset, optional): 
+                Evaluation dataset. If None, the model will not be evaluated during training 
+                process. Defaults to None.
+            optimizer (paddle.optimizer.Optimizer|None, optional): Optimizer used for 
+                training. If None, a default optimizer will be used. Defaults to None.
+            save_interval_epochs (int, optional): Epoch interval for saving the model. 
+                Defaults to 1.
+            log_interval_steps (int, optional): Step interval for printing training 
+                information. Defaults to 10.
+            save_dir (str, optional): Directory to save the model. Defaults to 'output'.
+            pretrain_weights (str|None, optional): None or name/path of pretrained 
+                weights. If None, no pretrained weights will be loaded. 
+                Defaults to 'IMAGENET'.
+            learning_rate (float, optional): Learning rate for training. Defaults to .001.
+            warmup_steps (int, optional): Number of steps of warm-up training. 
+                Defaults to 0.
+            warmup_start_lr (float, optional): Start learning rate of warm-up training. 
+                Defaults to 0..
+            lr_decay_epochs (list|tuple, optional): Epoch milestones for learning 
+                rate decay. Defaults to (216, 243).
+            lr_decay_gamma (float, optional): Gamma coefficient of learning rate decay. 
+                Defaults to .1.
+            metric (str|None, optional): Evaluation metric. Choices are {'VOC', 'COCO', None}. 
+                If None, determine the metric according to the  dataset format. 
+                Defaults to None.
+            use_ema (bool, optional): Whether to use exponential moving average 
+                strategy. Defaults to False.
+            early_stop (bool, optional): Whether to adopt early stop strategy. 
+                Defaults to False.
+            early_stop_patience (int, optional): Early stop patience. Defaults to 5.
+            use_vdl(bool, optional): Whether to use VisualDL to monitor the training 
+                process. Defaults to True.
+            resume_checkpoint (str|None, optional): Path of the checkpoint to resume
+                training from. If None, no training checkpoint will be resumed. At most
+                Aone of `resume_checkpoint` and `pretrain_weights` can be set simultaneously.
+                Defaults to None.
         """
+
         if self.status == 'Infer':
             logging.error(
                 "Exported inference model does not support training.",
@@ -242,7 +259,7 @@ class BaseDetector(BaseModel):
             logging.error(
                 "pretrain_weights and resume_checkpoint cannot be set simultaneously.",
                 exit=True)
-        if train_dataset.__class__.__name__ == 'VOCDetection':
+        if train_dataset.__class__.__name__ == 'VOCDetDataset':
             train_dataset.data_fields = {
                 'im_id', 'image_shape', 'image', 'gt_bbox', 'gt_class',
                 'difficult'
@@ -260,13 +277,13 @@ class BaseDetector(BaseModel):
                 }
 
         if metric is None:
-            if eval_dataset.__class__.__name__ == 'VOCDetection':
+            if eval_dataset.__class__.__name__ == 'VOCDetDataset':
                 self.metric = 'voc'
-            elif eval_dataset.__class__.__name__ == 'CocoDetection':
+            elif eval_dataset.__class__.__name__ == 'COCODetDataset':
                 self.metric = 'coco'
         else:
             assert metric.lower() in ['coco', 'voc'], \
-                "Evaluation metric {} is not supported, please choose form 'COCO' and 'VOC'"
+                "Evaluation metric {} is not supported. Please choose from 'COCO' and 'VOC'."
             self.metric = metric.lower()
 
         self.labels = train_dataset.labels
@@ -355,33 +372,50 @@ class BaseDetector(BaseModel):
                           quant_config=None):
         """
         Quantization-aware training.
+
         Args:
-            num_epochs(int): The number of epochs.
-            train_dataset(paddlers.dataset): Training dataset.
-            train_batch_size(int, optional): Total batch size among all cards used in training. Defaults to 64.
-            eval_dataset(paddlers.dataset, optional):
-                Evaluation dataset. If None, the model will not be evaluated during training process. Defaults to None.
-            optimizer(paddle.optimizer.Optimizer or None, optional):
-                Optimizer used for training. If None, a default optimizer is used. Defaults to None.
-            save_interval_epochs(int, optional): Epoch interval for saving the model. Defaults to 1.
-            log_interval_steps(int, optional): Step interval for printing training information. Defaults to 10.
-            save_dir(str, optional): Directory to save the model. Defaults to 'output'.
-            learning_rate(float, optional): Learning rate for training. Defaults to .001.
-            warmup_steps(int, optional): The number of steps of warm-up training. Defaults to 0.
-            warmup_start_lr(float, optional): Start learning rate of warm-up training. Defaults to 0..
-            lr_decay_epochs(list or tuple, optional): Epoch milestones for learning rate decay. Defaults to (216, 243).
-            lr_decay_gamma(float, optional): Gamma coefficient of learning rate decay. Defaults to .1.
-            metric({'VOC', 'COCO', None}, optional):
-                Evaluation metric. If None, determine the metric according to the dataset format. Defaults to None.
-            use_ema(bool, optional): Whether to use exponential moving average strategy. Defaults to False.
-            early_stop(bool, optional): Whether to adopt early stop strategy. Defaults to False.
-            early_stop_patience(int, optional): Early stop patience. Defaults to 5.
-            use_vdl(bool, optional): Whether to use VisualDL to monitor the training process. Defaults to True.
-            quant_config(dict or None, optional): Quantization configuration. If None, a default rule of thumb
-                configuration will be used. Defaults to None.
-            resume_checkpoint(str or None, optional): The path of the checkpoint to resume quantization-aware training
-                from. If None, no training checkpoint will be resumed. Defaults to None.
+            num_epochs (int): Number of epochs.
+            train_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset): 
+                Training dataset.
+            train_batch_size (int, optional): Total batch size among all cards used in 
+                training. Defaults to 64.
+            eval_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset, optional): 
+                Evaluation dataset. If None, the model will not be evaluated during training 
+                process. Defaults to None.
+            optimizer (paddle.optimizer.Optimizer or None, optional): Optimizer used for 
+                training. If None, a default optimizer will be used. Defaults to None.
+            save_interval_epochs (int, optional): Epoch interval for saving the model. 
+                Defaults to 1.
+            log_interval_steps (int, optional): Step interval for printing training 
+                information. Defaults to 10.
+            save_dir (str, optional): Directory to save the model. Defaults to 'output'.
+            learning_rate (float, optional): Learning rate for training. 
+                Defaults to .00001.
+            warmup_steps (int, optional): Number of steps of warm-up training. 
+                Defaults to 0.
+            warmup_start_lr (float, optional): Start learning rate of warm-up training. 
+                Defaults to 0..
+            lr_decay_epochs (list or tuple, optional): Epoch milestones for learning rate 
+                decay. Defaults to (216, 243).
+            lr_decay_gamma (float, optional): Gamma coefficient of learning rate decay. 
+                Defaults to .1.
+            metric (str|None, optional): Evaluation metric. Choices are {'VOC', 'COCO', None}. 
+                If None, determine the metric according to the dataset format. 
+                Defaults to None.
+            use_ema (bool, optional): Whether to use exponential moving average strategy. 
+                Defaults to False.
+            early_stop (bool, optional): Whether to adopt early stop strategy. 
+                Defaults to False.
+            early_stop_patience (int, optional): Early stop patience. Defaults to 5.
+            use_vdl (bool, optional): Whether to use VisualDL to monitor the training 
+                process. Defaults to True.
+            quant_config (dict or None, optional): Quantization configuration. If None, 
+                a default rule of thumb configuration will be used. Defaults to None.
+            resume_checkpoint (str|None, optional): Path of the checkpoint to resume
+                quantization-aware training from. If None, no training checkpoint will
+                be resumed. Defaults to None.
         """
+
         self._prepare_qat(quant_config)
         self.train(
             num_epochs=num_epochs,
@@ -412,25 +446,32 @@ class BaseDetector(BaseModel):
                  return_details=False):
         """
         Evaluate the model.
+
         Args:
-            eval_dataset(paddlers.dataset): Evaluation dataset.
-            batch_size(int, optional): Total batch size among all cards used for evaluation. Defaults to 1.
-            metric({'VOC', 'COCO', None}, optional):
-                Evaluation metric. If None, determine the metric according to the dataset format. Defaults to None.
-            return_details(bool, optional): Whether to return evaluation details. Defaults to False.
+            eval_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset): 
+                Evaluation dataset.
+            batch_size (int, optional): Total batch size among all cards used for 
+                evaluation. Defaults to 1.
+            metric (str|None, optional): Evaluation metric. Choices are {'VOC', 'COCO', None}. 
+                If None, determine the metric according to the dataset format. 
+                Defaults to None.
+            return_details (bool, optional): Whether to return evaluation details. 
+                Defaults to False.
+
         Returns:
-            collections.OrderedDict with key-value pairs: {"mAP(0.50, 11point)":`mean average precision`}.
+            collections.OrderedDict with key-value pairs: 
+                {"mAP(0.50, 11point)":`mean average precision`}.
         """
 
         if metric is None:
             if not hasattr(self, 'metric'):
-                if eval_dataset.__class__.__name__ == 'VOCDetection':
+                if eval_dataset.__class__.__name__ == 'VOCDetDataset':
                     self.metric = 'voc'
-                elif eval_dataset.__class__.__name__ == 'CocoDetection':
+                elif eval_dataset.__class__.__name__ == 'COCODetDataset':
                     self.metric = 'coco'
         else:
             assert metric.lower() in ['coco', 'voc'], \
-                "Evaluation metric {} is not supported, please choose form 'COCO' and 'VOC'"
+                "Evaluation metric {} is not supported. Please choose from 'COCO' and 'VOC'."
             self.metric = metric.lower()
 
         if self.metric == 'voc':
@@ -506,24 +547,32 @@ class BaseDetector(BaseModel):
     def predict(self, img_file, transforms=None):
         """
         Do inference.
+
         Args:
-            img_file(list[np.ndarray | str] | str | np.ndarray):
-                Image path or decoded image data, which also could constitute a list,meaning all images to be 
+            img_file (list[np.ndarray|str] | str | np.ndarray): Image path or decoded 
+                image data, which also could constitute a list, meaning all images to be 
                 predicted as a mini-batch.
-            transforms(paddlers.transforms.Compose or None, optional):
-                Transforms for inputs. If None, the transforms for evaluation process will be used. Defaults to None.
+            transforms (paddlers.transforms.Compose|None, optional): Transforms for 
+                inputs. If None, the transforms for evaluation process  will be used. 
+                Defaults to None.
+
         Returns:
-            If img_file is a string or np.array, the result is a list of dict with key-value pairs:
-            {"category_id": `category_id`, "category": `category`, "bbox": `[x, y, w, h]`, "score": `score`}.
-            If img_file is a list, the result is a list composed of dicts with the corresponding fields:
-            category_id(int): the predicted category ID. 0 represents the first category in the dataset, and so on.
-            category(str): category name
-            bbox(list): bounding box in [x, y, w, h] format
-            score(str): confidence
-            mask(dict): Only for instance segmentation task. Mask of the object in RLE format
+            If `img_file` is a string or np.array, the result is a list of dict with 
+                key-value pairs:
+                {"category_id": `category_id`, "category": `category`, "bbox": `[x, y, w, h]`, "score": `score`}.
+            If `img_file` is a list, the result is a list composed of dicts with the 
+                corresponding fields:
+                category_id(int): the predicted category ID. 0 represents the first 
+                    category in the dataset, and so on.
+                category(str): category name
+                bbox(list): bounding box in [x, y, w, h] format
+                score(str): confidence
+                mask(dict): Only for instance segmentation task. Mask of the object in 
+                    RLE format
         """
+
         if transforms is None and not hasattr(self, 'test_transforms'):
-            raise Exception("transforms need to be defined, now is None.")
+            raise ValueError("transforms need to be defined, now is None.")
         if transforms is None:
             transforms = self.test_transforms
         if isinstance(img_file, (str, np.ndarray)):
@@ -649,7 +698,7 @@ class PicoDet(BaseDetector):
         }:
             raise ValueError(
                 "backbone: {} is not supported. Please choose one of "
-                "('ESNet_s', 'ESNet_m', 'ESNet_l', 'LCNet', 'MobileNetV3', 'ResNet18_vd')".
+                "{'ESNet_s', 'ESNet_m', 'ESNet_l', 'LCNet', 'MobileNetV3', 'ResNet18_vd'}.".
                 format(backbone))
         self.backbone_name = backbone
         if params.get('with_net', True):
@@ -772,7 +821,7 @@ class PicoDet(BaseDetector):
         for i, op in enumerate(transforms.transforms):
             if isinstance(op, (BatchRandomResize, BatchRandomResizeByShort)):
                 if mode != 'train':
-                    raise Exception(
+                    raise ValueError(
                         "{} cannot be present in the {} transforms. ".format(
                             op.__class__.__name__, mode) +
                         "Please check the {} transforms.".format(mode))
@@ -851,34 +900,51 @@ class PicoDet(BaseDetector):
               resume_checkpoint=None):
         """
         Train the model.
+
         Args:
-            num_epochs(int): The number of epochs.
-            train_dataset(paddlers.dataset): Training dataset.
-            train_batch_size(int, optional): Total batch size among all cards used in training. Defaults to 64.
-            eval_dataset(paddlers.dataset, optional):
-                Evaluation dataset. If None, the model will not be evaluated during training process. Defaults to None.
-            optimizer(paddle.optimizer.Optimizer or None, optional):
-                Optimizer used for training. If None, a default optimizer is used. Defaults to None.
-            save_interval_epochs(int, optional): Epoch interval for saving the model. Defaults to 1.
-            log_interval_steps(int, optional): Step interval for printing training information. Defaults to 10.
-            save_dir(str, optional): Directory to save the model. Defaults to 'output'.
-            pretrain_weights(str or None, optional):
-                None or name/path of pretrained weights. If None, no pretrained weights will be loaded. Defaults to 'IMAGENET'.
-            learning_rate(float, optional): Learning rate for training. Defaults to .001.
-            warmup_steps(int, optional): The number of steps of warm-up training. Defaults to 0.
-            warmup_start_lr(float, optional): Start learning rate of warm-up training. Defaults to 0..
-            lr_decay_epochs(list or tuple, optional): Epoch milestones for learning rate decay. Defaults to (216, 243).
-            lr_decay_gamma(float, optional): Gamma coefficient of learning rate decay. Defaults to .1.
-            metric({'VOC', 'COCO', None}, optional):
-                Evaluation metric. If None, determine the metric according to the dataset format. Defaults to None.
-            use_ema(bool, optional): Whether to use exponential moving average strategy. Defaults to False.
-            early_stop(bool, optional): Whether to adopt early stop strategy. Defaults to False.
-            early_stop_patience(int, optional): Early stop patience. Defaults to 5.
-            use_vdl(bool, optional): Whether to use VisualDL to monitor the training process. Defaults to True.
-            resume_checkpoint(str or None, optional): The path of the checkpoint to resume training from.
-                If None, no training checkpoint will be resumed. At most one of `resume_checkpoint` and
-                `pretrain_weights` can be set simultaneously. Defaults to None.
+            num_epochs (int): Number of epochs.
+            train_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset): 
+                Training dataset.
+            train_batch_size (int, optional): Total batch size among all cards used in 
+                training. Defaults to 64.
+            eval_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset, optional): 
+                Evaluation dataset. If None, the model will not be evaluated during training 
+                process. Defaults to None.
+            optimizer (paddle.optimizer.Optimizer|None, optional): Optimizer used for 
+                training. If None, a default optimizer will be used. Defaults to None.
+            save_interval_epochs (int, optional): Epoch interval for saving the model. 
+                Defaults to 1.
+            log_interval_steps (int, optional): Step interval for printing training 
+                information. Defaults to 10.
+            save_dir (str, optional): Directory to save the model. Defaults to 'output'.
+            pretrain_weights (str|None, optional): None or name/path of pretrained 
+                weights. If None, no pretrained weights will be loaded. 
+                Defaults to 'IMAGENET'.
+            learning_rate (float, optional): Learning rate for training. Defaults to .001.
+            warmup_steps (int, optional): Number of steps of warm-up training. 
+                Defaults to 0.
+            warmup_start_lr (float, optional): Start learning rate of warm-up training. 
+                Defaults to 0..
+            lr_decay_epochs (list|tuple, optional): Epoch milestones for learning 
+                rate decay. Defaults to (216, 243).
+            lr_decay_gamma (float, optional): Gamma coefficient of learning rate decay. 
+                Defaults to .1.
+            metric (str|None, optional): Evaluation metric. Choices are {'VOC', 'COCO', None}. 
+                If None, determine the metric according to the  dataset format. 
+                Defaults to None.
+            use_ema (bool, optional): Whether to use exponential moving average 
+                strategy. Defaults to False.
+            early_stop (bool, optional): Whether to adopt early stop strategy. 
+                Defaults to False.
+            early_stop_patience (int, optional): Early stop patience. Defaults to 5.
+            use_vdl(bool, optional): Whether to use VisualDL to monitor the training 
+                process. Defaults to True.
+            resume_checkpoint (str|None, optional): Path of the checkpoint to resume
+                training from. If None, no training checkpoint will be resumed. At most
+                Aone of `resume_checkpoint` and `pretrain_weights` can be set simultaneously.
+                Defaults to None.
         """
+
         if optimizer is None:
             num_steps_each_epoch = len(train_dataset) // train_batch_size
             optimizer = self.default_optimizer(
@@ -936,8 +1002,8 @@ class YOLOv3(BaseDetector):
         }:
             raise ValueError(
                 "backbone: {} is not supported. Please choose one of "
-                "('MobileNetV1', 'MobileNetV1_ssld', 'MobileNetV3', 'MobileNetV3_ssld', 'DarkNet53', "
-                "'ResNet50_vd_dcn', 'ResNet34')".format(backbone))
+                "{'MobileNetV1', 'MobileNetV1_ssld', 'MobileNetV3', 'MobileNetV3_ssld', 'DarkNet53', "
+                "'ResNet50_vd_dcn', 'ResNet34'}.".format(backbone))
 
         self.backbone_name = backbone
         if params.get('with_net', True):
@@ -1030,7 +1096,7 @@ class YOLOv3(BaseDetector):
         for i, op in enumerate(transforms.transforms):
             if isinstance(op, (BatchRandomResize, BatchRandomResizeByShort)):
                 if mode != 'train':
-                    raise Exception(
+                    raise ValueError(
                         "{} cannot be present in the {} transforms. ".format(
                             op.__class__.__name__, mode) +
                         "Please check the {} transforms.".format(mode))
@@ -1089,8 +1155,8 @@ class FasterRCNN(BaseDetector):
         }:
             raise ValueError(
                 "backbone: {} is not supported. Please choose one of "
-                "('ResNet50', 'ResNet50_vd', 'ResNet50_vd_ssld', 'ResNet34', 'ResNet34_vd', "
-                "'ResNet101', 'ResNet101_vd', 'HRNet_W18')".format(backbone))
+                "{'ResNet50', 'ResNet50_vd', 'ResNet50_vd_ssld', 'ResNet34', 'ResNet34_vd', "
+                "'ResNet101', 'ResNet101_vd', 'HRNet_W18'}.".format(backbone))
         self.backbone_name = backbone
 
         if params.get('with_net', True):
@@ -1327,34 +1393,51 @@ class FasterRCNN(BaseDetector):
               resume_checkpoint=None):
         """
         Train the model.
+
         Args:
-            num_epochs(int): The number of epochs.
-            train_dataset(paddlers.dataset): Training dataset.
-            train_batch_size(int, optional): Total batch size among all cards used in training. Defaults to 64.
-            eval_dataset(paddlers.dataset, optional):
-                Evaluation dataset. If None, the model will not be evaluated during training process. Defaults to None.
-            optimizer(paddle.optimizer.Optimizer or None, optional):
-                Optimizer used for training. If None, a default optimizer is used. Defaults to None.
-            save_interval_epochs(int, optional): Epoch interval for saving the model. Defaults to 1.
-            log_interval_steps(int, optional): Step interval for printing training information. Defaults to 10.
-            save_dir(str, optional): Directory to save the model. Defaults to 'output'.
-            pretrain_weights(str or None, optional):
-                None or name/path of pretrained weights. If None, no pretrained weights will be loaded. Defaults to 'IMAGENET'.
-            learning_rate(float, optional): Learning rate for training. Defaults to .001.
-            warmup_steps(int, optional): The number of steps of warm-up training. Defaults to 0.
-            warmup_start_lr(float, optional): Start learning rate of warm-up training. Defaults to 0..
-            lr_decay_epochs(list or tuple, optional): Epoch milestones for learning rate decay. Defaults to (216, 243).
-            lr_decay_gamma(float, optional): Gamma coefficient of learning rate decay. Defaults to .1.
-            metric({'VOC', 'COCO', None}, optional):
-                Evaluation metric. If None, determine the metric according to the dataset format. Defaults to None.
-            use_ema(bool, optional): Whether to use exponential moving average strategy. Defaults to False.
-            early_stop(bool, optional): Whether to adopt early stop strategy. Defaults to False.
-            early_stop_patience(int, optional): Early stop patience. Defaults to 5.
-            use_vdl(bool, optional): Whether to use VisualDL to monitor the training process. Defaults to True.
-            resume_checkpoint(str or None, optional): The path of the checkpoint to resume training from.
-                If None, no training checkpoint will be resumed. At most one of `resume_checkpoint` and
-                `pretrain_weights` can be set simultaneously. Defaults to None.
+            num_epochs (int): Number of epochs.
+            train_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset): 
+                Training dataset.
+            train_batch_size (int, optional): Total batch size among all cards used in 
+                training. Defaults to 64.
+            eval_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset, optional): 
+                Evaluation dataset. If None, the model will not be evaluated during training 
+                process. Defaults to None.
+            optimizer (paddle.optimizer.Optimizer|None, optional): Optimizer used for 
+                training. If None, a default optimizer will be used. Defaults to None.
+            save_interval_epochs (int, optional): Epoch interval for saving the model. 
+                Defaults to 1.
+            log_interval_steps (int, optional): Step interval for printing training 
+                information. Defaults to 10.
+            save_dir (str, optional): Directory to save the model. Defaults to 'output'.
+            pretrain_weights (str|None, optional): None or name/path of pretrained 
+                weights. If None, no pretrained weights will be loaded. 
+                Defaults to 'IMAGENET'.
+            learning_rate (float, optional): Learning rate for training. Defaults to .001.
+            warmup_steps (int, optional): Number of steps of warm-up training. 
+                Defaults to 0.
+            warmup_start_lr (float, optional): Start learning rate of warm-up training. 
+                Defaults to 0..
+            lr_decay_epochs (list|tuple, optional): Epoch milestones for learning 
+                rate decay. Defaults to (216, 243).
+            lr_decay_gamma (float, optional): Gamma coefficient of learning rate decay. 
+                Defaults to .1.
+            metric (str|None, optional): Evaluation metric. Choices are {'VOC', 'COCO', None}. 
+                If None, determine the metric according to the  dataset format. 
+                Defaults to None.
+            use_ema (bool, optional): Whether to use exponential moving average 
+                strategy. Defaults to False.
+            early_stop (bool, optional): Whether to adopt early stop strategy. 
+                Defaults to False.
+            early_stop_patience (int, optional): Early stop patience. Defaults to 5.
+            use_vdl(bool, optional): Whether to use VisualDL to monitor the training 
+                process. Defaults to True.
+            resume_checkpoint (str|None, optional): Path of the checkpoint to resume
+                training from. If None, no training checkpoint will be resumed. At most
+                Aone of `resume_checkpoint` and `pretrain_weights` can be set simultaneously.
+                Defaults to None.
         """
+
         if train_dataset.pos_num < len(train_dataset.file_list):
             train_dataset.num_workers = 0
         super(FasterRCNN, self).train(
@@ -1377,7 +1460,7 @@ class FasterRCNN(BaseDetector):
         for i, op in enumerate(transforms.transforms):
             if isinstance(op, (BatchRandomResize, BatchRandomResizeByShort)):
                 if mode != 'train':
-                    raise Exception(
+                    raise ValueError(
                         "{} cannot be present in the {} transforms. ".format(
                             op.__class__.__name__, mode) +
                         "Please check the {} transforms.".format(mode))
@@ -1456,7 +1539,7 @@ class PPYOLO(YOLOv3):
         }:
             raise ValueError(
                 "backbone: {} is not supported. Please choose one of "
-                "('ResNet50_vd_dcn', 'ResNet18_vd', 'MobileNetV3_large', 'MobileNetV3_small')".
+                "{'ResNet50_vd_dcn', 'ResNet18_vd', 'MobileNetV3_large', 'MobileNetV3_small'}.".
                 format(backbone))
         self.backbone_name = backbone
         self.downsample_ratios = [
@@ -1769,7 +1852,7 @@ class PPYOLOv2(YOLOv3):
         if backbone not in {'ResNet50_vd_dcn', 'ResNet101_vd_dcn'}:
             raise ValueError(
                 "backbone: {} is not supported. Please choose one of "
-                "('ResNet50_vd_dcn', 'ResNet101_vd_dcn')".format(backbone))
+                "{'ResNet50_vd_dcn', 'ResNet101_vd_dcn'}.".format(backbone))
         self.backbone_name = backbone
         self.downsample_ratios = [32, 16, 8]
 
@@ -1916,7 +1999,7 @@ class MaskRCNN(BaseDetector):
         }:
             raise ValueError(
                 "backbone: {} is not supported. Please choose one of "
-                "('ResNet50', 'ResNet50_vd', 'ResNet50_vd_ssld', 'ResNet101', 'ResNet101_vd')".
+                "{'ResNet50', 'ResNet50_vd', 'ResNet50_vd_ssld', 'ResNet101', 'ResNet101_vd'}.".
                 format(backbone))
 
         self.backbone_name = backbone + '_fpn' if with_fpn else backbone
@@ -2152,34 +2235,51 @@ class MaskRCNN(BaseDetector):
               resume_checkpoint=None):
         """
         Train the model.
+
         Args:
-            num_epochs(int): The number of epochs.
-            train_dataset(paddlers.dataset): Training dataset.
-            train_batch_size(int, optional): Total batch size among all cards used in training. Defaults to 64.
-            eval_dataset(paddlers.dataset, optional):
-                Evaluation dataset. If None, the model will not be evaluated during training process. Defaults to None.
-            optimizer(paddle.optimizer.Optimizer or None, optional):
-                Optimizer used for training. If None, a default optimizer is used. Defaults to None.
-            save_interval_epochs(int, optional): Epoch interval for saving the model. Defaults to 1.
-            log_interval_steps(int, optional): Step interval for printing training information. Defaults to 10.
-            save_dir(str, optional): Directory to save the model. Defaults to 'output'.
-            pretrain_weights(str or None, optional):
-                None or name/path of pretrained weights. If None, no pretrained weights will be loaded. Defaults to 'IMAGENET'.
-            learning_rate(float, optional): Learning rate for training. Defaults to .001.
-            warmup_steps(int, optional): The number of steps of warm-up training. Defaults to 0.
-            warmup_start_lr(float, optional): Start learning rate of warm-up training. Defaults to 0..
-            lr_decay_epochs(list or tuple, optional): Epoch milestones for learning rate decay. Defaults to (216, 243).
-            lr_decay_gamma(float, optional): Gamma coefficient of learning rate decay. Defaults to .1.
-            metric({'VOC', 'COCO', None}, optional):
-                Evaluation metric. If None, determine the metric according to the dataset format. Defaults to None.
-            use_ema(bool, optional): Whether to use exponential moving average strategy. Defaults to False.
-            early_stop(bool, optional): Whether to adopt early stop strategy. Defaults to False.
-            early_stop_patience(int, optional): Early stop patience. Defaults to 5.
-            use_vdl(bool, optional): Whether to use VisualDL to monitor the training process. Defaults to True.
-            resume_checkpoint(str or None, optional): The path of the checkpoint to resume training from.
-                If None, no training checkpoint will be resumed. At most one of `resume_checkpoint` and
-                `pretrain_weights` can be set simultaneously. Defaults to None.
+            num_epochs (int): Number of epochs.
+            train_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset): 
+                Training dataset.
+            train_batch_size (int, optional): Total batch size among all cards used in 
+                training. Defaults to 64.
+            eval_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset, optional): 
+                Evaluation dataset. If None, the model will not be evaluated during training 
+                process. Defaults to None.
+            optimizer (paddle.optimizer.Optimizer|None, optional): Optimizer used for 
+                training. If None, a default optimizer will be used. Defaults to None.
+            save_interval_epochs (int, optional): Epoch interval for saving the model. 
+                Defaults to 1.
+            log_interval_steps (int, optional): Step interval for printing training 
+                information. Defaults to 10.
+            save_dir (str, optional): Directory to save the model. Defaults to 'output'.
+            pretrain_weights (str|None, optional): None or name/path of pretrained 
+                weights. If None, no pretrained weights will be loaded. 
+                Defaults to 'IMAGENET'.
+            learning_rate (float, optional): Learning rate for training. Defaults to .001.
+            warmup_steps (int, optional): Number of steps of warm-up training. 
+                Defaults to 0.
+            warmup_start_lr (float, optional): Start learning rate of warm-up training. 
+                Defaults to 0..
+            lr_decay_epochs (list|tuple, optional): Epoch milestones for learning 
+                rate decay. Defaults to (216, 243).
+            lr_decay_gamma (float, optional): Gamma coefficient of learning rate decay. 
+                Defaults to .1.
+            metric (str|None, optional): Evaluation metric. Choices are {'VOC', 'COCO', None}. 
+                If None, determine the metric according to the  dataset format. 
+                Defaults to None.
+            use_ema (bool, optional): Whether to use exponential moving average 
+                strategy. Defaults to False.
+            early_stop (bool, optional): Whether to adopt early stop strategy. 
+                Defaults to False.
+            early_stop_patience (int, optional): Early stop patience. Defaults to 5.
+            use_vdl(bool, optional): Whether to use VisualDL to monitor the training 
+                process. Defaults to True.
+            resume_checkpoint (str|None, optional): Path of the checkpoint to resume
+                training from. If None, no training checkpoint will be resumed. At most
+                Aone of `resume_checkpoint` and `pretrain_weights` can be set simultaneously.
+                Defaults to None.
         """
+
         if train_dataset.pos_num < len(train_dataset.file_list):
             train_dataset.num_workers = 0
         super(MaskRCNN, self).train(
@@ -2202,7 +2302,7 @@ class MaskRCNN(BaseDetector):
         for i, op in enumerate(transforms.transforms):
             if isinstance(op, (BatchRandomResize, BatchRandomResizeByShort)):
                 if mode != 'train':
-                    raise Exception(
+                    raise ValueError(
                         "{} cannot be present in the {} transforms. ".format(
                             op.__class__.__name__, mode) +
                         "Please check the {} transforms.".format(mode))

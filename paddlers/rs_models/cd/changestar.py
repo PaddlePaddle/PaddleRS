@@ -86,7 +86,8 @@ class ChangeStar_FarSeg(_ChangeStarBase):
     The ChangeStar implementation with a FarSeg encoder based on PaddlePaddle.
 
     The original article refers to
-        Z. Zheng, et al., "Change is Everywhere: Single-Temporal Supervised Object Change Detection in Remote Sensing Imagery"
+        Z. Zheng, et al., "Change is Everywhere: Single-Temporal Supervised Object 
+        Change Detection in Remote Sensing Imagery"
         (https://arxiv.org/abs/2108.07002).
     
     Note that this implementation differs from the original code in two aspects:
@@ -95,11 +96,14 @@ class ChangeStar_FarSeg(_ChangeStarBase):
 
     Args:
         num_classes (int): The number of target classes.
-        mid_channels (int, optional): The number of channels required by the ChangeMixin module. Default: 256.
-        inner_channels (int, optional): The number of filters used in the convolutional layers in the ChangeMixin module. 
-            Default: 16.
-        num_convs (int, optional): The number of convolutional layers used in the ChangeMixin module. Default: 4.
-        scale_factor (float, optional): The scaling factor of the output upsampling layer. Default: 4.0.
+        mid_channels (int, optional): The number of channels required by the 
+        ChangeMixin module. Default: 256.
+        inner_channels (int, optional): The number of filters used in the 
+            convolutional layers in the ChangeMixin module. Default: 16.
+        num_convs (int, optional): The number of convolutional layers used in the 
+            ChangeMixin module. Default: 4.
+        scale_factor (float, optional): The scaling factor of the output upsampling 
+            layer. Default: 4.0.
     """
 
     def __init__(

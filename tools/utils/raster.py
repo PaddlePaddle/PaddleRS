@@ -48,21 +48,23 @@ def _get_type(type_name: str) -> int:
 
 class Raster:
     def __init__(self,
-                 path: Optional[str],
+                 path: str,
                  gdal_obj: Optional[gdal.Dataset]=None,
                  band_list: Union[List[int], Tuple[int], None]=None,
                  to_uint8: bool=False) -> None:
         """
-        Class of raster reader.
+        Reader of raster files.
         
         Args:
-            path (Optional[str]): Path of raster file.
-            gdal_obj (Optional[Any], optional): GDAL dataset. Defaults to None.
-            band_list (Union[List[int], Tuple[int], None], optional): 
-                Select a set of bands (the band index starts from 1) or None (read all bands). Defaults to None.
-            to_uint8 (bool, optional): 
-                Whether to convert data type to uint8. Defaults to False.
+            path (str): Path of raster file.
+            gdal_obj (gdal.Dataset|None, optional): GDAL dataset. Defaults to None.
+            band_list (list[int] | tuple[int] | None, optional): Select a set of 
+                bands (the band index starts from 1). If None, read all bands. 
+                Defaults to None.
+            to_uint8 (bool, optional): Whether to convert data type to uint8. 
+                Defaults to False.
         """
+
         super(Raster, self).__init__()
         if path is not None:
             if osp.exists(path):
@@ -92,13 +94,15 @@ class Raster:
         self._getType()
 
     def setBands(self, band_list: Union[List[int], Tuple[int], None]) -> None:
-        """ 
+        """
         Set bands of data.
         
         Args:
-            band_list (Union[List[int], Tuple[int], None]): 
-                Select a set of bands (the band index starts from 1) or None (read all bands). Defaults to None.
+            band_list (list[int] | tuple[int] | None, optional): Select a set of 
+                bands (the band index starts from 1). If None, read all bands. 
+                Defaults to None.
         """
+
         if band_list is not None:
             if len(band_list) > self.bands:
                 raise ValueError(
@@ -113,18 +117,19 @@ class Raster:
                  start_loc: Union[List[int], Tuple[int, int], None]=None,
                  block_size: Union[List[int], Tuple[int, int]]=[512, 512]
                  ) -> np.ndarray:
-        """ 
+        """
         Fetch data in a ndarray.
         
         Args:
-            start_loc (Union[List[int], Tuple[int], None], optional): 
-                Coordinates of the upper left corner of the block. None value means returning full image.
-            block_size (Union[List[int], Tuple[int]], optional): 
-                Block size. Defaults to [512, 512].
+            start_loc (list[int] | tuple[int] | None, optional): Coordinates of the 
+                upper left corner of the block. None value means returning full image.
+            block_size (list[int] | tuple[int], optional): Block size. 
+                Defaults to [512, 512].
 
         Returns:
             np.ndarray: data's ndarray.
         """
+
         if self._src_data is not None:
             if start_loc is None:
                 return self._getArray()

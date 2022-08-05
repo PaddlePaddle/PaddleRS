@@ -15,8 +15,23 @@
 import paddle
 import paddle.nn as nn
 
+from .layers import Conv7x7
+
 
 class CDNet(nn.Layer):
+    """
+    The CDNet implementation based on PaddlePaddle.
+
+    The original article refers to
+        Pablo F. Alcantarilla, et al., "Street-View Change Detection with Deconvolut
+        ional Networks"
+        (https://link.springer.com/article/10.1007/s10514-018-9734-5).
+
+    Args:
+        in_channels (int): The number of bands of the input images.
+        num_classes (int): The number of target classes.
+    """
+
     def __init__(self, in_channels=6, num_classes=2):
         super(CDNet, self).__init__()
         self.conv1 = Conv7x7(in_channels, 64, norm=True, act=True)
@@ -48,28 +63,3 @@ class CDNet(nn.Layer):
         x = self.conv7(self.upool2(x, ind2))
         x = self.conv8(self.upool1(x, ind1))
         return [self.conv_out(x)]
-
-
-class Conv7x7(nn.Layer):
-    def __init__(self, in_ch, out_ch, norm=False, act=False):
-        super(Conv7x7, self).__init__()
-        layers = [
-            nn.Pad2D(3), nn.Conv2D(
-                in_ch, out_ch, 7, bias_attr=(False if norm else None))
-        ]
-        if norm:
-            layers.append(nn.BatchNorm2D(out_ch))
-        if act:
-            layers.append(nn.ReLU())
-        self.layers = nn.Sequential(*layers)
-
-    def forward(self, x):
-        return self.layers(x)
-
-
-if __name__ == "__main__":
-    t1 = paddle.randn((1, 3, 512, 512), dtype="float32")
-    t2 = paddle.randn((1, 3, 512, 512), dtype="float32")
-    model = CDNet(6, 2)
-    pred = model(t1, t2)[0]
-    print(pred.shape)

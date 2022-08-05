@@ -25,19 +25,22 @@ class DSAMNet(nn.Layer):
     The DSAMNet implementation based on PaddlePaddle.
 
     The original article refers to
-        Q. Shi, et al., "A Deeply Supervised Attention Metric-Based Network and an Open Aerial Image Dataset for Remote Sensing 
-        Change Detection"
+        Q. Shi, et al., "A Deeply Supervised Attention Metric-Based Network and an 
+        Open Aerial Image Dataset for Remote Sensing Change Detection"
         (https://ieeexplore.ieee.org/document/9467555).
 
     Note that this implementation differs from the original work in two aspects:
     1. We do not use multiple dilation rates in layer 4 of the ResNet backbone.
-    2. A classification head is used in place of the original metric learning-based head to stablize the training process.
+    2. A classification head is used in place of the original metric learning-based 
+        head to stablize the training process.
 
     Args:
         in_channels (int): The number of bands of the input images.
         num_classes (int): The number of target classes.
-        ca_ratio (int, optional): The channel reduction ratio for the channel attention module. Default: 8.
-        sa_kernel (int, optional): The size of the convolutional kernel used in the spatial attention module. Default: 7.
+        ca_ratio (int, optional): The channel reduction ratio for the channel 
+            attention module. Default: 8.
+        sa_kernel (int, optional): The size of the convolutional kernel used in the 
+            spatial attention module. Default: 7.
     """
 
     def __init__(self, in_channels, num_classes, ca_ratio=8, sa_kernel=7):

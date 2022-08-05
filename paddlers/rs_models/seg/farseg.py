@@ -32,7 +32,7 @@ class FPN(nn.Layer):
     """
     Module that adds FPN on top of a list of feature maps.
     The feature maps are currently supposed to be in increasing depth
-        order, and must be consecutive
+        order, and must be consecutive.
     """
 
     def __init__(self,
@@ -233,13 +233,14 @@ class ResNet50Encoder(nn.Layer):
 
 
 class FarSeg(nn.Layer):
-    '''
+    """
         The FarSeg implementation based on PaddlePaddle.
 
         The original article refers to
-        Zheng, Zhuo, et al. "Foreground-Aware Relation Network for Geospatial Object Segmentation in High Spatial Resolution Remote Sensing Imagery"
+        Zheng, Zhuo, et al. "Foreground-Aware Relation Network for Geospatial Object 
+            Segmentation in High Spatial Resolution Remote Sensing Imagery"
         (https://openaccess.thecvf.com/content_CVPR_2020/papers/Zheng_Foreground-Aware_Relation_Network_for_Geospatial_Object_Segmentation_in_High_Spatial_CVPR_2020_paper.pdf)
-    '''
+    """
 
     def __init__(self,
                  num_classes=16,

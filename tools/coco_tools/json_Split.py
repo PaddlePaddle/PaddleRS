@@ -11,14 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-'''
+"""
 @File Description:
 # json数据集划分，可以通过val_split_rate、val_split_num控制划分比例或个数, keep_val_inTrain可以设定是否在train中保留val相关信息
 python ./coco_tools/json_Split.py \
     --json_all_path=./annotations/instances_val2017.json \
     --json_train_path=./instances_val2017_train.json \
     --json_val_path=./instances_val2017_val.json
-'''
+"""
 
 import json
 import argparse
