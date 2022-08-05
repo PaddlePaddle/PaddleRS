@@ -29,18 +29,13 @@ pdrs.utils.download_and_decompress(
 train_transforms = T.Compose([
     # 读取影像
     T.DecodeImg(),
-    # 对输入影像施加随机色彩扰动
-    T.RandomDistort(),
-    # 在影像边界进行随机padding
-    T.RandomExpand(),
     # 随机裁剪，裁块大小在一定范围内变动
     T.RandomCrop(),
     # 随机水平翻转
     T.RandomHorizontalFlip(),
     # 对batch进行随机缩放，随机选择插值方式
     T.BatchRandomResize(
-        target_sizes=[320, 352, 384, 416, 448, 480, 512, 544, 576, 608],
-        interp='RANDOM'),
+        target_sizes=[512, 544, 576, 608], interp='RANDOM'),
     # 影像归一化
     T.Normalize(
         mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
