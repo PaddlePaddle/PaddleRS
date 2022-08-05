@@ -6,6 +6,7 @@ import argparse
 from operator import itemgetter
 
 import numpy as np
+import paddle
 from paddle.inference import Config
 from paddle.inference import create_predictor
 from paddle.inference import PrecisionType

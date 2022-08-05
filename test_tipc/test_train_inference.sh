@@ -96,7 +96,7 @@ infer_value1=$(func_parser_value "${lines[51]}")
 infer_key2=$(func_parser_key "${lines[52]}")
 infer_value2=$(func_parser_value "${lines[52]}")
 
-OUT_PATH="./test_tipc/output/${model_name}/${MODE}"
+OUT_PATH="./test_tipc/output/${task_name}/${model_name}/${MODE}"
 mkdir -p ${OUT_PATH}
 status_log="${OUT_PATH}/results_python.log"
 echo "------------------------ ${MODE} ------------------------" >> "${status_log}"

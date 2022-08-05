@@ -32,6 +32,12 @@ if [[ ${MODE} == 'lite_train_lite_infer' \
 
     if [[ ${task_name} == 'cd' ]]; then
         download_and_unzip_dataset "${DATA_DIR}" airchange https://paddlers.bj.bcebos.com/datasets/airchange.zip
+    elif [[ ${task_name} == 'clas' ]]; then
+        download_and_unzip_dataset "${DATA_DIR}" ucmerced https://paddlers.bj.bcebos.com/datasets/ucmerced.zip
+    elif [[ ${task_name} == 'det' ]]; then
+        download_and_unzip_dataset "${DATA_DIR}" sarship https://paddlers.bj.bcebos.com/datasets/sarship.zip
+    elif [[ ${task_name} == 'seg' ]]; then
+        download_and_unzip_dataset "${DATA_DIR}" rsseg https://paddlers.bj.bcebos.com/datasets/rsseg_mini.zip
     fi
 
 fi

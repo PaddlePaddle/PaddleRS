@@ -64,13 +64,8 @@ if __name__ == '__main__':
     # XXX: Late binding of transforms
     eval_dataset.transforms = eval_transforms
 
-    model = build_objects(cfg['model'], mod=paddlers.tasks)
-
-    if cfg['losses']:
-        model.losses = {
-            'types': build_objects(cfg['losses']['types']),
-            'coef': cfg['losses']['coef']
-        }
+    model = build_objects(
+        cfg['model'], mod=getattr(paddlers.tasks, cfg['task']))
 
     if cfg['cmd'] == 'train':
         if cfg['optimizer']:

@@ -81,10 +81,6 @@ function download_and_unzip_dataset() {
 
     local ds_path="${ds_dir}/${ds_name}"
     local zip_name="${url##*/}"
-    if [ "${ds_name}.zip" != "${zip_name}" ]; then
-        echo -e "\033[33m The zip name parsed from ${url} is not ${ds_name}.zip, but ${zip_name}! \033[0m"
-        return 1
-    fi
 
     if [ ${clear} = 'True' ]; then
         rm -rf "${ds_path}"
