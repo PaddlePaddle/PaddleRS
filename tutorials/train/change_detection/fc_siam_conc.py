@@ -74,7 +74,7 @@ eval_dataset = pdrs.datasets.CDDataset(
 # 使用默认参数构建FC-Siam-conc模型
 # 目前已支持的模型请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/model_zoo.md
 # 模型输入参数请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/change_detector.py
-model = pdrs.tasks.FCSiamConc()
+model = pdrs.tasks.cd.FCSiamConc()
 
 # 执行模型训练
 model.train(

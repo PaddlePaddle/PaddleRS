@@ -159,7 +159,7 @@ PaddleRS是遥感科研院所、相关高校共同基于飞桨开发的遥感处
 ├── deploy               # 部署相关的文档和脚本
 ├── docs                 # 整个项目文档及图片
 ├── paddlers  
-│     ├── custom_models  # 自定义网络模型代码
+│     ├── rs_models      # 遥感专用网络模型代码
 │     ├── datasets       # 数据加载相关代码
 │     ├── models         # 套件网络模型代码
 │     ├── tasks          # 相关任务代码

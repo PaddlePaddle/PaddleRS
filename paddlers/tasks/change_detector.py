@@ -25,7 +25,7 @@ import paddle.nn.functional as F
 from paddle.static import InputSpec
 
 import paddlers
-import paddlers.custom_models.cd as cmcd
+import paddlers.rs_models.cd as cmcd
 import paddlers.utils.logging as logging
 import paddlers.models.ppseg as paddleseg
 from paddlers.transforms import Resize, decode_image
@@ -49,9 +49,9 @@ class BaseChangeDetector(BaseModel):
         self.init_params = locals()
         if 'with_net' in self.init_params:
             del self.init_params['with_net']
-        super(BaseChangeDetector, self).__init__('changedetector')
+        super(BaseChangeDetector, self).__init__('change_detector')
         if model_name not in __all__:
-            raise Exception("ERROR: There's no model named {}.".format(
+            raise ValueError("ERROR: There is no model named {}.".format(
                 model_name))
         self.model_name = model_name
         self.num_classes = num_classes
