@@ -13,7 +13,7 @@ train_infer_file_list:./test_tipc/data/rsseg/:./test_tipc/data/rsseg/val.txt
 null:null
 ##
 trainer:norm
-norm_train:test_tipc/run_task.py train cd --config ./test_tipc/configs/seg/unet/unet.yaml
+norm_train:test_tipc/run_task.py train seg --config ./test_tipc/configs/seg/unet/unet.yaml
 pact_train:null
 fpgm_train:null
 distill_train:null

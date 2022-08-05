@@ -13,7 +13,7 @@ train_infer_file_list:./test_tipc/data/ucmerced/:./test_tipc/data/ucmerced/val.t
 null:null
 ##
 trainer:norm
-norm_train:test_tipc/run_task.py train cd --config ./test_tipc/configs/clas/hrnet/hrnet.yaml
+norm_train:test_tipc/run_task.py train clas --config ./test_tipc/configs/clas/hrnet/hrnet.yaml
 pact_train:null
 fpgm_train:null
 distill_train:null
