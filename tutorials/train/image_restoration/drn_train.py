@@ -66,7 +66,7 @@ test_dataset = pdrs.datasets.SRdataset(
     scale=scale)
 
 # 初始化模型，可以对网络结构的参数进行调整
-model = pdrs.tasks.DRNet(
+model = pdrs.tasks.res.DRNet(
     n_blocks=30, n_feats=16, n_colors=3, rgb_range=255, negval=0.2)
 
 model.train(

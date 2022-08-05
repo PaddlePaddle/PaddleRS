@@ -65,7 +65,7 @@ class TestCDModel(TestModel):
 
 
 class TestBITModel(TestCDModel):
-    MODEL_CLASS = paddlers.custom_models.cd.BIT
+    MODEL_CLASS = paddlers.rs_models.cd.BIT
 
     def set_specs(self):
         base_spec = dict(in_channels=3, num_classes=2)
@@ -80,7 +80,7 @@ class TestBITModel(TestCDModel):
 
 
 class TestCDNetModel(TestCDModel):
-    MODEL_CLASS = paddlers.custom_models.cd.CDNet
+    MODEL_CLASS = paddlers.rs_models.cd.CDNet
     EF_MODE = 'Concat'
 
     def set_specs(self):
@@ -92,7 +92,7 @@ class TestCDNetModel(TestCDModel):
 
 
 class TestChangeStarModel(TestCDModel):
-    MODEL_CLASS = paddlers.custom_models.cd.ChangeStar
+    MODEL_CLASS = paddlers.rs_models.cd.ChangeStar
 
     def set_specs(self):
         self.specs = [
@@ -112,7 +112,7 @@ class TestChangeStarModel(TestCDModel):
 
 
 class TestDSAMNetModel(TestCDModel):
-    MODEL_CLASS = paddlers.custom_models.cd.DSAMNet
+    MODEL_CLASS = paddlers.rs_models.cd.DSAMNet
 
     def set_specs(self):
         base_spec = dict(in_channels=3, num_classes=2)
@@ -134,7 +134,7 @@ class TestDSAMNetModel(TestCDModel):
 
 
 class TestDSIFNModel(TestCDModel):
-    MODEL_CLASS = paddlers.custom_models.cd.DSIFN
+    MODEL_CLASS = paddlers.rs_models.cd.DSIFN
 
     def set_specs(self):
         self.specs = [
@@ -153,7 +153,7 @@ class TestDSIFNModel(TestCDModel):
 
 
 class TestFCEarlyFusionModel(TestCDModel):
-    MODEL_CLASS = paddlers.custom_models.cd.FCEarlyFusion
+    MODEL_CLASS = paddlers.rs_models.cd.FCEarlyFusion
     EF_MODE = 'Concat'
 
     def set_specs(self):
@@ -166,7 +166,7 @@ class TestFCEarlyFusionModel(TestCDModel):
 
 
 class TestFCSiamConcModel(TestCDModel):
-    MODEL_CLASS = paddlers.custom_models.cd.FCSiamConc
+    MODEL_CLASS = paddlers.rs_models.cd.FCSiamConc
 
     def set_specs(self):
         self.specs = [
@@ -178,7 +178,7 @@ class TestFCSiamConcModel(TestCDModel):
 
 
 class TestFCSiamDiffModel(TestCDModel):
-    MODEL_CLASS = paddlers.custom_models.cd.FCSiamDiff
+    MODEL_CLASS = paddlers.rs_models.cd.FCSiamDiff
 
     def set_specs(self):
         self.specs = [
@@ -190,7 +190,7 @@ class TestFCSiamDiffModel(TestCDModel):
 
 
 class TestSNUNetModel(TestCDModel):
-    MODEL_CLASS = paddlers.custom_models.cd.SNUNet
+    MODEL_CLASS = paddlers.rs_models.cd.SNUNet
 
     def set_specs(self):
         self.specs = [
@@ -202,7 +202,7 @@ class TestSNUNetModel(TestCDModel):
 
 
 class TestSTANetModel(TestCDModel):
-    MODEL_CLASS = paddlers.custom_models.cd.STANet
+    MODEL_CLASS = paddlers.rs_models.cd.STANet
 
     def set_specs(self):
         base_spec = dict(in_channels=3, num_classes=2)

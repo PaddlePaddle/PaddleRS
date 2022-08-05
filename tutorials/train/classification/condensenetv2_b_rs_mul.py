@@ -39,7 +39,7 @@ eval_dataset = pdrs.datasets.ClasDataset(
 
 # 初始化模型
 num_classes = len(train_dataset.labels)
-model = pdrs.tasks.CondenseNetV2_b(in_channels=5, num_classes=num_classes)
+model = pdrs.tasks.clas.CondenseNetV2_b(in_channels=5, num_classes=num_classes)
 
 # 进行训练
 model.train(
