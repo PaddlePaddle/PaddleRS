@@ -35,9 +35,9 @@ class SNUNet(nn.Layer, KaimingInitMixin):
         different from the paper.
 
     Args:
-        in_channels (int): The number of bands of the input images.
-        num_classes (int): The number of target classes.
-        width (int, optional): The output channels of the first convolutional layer. 
+        in_channels (int): Number of bands of the input images.
+        num_classes (int): Number of target classes.
+        width (int, optional): Output channels of the first convolutional layer. 
             Default: 32.
     """
 

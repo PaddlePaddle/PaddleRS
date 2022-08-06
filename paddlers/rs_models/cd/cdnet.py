@@ -28,8 +28,8 @@ class CDNet(nn.Layer):
         (https://link.springer.com/article/10.1007/s10514-018-9734-5).
 
     Args:
-        in_channels (int): The number of bands of the input images.
-        num_classes (int): The number of target classes.
+        in_channels (int): Number of bands of the input images.
+        num_classes (int): Number of target classes.
     """
 
     def __init__(self, in_channels=6, num_classes=2):

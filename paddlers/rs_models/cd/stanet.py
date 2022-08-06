@@ -36,11 +36,11 @@ class STANet(nn.Layer):
         head to stablize the training process.
 
     Args:
-        in_channels (int): The number of bands of the input images.
-        num_classes (int): The number of target classes.
+        in_channels (int): Number of bands of the input images.
+        num_classes (int): Number of target classes.
         att_type (str, optional): The attention module used in the model. Options 
             are 'PAM' and 'BAM'. Default: 'BAM'.
-        ds_factor (int, optional): The downsampling factor of the attention modules. 
+        ds_factor (int, optional): Downsampling factor of the attention modules. 
             When `ds_factor` is set to values greater than 1, the input features 
             will first be processed by an average pooling layer with the kernel size 
             of `ds_factor`, before being used to calculate the attention scores. 

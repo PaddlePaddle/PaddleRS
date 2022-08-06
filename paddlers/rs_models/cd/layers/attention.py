@@ -28,8 +28,8 @@ class ChannelAttention(nn.Layer):
         (https://arxiv.org/abs/1807.06521).
 
     Args:
-        in_ch (int): The number of channels of the input features.
-        ratio (int, optional): The channel reduction ratio. Default: 8.
+        in_ch (int): Number of channels of the input features.
+        ratio (int, optional): Channel reduction ratio. Default: 8.
     """
 
     def __init__(self, in_ch, ratio=8):
@@ -55,7 +55,7 @@ class SpatialAttention(nn.Layer):
         (https://arxiv.org/abs/1807.06521).
 
     Args:
-        kernel_size (int, optional): The size of the convolutional kernel. 
+        kernel_size (int, optional): Size of the convolutional kernel. 
             Default: 7.
     """
 
@@ -80,10 +80,10 @@ class CBAM(nn.Layer):
         (https://arxiv.org/abs/1807.06521).
 
     Args:
-        in_ch (int): The number of channels of the input features.
-        ratio (int, optional): The channel reduction ratio for the channel 
+        in_ch (int): Number of channels of the input features.
+        ratio (int, optional): Channel reduction ratio for the channel 
             attention module. Default: 8.
-        kernel_size (int, optional): The size of the convolutional kernel used in 
+        kernel_size (int, optional): Size of the convolutional kernel used in 
             the spatial attention module. Default: 7.
     """
 

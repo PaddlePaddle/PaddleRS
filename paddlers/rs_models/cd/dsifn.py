@@ -35,7 +35,7 @@ class DSIFN(nn.Layer):
     Note that in this implementation, there is a flexible number of target classes.
 
     Args:
-        num_classes (int): The number of target classes.
+        num_classes (int): Number of target classes.
         use_dropout (bool, optional): A bool value that indicates whether to use 
             dropout layers. When the model is trained on a relatively small dataset, 
             the dropout layers help prevent overfitting. Default: False.

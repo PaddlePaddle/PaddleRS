@@ -940,7 +940,7 @@ class RandomCrop(Transform):
             crop. Defaults to [.0, .1, .3, .5, .7, .9].
         scaling (list[float], optional): Ratio between the cropped region and the 
             original image in [min, max] format. Defaults to [.3, 1.].
-        num_attempts (int, optional): The max number of tries before giving up. 
+        num_attempts (int, optional): Max number of tries before giving up. 
             Defaults to 50.
         allow_no_crop (bool, optional): Whether returning without doing crop is 
             allowed. Defaults to True.
@@ -1158,9 +1158,9 @@ class RandomExpand(Transform):
     Randomly expand the input by padding according to random offsets.
 
     Args:
-        upper_ratio (float, optional): The maximum ratio to which the original image 
+        upper_ratio (float, optional): Maximum ratio to which the original image 
             is expanded. Defaults to 4..
-        prob (float, optional): The probability of apply expanding. Defaults to .5.
+        prob (float, optional): Probability of apply expanding. Defaults to .5.
         im_padding_value (list[float] | tuple[float], optional): RGB filling value 
             for the image. Defaults to (127.5, 127.5, 127.5).
         label_padding_value (int, optional): Filling value for the mask. 

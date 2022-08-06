@@ -31,8 +31,8 @@ class FCSiamConc(nn.Layer):
         (https://arxiv.org/abs/1810.08462).
 
     Args:
-        in_channels (int): The number of bands of the input images.
-        num_classes (int): The number of target classes.
+        in_channels (int): Number of bands of the input images.
+        num_classes (int): Number of target classes.
         use_dropout (bool, optional): A bool value that indicates whether to use 
             dropout layers. When the model is trained on a relatively small dataset, 
             the dropout layers help prevent overfitting. Default: False.

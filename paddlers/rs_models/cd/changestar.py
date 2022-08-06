@@ -95,14 +95,14 @@ class ChangeStar_FarSeg(_ChangeStarBase):
     2. We use conv-bn-relu instead of conv-relu-bn.
 
     Args:
-        num_classes (int): The number of target classes.
-        mid_channels (int, optional): The number of channels required by the 
+        num_classes (int): Number of target classes.
+        mid_channels (int, optional): Number of channels required by the 
         ChangeMixin module. Default: 256.
-        inner_channels (int, optional): The number of filters used in the 
+        inner_channels (int, optional): Number of filters used in the 
             convolutional layers in the ChangeMixin module. Default: 16.
-        num_convs (int, optional): The number of convolutional layers used in the 
+        num_convs (int, optional): Number of convolutional layers used in the 
             ChangeMixin module. Default: 4.
-        scale_factor (float, optional): The scaling factor of the output upsampling 
+        scale_factor (float, optional): Scaling factor of the output upsampling 
             layer. Default: 4.0.
     """
 

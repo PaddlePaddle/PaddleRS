@@ -35,11 +35,11 @@ class DSAMNet(nn.Layer):
         head to stablize the training process.
 
     Args:
-        in_channels (int): The number of bands of the input images.
-        num_classes (int): The number of target classes.
-        ca_ratio (int, optional): The channel reduction ratio for the channel 
+        in_channels (int): Number of bands of the input images.
+        num_classes (int): Number of target classes.
+        ca_ratio (int, optional): Channel reduction ratio for the channel 
             attention module. Default: 8.
-        sa_kernel (int, optional): The size of the convolutional kernel used in the 
+        sa_kernel (int, optional): Size of the convolutional kernel used in the 
             spatial attention module. Default: 7.
     """
 
