@@ -108,6 +108,7 @@ PaddleRS对代码风格的规范基本与[Google Python风格规范](https://zh-
 添加完测试用例后，您需要完整执行所有的测试（因为新增的代码可能影响了项目原有的代码，使部分功能不能正常使用）。输入如下指令：
 
 ```bash
+cd tests
 bash run_tests.sh
 ```
 
