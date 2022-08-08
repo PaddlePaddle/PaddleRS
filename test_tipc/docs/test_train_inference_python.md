@@ -41,28 +41,28 @@ pip install  https://paddleocr.bj.bcebos.com/libs/auto_log-1.2.0-py3-none-any.wh
 - 模式1：lite_train_lite_infer，使用少量数据训练，用于快速验证训练到预测的流程是否能走通，不验证精度和速度；
 ```shell
 bash ./test_tipc/prepare.sh test_tipc/configs/clas/hrnet/train_infer_python.txt lite_train_lite_infer
-bash ./test_tipc/test_train_inference.sh test_tipc/configs/clas/hrnet/train_infer_python.txt lite_train_lite_infer
+bash ./test_tipc/test_train_inference_python.sh test_tipc/configs/clas/hrnet/train_infer_python.txt lite_train_lite_infer
 ```  
 
 - 模式2：lite_train_whole_infer，使用少量数据训练，全量数据预测，用于验证训练后的模型执行预测时预测速度是否合理；
 ```shell
 bash ./test_tipc/prepare.sh test_tipc/configs/clas/hrnet/train_infer_python.txt lite_train_whole_infer
-bash ./test_tipc/test_train_inference.sh test_tipc/configs/clas/hrnet/train_infer_python.txt lite_train_whole_infer
+bash ./test_tipc/test_train_inference_python.sh test_tipc/configs/clas/hrnet/train_infer_python.txt lite_train_whole_infer
 ```  
 
 - 模式3：whole_infer，不训练，使用全量数据预测，验证模型动转静是否正常，检查模型的预测时间和精度;
 ```shell
 bash ./test_tipc/prepare.sh test_tipc/configs/clas/hrnet/train_infer_python.txt whole_infer
 # 用法1:
-bash ./test_tipc/test_train_inference.sh test_tipc/configs/clas/hrnet/train_infer_python.txt whole_infer
+bash ./test_tipc/test_train_inference_python.sh test_tipc/configs/clas/hrnet/train_infer_python.txt whole_infer
 # 用法2: 在指定GPU上执行预测，第三个传入参数为GPU编号
-bash ./test_tipc/test_train_inference.sh test_tipc/configs/clas/hrnet/train_infer_python.txt whole_infer '1'
+bash ./test_tipc/test_train_inference_python.sh test_tipc/configs/clas/hrnet/train_infer_python.txt whole_infer '1'
 ```  
 
 - 模式4：whole_train_whole_infer，CE： 全量数据训练，全量数据预测，验证模型训练精度、预测精度、预测速度；
 ```shell
 bash ./test_tipc/prepare.sh test_tipc/configs/clas/hrnet/train_infer_python.txt whole_train_whole_infer
-bash ./test_tipc/test_train_inference.sh test_tipc/configs/clas/hrnet/train_infer_python.txt whole_train_whole_infer
+bash ./test_tipc/test_train_inference_python.sh test_tipc/configs/clas/hrnet/train_infer_python.txt whole_train_whole_infer
 ```  
 
 运行相应指令后，在`test_tipc/output`目录中会自动保存运行日志。如lite_train_lite_infer模式下，该目录中可能存在以下文件：
