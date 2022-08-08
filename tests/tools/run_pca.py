@@ -14,11 +14,10 @@
 
 import tempfile
 
-from testing_utils import CpuCommonTest, run_script
+from testing_utils import run_script
 
-
-class TestOIF(CpuCommonTest):
-    def test_script(self):
+if __name__ == '__main__':
+    with tempfile.TemporaryDirectory() as td:
         run_script(
-            f"python oif.py --im_path ../tests/data/ssst/multispectral.tif",
+            f"python pca.py --im_path ../tests/data/ssst/multispectral.tif --save_dir {td} --dim 5",
             wd="../tools")

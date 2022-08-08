@@ -12,14 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import tempfile
+from testing_utils import run_script
 
-from testing_utils import CpuCommonTest, run_script
-
-
-class TestPCA(CpuCommonTest):
-    def test_script(self):
-        with tempfile.TemporaryDirectory() as td:
-            run_script(
-                f"python pca.py --im_path ../tests/data/ssst/multispectral.tif --save_dir {td} --dim 5",
-                wd="../tools")
+if __name__ == '__main__':
+    run_script(
+        f"python oif.py --im_path ../tests/data/ssst/multispectral.tif",
+        wd="../tools")

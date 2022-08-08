@@ -16,10 +16,8 @@ import tempfile
 
 from testing_utils import CpuCommonTest, run_script
 
-
-class TestSplit(CpuCommonTest):
-    def test_script(self):
-        with tempfile.TemporaryDirectory() as td:
-            run_script(
-                f"python split.py --image_path ../tests/data/ssst/multispectral.tif --mask_path ../tests/data/ssst/multiclass_gt2.png --block_size 128 --save_dir {td}",
-                wd="../tools")
+if __name__ == '__main__':
+    with tempfile.TemporaryDirectory() as td:
+        run_script(
+            f"python split.py --image_path ../tests/data/ssst/multispectral.tif --mask_path ../tests/data/ssst/multiclass_gt2.png --block_size 128 --save_dir {td}",
+            wd="../tools")

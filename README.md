@@ -206,6 +206,7 @@ PaddleRS是遥感科研院所、相关高校共同基于飞桨开发的遥感处
 
 * 非常感谢国家对地观测科学数据中心、中国科学院空天信息创新研究院、北京航空航天大学、武汉大学、中国石油大学（华东）、中国地质大学、中国四维、航天宏图、中科星图、超图等单位对PaddleRS项目的贡献。注：排名不分先后。
 * 非常感谢[geoyee](https://github.com/geoyee)(陈奕州), [Bobholamovic](https://github.com/Bobholamovic)(林漫晖), [kongdebug](https://github.com/kongdebug)(孔远杭), [huilin16](https://github.com/huilin16)(赵慧琳)等开发者对PaddleRS项目的贡献。
+* PaddleRS欢迎来自开源社区的贡献。如果您想要为PaddleRS贡献源码/案例，请参考[贡献指南](docs/CONTRIBUTING.md)。
 
 ## 许可证书
 
