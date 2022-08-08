@@ -106,10 +106,11 @@ def download(url, path, md5sum=None):
             if total_size:
                 download_size = 0
                 current_time = time.time()
-                for chunk in tqdm.tqdm(
-                        req.iter_content(chunk_size=1024),
-                        total=(int(total_size) + 1023) // 1024,
-                        unit='KB'):
+                pb = tqdm.tqdm(
+                    req.iter_content(chunk_size=1024),
+                    total=(int(total_size) + 1023) // 1024,
+                    unit='KB')
+                for chunk in pb:
                     f.write(chunk)
                     download_size += 1024
                     if download_size % 524288 == 0:
@@ -120,9 +121,9 @@ def download(url, path, md5sum=None):
                         speed = int(524288 / (time.time() - current_time + 0.01)
                                     / 1024.0)
                         current_time = time.time()
-                        logging.debug(
-                            "Downloading: TotalSize={}M, DownloadSize={}M, Speed={}KB/s"
-                            .format(total_size_m, download_size_m, speed))
+                        pb.set_description(
+                            "Downloading: TotalSize={}M, DownloadedSize={}M"
+                            .format(total_size_m, download_size_m))
             else:
                 for chunk in req.iter_content(chunk_size=1024):
                     if chunk:
