@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-'''
+"""
 @File Description:
 # json文件annotations信息，生成统计结果csv，对象框shape、对象看shape比例、对象框起始位置、对象结束位置、对象结束位置、对象类别、单个图像对象数量的分布
 python ./coco_tools/json_AnnoSta.py \
@@ -24,7 +24,8 @@ python ./coco_tools/json_AnnoSta.py \
     --png_cat_path=./anno_sta/annos_cat.png \
     --png_objNum_path=./anno_sta/annos_objNum.png \
     --get_relative=True
-'''
+"""
+
 import os
 import json
 import argparse

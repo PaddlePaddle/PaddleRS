@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .voc import VOCDetection
-from .coco import COCODetection
+from .voc import VOCDetDataset
+from .coco import COCODetDataset
 from .seg_dataset import SegDataset
 from .cd_dataset import CDDataset
 from .clas_dataset import ClasDataset

@@ -6,8 +6,6 @@
 import paddlers as pdrs
 from paddlers import transforms as T
 
-# 下载文件存放目录
-DOWNLOAD_DIR = './data/ucmerced/'
 # 数据集存放目录
 DATA_DIR = './data/ucmerced/'
 # 训练集`file_list`文件路径
@@ -20,8 +18,8 @@ LABEL_LIST_PATH = './data/ucmerced/labels.txt'
 EXP_DIR = './output/hrnet/'
 
 # 下载和解压UC Merced数据集
-ucmerced_dataset = 'http://weegee.vision.ucmerced.edu/datasets/UCMerced_LandUse.zip'
-pdrs.utils.download_and_decompress(ucmerced_dataset, path=DOWNLOAD_DIR)
+pdrs.utils.download_and_decompress(
+    'https://paddlers.bj.bcebos.com/datasets/ucmerced.zip', path='./data/')
 
 # 定义训练和验证时使用的数据变换（数据增强、预处理等）
 # 使用Compose组合多种变换方式。Compose中包含的变换将按顺序串行执行

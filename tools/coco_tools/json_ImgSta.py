@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-'''
+"""
 @File Description:
 # 统计json文件images信息，生成统计结果csv，同时生成图像shape、图像shape比例的二维分布图
 python ./coco_tools/json_ImgSta.py \
@@ -19,7 +19,7 @@ python ./coco_tools/json_ImgSta.py \
     --csv_path=./img_sta/images.csv \
     --png_shape_path=./img_sta/images_shape.png \
     --png_shapeRate_path=./img_sta/images_shapeRate.png
-'''
+"""
 
 import json
 import argparse

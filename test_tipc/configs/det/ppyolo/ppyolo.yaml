@@ -1,0 +1,10 @@
+# Basic configurations of PP-YOLO
+
+_base_: ../_base_/sarship.yaml
+
+save_dir: ./test_tipc/output/det/ppyolo/
+
+model: !Node
+       type: PPYOLO
+       args:
+           num_classes: 1

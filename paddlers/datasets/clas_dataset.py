@@ -19,24 +19,26 @@ from paddlers.utils import logging, get_encoding, norm_path, is_pic
 
 
 class ClasDataset(BaseDataset):
-    """读取图像分类任务数据集，并对样本进行相应的处理。
+    """
+    Dataset for scene classification tasks.
 
     Args:
-        data_dir (str): 数据集所在的目录路径。
-        file_list (str): 描述数据集图片文件和对应标注序号（文本内每行路径为相对data_dir的相对路）。
-        label_list (str): 描述数据集包含的类别信息文件路径，文件格式为（类别 说明）。默认值为None。
-        transforms (paddlers.transforms.Compose): 数据集中每个样本的预处理/增强算子。
-        num_workers (int|str): 数据集中样本在预处理过程中的线程或进程数。默认为'auto'。当设为'auto'时，根据
-            系统的实际CPU核数设置`num_workers`: 如果CPU核数的一半大于8，则`num_workers`为8，否则为CPU核数的
-            一半。
-        shuffle (bool): 是否需要对数据集中样本打乱顺序。默认为False。
+        data_dir (str): Root directory of the dataset.
+        file_list (str): Path of the file that contains relative paths of images and labels.
+        transforms (paddlers.transforms.Compose): Data preprocessing and data augmentation operators to apply.
+        label_list (str, optional): Path of the file that contains the category names. Defaults to None.
+        num_workers (int|str, optional): Number of processes used for data loading. If `num_workers` is 'auto',
+            the number of workers will be automatically determined according to the number of CPU cores: If 
+            there are more than 16 cores，8 workers will be used. Otherwise, the number of workers will be half 
+            the number of CPU cores. Defaults: 'auto'.
+        shuffle (bool, optional): Whether to shuffle the samples. Defaults to False.
     """
 
     def __init__(self,
                  data_dir,
                  file_list,
+                 transforms,
                  label_list=None,
-                 transforms=None,
                  num_workers='auto',
                  shuffle=False):
         super(ClasDataset, self).__init__(data_dir, label_list, transforms,
@@ -57,7 +59,7 @@ class ClasDataset(BaseDataset):
             for line in f:
                 items = line.strip().split()
                 if len(items) > 2:
-                    raise Exception(
+                    raise ValueError(
                         "A space is defined as the delimiter to separate the image and label path, " \
                         "so the space cannot be in the image or label path, but the line[{}] of " \
                         " file_list[{}] has a space in the image or label path.".format(line, file_list))

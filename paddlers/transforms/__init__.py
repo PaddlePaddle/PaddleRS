@@ -29,14 +29,16 @@ def decode_image(im_path,
     Decode an image.
     
     Args:
-        im_path (str): Path of the image to decode.
-        to_rgb (bool, optional): If True, convert input image(s) from BGR format to RGB format. Defaults to True.
-        to_uint8 (bool, optional): If True, quantize and convert decoded image(s) to uint8 type. Defaults to True.
-        decode_bgr (bool, optional): If True, automatically interpret a non-geo image (e.g. jpeg images) as a BGR image. 
-            Defaults to True.
-        decode_sar (bool, optional): If True, automatically interpret a two-channel geo image (e.g. geotiff images) as a 
-            SAR image, set this argument to True. Defaults to True.
-
+        to_rgb (bool, optional): If True, convert input image(s) from BGR format to 
+            RGB format. Defaults to True.
+        to_uint8 (bool, optional): If True, quantize and convert decoded image(s) to 
+            uint8 type. Defaults to True.
+        decode_bgr (bool, optional): If True, automatically interpret a non-geo 
+            image (e.g. jpeg images) as a BGR image. Defaults to True.
+        decode_sar (bool, optional): If True, automatically interpret a two-channel 
+            geo image (e.g. geotiff images) as a SAR image, set this argument to 
+            True. Defaults to True.
+    
     Returns:
         np.ndarray: Decoded image.
     """

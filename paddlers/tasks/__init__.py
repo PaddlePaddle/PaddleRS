@@ -12,9 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import paddlers.tasks.object_detector as det
-import paddlers.tasks.segmenter as seg
-import paddlers.tasks.change_detector as cd
-import paddlers.tasks.classifier as clas
-import paddlers.tasks.image_restorer as res
+import paddlers.tasks.object_detector as detector
+import paddlers.tasks.segmenter as segmenter
+import paddlers.tasks.change_detector as change_detector
+import paddlers.tasks.classifier as classifier
+import paddlers.tasks.image_restorer as restorer
 from .load_model import load_model
+
+# Shorter aliases
+det = detector
+seg = segmenter
+cd = change_detector
+clas = classifier
+res = restorer
