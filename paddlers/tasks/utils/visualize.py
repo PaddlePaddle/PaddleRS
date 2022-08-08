@@ -50,11 +50,12 @@ def visualize_segmentation(image, result, weight=0.6, save_dir='./',
     Convert segment result to color image, and save added image.
 
     Args:
-        image: the path of origin image
-        result: the predict result of image
-        weight: the image weight of visual image, and the result weight is (1 - weight)
-        save_dir: the directory for saving visual image
-        color: the list of a BGR-mode color for each label.
+        image (str): Path of original image.
+        result (dict): Predicted results.
+        weight (float, optional): Weight used to mix the original image with the predicted image.
+            Defaults to 0.6.
+        save_dir (str, optional): Directory for saving visualized image. Defaults to './'.
+        color (list|None): None or list of BGR indices for each label. Defaults to None.
     """
 
     label_map = result['label_map'].astype("uint8")
@@ -106,14 +107,15 @@ def visualize_segmentation(image, result, weight=0.6, save_dir='./',
 
 
 def get_color_map_list(num_classes):
-    """ 
-    Returns the color map for visualizing the segmentation mask, which can support arbitrary number of classes.
+    """
+    Get the color map for visualizing a segmentation mask.
+    This function supports arbitrary number of classes.
 
     Args:
-        num_classes: Number of classes
+        num_classes (int): Number of classes.
 
     Returns:
-        The color map
+        list: Color map.
     """
 
     color_map = num_classes * [0, 0, 0]
@@ -130,10 +132,10 @@ def get_color_map_list(num_classes):
     return color_map
 
 
-# expand an array of boxes by a given scale.
 def expand_boxes(boxes, scale):
     """
-        """
+    Expand an array of boxes by a given scale.
+    """
     w_half = (boxes[:, 2] - boxes[:, 0]) * .5
     h_half = (boxes[:, 3] - boxes[:, 1]) * .5
     x_c = (boxes[:, 2] + boxes[:, 0]) * .5
@@ -175,7 +177,7 @@ def draw_bbox_mask(image, results, threshold=0.5, color_map=None):
     else:
         color_map = np.asarray(color_map)
         if color_map.shape[0] != len(labels) or color_map.shape[1] != 3:
-            raise Exception(
+            raise ValueError(
                 "The shape for color_map is required to be {}x3, but recieved shape is {}x{}.".
                 format(len(labels), color_map.shape))
         if np.max(color_map) > 255 or np.min(color_map) < 0:
@@ -203,11 +205,11 @@ def draw_bbox_mask(image, results, threshold=0.5, color_map=None):
         ymax = ymin + h
 
         color = tuple(map(int, color_map[labels.index(cname)]))
-        # draw bbox
+        # Draw bbox
         image = cv2.rectangle(image, (xmin, ymin), (xmax, ymax), color,
                               linewidth)
 
-        # draw mask
+        # Draw mask
         if 'mask' in dt:
             mask = dt['mask'] * 255
             image = image.astype('float32')
@@ -230,7 +232,7 @@ def draw_bbox_mask(image, results, threshold=0.5, color_map=None):
                 thickness=1,
                 lineType=cv2.LINE_AA)
 
-        # draw label
+        # Draw label
         text_pos = (xmin, ymin)
         instance_area = w * h
         if (instance_area < _SMALL_OBJECT_AREA_THRESH or h < 40):
@@ -279,13 +281,13 @@ def draw_pr_curve(eval_details_file=None,
                 pred_mask = eval_details['mask']
             gt = eval_details['gt']
     if gt is None or pred_bbox is None:
-        raise Exception(
+        raise ValueError(
             "gt/pred_bbox/pred_mask is None now, please set right eval_details_file or gt/pred_bbox/pred_mask."
         )
     if pred_bbox is not None and len(pred_bbox) == 0:
-        raise Exception("There is no predicted bbox.")
+        raise ValueError("There is no predicted bbox.")
     if pred_mask is not None and len(pred_mask) == 0:
-        raise Exception("There is no predicted mask.")
+        raise ValueError("There is no predicted mask.")
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
@@ -297,7 +299,8 @@ def draw_pr_curve(eval_details_file=None,
 
     def _summarize(coco_gt, ap=1, iouThr=None, areaRng='all', maxDets=100):
         """
-        This function has the same functionality as _summarize() in pycocotools.COCOeval.summarize().
+        This function has the same functionality as _summarize() in 
+            pycocotools.COCOeval.summarize().
 
         Refer to
         https://github.com/cocodataset/cocoapi/blob/8c9bcc3cf640524c4c20a9c40e89cb6a2f2fa0e9/PythonAPI/pycocotools/cocoeval.py#L427,
@@ -336,7 +339,7 @@ def draw_pr_curve(eval_details_file=None,
         stats = _summarize(coco_eval, iouThr=iou_thresh)
         catIds = coco_gt.getCatIds()
         if len(catIds) != coco_eval.eval['precision'].shape[2]:
-            raise Exception(
+            raise ValueError(
                 "The category number must be same as the third dimension of precisions."
             )
         x = np.arange(0.0, 1.01, 0.01)

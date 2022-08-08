@@ -54,14 +54,14 @@ eval_transforms = T.Compose([
 ])
 
 # 分别构建训练和验证所用的数据集
-train_dataset = pdrs.datasets.VOCDetection(
+train_dataset = pdrs.datasets.VOCDetDataset(
     data_dir=DATA_DIR,
     file_list=TRAIN_FILE_LIST_PATH,
     label_list=LABEL_LIST_PATH,
     transforms=train_transforms,
     shuffle=True)
 
-eval_dataset = pdrs.datasets.VOCDetection(
+eval_dataset = pdrs.datasets.VOCDetDataset(
     data_dir=DATA_DIR,
     file_list=EVAL_FILE_LIST_PATH,
     label_list=LABEL_LIST_PATH,

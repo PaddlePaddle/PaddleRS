@@ -71,13 +71,13 @@ def cocoapi_eval(anns,
                  classwise=False):
     """
     Args:
-        anns: Evaluation result.
-        style (str): COCOeval style, can be `bbox` , `segm` and `proposal`.
-        coco_gt (str): Whether to load COCOAPI through anno_file,
+        anns (list): Evaluation result.
+        style (str): COCOeval style. Choices are 'bbox', 'segm' and 'proposal'.
+        coco_gt (str, optional): Whether to load COCOAPI through anno_file,
                  eg: coco_gt = COCO(anno_file)
-        anno_file (str): COCO annotations file.
-        max_dets (tuple): COCO evaluation maxDets.
-        classwise (bool): Whether per-category AP and draw P-R Curve or not.
+        anno_file (str, optional): COCO annotations file. Defaults to None.
+        max_dets (tuple, optional): COCO evaluation maxDets. Defaults to (100, 300, 1000).
+        classwise (bool, optional): Whether to calculate per-category statistics or not. Defaults to None.
     """
 
     assert coco_gt is not None or anno_file is not None
@@ -148,12 +148,6 @@ def cocoapi_eval(anns,
 
 
 def loadRes(coco_obj, anns):
-    """
-    Load result file and return a result api object.
-    :param   resFile (str)     : file name of result file
-    :return: res (obj)         : result api object
-    """
-
     # This function has the same functionality as pycocotools.COCO.loadRes,
     # except that the input anns is list of results rather than a json file.
     # Refer to
@@ -294,7 +288,6 @@ def analyze_individual_category(k, cocoDt, cocoGt, catId, iou_type, areas=None):
         int:
         dict: 有关键字'ps_supercategory'和'ps_allcategory'。关键字'ps_supercategory'的键值是忽略亚类间
             混淆时的准确率，关键字'ps_allcategory'的键值是忽略类别间混淆时的准确率。
-
     """
 
     # matplotlib.use() must be called *before* pylab, matplotlib.pyplot,
@@ -402,13 +395,13 @@ def coco_error_analysis(eval_details_file=None,
                 pred_mask = eval_details['mask']
             gt = eval_details['gt']
     if gt is None or pred_bbox is None:
-        raise Exception(
-            "gt/pred_bbox/pred_mask is None now, please set right eval_details_file or gt/pred_bbox/pred_mask."
+        raise ValueError(
+            "gt/pred_bbox/pred_mask is None now. Please set right eval_details_file or gt/pred_bbox/pred_mask."
         )
     if pred_bbox is not None and len(pred_bbox) == 0:
-        raise Exception("There is no predicted bbox.")
+        raise ValueError("There is no predicted bbox.")
     if pred_mask is not None and len(pred_mask) == 0:
-        raise Exception("There is no predicted mask.")
+        raise ValueError("There is no predicted mask.")
 
     def _analyze_results(cocoGt, cocoDt, res_type, out_dir):
         """
@@ -474,4 +467,4 @@ def coco_error_analysis(eval_details_file=None,
     if pred_mask is not None:
         coco_dt = loadRes(coco_gt, pred_mask)
         _analyze_results(coco_gt, coco_dt, res_type='segm', out_dir=save_dir)
-    logging.info("The analysis figures are saved in {}".format(save_dir))
+    logging.info("The analysis figures are saved in {}.".format(save_dir))

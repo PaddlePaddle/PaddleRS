@@ -22,7 +22,7 @@ from utils import Raster, raster2uint8, save_geotiff, time_it
 
 class MatchError(Exception):
     def __str__(self):
-        return "Cannot match two images."
+        return "Cannot match the two images."
 
 
 def _calcu_tf(im1, im2):

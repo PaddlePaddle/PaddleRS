@@ -42,24 +42,24 @@ class BIT(nn.Layer):
     This implementation adopts pretrained encoders, as opposed to the original work where weights are randomly initialized.
 
     Args:
-        in_channels (int): The number of bands of the input images.
-        num_classes (int): The number of target classes.
+        in_channels (int): Number of bands of the input images.
+        num_classes (int): Number of target classes.
         backbone (str, optional): The ResNet architecture that is used as the backbone. Currently, only 'resnet18' and 
             'resnet34' are supported. Default: 'resnet18'.
-        n_stages (int, optional): The number of ResNet stages used in the backbone, which should be a value in {3,4,5}. 
+        n_stages (int, optional): Number of ResNet stages used in the backbone, which should be a value in {3,4,5}. 
             Default: 4.
         use_tokenizer (bool, optional): Use a tokenizer or not. Default: True.
-        token_len (int, optional): The length of input tokens. Default: 4.
+        token_len (int, optional): Length of input tokens. Default: 4.
         pool_mode (str, optional): The pooling strategy to obtain input tokens when `use_tokenizer` is set to False. 'max'
             for global max pooling and 'avg' for global average pooling. Default: 'max'.
-        pool_size (int, optional): The height and width of the pooled feature maps when `use_tokenizer` is set to False. 
+        pool_size (int, optional): Height and width of the pooled feature maps when `use_tokenizer` is set to False. 
             Default: 2.
         enc_with_pos (bool, optional): Whether to add leanred positional embedding to the input feature sequence of the 
             encoder. Default: True.
-        enc_depth (int, optional): The number of attention blocks used in the encoder. Default: 1
-        enc_head_dim (int, optional): The embedding dimension of each encoder head. Default: 64.
-        dec_depth (int, optional): The number of attention blocks used in the decoder. Default: 8.
-        dec_head_dim (int, optional): The embedding dimension of each decoder head. Default: 8.
+        enc_depth (int, optional): Number of attention blocks used in the encoder. Default: 1
+        enc_head_dim (int, optional): Embedding dimension of each encoder head. Default: 64.
+        dec_depth (int, optional): Number of attention blocks used in the decoder. Default: 8.
+        dec_head_dim (int, optional): Embedding dimension of each decoder head. Default: 8.
 
     Raises:
         ValueError: When an unsupported backbone type is specified, or the number of backbone stages is not 3, 4, or 5.
