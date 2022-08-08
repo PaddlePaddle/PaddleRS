@@ -194,10 +194,15 @@ class BaseModel(metaclass=ModelMeta):
                 info['Transforms'] = list()
                 for op in self.test_transforms.transforms:
                     name = op.__class__.__name__
-                    if name.startswith('Arrange'):
-                        continue
                     attr = op.__dict__
                     info['Transforms'].append({name: attr})
+                arrange = self.test_transforms.arrange
+                if arrange is not None:
+                    info['Transforms'].append({
+                        arrange.__class__.__name__: {
+                            'mode': 'test'
+                        }
+                    })
         info['completed_epochs'] = self.completed_epochs
         return info
 

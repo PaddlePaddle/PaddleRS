@@ -62,7 +62,10 @@ class BatchCompose(Transform):
                 for i in range(len(samples)):
                     tmp_data.append(samples[i][k])
                 if not 'gt_' in k and not 'is_crowd' in k and not 'difficult' in k:
-                    tmp_data = np.stack(tmp_data, axis=0)
+                    # This if assumes that all elements in tmp_data has the same type.
+                    if len(tmp_data) == 0 or not isinstance(tmp_data[0],
+                                                            (str, bytes)):
+                        tmp_data = np.stack(tmp_data, axis=0)
                 batch_data[k] = tmp_data
         return batch_data
 
