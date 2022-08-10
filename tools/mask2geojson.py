@@ -60,11 +60,11 @@ def convert_data(image_path, geojson_path):
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--raster_path", type=str, required=True, \
-                    help="Path of original raster image.")
-parser.add_argument("--geotiff_path", type=str, required=True, \
-                    help="Path to store the geotiff file (the coordinate system is WGS84).")
+parser.add_argument("--mask_path", type=str, required=True, \
+                    help="Path of mask data.")
+parser.add_argument("--save_path", type=str, required=True, \
+                    help="Path to store the GeoJSON file (the coordinate system is WGS84).")
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    convert_data(args.raster_path, args.geotiff_path)
+    convert_data(args.raster_path, args.geojson_path)
