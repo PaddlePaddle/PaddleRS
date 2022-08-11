@@ -22,7 +22,7 @@
 PaddleRS是遥感科研院所、相关高校共同基于飞桨开发的遥感处理平台，支持遥感图像分类，目标检测，图像分割，以及变化检测等常用遥感任务，能够帮助遥感领域科研从业者和致力于遥感影像处理算法落地的开发者便捷地完成从训练到部署的全流程遥感深度学习应用。
 
 <div align="center">
-<img src="docs/images/whole_image.jpg"  width = "2000" />  
+<img src="docs/images/whole_picture.jpg"  width = "2000" />  
 </div>
 
 ## 特性 <img src="./docs/images/feature.png" width="30"/>
