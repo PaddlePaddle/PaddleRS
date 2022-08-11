@@ -186,7 +186,7 @@ PaddleRS目录树中关键部分如下：
 
 * [快速上手PaddleRS](./tutorials/train/README.md)
 * 准备数据集
-  * [遥感数据介绍](./docs/data/rs_data.md)
+  * [快速了解遥感与遥感数据](./docs/data/rs_data.md)
   * [遥感数据集整理](./docs/data/dataset.md)
   * [智能标注工具EISeg](https://github.com/PaddlePaddle/PaddleSeg/tree/release/2.4/EISeg)
   * [遥感影像处理工具集](./docs/data/tools.md)
