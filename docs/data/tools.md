@@ -98,6 +98,6 @@ python split.py --image_path {输入影像路径} [--mask_path {真值标签路�
 - `json_AnnoSta.py`:     统计json文件中的标注信息，生成统计表、统计图；
 - `json_Img2Json.py`:    统计test集图像，生成json文件；
 - `json_Split.py`:       将json文件中的内容划分为train set和val set；
-- `json_Merge.py`:       将多个json文件合并为1个。
+- `json_Merge.py`:       将多个json文件合并为一个。
 
 详细使用方法请参见[coco_tools使用说明](coco_tools.md)。

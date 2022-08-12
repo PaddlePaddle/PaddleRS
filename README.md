@@ -197,6 +197,7 @@ PaddleRS目录树中关键部分如下：
   * [模型训练API说明](./docs/apis/train.md)
 * 模型部署
   * [模型导出](./deploy/export/README.md)
+  * [Python部署](./deploy/README.md)
   * [模型推理API说明](./docs/apis/infer.md)
 * 实践案例
   * [遥感影像变化检测案例](./docs/cases/csc_cd_cn.md)
