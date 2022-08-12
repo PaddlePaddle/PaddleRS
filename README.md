@@ -29,13 +29,13 @@ PaddleRS是遥感科研院所、相关高校共同基于飞桨开发的遥感处
 
 PaddleRS具有以下五大特色：
 
-* <img src="./docs/images/f1.png" width="20"/> **丰富的遥感特色模型**：支持FarSeg、BIT、ChangeStar等数十种遥感专用模型，覆盖图像分割、目标检测、变化检测等领域。
+* <img src="./docs/images/f1.png" width="20"/> **丰富的遥感特色模型**：支持FarSeg、BIT、ChangeStar等众多遥感领域深度学习模型，覆盖图像分割、目标检测、场景分类、变化检测等任务。
 
 * <img src="./docs/images/f1.png" width="20"/> **对遥感专有任务的支持**：支持包括变化检测在内的遥感领域特色任务，提供完善的训练、部署教程以及丰富的实践案例。
 
 * <img src="./docs/images/f2.png" width="20"/> **面向遥感影像大幅面性质的针对性优化**：支持大幅面影像滑窗推理，使用内存延迟载入技术提升性能；支持对大幅面影像地理坐标信息的读写。
 
-* <img src="./docs/images/f2.png" width="20"/> **顾及遥感特性与地学知识的数据预处理**：针对遥感数据特点，提供对包含任意数量波段的数据以及多时相数据的预处理功能，支持影像配准、辐射校正、波段选择等遥感专有数据预处理方法。
+* <img src="./docs/images/f2.png" width="20"/> **顾及遥感特性与地学知识的数据预处理**：针对遥感数据特点，提供对包含任意数量波段的数据以及多时相数据的预处理功能，支持影像配准、辐射校正、波段选择等遥感数据预处理方法。
 
 * <img src="./docs/images/f3.png" width="20"/> **工业级训练与部署性能**：支持多进程异步I/O、多卡并行训练等加速策略，结合飞桨核心框架的显存优化功能，可大幅度减少模型的训练开销，帮助开发者以更低成本、更高效地完成遥感的开发和训练。
 
@@ -188,7 +188,7 @@ PaddleRS目录树中关键部分如下：
 * 准备数据集
   * [快速了解遥感与遥感数据](./docs/data/rs_data.md)
   * [遥感数据集整理](./docs/data/dataset.md)
-  * [智能标注工具EISeg](https://github.com/PaddlePaddle/PaddleSeg/tree/release/2.4/EISeg)
+  * [智能标注工具EISeg](https://github.com/PaddlePaddle/PaddleSeg/tree/release/2.6/EISeg)
   * [遥感影像处理工具集](./docs/data/tools.md)
 * 组件介绍
   * [数据预处理/数据增强](./docs/intro/transforms.md)

@@ -213,7 +213,7 @@ class BaseDetector(BaseModel):
                 Training dataset.
             train_batch_size (int, optional): Total batch size among all cards used in 
                 training. Defaults to 64.
-            eval_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset, optional): 
+            eval_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset|None, optional): 
                 Evaluation dataset. If None, the model will not be evaluated during training 
                 process. Defaults to None.
             optimizer (paddle.optimizer.Optimizer|None, optional): Optimizer used for 
@@ -379,7 +379,7 @@ class BaseDetector(BaseModel):
                 Training dataset.
             train_batch_size (int, optional): Total batch size among all cards used in 
                 training. Defaults to 64.
-            eval_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset, optional): 
+            eval_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset|None, optional): 
                 Evaluation dataset. If None, the model will not be evaluated during training 
                 process. Defaults to None.
             optimizer (paddle.optimizer.Optimizer or None, optional): Optimizer used for 
@@ -907,7 +907,7 @@ class PicoDet(BaseDetector):
                 Training dataset.
             train_batch_size (int, optional): Total batch size among all cards used in 
                 training. Defaults to 64.
-            eval_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset, optional): 
+            eval_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset|None, optional): 
                 Evaluation dataset. If None, the model will not be evaluated during training 
                 process. Defaults to None.
             optimizer (paddle.optimizer.Optimizer|None, optional): Optimizer used for 
@@ -1400,7 +1400,7 @@ class FasterRCNN(BaseDetector):
                 Training dataset.
             train_batch_size (int, optional): Total batch size among all cards used in 
                 training. Defaults to 64.
-            eval_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset, optional): 
+            eval_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset|None, optional): 
                 Evaluation dataset. If None, the model will not be evaluated during training 
                 process. Defaults to None.
             optimizer (paddle.optimizer.Optimizer|None, optional): Optimizer used for 
@@ -2242,7 +2242,7 @@ class MaskRCNN(BaseDetector):
                 Training dataset.
             train_batch_size (int, optional): Total batch size among all cards used in 
                 training. Defaults to 64.
-            eval_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset, optional): 
+            eval_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset|None, optional): 
                 Evaluation dataset. If None, the model will not be evaluated during training 
                 process. Defaults to None.
             optimizer (paddle.optimizer.Optimizer|None, optional): Optimizer used for 

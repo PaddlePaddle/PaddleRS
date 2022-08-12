@@ -1,6 +1,12 @@
 # 数据预处理/数据增强
 
-PaddleRS对不同遥感任务需要的数据预处理/数据增强策略进行了有机整合，设计统一的算子，并通过`paddlers.transforms.DecodeImg`对各种格式的遥感影像进行读取。PaddleRS提供的所有数据预处理/数据增强算子如下表：
+## 读取各种格式的遥感影像
+
+遥感影像的来源多样，数据格式十分繁杂。PaddleRS为不同类型、不同格式的遥感影像提供了统一的读取接口，只需向`paddlers.transforms.decode_image()`函数传入影像路径，即可将其中的数据信息读取至内存。目前，`paddlers.transforms.decode_image()`支持.png、.jpg、.bmp、.npy等常见文件格式，也支持遥感领域常用的GeoTiff、img等影像格式。
+
+## PaddleRS已支持的数据预处理/数据增强算子列表
+
+PaddleRS对不同遥感任务需要的数据预处理/数据增强策略进行了有机整合，设计统一的算子。考虑到遥感影像的多波段特性，PaddleRS的大部分数据处理算子均能够处理任意数量波段的输入。PaddleRS目前提供的所有数据预处理/数据增强算子如下表：
 
 | 数据预处理/数据增强算子名 | 用途                                           | 任务     | ... |
 | -------------------- | ------------------------------------------------- | -------- | ---- |
@@ -25,3 +31,7 @@ PaddleRS对不同遥感任务需要的数据预处理/数据增强策略进行�
 | SelectBand           | 对输入影像进行波段选择 | 所有任务 | ... |
 | RandomSwap           | 随机交换两个时相的输入影像 | 变化检测 | ... |
 | ...                  | ... | ... | ... |
+
+## 组合算子
+
+在实际的模型训练过程中，常常需要组合多种数据预处理与数据增强策略。PaddleRS提供了`paddlers.transforms.Compose`类以便捷地组合多个数据预处理/数据增强算子，使这些算子能够串行执行。关于`paddlers.transforms.Compose`的具体用法请参见[API说明](https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/data.md)。
