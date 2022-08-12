@@ -460,7 +460,7 @@ class BaseDetector(BaseModel):
 
         Returns:
             collections.OrderedDict with key-value pairs: 
-                {"mAP(0.50, 11point)":`mean average precision`}.
+                {"bbox_mmap":`mean average precision (0.50, 11point)`}.
         """
 
         if metric is None:

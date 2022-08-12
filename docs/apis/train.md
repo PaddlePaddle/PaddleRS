@@ -1,6 +1,6 @@
 # PaddleRS训练API说明
 
-训练器封装了模型训练、验证、量化以及动态图推理等逻辑，定义在`paddlers/tasks/`目录下的文件中。为了方便用户使用，PaddleRS为所有支持的模型均提供了继承自父类[`BaseModel`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/base.py)的训练器，并对外提供数个API。变化检测、场景分类、图像分割以及目标检测任务对应的训练器类型分别为`BaseChangeDetector`、`BaseClassifier`、`BaseDetector`和`BaseSegmenter`。本文档介绍训练器的初始化函数以及`train()`、`evaluate()` API。
+**训练器**封装了模型训练、验证、量化以及动态图推理等逻辑，定义在`paddlers/tasks/`目录下的文件中。为了方便用户使用，PaddleRS为所有支持的模型均提供了继承自父类[`BaseModel`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/base.py)的训练器，并对外提供数个API。变化检测、场景分类、图像分割以及目标检测任务对应的训练器类型分别为`BaseChangeDetector`、`BaseClassifier`、`BaseDetector`和`BaseSegmenter`。本文档介绍训练器的初始化函数以及`train()`、`evaluate()` API。
 
 ## 初始化训练器
 
@@ -8,43 +8,48 @@
 
 ### 初始化`BaseChangeDetector`子类对象
 
-一般支持设置`num_classes`、`use_mixed_loss`以及`in_channels`参数，分别表示模型输出类别数、是否使用预置的混合损失以及输入通道数。部分子类如`DSIFN`暂不支持对`in_channels`参数的设置。`use_mixed_loss`参将在未来被弃用，因此不建议使用。不同的子类支持与模型相关的输入参数，详情请参考[模型定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/rs_models/cd)和[训练器定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/change_detector.py)。
+- 一般支持设置`num_classes`、`use_mixed_loss`以及`in_channels`参数，分别表示模型输出类别数、是否使用预置的混合损失以及输入通道数。部分子类如`DSIFN`暂不支持对`in_channels`参数的设置。
+- `use_mixed_loss`参将在未来被弃用，因此不建议使用。
+- 不同的子类支持与模型相关的输入参数，详情请参考[模型定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/rs_models/cd)和[训练器定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/change_detector.py)。
 
 ### 初始化`BaseClassifier`子类对象
 
-一般支持设置`num_classes`和`use_mixed_loss`参数，分别表示模型输出类别数以及是否使用预置的混合损失。`use_mixed_loss`参将在未来被弃用，因此不建议使用。不同的子类支持与模型相关的输入参数，详情请参考[模型定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/rs_models/clas)和[训练器定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/classifier.py)。
+- 一般支持设置`num_classes`和`use_mixed_loss`参数，分别表示模型输出类别数以及是否使用预置的混合损失。
+- `use_mixed_loss`参将在未来被弃用，因此不建议使用。
+- 不同的子类支持与模型相关的输入参数，详情请参考[模型定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/rs_models/clas)和[训练器定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/classifier.py)。
 
 ### 初始化`Baseetector`子类对象
 
-一般支持设置`num_classes`和`backbone`参数，分别表示模型输出类别数以及所用的骨干网络类型。相比其它任务，目标检测任务的训练器支持设置的初始化参数较多，囊括网络结构、损失函数、后处理策略等方面。不同的子类支持与模型相关的输入参数，详情请参考[模型定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/rs_models/det)和[训练器定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/object_detector.py)。
+- 一般支持设置`num_classes`和`backbone`参数，分别表示模型输出类别数以及所用的骨干网络类型。相比其它任务，目标检测任务的训练器支持设置的初始化参数较多，囊括网络结构、损失函数、后处理策略等方面。
+- 不同的子类支持与模型相关的输入参数，详情请参考[模型定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/rs_models/det)和[训练器定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/object_detector.py)。
 
 ### 初始化`BaseSegmenter`子类对象
 
-一般支持设置`input_channel`、`num_classes`以及`use_mixed_loss`参数，分别表示输入通道数、输出类别数以及是否使用预置的混合损失。部分模型如`FarSeg`暂不支持对`input_channel`参数的设置。`use_mixed_loss`参将在未来被弃用，因此不建议使用。不同的子类支持与模型相关的输入参数，详情请参考[模型定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/rs_models/seg)和[训练器定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/segmentor.py)。
+- 一般支持设置`input_channel`、`num_classes`以及`use_mixed_loss`参数，分别表示输入通道数、输出类别数以及是否使用预置的混合损失。部分模型如`FarSeg`暂不支持对`input_channel`参数的设置。
+- `use_mixed_loss`参将在未来被弃用，因此不建议使用。
+- 不同的子类支持与模型相关的输入参数，详情请参考[模型定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/rs_models/seg)和[训练器定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/segmentor.py)。
 
 ## `train()`
 
 ### `BaseChangeDetector.train()`
 
-方法定义如下：
-
 ```python
 def train(self,
-            num_epochs,
-            train_dataset,
-            train_batch_size=2,
-            eval_dataset=None,
-            optimizer=None,
-            save_interval_epochs=1,
-            log_interval_steps=2,
-            save_dir='output',
-            pretrain_weights=None,
-            learning_rate=0.01,
-            lr_decay_power=0.9,
-            early_stop=False,
-            early_stop_patience=5,
-            use_vdl=True,
-            resume_checkpoint=None):
+          num_epochs,
+          train_dataset,
+          train_batch_size=2,
+          eval_dataset=None,
+          optimizer=None,
+          save_interval_epochs=1,
+          log_interval_steps=2,
+          save_dir='output',
+          pretrain_weights=None,
+          learning_rate=0.01,
+          lr_decay_power=0.9,
+          early_stop=False,
+          early_stop_patience=5,
+          use_vdl=True,
+          resume_checkpoint=None):
 ```
 
 其中各参数的含义如下：
@@ -69,25 +74,23 @@ def train(self,
 
 ### `BaseClassifier.train()`
 
-方法定义如下：
-
 ```python
 def train(self,
-            num_epochs,
-            train_dataset,
-            train_batch_size=2,
-            eval_dataset=None,
-            optimizer=None,
-            save_interval_epochs=1,
-            log_interval_steps=2,
-            save_dir='output',
-            pretrain_weights='IMAGENET',
-            learning_rate=0.1,
-            lr_decay_power=0.9,
-            early_stop=False,
-            early_stop_patience=5,
-            use_vdl=True,
-            resume_checkpoint=None):
+          num_epochs,
+          train_dataset,
+          train_batch_size=2,
+          eval_dataset=None,
+          optimizer=None,
+          save_interval_epochs=1,
+          log_interval_steps=2,
+          save_dir='output',
+          pretrain_weights='IMAGENET',
+          learning_rate=0.1,
+          lr_decay_power=0.9,
+          early_stop=False,
+          early_stop_patience=5,
+          use_vdl=True,
+          resume_checkpoint=None):
 ```
 
 其中各参数的含义如下：
@@ -112,30 +115,28 @@ def train(self,
 
 ### `BaseDetector.train()`
 
-方法定义如下：
-
 ```python
 def train(self,
-            num_epochs,
-            train_dataset,
-            train_batch_size=64,
-            eval_dataset=None,
-            optimizer=None,
-            save_interval_epochs=1,
-            log_interval_steps=10,
-            save_dir='output',
-            pretrain_weights='IMAGENET',
-            learning_rate=.001,
-            warmup_steps=0,
-            warmup_start_lr=0.0,
-            lr_decay_epochs=(216, 243),
-            lr_decay_gamma=0.1,
-            metric=None,
-            use_ema=False,
-            early_stop=False,
-            early_stop_patience=5,
-            use_vdl=True,
-            resume_checkpoint=None):
+          num_epochs,
+          train_dataset,
+          train_batch_size=64,
+          eval_dataset=None,
+          optimizer=None,
+          save_interval_epochs=1,
+          log_interval_steps=10,
+          save_dir='output',
+          pretrain_weights='IMAGENET',
+          learning_rate=.001,
+          warmup_steps=0,
+          warmup_start_lr=0.0,
+          lr_decay_epochs=(216, 243),
+          lr_decay_gamma=0.1,
+          metric=None,
+          use_ema=False,
+          early_stop=False,
+          early_stop_patience=5,
+          use_vdl=True,
+          resume_checkpoint=None):
 ```
 
 其中各参数的含义如下：
@@ -167,21 +168,21 @@ def train(self,
 
 ```python
 def train(self,
-            num_epochs,
-            train_dataset,
-            train_batch_size=2,
-            eval_dataset=None,
-            optimizer=None,
-            save_interval_epochs=1,
-            log_interval_steps=2,
-            save_dir='output',
-            pretrain_weights='CITYSCAPES',
-            learning_rate=0.01,
-            lr_decay_power=0.9,
-            early_stop=False,
-            early_stop_patience=5,
-            use_vdl=True,
-            resume_checkpoint=None):
+          num_epochs,
+          train_dataset,
+          train_batch_size=2,
+          eval_dataset=None,
+          optimizer=None,
+          save_interval_epochs=1,
+          log_interval_steps=2,
+          save_dir='output',
+          pretrain_weights='CITYSCAPES',
+          learning_rate=0.01,
+          lr_decay_power=0.9,
+          early_stop=False,
+          early_stop_patience=5,
+          use_vdl=True,
+          resume_checkpoint=None):
 ```
 
 其中各参数的含义如下：
@@ -208,8 +209,117 @@ def train(self,
 
 ### `BaseChangeDetector.evaluate()`
 
+```python
+def evaluate(self, eval_dataset, batch_size=1, return_details=False):
+```
+
+输入参数如下：
+
+|参数名称|类型|参数说明|默认值|
+|-------|----|--------|-----|
+|`eval_dataset`|`paddlers.datasets.CDDataset`|评估数据集。||
+|`batch_size`|`int`|评估时使用的batch size（多卡训练时，为所有设备合计batch size）。|`1`|
+|`return_details`|`bool`|是否返回详细信息。|`False`|
+
+当`return_details`为`False`（默认行为）时，输出为一个`collections.OrderedDict`对象。对于二类变化检测任务，输出包含如下键值对：
+
+```
+{"iou": 变化类的IoU指标，
+"f1": 变化类的F1分数，
+"oacc": 总体精度（准确率），
+"kappa": kappa系数}
+```
+
+对于多类变化检测任务，输出包含如下键值对：
+
+```
+{"miou": mIoU指标，
+"category_iou": 各类的IoU指标，
+"oacc": 总体精度（准确率），
+"category_acc": 各类精确率，
+"kappa": kappa系数，
+"category_F1score": 各类F1分数}
+```
+
+当`return_details`为`True`时，返回一个由两个字典构成的二元组，其中第一个元素为上述评价指标，第二个元素为仅包含一个key的字典，其`'confusion_matrix'`键对应值为以Python built-in list存储的混淆矩阵。
+
 ### `BaseClassifier.evaluate()`
+
+```python
+def evaluate(self, eval_dataset, batch_size=1, return_details=False):
+```
+
+输入参数如下：
+
+|参数名称|类型|参数说明|默认值|
+|-------|----|--------|-----|
+|`eval_dataset`|`paddlers.datasets.ClasDataset`|评估数据集。||
+|`batch_size`|`int`|评估时使用的batch size（多卡训练时，为所有设备合计batch size）。|`1`|
+|`return_details`|`bool`|*当前版本请勿手动设置此参数。*|`False`|
+
+输出为一个`collections.OrderedDict`对象，包含如下键值对：
+
+```
+{"top1": top1准确率，
+"top5": `top5准确率}
+```
 
 ### `BaseDetector.evaluate()`
 
+```python
+def evaluate(self,
+             eval_dataset,
+             batch_size=1,
+             metric=None,
+             return_details=False):
+```
+
+输入参数如下：
+
+|参数名称|类型|参数说明|默认值|
+|-------|----|--------|-----|
+|`eval_dataset`|`paddlers.datasets.COCODetDataset` \| `paddlers.datasets.VOCDetDataset`|评估数据集。||
+|`batch_size`|`int`|评估时使用的batch size（多卡训练时，为所有设备合计batch size）。|`1`|
+|`metric`|`str` \| `None`|评价指标，可以为`'VOC'`、`COCO`或`None`。若为`Nnoe`，则根据数据集格式自动确定使用的评价指标。|`None`|
+|`return_details`|`bool`|是否返回详细信息。|`False`|
+
+当`return_details`为`False`（默认行为）时，输出为一个`collections.OrderedDict`对象，包含如下键值对：
+
+```
+{"bbox_mmap": 预测结果的mAP值}
+```
+
+当`return_details`为`True`时，返回一个由两个字典构成的二元组，其中第一个字典为上述评价指标，第二个字典包含如下3个键值对：
+
+```
+{"gt": 数据集标注信息，
+"bbox": 预测得到的目标框信息，
+"mask": 预测得到的掩模图信息}
+```
+
 ### `BaseSegmenter.evaluate()`
+
+```python
+def evaluate(self, eval_dataset, batch_size=1, return_details=False):
+```
+
+输入参数如下：
+
+|参数名称|类型|参数说明|默认值|
+|-------|----|--------|-----|
+|`eval_dataset`|`paddlers.datasets.SegDataset`|评估数据集。||
+|`batch_size`|`int`|评估时使用的batch size（多卡训练时，为所有设备合计batch size）。|`1`|
+|`return_details`|`bool`|是否返回详细信息。|`False`|
+
+当`return_details`为`False`（默认行为）时，输出为一个`collections.OrderedDict`对象，包含如下键值对：
+
+```
+{"miou": mIoU指标，
+"category_iou": 各类的IoU指标，
+"oacc": 总体精度（准确率），
+"category_acc": 各类精确率，
+"kappa": kappa系数，
+"category_F1score": 各类F1分数}
+```
+
+当`return_details`为`True`时，返回一个由两个字典构成的二元组，其中第一个元素为上述评价指标，第二个元素为仅包含一个key的字典，其`'confusion_matrix'`键对应值为以Python built-in list存储的混淆矩阵。
