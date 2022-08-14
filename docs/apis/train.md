@@ -33,6 +33,8 @@
 
 ### `BaseChangeDetector.train()`
 
+接口形式：
+
 ```python
 def train(self,
           num_epochs,
@@ -74,6 +76,8 @@ def train(self,
 
 ### `BaseClassifier.train()`
 
+接口形式：
+
 ```python
 def train(self,
           num_epochs,
@@ -114,6 +118,8 @@ def train(self,
 |`resume_checkpoint`|`str` \| `None`|检查点路径。PaddleRS支持从检查点（包含先前训练过程中存储的模型权重和优化器权重）继续训练，但需注意`resume_checkpoint`与`pretrain_weights`不得同时设置为`None`以外的值。|`None`|
 
 ### `BaseDetector.train()`
+
+接口形式：
 
 ```python
 def train(self,
@@ -166,6 +172,8 @@ def train(self,
 
 ### `BaseSegmenter.train()`
 
+接口形式：
+
 ```python
 def train(self,
           num_epochs,
@@ -209,6 +217,8 @@ def train(self,
 
 ### `BaseChangeDetector.evaluate()`
 
+接口形式：
+
 ```python
 def evaluate(self, eval_dataset, batch_size=1, return_details=False):
 ```
@@ -224,26 +234,28 @@ def evaluate(self, eval_dataset, batch_size=1, return_details=False):
 当`return_details`为`False`（默认行为）时，输出为一个`collections.OrderedDict`对象。对于二类变化检测任务，输出包含如下键值对：
 
 ```
-{"iou": 变化类的IoU指标，
-"f1": 变化类的F1分数，
-"oacc": 总体精度（准确率），
-"kappa": kappa系数}
+{"iou": 变化类的IoU指标,
+ "f1": 变化类的F1分数,
+ "oacc": 总体精度（准确率）,
+ "kappa": kappa系数}
 ```
 
 对于多类变化检测任务，输出包含如下键值对：
 
 ```
-{"miou": mIoU指标，
-"category_iou": 各类的IoU指标，
-"oacc": 总体精度（准确率），
-"category_acc": 各类精确率，
-"kappa": kappa系数，
-"category_F1score": 各类F1分数}
+{"miou": mIoU指标,
+ "category_iou": 各类的IoU指标,
+ "oacc": 总体精度（准确率）,
+ "category_acc": 各类精确率,
+ "kappa": kappa系数,
+ "category_F1score": 各类F1分数}
 ```
 
 当`return_details`为`True`时，返回一个由两个字典构成的二元组，其中第一个元素为上述评价指标，第二个元素为仅包含一个key的字典，其`'confusion_matrix'`键对应值为以Python built-in list存储的混淆矩阵。
 
 ### `BaseClassifier.evaluate()`
+
+接口形式：
 
 ```python
 def evaluate(self, eval_dataset, batch_size=1, return_details=False):
@@ -260,11 +272,13 @@ def evaluate(self, eval_dataset, batch_size=1, return_details=False):
 输出为一个`collections.OrderedDict`对象，包含如下键值对：
 
 ```
-{"top1": top1准确率，
-"top5": `top5准确率}
+{"top1": top1准确率,
+ "top5": `top5准确率}
 ```
 
 ### `BaseDetector.evaluate()`
+
+接口形式：
 
 ```python
 def evaluate(self,
@@ -292,12 +306,14 @@ def evaluate(self,
 当`return_details`为`True`时，返回一个由两个字典构成的二元组，其中第一个字典为上述评价指标，第二个字典包含如下3个键值对：
 
 ```
-{"gt": 数据集标注信息，
-"bbox": 预测得到的目标框信息，
-"mask": 预测得到的掩模图信息}
+{"gt": 数据集标注信息,
+ "bbox": 预测得到的目标框信息,
+ "mask": 预测得到的掩模图信息}
 ```
 
 ### `BaseSegmenter.evaluate()`
+
+接口形式：
 
 ```python
 def evaluate(self, eval_dataset, batch_size=1, return_details=False):
@@ -314,12 +330,12 @@ def evaluate(self, eval_dataset, batch_size=1, return_details=False):
 当`return_details`为`False`（默认行为）时，输出为一个`collections.OrderedDict`对象，包含如下键值对：
 
 ```
-{"miou": mIoU指标，
-"category_iou": 各类的IoU指标，
-"oacc": 总体精度（准确率），
-"category_acc": 各类精确率，
-"kappa": kappa系数，
-"category_F1score": 各类F1分数}
+{"miou": mIoU指标,
+ "category_iou": 各类的IoU指标,
+ "oacc": 总体精度（准确率）,
+ "category_acc": 各类精确率,
+ "kappa": kappa系数,
+ "category_F1score": 各类F1分数}
 ```
 
 当`return_details`为`True`时，返回一个由两个字典构成的二元组，其中第一个元素为上述评价指标，第二个元素为仅包含一个key的字典，其`'confusion_matrix'`键对应值为以Python built-in list存储的混淆矩阵。

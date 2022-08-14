@@ -438,7 +438,9 @@ class BaseClassifier(BaseModel):
         Returns:
             If `img_file` is a string or np.array, the result is a dict with key-value 
                 pairs:
-                {"label map": `class_ids_map`, "scores_map": `label_names_map`}.
+                {"label map": `class_ids_map`, 
+                 "scores_map": `scores_map`, 
+                 "label_names_map": `label_names_map`}.
             If `img_file` is a list, the result is a list composed of dicts with the 
                 corresponding fields:
                 class_ids_map (np.ndarray): class_ids

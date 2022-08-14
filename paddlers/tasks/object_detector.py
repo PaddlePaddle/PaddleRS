@@ -559,9 +559,13 @@ class BaseDetector(BaseModel):
         Returns:
             If `img_file` is a string or np.array, the result is a list of dict with 
                 key-value pairs:
-                {"category_id": `category_id`, "category": `category`, "bbox": `[x, y, w, h]`, "score": `score`}.
-            If `img_file` is a list, the result is a list composed of dicts with the 
-                corresponding fields:
+                {"category_id": `category_id`, 
+                 "category": `category`, 
+                 "bbox": `[x, y, w, h]`, 
+                 "score": `score`, 
+                 "mask": `mask`}.
+            If `img_file` is a list, the result is a list composed of list of dicts 
+                with the corresponding fields:
                 category_id(int): the predicted category ID. 0 represents the first 
                     category in the dataset, and so on.
                 category(str): category name

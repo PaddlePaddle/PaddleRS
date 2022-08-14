@@ -2,10 +2,102 @@
 
 ## 数据集
 
-在PaddleRS中，所有数据集均继承自
+在PaddleRS中，所有数据集均继承自父类[`BaseDataset`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/datasets/base.py)。
 
-## 数据预处理/数据增强算子
+### `CDDataset`
 
-## 组合数据处理算子
+https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/datasets/cd_dataset.py
 
-## `decode_image()`
+### `ClasDataset`
+
+https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/datasets/clas_dataset.py
+
+### `COCODetDataset`
+
+https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/datasets/coco.py
+
+### `VOCDetDataset`
+
+https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/datasets/voc.py
+
+### `SegDataset`
+
+https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/datasets/seg_dataset.py
+
+## 数据读取API
+
+遥感影像的来源多样，数据格式十分繁杂。PaddleRS为不同类型、不同格式的遥感影像提供了统一的读取接口。目前，PaddleRS支持.png、.jpg、.bmp、.npy等常见文件格式的读取，也支持处理遥感领域常用的GeoTiff、img等影像格式。
+
+根据实际需要，用户可以选择`paddlers.transforms.decode_image()`或`paddlers.transforms.DecodeImg`进行数据读取。`DecodeImg`是[数据变换算子](#数据变换算子)之一，可以与其它算子组合使用。`decode_image`是对`DecodeImg`算子的封装，方便用户以函数调用的方式使用。
+
+`decode_image()`函数的参数列表如下：
+
+|参数名称|类型|参数说明|默认值|
+|-------|----|--------|-----|
+|`im_path`|`str`|输入图像路径。||
+|`to_rgb`|`bool`|若为`True`，则执行BGR到RGB格式的转换。|`True`|
+|`to_uint8`|`bool`|若为`True`，则将读取的图像数据量化并转换为uint8类型。|`True`|
+|`decode_bgr`|`bool`|若为`True`，则自动将非地学格式影像（如jpeg影像）解析为BGR格式。|`True`|
+|`decode_sar`|`bool`|若为`True`，则自动将2通道的地学格式影像（如GeoTiff影像）作为SAR影像解析。|`True`|
+|`read_geo_info`|`bool`|若为`True`，则从影像中读取地理信息。|`False`|
+
+返回格式如下：
+
+- 若`read_geo_info`为`False`，则以np.ndarray形式返回读取的影像数据（[h, w, c]排布）；
+- 若`read_geo_info`为`True`，则返回一个二元组，其中第一个元素为读取的影像数据，第二个元素为一个字典，其中的键值对为影像的地理信息，如地理变换信息、地理投影信息等。
+
+## 数据变换算子
+
+在PaddleRS中定义了一系列类，这些类在实例化之后，可通过调用`__call__`方法执行某种特定的数据预处理或数据增强操作。PaddleRS将这些类称为数据预处理/数据增强算子，并统称为**数据变换算子**。所有数据变换算子均继承自父类[`Transform`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/transforms/operators.py)。
+
+### `Transform`
+
+`Transform`对象的`__call__`方法接受唯一的参数`sample`。`sample`必须为字典或字典构成的序列。当`sample`是序列时，为`sample`中的每个字典执行数据变换操作，并将变换结果依次存储在一个Python built-in list中返回；当`sample`是字典时，`Transform`对象根据其中的一些键值对提取输入（这些键称为“输入键”），执行变换后，将结果以键值对的形式写入`sample`中（这些键称为“输出键”）。需要注意的是，目前PaddleRS中许多`Transform`对象都存在复写行为，即，输入键与输出键之间存在交集。`sample`中常见的键名及其表示的含义如下表：
+
+|键名|说明|
+|----|----|
+|`'image'`|影像路径或数据。对于变化检测任务，指第一时相影像数据。|
+|`'image2'`|变化检测任务中第二时相影像数据。|
+|`'image_t1'`|变化检测任务中第一时相影像路径。|
+|`'image_t2'`|变化检测任务中第二时相影像路径。|
+|`'mask'`|图像分割/变化检测任务中的真值标签路径或数据。|
+|`'aux_masks'`|图像分割/变化检测任务中的辅助标签路径或数据。|
+|`'gt_bbox'`|目标检测任务中的检测框标注数据。|
+|`'gt_poly'`|目标检测任务中的多边形标注数据。|
+
+## 组合数据变换算子
+
+使用`paddlers.transforms.Compose`对一组数据变换算子进行组合。`Compose`对象在构造时接受一个列表输入。在调用`Compose`对象时，相当于串行执行列表中的每一个数据变换算子。示例如下：
+
+```python
+# 使用Compose组合多种变换方式。Compose中包含的变换将按顺序串行执行
+train_transforms = T.Compose([
+    # 读取影像
+    T.DecodeImg(),
+    # 将影像缩放到512x512大小
+    T.Resize(target_size=512),
+    # 以50%的概率实施随机水平翻转
+    T.RandomHorizontalFlip(prob=0.5),
+    # 将数据归一化到[-1,1]
+    T.Normalize(
+        mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
+    # 挑选并排布后续需要使用的信息
+    T.ArrangeSegmenter('train')
+])
+```
+
+一般来说，`Compose`对象接受的数据变换算子列表中，首个元素为`paddlers.transforms.DecodeImg`对象，用于读取影像数据；最后一个元素为[`Arrange`算子](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/transforms/operators.py)，用于从`sample`字典中抽取信息并排列。
+
+对于图像分割任务和变化检测任务的验证集而言，可在`Arrange`算子之前插入`ReloadMask`算子以重新加载真值标签。示例如下：
+
+```python
+eval_transforms = T.Compose([
+    T.DecodeImg(),
+    T.Resize(target_size=512),
+    T.Normalize(
+        mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
+    # 重新加载标签
+    T.ReloadMask(),
+    T.ArrangeSegmenter('eval')
+])
+```
