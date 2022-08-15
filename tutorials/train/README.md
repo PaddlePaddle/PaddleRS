@@ -6,6 +6,7 @@
 |------|--------|---------|
 |change_detection/bit.py | 变化检测 | BIT |
 |change_detection/cdnet.py | 变化检测 | CDNet |
+|change_detection/changeformer.py | 变化检测 | ChangeFormer |
 |change_detection/dsamnet.py | 变化检测 | DSAMNet |
 |change_detection/dsifn.py | 变化检测 | DSIFN |
 |change_detection/snunet.py | 变化检测 | SNUNet |
