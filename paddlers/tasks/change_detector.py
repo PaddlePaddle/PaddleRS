@@ -36,7 +36,7 @@ from .utils import seg_metrics as metrics
 
 __all__ = [
     "CDNet", "FCEarlyFusion", "FCSiamConc", "FCSiamDiff", "STANet", "BIT",
-    "SNUNet", "DSIFN", "DSAMNet", "ChangeStar"
+    "SNUNet", "DSIFN", "DSAMNet", "ChangeStar", "ChangeFormer"
 ]
 
 
@@ -1041,3 +1041,23 @@ class ChangeStar(BaseChangeDetector):
             raise ValueError(
                 f"Currently `use_mixed_loss` must be set to False for {self.__class__}"
             )
+
+
+class ChangeFormer(BaseChangeDetector):
+    def __init__(self,
+                 in_channels=3,
+                 num_classes=2,
+                 decoder_softmax=False,
+                 embed_dim=256,
+                 use_mixed_loss=False,
+                 **params):
+        params.update({
+            'in_channels': in_channels,
+            'embed_dim': embed_dim,
+            'decoder_softmax': decoder_softmax
+        })
+        super(ChangeFormer, self).__init__(
+            model_name='ChangeFormer',
+            num_classes=num_classes,
+            use_mixed_loss=use_mixed_loss,
+            **params)

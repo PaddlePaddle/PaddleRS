@@ -21,7 +21,8 @@ from rs_models.test_model import TestModel
 __all__ = [
     'TestBITModel', 'TestCDNetModel', 'TestChangeStarModel', 'TestDSAMNetModel',
     'TestDSIFNModel', 'TestFCEarlyFusionModel', 'TestFCSiamConcModel',
-    'TestFCSiamDiffModel', 'TestSNUNetModel', 'TestSTANetModel'
+    'TestFCSiamDiffModel', 'TestSNUNetModel', 'TestSTANetModel',
+    'TestChangeFormerModel'
 ]
 
 
@@ -212,6 +213,18 @@ class TestSTANetModel(TestCDModel):
             dict(in_channels=3, num_classes=8),
             dict(**base_spec, att_type='PAM'),
             dict(**base_spec, ds_factor=4)
+        ]   # yapf: disable
+
+
+class TestChangeFormerModel(TestCDModel):
+    MODEL_CLASS = paddlers.rs_models.cd.ChangeFormer
+
+    def set_specs(self):
+        base_spec = dict(in_channels=3, num_classes=2)
+        self.specs = [
+            base_spec,
+            dict(**base_spec, decoder_softmax=True),
+            dict(**base_spec, embed_dim=56)
         ]   # yapf: disable
 
 
