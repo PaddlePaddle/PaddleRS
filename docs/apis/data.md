@@ -4,25 +4,104 @@
 
 在PaddleRS中，所有数据集均继承自父类[`BaseDataset`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/datasets/base.py)。
 
-### `CDDataset`
+### 变化检测数据集`CDDataset`
 
-https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/datasets/cd_dataset.py
+`CDDataset`定义在：https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/datasets/cd_dataset.py
 
-### `ClasDataset`
+其初始化参数列表如下：
 
-https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/datasets/clas_dataset.py
+|参数名称|类型|参数说明|默认值|
+|-------|----|--------|-----|
+|`data_dir`|`str`|数据集存放目录。||
+|`file_list`|`str`|file list路径。file list是一个文本文件，其中每一行包含一个样本的路径信息。`CDDataset`对file list的具体要求请参见下文。||
+|`transforms`|`paddlers.transforms.Compose`|对输入数据应用的数据变换算子。||
+|`label_list`|`str` \| `None`|label list文件。label list是一个文本文件，其中每一行包含一个类别的名称。|`None`|
+|`num_workers`|`int` \| `str`|加载数据时使用的辅助进程数。若设置为`'auto'`，则按照如下规则确定使用进程数：当CPU核心数大于16时，使用8个数据读取辅助进程；否则，使用CPU核心数一半数量的辅助进程。|`'auto'`|
+|`shuffle`|`bool`|是否随机打乱数据集中的样本。|`False`|
+|`with_seg_labels`|`bool`|当数据集中包含每个时相的分割标签时，请指定此选项为`True`。|`False`|
+|`binarize_labels`|`bool`|若为`True`，则在除`Arrange`以外的所有数据变换算子处理完毕后对变化标签（和分割标签）进行二值化操作。例如，将取值为{0, 255}的标签二值化到{0, 1}。|`False`|
 
-### `COCODetDataset`
+`CDDataset`对file list的要求如下：
 
-https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/datasets/coco.py
+- 当`with_seg_labels`为`False`时，file list中的每一行应该包含3个以空格分隔的项，依次表示第一时相影像相对`data_dir`的路径、第二时相影像相对`data_dir`的路径以及变化标签相对`data_dir`的路径。
+- 当`with_seg_labels`为`True`时，file list中的每一行应该包含5个以空格分隔的项，其中前3项的表示含义与`with_seg_labels`为`False`时相同，后2项依次表示第一时相和第二时相影像对应的分割标签相对`data_dir`的路径。
 
-### `VOCDetDataset`
+### 场景分类数据集`ClasDataset`
 
-https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/datasets/voc.py
+`ClasDataset`定义在：https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/datasets/clas_dataset.py
 
-### `SegDataset`
+其初始化参数列表如下：
 
-https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/datasets/seg_dataset.py
+|参数名称|类型|参数说明|默认值|
+|-------|----|--------|-----|
+|`data_dir`|`str`|数据集存放目录。||
+|`file_list`|`str`|file list路径。file list是一个文本文件，其中每一行包含一个样本的路径信息。`ClasDataset`对file list的具体要求请参见下文。||
+|`transforms`|`paddlers.transforms.Compose`|对输入数据应用的数据变换算子。||
+|`label_list`|`str` \| `None`|label list文件。label list是一个文本文件，其中每一行包含一个类别的名称。|`None`|
+|`num_workers`|`int` \| `str`|加载数据时使用的辅助进程数。若设置为`'auto'`，则按照如下规则确定使用进程数：当CPU核心数大于16时，使用8个数据读取辅助进程；否则，使用CPU核心数一半数量的辅助进程。|`'auto'`|
+|`shuffle`|`bool`|是否随机打乱数据集中的样本。|`False`|
+
+`ClasDataset`对file list的要求如下：
+
+- file list中的每一行应该包含2个以空格分隔的项，依次表示输入影像相对`data_dir`的路径以及影像的类别ID（可解析为整型值）。
+
+### COCO格式目标检测数据集`COCODetDataset`
+
+`COCODetDataset`定义在：https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/datasets/coco.py
+
+其初始化参数列表如下：
+
+|参数名称|类型|参数说明|默认值|
+|-------|----|--------|-----|
+|`data_dir`|`str`|数据集存放目录。||
+|`image_dir`|`str`|输入图像存放目录。||
+|`ann_path`|`str`|[COCO格式](https://cocodataset.org/#home)标注文件路径。||
+|`transforms`|`paddlers.transforms.Compose`|对输入数据应用的数据变换算子。||
+|`label_list`|`str` \| `None`|label list文件。label list是一个文本文件，其中每一行包含一个类别的名称。|`None`|
+|`num_workers`|`int` \| `str`|加载数据时使用的辅助进程数。若设置为`'auto'`，则按照如下规则确定使用进程数：当CPU核心数大于16时，使用8个数据读取辅助进程；否则，使用CPU核心数一半数量的辅助进程。|`'auto'`|
+|`shuffle`|`bool`|是否随机打乱数据集中的样本。|`False`|
+|`allow_empty`|`bool`|是否向数据集中添加负样本。|`False`|
+|`empty_ratio`|`float`|负样本占比，仅当`allow_empty`为`True`时生效。若`empty_ratio`为负值或大于等于1，则保留所有生成的负样本。|`1.0`|
+
+### VOC格式目标检测数据集`VOCDetDataset`
+
+`VOCDetDataset`定义在：https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/datasets/voc.py
+
+其初始化参数列表如下：
+
+|参数名称|类型|参数说明|默认值|
+|-------|----|--------|-----|
+|`data_dir`|`str`|数据集存放目录。||
+|`file_list`|`str`|file list路径。file list是一个文本文件，其中每一行包含一个样本的路径信息。`VOCDetDataset`对file list的具体要求请参见下文。||
+|`transforms`|`paddlers.transforms.Compose`|对输入数据应用的数据变换算子。||
+|`label_list`|`str` \| `None`|label list文件。label list是一个文本文件，其中每一行包含一个类别的名称。|`None`|
+|`num_workers`|`int` \| `str`|加载数据时使用的辅助进程数。若设置为`'auto'`，则按照如下规则确定使用进程数：当CPU核心数大于16时，使用8个数据读取辅助进程；否则，使用CPU核心数一半数量的辅助进程。|`'auto'`|
+|`shuffle`|`bool`|是否随机打乱数据集中的样本。|`False`|
+|`allow_empty`|`bool`|是否向数据集中添加负样本。|`False`|
+|`empty_ratio`|`float`|负样本占比，仅当`allow_empty`为`True`时生效。若`empty_ratio`为负值或大于等于1，则保留所有生成的负样本。|`1.0`|
+
+`VOCDetDataset`对file list的要求如下：
+
+- file list中的每一行应该包含2个以空格分隔的项，依次表示输入影像相对`data_dir`的路径以及[Pascal VOC格式](http://host.robots.ox.ac.uk/pascal/VOC/)标注文件相对`data_dir`的路径。
+
+### 图像分割数据集`SegDataset`
+
+`SegDataset`定义在：https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/datasets/seg_dataset.py
+
+其初始化参数列表如下：
+
+|参数名称|类型|参数说明|默认值|
+|-------|----|--------|-----|
+|`data_dir`|`str`|数据集存放目录。||
+|`file_list`|`str`|file list路径。file list是一个文本文件，其中每一行包含一个样本的路径信息。`SegDataset`对file list的具体要求请参见下文。||
+|`transforms`|`paddlers.transforms.Compose`|对输入数据应用的数据变换算子。||
+|`label_list`|`str` \| `None`|label list文件。label list是一个文本文件，其中每一行包含一个类别的名称。|`None`|
+|`num_workers`|`int` \| `str`|加载数据时使用的辅助进程数。若设置为`'auto'`，则按照如下规则确定使用进程数：当CPU核心数大于16时，使用8个数据读取辅助进程；否则，使用CPU核心数一半数量的辅助进程。|`'auto'`|
+|`shuffle`|`bool`|是否随机打乱数据集中的样本。|`False`|
+
+`SegDataset`对file list的要求如下：
+
+- file list中的每一行应该包含2个以空格分隔的项，依次表示输入影像相对`data_dir`的路径以及分割标签相对`data_dir`的路径。
 
 ## 数据读取API
 
@@ -65,7 +144,7 @@ https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/datasets/seg_data
 |`'gt_bbox'`|目标检测任务中的检测框标注数据。|
 |`'gt_poly'`|目标检测任务中的多边形标注数据。|
 
-## 组合数据变换算子
+### 组合数据变换算子
 
 使用`paddlers.transforms.Compose`对一组数据变换算子进行组合。`Compose`对象在构造时接受一个列表输入。在调用`Compose`对象时，相当于串行执行列表中的每一个数据变换算子。示例如下：
 
