@@ -29,7 +29,7 @@ from paddlers.utils import get_single_card_bs, DisablePrint
 import paddlers.utils.logging as logging
 from .base import BaseModel
 from paddlers.models.ppcls.metric import build_metrics
-from paddlers.models.ppcls.loss import build_loss
+from paddlers.models import clas_losses
 from paddlers.models.ppcls.data.postprocess import build_postprocess
 from paddlers.utils.checkpoint import cls_pretrain_weights_dict
 from paddlers.transforms import Resize, decode_image
@@ -146,7 +146,7 @@ class BaseClassifier(BaseModel):
     def default_loss(self):
         # TODO: use mixed loss and other loss
         default_config = [{"CELoss": {"weight": 1.0}}]
-        return build_loss(default_config)
+        return clas_losses.build_loss(default_config)
 
     def default_optimizer(self,
                           parameters,

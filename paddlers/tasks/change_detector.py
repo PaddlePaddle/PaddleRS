@@ -28,7 +28,7 @@ import paddlers
 import paddlers.rs_models.cd as cmcd
 import paddlers.utils.logging as logging
 import paddlers.models.ppseg.utils.metrics as metrics
-import paddlers.models.seg_losses as seg_losses
+from paddlers.models import seg_losses
 from paddlers.transforms import Resize, decode_image
 from paddlers.utils import get_single_card_bs, DisablePrint
 from paddlers.utils.checkpoint import seg_pretrain_weights_dict

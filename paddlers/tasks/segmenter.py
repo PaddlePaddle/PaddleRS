@@ -25,9 +25,9 @@ from paddle.static import InputSpec
 
 import paddlers
 import paddlers.models.ppseg as paddleseg
-import paddlers.models.seg_losses as seg_losses
 import paddlers.custom_models.seg as cmseg
 import paddlers.utils.logging as logging
+from paddlers.models import seg_losses
 from .base import BaseModel
 from .utils import seg_metrics as metrics
 from paddlers.utils.checkpoint import seg_pretrain_weights_dict
