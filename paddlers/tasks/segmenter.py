@@ -25,7 +25,7 @@ from paddle.static import InputSpec
 
 import paddlers
 import paddlers.models.ppseg as paddleseg
-import paddlers.custom_models.seg as cmseg
+import paddlers.rs_models.seg as cmseg
 import paddlers.utils.logging as logging
 from paddlers.models import seg_losses
 from .base import BaseModel
