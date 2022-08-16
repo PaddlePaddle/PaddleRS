@@ -63,7 +63,7 @@ def js_test(test_image_path, js_train_path, js_test_path, image_keyname,
 def get_args():
     parser = argparse.ArgumentParser(description='Get Test Json')
 
-    # parameters
+    # Parameters
     parser.add_argument('--test_image_path', type=str, help='test image path')
     parser.add_argument(
         '--json_train_path',

@@ -25,9 +25,9 @@ import paddle.nn.functional as F
 from paddle.static import InputSpec
 
 import paddlers
+import paddlers.models.ppseg as ppseg
 import paddlers.rs_models.cd as cmcd
 import paddlers.utils.logging as logging
-import paddlers.models.ppseg as paddleseg
 from paddlers.transforms import Resize, decode_image
 from paddlers.utils import get_single_card_bs, DisablePrint
 from paddlers.utils.checkpoint import seg_pretrain_weights_dict
@@ -144,7 +144,7 @@ class BaseChangeDetector(BaseModel):
             origin_shape = [label.shape[-2:]]
             pred = self._postprocess(
                 pred, origin_shape, transforms=inputs[3])[0]  # NCHW
-            intersect_area, pred_area, label_area = paddleseg.utils.metrics.calculate_area(
+            intersect_area, pred_area, label_area = ppseg.utils.metrics.calculate_area(
                 pred, label, self.num_classes)
             outputs['intersect_area'] = intersect_area
             outputs['pred_area'] = pred_area
@@ -178,16 +178,13 @@ class BaseChangeDetector(BaseModel):
         if isinstance(self.use_mixed_loss, bool):
             if self.use_mixed_loss:
                 losses = [
-                    paddleseg.models.CrossEntropyLoss(),
-                    paddleseg.models.LovaszSoftmaxLoss()
+                    ppseg.models.CrossEntropyLoss(),
+                    ppseg.models.LovaszSoftmaxLoss()
                 ]
                 coef = [.8, .2]
-                loss_type = [
-                    paddleseg.models.MixedLoss(
-                        losses=losses, coef=coef),
-                ]
+                loss_type = [ppseg.models.MixedLoss(losses=losses, coef=coef), ]
             else:
-                loss_type = [paddleseg.models.CrossEntropyLoss()]
+                loss_type = [ppseg.models.CrossEntropyLoss()]
         else:
             losses, coef = list(zip(*self.use_mixed_loss))
             if not set(losses).issubset(
@@ -195,11 +192,8 @@ class BaseChangeDetector(BaseModel):
                 raise ValueError(
                     "Only 'CrossEntropyLoss', 'DiceLoss', 'LovaszSoftmaxLoss' are supported."
                 )
-            losses = [getattr(paddleseg.models, loss)() for loss in losses]
-            loss_type = [
-                paddleseg.models.MixedLoss(
-                    losses=losses, coef=list(coef))
-            ]
+            losses = [getattr(ppseg.models, loss)() for loss in losses]
+            loss_type = [ppseg.models.MixedLoss(losses=losses, coef=list(coef))]
         loss_coef = [1.0]
         losses = {'types': loss_type, 'coef': loss_coef}
         return losses
@@ -492,13 +486,13 @@ class BaseChangeDetector(BaseModel):
                     pred_area_all = pred_area_all + pred_area
                     label_area_all = label_area_all + label_area
                     conf_mat_all.append(conf_mat)
-        class_iou, miou = paddleseg.utils.metrics.mean_iou(
+        class_iou, miou = ppseg.utils.metrics.mean_iou(
             intersect_area_all, pred_area_all, label_area_all)
         # TODO 确认是按oacc还是macc
-        class_acc, oacc = paddleseg.utils.metrics.accuracy(intersect_area_all,
-                                                           pred_area_all)
-        kappa = paddleseg.utils.metrics.kappa(intersect_area_all, pred_area_all,
-                                              label_area_all)
+        class_acc, oacc = ppseg.utils.metrics.accuracy(intersect_area_all,
+                                                       pred_area_all)
+        kappa = ppseg.utils.metrics.kappa(intersect_area_all, pred_area_all,
+                                          label_area_all)
         category_f1score = metrics.f1_score(intersect_area_all, pred_area_all,
                                             label_area_all)
 
@@ -643,7 +637,7 @@ class BaseChangeDetector(BaseModel):
                     int(xoff), int(yoff), xsize, ysize).transpose((1, 2, 0))
                 im2 = src2_data.ReadAsArray(
                     int(xoff), int(yoff), xsize, ysize).transpose((1, 2, 0))
-                # fill
+                # Fill
                 h, w = im1.shape[:2]
                 im1_fill = np.zeros(
                     (block_size[1], block_size[0], bands), dtype=im1.dtype)
@@ -651,10 +645,10 @@ class BaseChangeDetector(BaseModel):
                 im1_fill[:h, :w, :] = im1
                 im2_fill[:h, :w, :] = im2
                 im_fill = (im1_fill, im2_fill)
-                # predict
+                # Predict
                 pred = self.predict(im_fill,
                                     transforms)["label_map"].astype("uint8")
-                # overlap
+                # Overlap
                 rd_block = band.ReadAsArray(int(xoff), int(yoff), xsize, ysize)
                 mask = (rd_block == pred[:h, :w]) | (rd_block == 255)
                 temp = pred[:h, :w].copy()
@@ -966,7 +960,7 @@ class DSIFN(BaseChangeDetector):
         if self.use_mixed_loss is False:
             return {
                 # XXX: make sure the shallow copy works correctly here.
-                'types': [paddleseg.models.CrossEntropyLoss()] * 5,
+                'types': [ppseg.models.CrossEntropyLoss()] * 5,
                 'coef': [1.0] * 5
             }
         else:
@@ -998,8 +992,8 @@ class DSAMNet(BaseChangeDetector):
         if self.use_mixed_loss is False:
             return {
                 'types': [
-                    paddleseg.models.CrossEntropyLoss(),
-                    paddleseg.models.DiceLoss(), paddleseg.models.DiceLoss()
+                    ppseg.models.CrossEntropyLoss(), ppseg.models.DiceLoss(),
+                    ppseg.models.DiceLoss()
                 ],
                 'coef': [1.0, 0.05, 0.05]
             }
@@ -1034,7 +1028,7 @@ class ChangeStar(BaseChangeDetector):
         if self.use_mixed_loss is False:
             return {
                 # XXX: make sure the shallow copy works correctly here.
-                'types': [paddleseg.models.CrossEntropyLoss()] * 4,
+                'types': [ppseg.models.CrossEntropyLoss()] * 4,
                 'coef': [1.0] * 4
             }
         else:
