@@ -8,23 +8,20 @@ import os
 import paddlers as pdrs
 from paddlers import transforms as T
 
-# 下载文件存放目录
-DOWNLOAD_DIR = './data/sarship/'
 # 数据集存放目录
-DATA_DIR = './data/sarship/sar_ship_1/'
+DATA_DIR = './data/sarship/'
 # 训练集`file_list`文件路径
-TRAIN_FILE_LIST_PATH = './data/sarship/sar_ship_1/train.txt'
+TRAIN_FILE_LIST_PATH = './data/sarship/train.txt'
 # 验证集`file_list`文件路径
-EVAL_FILE_LIST_PATH = './data/sarship/sar_ship_1/valid.txt'
+EVAL_FILE_LIST_PATH = './data/sarship/eval.txt'
 # 数据集类别信息文件路径
-LABEL_LIST_PATH = './data/sarship/sar_ship_1/labels.txt'
+LABEL_LIST_PATH = './data/sarship/labels.txt'
 # 实验目录，保存输出的模型权重和结果
 EXP_DIR = './output/faster_rcnn/'
 
 # 下载和解压SAR影像舰船检测数据集
-sarship_dataset = 'https://paddleseg.bj.bcebos.com/dataset/sar_ship_1.tar.gz'
-if not os.path.exists(DATA_DIR):
-    pdrs.utils.download_and_decompress(sarship_dataset, path=DOWNLOAD_DIR)
+pdrs.utils.download_and_decompress(
+    'https://paddlers.bj.bcebos.com/datasets/sarship.zip', path='./data/')
 
 # 定义训练和验证时使用的数据变换（数据增强、预处理等）
 # 使用Compose组合多种变换方式。Compose中包含的变换将按顺序串行执行
@@ -32,18 +29,13 @@ if not os.path.exists(DATA_DIR):
 train_transforms = T.Compose([
     # 读取影像
     T.DecodeImg(),
-    # 对输入影像施加随机色彩扰动
-    T.RandomDistort(),
-    # 在影像边界进行随机padding
-    T.RandomExpand(),
     # 随机裁剪，裁块大小在一定范围内变动
     T.RandomCrop(),
     # 随机水平翻转
     T.RandomHorizontalFlip(),
     # 对batch进行随机缩放，随机选择插值方式
     T.BatchRandomResize(
-        target_sizes=[320, 352, 384, 416, 448, 480, 512, 544, 576, 608],
-        interp='RANDOM'),
+        target_sizes=[512, 544, 576, 608], interp='RANDOM'),
     # 影像归一化
     T.Normalize(
         mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
@@ -62,14 +54,14 @@ eval_transforms = T.Compose([
 ])
 
 # 分别构建训练和验证所用的数据集
-train_dataset = pdrs.datasets.VOCDetection(
+train_dataset = pdrs.datasets.VOCDetDataset(
     data_dir=DATA_DIR,
     file_list=TRAIN_FILE_LIST_PATH,
     label_list=LABEL_LIST_PATH,
     transforms=train_transforms,
     shuffle=True)
 
-eval_dataset = pdrs.datasets.VOCDetection(
+eval_dataset = pdrs.datasets.VOCDetDataset(
     data_dir=DATA_DIR,
     file_list=EVAL_FILE_LIST_PATH,
     label_list=LABEL_LIST_PATH,
@@ -79,7 +71,7 @@ eval_dataset = pdrs.datasets.VOCDetection(
 # 构建Faster R-CNN模型
 # 目前已支持的模型请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/model_zoo.md
 # 模型输入参数请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/object_detector.py
-model = pdrs.tasks.FasterRCNN(num_classes=len(train_dataset.labels))
+model = pdrs.tasks.det.FasterRCNN(num_classes=len(train_dataset.labels))
 
 # 执行模型训练
 model.train(

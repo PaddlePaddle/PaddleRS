@@ -50,8 +50,7 @@ def md5check(fullname, md5sum=None):
 
 def move_and_merge_tree(src, dst):
     """
-    Move src directory to dst, if dst is already exists,
-    merge src to dst
+    Move `src` to `dst`. If `dst` already exists, merge `src` with `dst`.
     """
     if not osp.exists(dst):
         shutil.move(src, dst)
@@ -71,10 +70,10 @@ def move_and_merge_tree(src, dst):
 
 def download(url, path, md5sum=None):
     """
-    Download from url, save to path.
+    Download from `url` and save the result to `path`.
 
-    url (str): download url
-    path (str): download to given path
+    url (str): URL.
+    path (str): Path to save the downloaded result.
     """
     if not osp.exists(path):
         os.makedirs(path)
@@ -106,10 +105,11 @@ def download(url, path, md5sum=None):
             if total_size:
                 download_size = 0
                 current_time = time.time()
-                for chunk in tqdm.tqdm(
-                        req.iter_content(chunk_size=1024),
-                        total=(int(total_size) + 1023) // 1024,
-                        unit='KB'):
+                pb = tqdm.tqdm(
+                    req.iter_content(chunk_size=1024),
+                    total=(int(total_size) + 1023) // 1024,
+                    unit='KB')
+                for chunk in pb:
                     f.write(chunk)
                     download_size += 1024
                     if download_size % 524288 == 0:
@@ -120,9 +120,9 @@ def download(url, path, md5sum=None):
                         speed = int(524288 / (time.time() - current_time + 0.01)
                                     / 1024.0)
                         current_time = time.time()
-                        logging.debug(
-                            "Downloading: TotalSize={}M, DownloadSize={}M, Speed={}KB/s"
-                            .format(total_size_m, download_size_m, speed))
+                        pb.set_description(
+                            "Downloading: TotalSize={}M, DownloadedSize={}M"
+                            .format(total_size_m, download_size_m))
             else:
                 for chunk in req.iter_content(chunk_size=1024):
                     if chunk:
@@ -135,7 +135,7 @@ def download(url, path, md5sum=None):
 
 def decompress(fname):
     """
-    Decompress for zip and tar file
+    Decompress zip or tar files.
     """
     logging.info("Decompressing {}...".format(fname))
 

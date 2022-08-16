@@ -11,13 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-'''
+"""
 @File Description:
 # 输出json文件基本信息
 python ./coco_tools/json_InfoShow.py \
        --json_path=./annotations/instances_val2017.json \
        --show_num 5
-'''
+"""
 
 import json
 import argparse

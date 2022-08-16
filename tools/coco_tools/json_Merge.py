@@ -11,14 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-'''
+"""
 @File Description:
 # 合并json文件，可以通过merge_keys控制合并的字段, 默认合并'images', 'annotations'字段
 python ./coco_tools/json_Merge.py \
     --json1_path=./annotations/instances_train2017.json \
     --json2_path=./annotations/instances_val2017.json \
     --save_path=./instances_trainval2017.json
-'''
+"""
 
 import json
 import argparse

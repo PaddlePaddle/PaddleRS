@@ -58,75 +58,73 @@ def center_crop(im, crop_size=224):
 # region flip
 def img_flip(im, method=0):
     """
-    flip image in different ways, this function provides 5 method to filp
-    this function can be applied to 2D or 3D images
+    Flip an image. 
+    This function provides 5 flipping methods and can be applied to 2D or 3D numpy arrays.
 
     Args:
-        im(array): image array
-        method(int or string): choose the flip method, it must be one of [
-                                0, 1, 2, 3, 4, 'h', 'v', 'hv', 'rt2lb', 'lt2rb', 'dia', 'adia']
-        0 or 'h': flipped in horizontal direction, which is the most frequently used method
-        1 or 'v': flipped in vertical direction
-        2 or 'hv': flipped in both horizontal diction and vertical direction
-        3 or 'rt2lb' or 'dia': flipped around the diagonal,
-                                which also can be thought as changing the RightTop part with LeftBottom part,
-                                so it is called 'rt2lb' as well.
-        4 or 'lt2rb' or 'adia': flipped around the anti-diagonal
-                                    which also can be thought as changing the LeftTop part with RightBottom part,
-                                    so it is called 'lt2rb' as well.
+        im (np.ndarray): Input image.
+        method (int|string): Flipping method. Must be one of [
+                                0, 1, 2, 3, 4, 'h', 'v', 'hv', 'rt2lb', 'lt2rb', 
+                                'dia', 'adia'].
+            0 or 'h': flip the image in horizontal direction, which is the most frequently 
+                used method;
+            1 or 'v': flip the image in vertical direction;
+            2 or 'hv': flip the image in both horizontal diction and vertical direction;
+            3 or 'rt2lb' or 'dia': flip the image across the diagonal;
+            4 or 'lt2rb' or 'adia': flip the image across the anti-diagonal.
 
     Returns:
-        flipped image(array)
+        np.ndarray: Flipped image.
 
     Raises:
-        ValueError: Shape of image should 2d, 3d or more.
+        ValueError: Invalid shape of images.
 
     Examples:
-        --assume an image is like this:
+        Assume an image is like this:
 
         img:
         / + +
         - / *
         - * /
 
-        --we can flip it in following code:
+        We can flip it with following code:
 
-        img_h = im_flip(img, 'h')
-        img_v = im_flip(img, 'v')
-        img_vh = im_flip(img, 2)
-        img_rt2lb = im_flip(img, 3)
-        img_lt2rb = im_flip(img, 4)
+        img_h = img_flip(img, 'h')
+        img_v = img_flip(img, 'v')
+        img_vh = img_flip(img, 2)
+        img_rt2lb = img_flip(img, 3)
+        img_lt2rb = img_flip(img, 4)
 
-        --we can get flipped image:
+        Then we get the flipped images:
 
-        img_h, flipped in horizontal direction
+        img_h, flipped in horizontal direction:
         + + \
         * \ -
         \ * -
 
-        img_v, flipped in vertical direction
+        img_v, flipped in vertical direction:
         - * \
         - \ *
         \ + +
 
-        img_vh, flipped in both horizontal diction and vertical direction
+        img_vh, flipped in both horizontal diction and vertical direction:
         / * -
         * / -
         + + /
 
-        img_rt2lb, flipped around the diagonal
+        img_rt2lb, mirrored on the diagonal:
         / | |
         + / *
         + * /
 
-        img_lt2rb, flipped around the anti-diagonal
+        img_lt2rb, mirrored on the anti-diagonal:
         / * +
         * / +
         | | /
-
     """
+
     if not len(im.shape) >= 2:
-        raise ValueError("Shape of image should 2d, 3d or more")
+        raise ValueError("The number of image dimensions is less than 2.")
     if method == 0 or method == 'h':
         return horizontal_flip(im)
     elif method == 1 or method == 'v':
@@ -176,61 +174,58 @@ def lt2rb_flip(im):
 # region rotation
 def img_simple_rotate(im, method=0):
     """
-    rotate image in simple ways, this function provides 3 method to rotate
-    this function can be applied to 2D or 3D images
+    Rotate an image. 
+    This function provides 3 rotating methods and can be applied to 2D or 3D numpy arrays.
 
     Args:
-        im(array): image array
-        method(int or string): choose the flip method, it must be one of [
+        im (np.ndarray): Input image.
+        method (int|string): Rotating method, which must be one of [
                                 0, 1, 2, 90, 180, 270
-                                ]
-        0 or 90 : rotated in 90 degree, clockwise
-        1 or 180: rotated in 180 degree, clockwise
-        2 or 270: rotated in 270 degree, clockwise
+                                ].
+            0 or 90 : rotate the image by 90 degrees, clockwise;
+            1 or 180: rotate the image by 180 degrees, clockwise;
+            2 or 270: rotate the image by 270 degrees, clockwise.
 
     Returns:
-        flipped image(array)
-
+        np.ndarray: Rotated image.
 
     Raises:
-        ValueError: Shape of image should 2d, 3d or more.
-
+        ValueError: Invalid shape of images.
 
     Examples:
-        --assume an image is like this:
+        Assume an image is like this:
 
         img:
         / + +
         - / *
         - * /
 
-        --we can rotate it in following code:
+        We can rotate it with following code:
 
         img_r90 = img_simple_rotate(img, 90)
         img_r180 = img_simple_rotate(img, 1)
         img_r270 = img_simple_rotate(img, 2)
 
-        --we can get rotated image:
+        Then we get the following rotated images:
 
-        img_r90, rotated in 90 degree
+        img_r90, rotated by 90°:
         | | \
         * \ +
         \ * +
 
-        img_r180, rotated in 180 degree
+        img_r180, rotated by 180°:
         / * -
         * / -
         + + /
 
-        img_r270, rotated in 270 degree
+        img_r270, rotated by 270°:
         + * \
         + \ *
         \ | |
-
-
     """
+
     if not len(im.shape) >= 2:
-        raise ValueError("Shape of image should 2d, 3d or more")
+        raise ValueError("The number of image dimensions is less than 2.")
     if method == 0 or method == 90:
         return rot_90(im)
     elif method == 1 or method == 180:
@@ -396,14 +391,15 @@ def resize_rle(rle, im_h, im_w, im_scale_x, im_scale_y, interp):
 
 
 def to_uint8(im, is_linear=False):
-    """ Convert raster to uint8.
+    """
+    Convert raster data to uint8 type.
     
     Args:
-        im (np.ndarray): The image.
+        im (np.ndarray): Input raster image.
         is_linear (bool, optional): Use 2% linear stretch or not. Default is False.
 
     Returns:
-        np.ndarray: Image on uint8.
+        np.ndarray: Image data with unit8 type.
     """
 
     # 2% linear stretch
@@ -448,16 +444,18 @@ def to_uint8(im, is_linear=False):
 
 
 def to_intensity(im):
-    """ calculate SAR data's intensity diagram.
+    """
+    Calculate the intensity of SAR data.
 
     Args:
-        im (np.ndarray): The SAR image.
+        im (np.ndarray): SAR image.
 
     Returns:
-        np.ndarray: Intensity diagram.
+        np.ndarray: Intensity image.
     """
+
     if len(im.shape) != 2:
-        raise ValueError("im's shape must be 2.")
+        raise ValueError("`len(im.shape) must be 2.")
     # the type is complex means this is a SAR data
     if isinstance(type(im[0, 0]), complex):
         im = abs(im)
@@ -465,15 +463,18 @@ def to_intensity(im):
 
 
 def select_bands(im, band_list=[1, 2, 3]):
-    """ Select bands.
+    """
+    Select bands of a multi-band image.
 
     Args:
-        im (np.ndarray): The image.
-        band_list (list, optional): Bands of selected (Start with 1). Defaults to [1, 2, 3].
+        im (np.ndarray): Input image.
+        band_list (list, optional): Bands to select (band index start from 1). 
+            Defaults to [1, 2, 3].
 
     Returns:
-        np.ndarray: The image after band selected.
+        np.ndarray: Image with selected bands.
     """
+
     if len(im.shape) == 2:  # just have one channel
         return im
     if not isinstance(band_list, list) or len(band_list) == 0:
@@ -492,14 +493,14 @@ def select_bands(im, band_list=[1, 2, 3]):
 
 def dehaze(im, gamma=False):
     """
-    Single image haze removal using dark channel prior.
+    Perform single image haze removal using dark channel prior.
 
     Args:
         im (np.ndarray): Input image.
         gamma (bool, optional): Use gamma correction or not. Defaults to False.
 
     Returns:
-        np.ndarray: The image after dehazed.
+        np.ndarray: Output dehazed image.
     """
 
     def _guided_filter(I, p, r, eps):
@@ -549,7 +550,8 @@ def match_histograms(im, ref):
 
     Args:
         im (np.ndarray): Input image.
-        ref (np.ndarray): Reference image to match histogram of. `ref` must have the same number of channels as `im`.
+        ref (np.ndarray): Reference image to match histogram of. `ref` must have 
+            the same number of channels as `im`.
 
     Returns:
         np.ndarray: Transformed input image.
@@ -557,6 +559,7 @@ def match_histograms(im, ref):
     Raises:
         ValueError: When the number of channels of `ref` differs from that of im`.
     """
+
     # TODO: Check the data types of the inputs to see if they are supported by skimage
     return exposure.match_histograms(
         im, ref, channel_axis=-1 if im.ndim > 2 else None)
@@ -568,10 +571,12 @@ def match_by_regression(im, ref, pif_loc=None):
 
     Args:
         im (np.ndarray): Input image.
-        ref (np.ndarray): Reference image to match. `ref` must have the same shape as `im`.
-        pif_loc (tuple|None, optional): Spatial locations where pseudo-invariant features (PIFs) are obtained. If 
-            `pif_loc` is set to None, all pixels in the image will be used as training samples for the regression model. 
-            In other cases, `pif_loc` should be a tuple of np.ndarrays. Default: None.
+        ref (np.ndarray): Reference image to match. `ref` must have the same shape 
+            as `im`.
+        pif_loc (tuple|None, optional): Spatial locations where pseudo-invariant 
+            features (PIFs) are obtained. If `pif_loc` is set to None, all pixels in 
+            the image will be used as training samples for the regression model. In 
+            other cases, `pif_loc` should be a tuple of np.ndarrays. Default: None.
 
     Returns:
         np.ndarray: Transformed input image.
@@ -609,15 +614,16 @@ def match_by_regression(im, ref, pif_loc=None):
 
 def inv_pca(im, joblib_path):
     """
-    Restore PCA result.
+    Perform inverse PCA transformation.
 
     Args:
-        im (np.ndarray): The input image after PCA.
-        joblib_path (str): Path of *.joblib about PCA.
+        im (np.ndarray): Input image after performing PCA.
+        joblib_path (str): Path of *.joblib file that stores PCA information.
 
     Returns:
-        np.ndarray: The raw input image.
+        np.ndarray: Reconstructed input image.
     """
+
     pca = load(joblib_path)
     H, W, C = im.shape
     n_im = np.reshape(im, (-1, C))

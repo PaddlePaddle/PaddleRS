@@ -29,27 +29,30 @@ from paddlers.transforms import DecodeImg, MixupImage
 from paddlers.tools import YOLOAnchorCluster
 
 
-class VOCDetection(BaseDataset):
-    """读取PascalVOC格式的检测数据集，并对样本进行相应的处理。
+class VOCDetDataset(BaseDataset):
+    """
+    Dataset with PASCAL VOC annotations for detection tasks.
 
     Args:
-        data_dir (str): 数据集所在的目录路径。
-        file_list (str): 描述数据集图片文件和对应标注文件的文件路径（文本内每行路径为相对data_dir的相对路）。
-        label_list (str): 描述数据集包含的类别信息文件路径。
-        transforms (paddlers.transforms.Compose): 数据集中每个样本的预处理/增强算子。
-        num_workers (int|str): 数据集中样本在预处理过程中的线程或进程数。默认为'auto'。当设为'auto'时，根据
-            系统的实际CPU核数设置`num_workers`: 如果CPU核数的一半大于8，则`num_workers`为8，否则为CPU核数的
-            一半。
-        shuffle (bool): 是否需要对数据集中样本打乱顺序。默认为False。
-        allow_empty (bool): 是否加载负样本。默认为False。
-        empty_ratio (float): 用于指定负样本占总样本数的比例。如果小于0或大于等于1，则保留全部的负样本。默认为1。
+        data_dir (str): Root directory of the dataset.
+        file_list (str): Path of the file that contains relative paths of images and annotation files.
+        transforms (paddlers.transforms.Compose): Data preprocessing and data augmentation operators to apply.
+        label_list (str, optional): Path of the file that contains the category names. Defaults to None.
+        num_workers (int|str, optional): Number of processes used for data loading. If `num_workers` is 'auto',
+            the number of workers will be automatically determined according to the number of CPU cores: If 
+            there are more than 16 cores，8 workers will be used. Otherwise, the number of workers will be half 
+            the number of CPU cores. Defaults: 'auto'.
+        shuffle (bool, optional): Whether to shuffle the samples. Defaults to False.
+        allow_empty (bool, optional): Whether to add negative samples. Defaults to False.
+        empty_ratio (float, optional): Ratio of negative samples. If `empty_ratio` is smaller than 0 or not less 
+            than 1, keep all generated negative samples. Defaults to 1.0.
     """
 
     def __init__(self,
                  data_dir,
                  file_list,
+                 transforms,
                  label_list,
-                 transforms=None,
                  num_workers='auto',
                  shuffle=False,
                  allow_empty=False,
@@ -60,8 +63,8 @@ class VOCDetection(BaseDataset):
         import matplotlib
         matplotlib.use('Agg')
         from pycocotools.coco import COCO
-        super(VOCDetection, self).__init__(data_dir, label_list, transforms,
-                                           num_workers, shuffle)
+        super(VOCDetDataset, self).__init__(data_dir, label_list, transforms,
+                                            num_workers, shuffle)
 
         self.data_fields = None
         self.num_max_boxes = 50
@@ -109,9 +112,9 @@ class VOCDetection(BaseDataset):
                 if not line:
                     break
                 if len(line.strip().split()) > 2:
-                    raise Exception("A space is defined as the separator, "
-                                    "but it exists in image or label name {}."
-                                    .format(line))
+                    raise ValueError("A space is defined as the separator, "
+                                     "but it exists in image or label name {}."
+                                     .format(line))
                 img_file, xml_file = [
                     osp.join(data_dir, x) for x in line.strip().split()[:2]
                 ]
@@ -186,7 +189,7 @@ class VOCDetection(BaseDataset):
                     box_tag = pattern.findall(str(ET.tostringlist(obj)))
                     if len(box_tag) == 0:
                         logging.warning(
-                            "There's no field '<bndbox>' in one of object, "
+                            "There is no field '<bndbox>' in the object, "
                             "so this object will be ignored. xml file: {}".
                             format(xml_file))
                         continue
@@ -345,15 +348,16 @@ class VOCDetection(BaseDataset):
             https://github.com/ultralytics/yolov5/blob/master/utils/autoanchor.py
 
         Args:
-            num_anchors (int): number of clusters
-            image_size (list or int): [h, w], being an int means image height and image width are the same.
-            cache (bool): whether using cache
-            cache_path (str or None, optional): cache directory path. If None, use `data_dir` of dataset.
-            iters (int, optional): iters of kmeans algorithm
-            gen_iters (int, optional): iters of genetic algorithm
-            threshold (float, optional): anchor scale threshold
-            verbose (bool, optional): whether print results
+            num_anchors (int): Number of clusters.
+            image_size (list[int]|int): [h, w] or an int value that corresponds to the shape [image_size, image_size].
+            cache (bool, optional): Whether to use cache. Defaults to True.
+            cache_path (str|None, optional): Path of cache directory. If None, use `dataset.data_dir`. 
+                Defaults to None.
+            iters (int, optional): Iterations of k-means algorithm. Defaults to 300.
+            gen_iters (int, optional): Iterations of genetic algorithm. Defaults to 1000.
+            thresh (float, optional): Anchor scale threshold. Defaults to 0.25.
         """
+
         if cache_path is None:
             cache_path = self.data_dir
         cluster = YOLOAnchorCluster(
@@ -369,17 +373,18 @@ class VOCDetection(BaseDataset):
         return anchors
 
     def add_negative_samples(self, image_dir, empty_ratio=1):
-        """将背景图片加入训练
+        """
+        Generate and add negative samples.
 
         Args:
-            image_dir (str)：背景图片所在的文件夹目录。
-            empty_ratio (float or None): 用于指定负样本占总样本数的比例。如果为None，保留数据集初始化是设置的`empty_ratio`值，
-                否则更新原有`empty_ratio`值。如果小于0或大于等于1，则保留全部的负样本。默认为1。
-
+            image_dir (str): Directory that contains images.
+            empty_ratio (float|None, optional): Ratio of negative samples. If `empty_ratio` is smaller than
+                0 or not less than 1, keep all generated negative samples. Defaults to 1.0.
         """
+
         import cv2
         if not osp.isdir(image_dir):
-            raise Exception("{} is not a valid image directory.".format(
+            raise ValueError("{} is not a valid image directory.".format(
                 image_dir))
         if empty_ratio is not None:
             self.empty_ratio = empty_ratio

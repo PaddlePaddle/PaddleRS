@@ -48,7 +48,7 @@ class TestSegModel(TestModel):
 
 
 class TestFarSegModel(TestSegModel):
-    MODEL_CLASS = paddlers.custom_models.seg.FarSeg
+    MODEL_CLASS = paddlers.rs_models.seg.FarSeg
 
     def set_specs(self):
         self.specs = [

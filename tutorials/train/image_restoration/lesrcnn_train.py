@@ -63,7 +63,7 @@ test_dataset = pdrs.datasets.SRdataset(
     scale=scale)
 
 # 初始化模型，可以对网络结构的参数进行调整
-model = pdrs.tasks.LESRCNNet(scale=4, multi_scale=False, group=1)
+model = pdrs.tasks.res.LESRCNNet(scale=4, multi_scale=False, group=1)
 
 model.train(
     total_iters=1000000,

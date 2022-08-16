@@ -16,8 +16,8 @@ EVAL_FILE_LIST_PATH = './data/airchange/eval.txt'
 EXP_DIR = './output/fc_siam_conc/'
 
 # 下载和解压AirChange数据集
-airchange_dataset = 'http://mplab.sztaki.hu/~bcsaba/test/SZTAKI_AirChange_Benchmark.zip'
-pdrs.utils.download_and_decompress(airchange_dataset, path=DATA_DIR)
+pdrs.utils.download_and_decompress(
+    'https://paddlers.bj.bcebos.com/datasets/airchange.zip', path='./data/')
 
 # 定义训练和验证时使用的数据变换（数据增强、预处理等）
 # 使用Compose组合多种变换方式。Compose中包含的变换将按顺序串行执行
@@ -74,7 +74,7 @@ eval_dataset = pdrs.datasets.CDDataset(
 # 使用默认参数构建FC-Siam-conc模型
 # 目前已支持的模型请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/model_zoo.md
 # 模型输入参数请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/change_detector.py
-model = pdrs.tasks.FCSiamConc()
+model = pdrs.tasks.cd.FCSiamConc()
 
 # 执行模型训练
 model.train(

@@ -1,0 +1,10 @@
+# Basic configurations of HRNet
+
+_base_: ../_base_/ucmerced.yaml
+
+save_dir: ./test_tipc/output/clas/hrnet/
+
+model: !Node
+       type: HRNet_W18_C
+       args:
+           num_classes: 21
