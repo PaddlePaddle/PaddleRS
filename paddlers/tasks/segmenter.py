@@ -64,7 +64,7 @@ class BaseSegmenter(BaseModel):
 
     def build_net(self, **params):
         # TODO: when using paddle.utils.unique_name.guard,
-        # DeepLabv3p and HRNet will raise a error
+        # DeepLabv3p and HRNet will raise an error.
         net = dict(paddleseg.models.__dict__,
                    **cmseg.__dict__)[self.model_name](
                        num_classes=self.num_classes, **params)
