@@ -580,16 +580,16 @@ class BaseDetector(BaseModel):
         else:
             images = img_file
 
-        batch_samples = self._preprocess(images, transforms)
+        batch_samples = self.preprocess(images, transforms)
         self.net.eval()
         outputs = self.run(self.net, batch_samples, 'test')
-        prediction = self._postprocess(outputs)
+        prediction = self.postprocess(outputs)
 
         if isinstance(img_file, (str, np.ndarray)):
             prediction = prediction[0]
         return prediction
 
-    def _preprocess(self, images, transforms, to_tensor=True):
+    def preprocess(self, images, transforms, to_tensor=True):
         self._check_transforms(transforms, 'test')
         batch_samples = list()
         for im in images:
@@ -606,7 +606,7 @@ class BaseDetector(BaseModel):
 
         return batch_samples
 
-    def _postprocess(self, batch_pred):
+    def postprocess(self, batch_pred):
         infer_result = {}
         if 'bbox' in batch_pred:
             bboxes = batch_pred['bbox']
