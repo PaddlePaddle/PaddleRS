@@ -195,9 +195,8 @@ PaddleRS是遥感科研院所、相关高校共同基于飞桨开发的遥感处
 * 推理部署
    * 模型导出
    * 推理预测
-* 应用案例
-  * [变化检测示例](./docs/cases/csc_cd_cn.md)
-  * [超分模块示例](./docs/cases/sr_seg_cn.md)
+* 实践案例
+  * [PaddleRS实践案例库](./examples/README.md)
 * 代码贡献
   * [PaddleRS代码注释规范](https://github.com/PaddlePaddle/PaddleRS/wiki/PaddleRS代码注释规范)
 
