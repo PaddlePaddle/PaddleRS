@@ -259,7 +259,7 @@ class EncoderTransformer_v3(nn.Layer):
         self.depths = depths
         self.embed_dims = embed_dims
 
-        # patch embedding definitions
+        # Patch embedding definitions
         self.patch_embed1 = OverlapPatchEmbed(
             img_size=img_size,
             patch_size=7,
@@ -406,7 +406,7 @@ class EncoderTransformer_v3(nn.Layer):
         B = x.shape[0]
         outs = []
 
-        # stage 1
+        # Stage 1
         x1, H1, W1 = self.patch_embed1(x)
         for i, blk in enumerate(self.block1):
             x1 = blk(x1, H1, W1)
@@ -416,7 +416,7 @@ class EncoderTransformer_v3(nn.Layer):
                 [0, 3, 1, 2])
         outs.append(x1)
 
-        # stage 2
+        # Stage 2
         x1, H1, W1 = self.patch_embed2(x1)
         for i, blk in enumerate(self.block2):
             x1 = blk(x1, H1, W1)
@@ -426,7 +426,7 @@ class EncoderTransformer_v3(nn.Layer):
                 [0, 3, 1, 2])
         outs.append(x1)
 
-        # stage 3
+        # Stage 3
         x1, H1, W1 = self.patch_embed3(x1)
         for i, blk in enumerate(self.block3):
             x1 = blk(x1, H1, W1)
@@ -436,7 +436,7 @@ class EncoderTransformer_v3(nn.Layer):
                 [0, 3, 1, 2])
         outs.append(x1)
 
-        # stage 4
+        # Stage 4
         x1, H1, W1 = self.patch_embed4(x1)
         for i, blk in enumerate(self.block4):
             x1 = blk(x1, H1, W1)
@@ -467,11 +467,11 @@ class DecoderTransformer_v3(nn.Layer):
                  decoder_softmax=False,
                  feature_strides=[2, 4, 8, 16]):
         super(DecoderTransformer_v3, self).__init__()
-        # assert
+
         assert len(feature_strides) == len(in_channels)
         assert min(feature_strides) == feature_strides[0]
 
-        # settings
+        # Settings
         self.feature_strides = feature_strides
         self.input_transform = input_transform
         self.in_index = in_index
@@ -491,7 +491,7 @@ class DecoderTransformer_v3(nn.Layer):
         self.linear_c1 = MLP(input_dim=c1_in_channels,
                              embed_dim=self.embedding_dim)
 
-        # convolutional Difference Layers
+        # Convolutional Difference Layers
         self.diff_c4 = conv_diff(
             in_channels=2 * self.embedding_dim, out_channels=self.embedding_dim)
         self.diff_c3 = conv_diff(
@@ -501,7 +501,7 @@ class DecoderTransformer_v3(nn.Layer):
         self.diff_c1 = conv_diff(
             in_channels=2 * self.embedding_dim, out_channels=self.embedding_dim)
 
-        # taking outputs from middle of the encoder
+        # Take outputs from middle of the encoder
         self.make_pred_c4 = make_prediction(
             in_channels=self.embedding_dim, out_channels=self.output_nc)
         self.make_pred_c3 = make_prediction(

@@ -22,17 +22,17 @@ import paddle
 import paddle.nn.functional as F
 from paddle.static import InputSpec
 
-import paddlers.models.ppcls as paddleclas
-import paddlers.rs_models.clas as cmcls
 import paddlers
-from paddlers.utils import get_single_card_bs, DisablePrint
+import paddlers.models.ppcls as ppcls
+import paddlers.rs_models.clas as cmcls
 import paddlers.utils.logging as logging
-from .base import BaseModel
+from paddlers.utils import get_single_card_bs, DisablePrint
 from paddlers.models.ppcls.metric import build_metrics
 from paddlers.models.ppcls.loss import build_loss
 from paddlers.models.ppcls.data.postprocess import build_postprocess
 from paddlers.utils.checkpoint import cls_pretrain_weights_dict
 from paddlers.transforms import Resize, decode_image
+from .base import BaseModel
 
 __all__ = [
     "ResNet50_vd", "MobileNetV3_small_x1_0", "HRNet_W18_C", "CondenseNetV2_b"
@@ -50,7 +50,7 @@ class BaseClassifier(BaseModel):
         if 'with_net' in self.init_params:
             del self.init_params['with_net']
         super(BaseClassifier, self).__init__('classifier')
-        if not hasattr(paddleclas.arch.backbone, model_name) and \
+        if not hasattr(ppcls.arch.backbone, model_name) and \
            not hasattr(cmcls, model_name):
             raise ValueError("ERROR: There is no model named {}.".format(
                 model_name))
@@ -69,7 +69,7 @@ class BaseClassifier(BaseModel):
 
     def build_net(self, **params):
         with paddle.utils.unique_name.guard():
-            model = dict(paddleclas.arch.backbone.__dict__,
+            model = dict(ppcls.arch.backbone.__dict__,
                          **cmcls.__dict__)[self.model_name]
             # TODO: Determine whether there is in_channels
             try:

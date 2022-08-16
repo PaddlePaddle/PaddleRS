@@ -51,7 +51,7 @@ def js_show(js_path, show_num):
 def get_args():
     parser = argparse.ArgumentParser(description='Json Infomation Show')
 
-    # parameters
+    # Parameters
     parser.add_argument(
         '--json_path', type=str, help='json path to show information')
     parser.add_argument(

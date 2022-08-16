@@ -1,4 +1,4 @@
-# base on https://github.com/kongdebug/RCAN-Paddle
+# Based on https://github.com/kongdebug/RCAN-Paddle
 import math
 
 import paddle
@@ -37,9 +37,9 @@ class MeanShift(nn.Conv2D):
 class CALayer(nn.Layer):
     def __init__(self, channel, reduction=16):
         super(CALayer, self).__init__()
-        # global average pooling: feature --> point
+        # Global average pooling: feature --> point
         self.avg_pool = nn.AdaptiveAvgPool2D(1)
-        # feature channel downscale and upscale --> channel weight
+        # Feature channel downscale and upscale --> channel weight
         self.conv_du = nn.Sequential(
             nn.Conv2D(
                 channel, channel // reduction, 1, padding=0, bias_attr=True),
@@ -157,10 +157,10 @@ class RCAN(nn.Layer):
         rgb_std = (1.0, 1.0, 1.0)
         self.sub_mean = MeanShift(rgb_range, rgb_mean, rgb_std)
 
-        # define head module
+        # Define head module
         modules_head = [conv(n_colors, n_feats, kernel_size)]
 
-        # define body module
+        # Define body module
         modules_body = [
             ResidualGroup(
                 conv, n_feats, kernel_size, reduction, act=act, res_scale= 1, n_resblocks=n_resblocks) \
@@ -168,7 +168,7 @@ class RCAN(nn.Layer):
 
         modules_body.append(conv(n_feats, n_feats, kernel_size))
 
-        # define tail module
+        # Define tail module
         modules_tail = [
             Upsampler(
                 conv, scale, n_feats, act=False),

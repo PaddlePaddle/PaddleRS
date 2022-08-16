@@ -441,7 +441,7 @@ def load_pretrain_weights(model, pretrain_weights=None, model_name=None):
         if os.path.exists(pretrain_weights):
             param_state_dict = paddle.load(pretrain_weights)
             model_state_dict = model.state_dict()
-            # hack: fit for faster rcnn. Pretrain weights contain prefix of 'backbone'
+            # HACK: Fit for faster rcnn. Pretrain weights contain prefix of 'backbone'
             # while res5 module is located in bbox_head.head. Replace the prefix of
             # res5 with 'bbox_head.head' to load pretrain weights correctly.
             for k in param_state_dict.keys():

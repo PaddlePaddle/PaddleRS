@@ -38,7 +38,7 @@ class DropPath(nn.Layer):
         Returns:
             output: output tensor after drop path
         """
-        # if prob is 0 or eval mode, return original input
+        # If prob is 0 or is in eval mode, return original input.
         if self.drop_prob == 0. or not self.training:
             return inputs
         keep_prob = 1 - self.drop_prob
@@ -47,8 +47,8 @@ class DropPath(nn.Layer):
                                                )  # shape=(N, 1, 1, 1)
         random_tensor = keep_prob + paddle.rand(shape, dtype=inputs.dtype)
         random_tensor = random_tensor.floor()  # mask
-        output = inputs.divide(
-            keep_prob) * random_tensor  # divide to keep same output expectation
+        # Make division to keep output expectation same.
+        output = inputs.divide(keep_prob) * random_tensor
         return output
 
     def forward(self, inputs):
