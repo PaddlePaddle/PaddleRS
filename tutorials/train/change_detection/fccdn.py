@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# 变化检测模型ChangeFormer训练示例脚本
+# 变化检测模型FCCDN训练示例脚本
 # 执行此脚本前，请确认已正确安装PaddleRS库
 
 import paddlers as pdrs
@@ -71,7 +71,7 @@ eval_dataset = pdrs.datasets.CDDataset(
     with_seg_labels=False,
     binarize_labels=True)
 
-# 使用默认参数构建ChangeFormer模型
+# 使用默认参数构建FCCDN模型
 # 目前已支持的模型请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/model_zoo.md
 # 模型输入参数请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/change_detector.py
 model = pdrs.tasks.cd.FCCDN()
