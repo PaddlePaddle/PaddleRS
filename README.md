@@ -64,30 +64,35 @@ PaddleRS具有以下五大特色：
           <li>ResNet50-vd</li>
           <li>MobileNetV3</li>
           <li>HRNet</li>
+          <li>...</li>
         </ul>
         <b>语义分割</b><br>
         <ul>
-          <li>UNet</li>
           <li>FarSeg</li>
+          <li>UNet</li>
           <li>DeepLab V3+</li>
+          <li>...</li>
         </ul>
         <b>目标检测</b><br>
         <ul>
           <li>PP-YOLO</li>
           <li>Faster R-CNN</li>
           <li>YOLOv3</li>
+          <li>...</li>
         </ul>
         <b>图像复原</b><br>
         <ul>
           <li>DRNet</li>
           <li>LESRCNN</li>
           <li>ESRGAN</li>
+          <li>...</li>
         </ul>
         <b>变化检测</b><br>
         <ul>
           <li>DSIFN</li>
           <li>STANet</li>
           <li>ChangeStar</li>
+          <li>...</li>
         </ul>
       </td>
       <td>
@@ -114,6 +119,7 @@ PaddleRS具有以下五大特色：
           <li>ReduceDim</li>  
           <li>SelectBand</li>  
           <li>RandomSwap</li>
+          <li>...</li>
         </ul>  
       </td>
       <td>
@@ -122,12 +128,15 @@ PaddleRS具有以下五大特色：
           <li>coco to mask</li>
           <li>mask to shpfile</li>
           <li>mask to geojson</li>
+          <li>...</li>
         </ul>
         <b>数据预处理</b><br>
         <ul>
           <li>影像切片</li>
           <li>影像配准</li>
           <li>波段选择</li>
+          <li>辐射校正</li>
+          <li>...</li>
         </ul>
       </td>
       <td>
@@ -135,7 +144,7 @@ PaddleRS具有以下五大特色：
         <ul>
           <li>待更</li>
         </ul>
-        <b>遥感语义分割</b><br>
+        <b>遥感图像分割</b><br>
         <ul>
           <li>待更</li>
         </ul>
@@ -147,7 +156,7 @@ PaddleRS具有以下五大特色：
         <ul>
           <li>待更</li>
         </ul>
-        <b>遥感影像超分</b><br>
+        <b>遥感图像复原</b><br>
         <ul>
           <li>待更</li>
         </ul>
