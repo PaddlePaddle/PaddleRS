@@ -26,10 +26,11 @@ from paddle.static import InputSpec
 import paddlers
 import paddlers.models.ppseg as ppseg
 import paddlers.rs_models.seg as cmseg
-from paddlers.utils import get_single_card_bs, DisablePrint
 import paddlers.utils.logging as logging
-from paddlers.utils.checkpoint import seg_pretrain_weights_dict
+from paddlers.models import seg_losses
 from paddlers.transforms import Resize, decode_image
+from paddlers.utils import get_single_card_bs, DisablePrint
+from paddlers.utils.checkpoint import seg_pretrain_weights_dict
 from .base import BaseModel
 from .utils import seg_metrics as metrics
 
@@ -41,6 +42,7 @@ class BaseSegmenter(BaseModel):
                  model_name,
                  num_classes=2,
                  use_mixed_loss=False,
+                 losses=None,
                  **params):
         self.init_params = locals()
         if 'with_net' in self.init_params:
@@ -53,7 +55,7 @@ class BaseSegmenter(BaseModel):
         self.model_name = model_name
         self.num_classes = num_classes
         self.use_mixed_loss = use_mixed_loss
-        self.losses = None
+        self.losses = losses
         self.labels = None
         if params.get('with_net', True):
             params.pop('with_net', None)
@@ -160,13 +162,13 @@ class BaseSegmenter(BaseModel):
         if isinstance(self.use_mixed_loss, bool):
             if self.use_mixed_loss:
                 losses = [
-                    ppseg.models.CrossEntropyLoss(),
-                    ppseg.models.LovaszSoftmaxLoss()
+                    seg_losses.CrossEntropyLoss(),
+                    seg_losses.LovaszSoftmaxLoss()
                 ]
                 coef = [.8, .2]
-                loss_type = [ppseg.models.MixedLoss(losses=losses, coef=coef), ]
+                loss_type = [seg_losses.MixedLoss(losses=losses, coef=coef), ]
             else:
-                loss_type = [ppseg.models.CrossEntropyLoss()]
+                loss_type = [seg_losses.CrossEntropyLoss()]
         else:
             losses, coef = list(zip(*self.use_mixed_loss))
             if not set(losses).issubset(
@@ -174,8 +176,8 @@ class BaseSegmenter(BaseModel):
                 raise ValueError(
                     "Only 'CrossEntropyLoss', 'DiceLoss', 'LovaszSoftmaxLoss' are supported."
                 )
-            losses = [getattr(ppseg.models, loss)() for loss in losses]
-            loss_type = [ppseg.models.MixedLoss(losses=losses, coef=list(coef))]
+            losses = [getattr(seg_losses, loss)() for loss in losses]
+            loss_type = [seg_losses.MixedLoss(losses=losses, coef=list(coef))]
         if self.model_name == 'FastSCNN':
             loss_type *= 2
             loss_coef = [1.0, 0.4]
@@ -771,12 +773,18 @@ class BaseSegmenter(BaseModel):
             raise TypeError(
                 "`transforms.arrange` must be an ArrangeSegmenter object.")
 
+    def set_losses(self, losses, weights=None):
+        if weights is None:
+            weights = [1. for _ in range(len(losses))]
+        self.losses = {'types': losses, 'coef': weights}
+
 
 class UNet(BaseSegmenter):
     def __init__(self,
                  input_channel=3,
                  num_classes=2,
                  use_mixed_loss=False,
+                 losses=None,
                  use_deconv=False,
                  align_corners=False,
                  **params):
@@ -789,6 +797,7 @@ class UNet(BaseSegmenter):
             input_channel=input_channel,
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
+            losses=losses,
             **params)
 
 
@@ -798,6 +807,7 @@ class DeepLabV3P(BaseSegmenter):
                  num_classes=2,
                  backbone='ResNet50_vd',
                  use_mixed_loss=False,
+                 losses=None,
                  output_stride=8,
                  backbone_indices=(0, 3),
                  aspp_ratios=(1, 12, 24, 36),
@@ -826,6 +836,7 @@ class DeepLabV3P(BaseSegmenter):
             model_name='DeepLabV3P',
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
+            losses=losses,
             **params)
 
 
@@ -833,6 +844,7 @@ class FastSCNN(BaseSegmenter):
     def __init__(self,
                  num_classes=2,
                  use_mixed_loss=False,
+                 losses=None,
                  align_corners=False,
                  **params):
         params.update({'align_corners': align_corners})
@@ -840,6 +852,7 @@ class FastSCNN(BaseSegmenter):
             model_name='FastSCNN',
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
+            losses=losses,
             **params)
 
 
@@ -848,6 +861,7 @@ class HRNet(BaseSegmenter):
                  num_classes=2,
                  width=48,
                  use_mixed_loss=False,
+                 losses=None,
                  align_corners=False,
                  **params):
         if width not in (18, 48):
@@ -867,6 +881,7 @@ class HRNet(BaseSegmenter):
             model_name='FCN',
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
+            losses=losses,
             **params)
         self.model_name = 'HRNet'
 
@@ -875,6 +890,7 @@ class BiSeNetV2(BaseSegmenter):
     def __init__(self,
                  num_classes=2,
                  use_mixed_loss=False,
+                 losses=None,
                  align_corners=False,
                  **params):
         params.update({'align_corners': align_corners})
@@ -882,13 +898,19 @@ class BiSeNetV2(BaseSegmenter):
             model_name='BiSeNetV2',
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
+            losses=losses,
             **params)
 
 
 class FarSeg(BaseSegmenter):
-    def __init__(self, num_classes=2, use_mixed_loss=False, **params):
+    def __init__(self,
+                 num_classes=2,
+                 use_mixed_loss=False,
+                 losses=None,
+                 **params):
         super(FarSeg, self).__init__(
             model_name='FarSeg',
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
+            losses=losses,
             **params)
