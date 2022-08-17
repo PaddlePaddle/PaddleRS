@@ -49,8 +49,6 @@ class SegDataset(BaseDataset):
         self.file_list = list()
         self.labels = list()
 
-        # TODO：非None时，让用户跳转数据集分析生成label_list
-        # 不要在此处分析label file
         if label_list is not None:
             with open(label_list, encoding=get_encoding(label_list)) as f:
                 for line in f:

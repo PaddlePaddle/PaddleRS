@@ -98,7 +98,7 @@ def download(url, path, md5sum=None):
 
         # For protecting download interupted, download to
         # tmp_fullname firstly, move tmp_fullname to fullname
-        # after download finished
+        # after download finished.
         tmp_fullname = fullname + "_tmp"
         total_size = req.headers.get('content-length')
         with open(tmp_fullname, 'wb') as f:
@@ -181,8 +181,7 @@ def download_and_decompress(url, path='.'):
     local_rank = paddle.distributed.get_rank()
     fname = osp.split(url)[-1]
     fullname = osp.join(path, fname)
-    # if url.endswith(('tgz', 'tar.gz', 'tar', 'zip')):
-    #     fullname = osp.join(path, fname.split('.')[0])
+
     if nranks <= 1:
         dst_dir = url2dir(url, path)
         if dst_dir is not None:

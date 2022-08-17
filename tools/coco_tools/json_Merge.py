@@ -56,7 +56,7 @@ def js_merge(js1_path, js2_path, js_merge_path, merge_keys):
 def get_args():
     parser = argparse.ArgumentParser(description='Json Merge')
 
-    # parameters
+    # Parameters
     parser.add_argument('--json1_path', type=str, help='json path1 to merge')
     parser.add_argument('--json2_path', type=str, help='json path2 to merge')
     parser.add_argument(

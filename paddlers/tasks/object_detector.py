@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-
 import collections
 import copy
 import os
@@ -23,18 +21,18 @@ import numpy as np
 import paddle
 from paddle.static import InputSpec
 
+import paddlers
 import paddlers.models.ppdet as ppdet
 from paddlers.models.ppdet.modeling.proposal_generator.target_layer import BBoxAssigner, MaskAssigner
-import paddlers
-import paddlers.utils.logging as logging
 from paddlers.transforms import decode_image
 from paddlers.transforms.operators import _NormalizeBox, _PadBox, _BboxXYXY2XYWH, Resize, Pad
 from paddlers.transforms.batch_operators import BatchCompose, BatchRandomResize, BatchRandomResizeByShort, \
     _BatchPad, _Gt2YoloTarget
+from paddlers.models.ppdet.optimizer import ModelEMA
+import paddlers.utils.logging as logging
+from paddlers.utils.checkpoint import det_pretrain_weights_dict
 from .base import BaseModel
 from .utils.det_metrics import VOCMetric, COCOMetric
-from paddlers.models.ppdet.optimizer import ModelEMA
-from paddlers.utils.checkpoint import det_pretrain_weights_dict
 
 __all__ = [
     "YOLOv3", "FasterRCNN", "PPYOLO", "PPYOLOTiny", "PPYOLOv2", "MaskRCNN"
@@ -291,7 +289,7 @@ class BaseDetector(BaseModel):
         train_dataset.batch_transforms = self._compose_batch_transform(
             train_dataset.transforms, mode='train')
 
-        # build optimizer if not defined
+        # Build optimizer if not defined
         if optimizer is None:
             num_steps_each_epoch = len(train_dataset) // train_batch_size
             self.optimizer = self.default_optimizer(
@@ -305,7 +303,7 @@ class BaseDetector(BaseModel):
         else:
             self.optimizer = optimizer
 
-        # initiate weights
+        # Initiate weights
         if pretrain_weights is not None and not osp.exists(pretrain_weights):
             if pretrain_weights not in det_pretrain_weights_dict['_'.join(
                 [self.model_name, self.backbone_name])]:
@@ -335,7 +333,7 @@ class BaseDetector(BaseModel):
             ema = ModelEMA(model=self.net, decay=.9998, use_thres_step=True)
         else:
             ema = None
-        # start train loop
+        # Start train loop
         self.train_loop(
             num_epochs=num_epochs,
             train_dataset=train_dataset,
@@ -822,7 +820,7 @@ class PicoDet(BaseDetector):
             if isinstance(op, (BatchRandomResize, BatchRandomResizeByShort)):
                 if mode != 'train':
                     raise ValueError(
-                        "{} cannot be present in the {} transforms. ".format(
+                        "{} cannot be present in the {} transforms.".format(
                             op.__class__.__name__, mode) +
                         "Please check the {} transforms.".format(mode))
                 custom_batch_transforms.insert(0, copy.deepcopy(op))

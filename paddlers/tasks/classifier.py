@@ -22,17 +22,17 @@ import paddle
 import paddle.nn.functional as F
 from paddle.static import InputSpec
 
-import paddlers.models.ppcls as paddleclas
-import paddlers.rs_models.clas as cmcls
 import paddlers
-from paddlers.utils import get_single_card_bs, DisablePrint
+import paddlers.models.ppcls as ppcls
+import paddlers.rs_models.clas as cmcls
 import paddlers.utils.logging as logging
-from .base import BaseModel
+from paddlers.utils import get_single_card_bs, DisablePrint
 from paddlers.models.ppcls.metric import build_metrics
-from paddlers.models.ppcls.loss import build_loss
+from paddlers.models import clas_losses
 from paddlers.models.ppcls.data.postprocess import build_postprocess
 from paddlers.utils.checkpoint import cls_pretrain_weights_dict
 from paddlers.transforms import Resize, decode_image
+from .base import BaseModel
 
 __all__ = [
     "ResNet50_vd", "MobileNetV3_small_x1_0", "HRNet_W18_C", "CondenseNetV2_b"
@@ -45,12 +45,13 @@ class BaseClassifier(BaseModel):
                  in_channels=3,
                  num_classes=2,
                  use_mixed_loss=False,
+                 losses=None,
                  **params):
         self.init_params = locals()
         if 'with_net' in self.init_params:
             del self.init_params['with_net']
         super(BaseClassifier, self).__init__('classifier')
-        if not hasattr(paddleclas.arch.backbone, model_name) and \
+        if not hasattr(ppcls.arch.backbone, model_name) and \
            not hasattr(cmcls, model_name):
             raise ValueError("ERROR: There is no model named {}.".format(
                 model_name))
@@ -59,7 +60,7 @@ class BaseClassifier(BaseModel):
         self.num_classes = num_classes
         self.use_mixed_loss = use_mixed_loss
         self.metrics = None
-        self.losses = None
+        self.losses = losses
         self.labels = None
         self._postprocess = None
         if params.get('with_net', True):
@@ -69,7 +70,7 @@ class BaseClassifier(BaseModel):
 
     def build_net(self, **params):
         with paddle.utils.unique_name.guard():
-            model = dict(paddleclas.arch.backbone.__dict__,
+            model = dict(ppcls.arch.backbone.__dict__,
                          **cmcls.__dict__)[self.model_name]
             # TODO: Determine whether there is in_channels
             try:
@@ -145,7 +146,7 @@ class BaseClassifier(BaseModel):
     def default_loss(self):
         # TODO: use mixed loss and other loss
         default_config = [{"CELoss": {"weight": 1.0}}]
-        return build_loss(default_config)
+        return clas_losses.build_loss(default_config)
 
     def default_optimizer(self,
                           parameters,
@@ -556,36 +557,56 @@ class BaseClassifier(BaseModel):
 
 
 class ResNet50_vd(BaseClassifier):
-    def __init__(self, num_classes=2, use_mixed_loss=False, **params):
+    def __init__(self,
+                 num_classes=2,
+                 use_mixed_loss=False,
+                 losses=None,
+                 **params):
         super(ResNet50_vd, self).__init__(
             model_name='ResNet50_vd',
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
+            losses=losses,
             **params)
 
 
 class MobileNetV3_small_x1_0(BaseClassifier):
-    def __init__(self, num_classes=2, use_mixed_loss=False, **params):
+    def __init__(self,
+                 num_classes=2,
+                 use_mixed_loss=False,
+                 losses=None,
+                 **params):
         super(MobileNetV3_small_x1_0, self).__init__(
             model_name='MobileNetV3_small_x1_0',
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
+            losses=losses,
             **params)
 
 
 class HRNet_W18_C(BaseClassifier):
-    def __init__(self, num_classes=2, use_mixed_loss=False, **params):
+    def __init__(self,
+                 num_classes=2,
+                 use_mixed_loss=False,
+                 losses=None,
+                 **params):
         super(HRNet_W18_C, self).__init__(
             model_name='HRNet_W18_C',
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
+            losses=losses,
             **params)
 
 
 class CondenseNetV2_b(BaseClassifier):
-    def __init__(self, num_classes=2, use_mixed_loss=False, **params):
+    def __init__(self,
+                 num_classes=2,
+                 use_mixed_loss=False,
+                 losses=None,
+                 **params):
         super(CondenseNetV2_b, self).__init__(
             model_name='CondenseNetV2_b',
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
+            losses=losses,
             **params)

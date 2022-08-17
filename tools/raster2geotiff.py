@@ -25,7 +25,8 @@ from utils import Raster, save_geotiff, translate_vector, time_it
 def _gt_convert(x_geo, y_geo, geotf):
     a = np.array([[geotf[1], geotf[2]], [geotf[4], geotf[5]]])
     b = np.array([x_geo - geotf[0], y_geo - geotf[3]])
-    return np.round(np.linalg.solve(a, b)).tolist()  # 解一元二次方程
+    return np.round(np.linalg.solve(a,
+                                    b)).tolist()  # Solve a quadratic equation
 
 
 @time_it
@@ -36,13 +37,13 @@ def convert_data(image_path, geojson_path):
     # vector to EPSG from raster
     temp_geojson_path = translate_vector(geojson_path, raster.proj)
     geo_reader = codecs.open(temp_geojson_path, "r", encoding="utf-8")
-    feats = geojson.loads(geo_reader.read())["features"]  # 所有图像块
+    feats = geojson.loads(geo_reader.read())["features"]  # All image patches
     geo_reader.close()
     for feat in tqdm(feats):
         geo = feat["geometry"]
-        if geo["type"] == "Polygon":  # 多边形
+        if geo["type"] == "Polygon":
             geo_points = geo["coordinates"][0]
-        elif geo["type"] == "MultiPolygon":  # 多面
+        elif geo["type"] == "MultiPolygon":
             geo_points = geo["coordinates"][0][0]
         else:
             raise TypeError(
@@ -52,7 +53,7 @@ def convert_data(image_path, geojson_path):
             _gt_convert(point[0], point[1], raster.geot) for point in geo_points
         ]).astype(np.int32)
         # TODO: Label category
-        cv2.fillPoly(tmp_img, [xy_points], 1)  # 多边形填充
+        cv2.fillPoly(tmp_img, [xy_points], 1)  # Fill with polygons
     ext = "." + geojson_path.split(".")[-1]
     save_geotiff(tmp_img,
                  geojson_path.replace(ext, ".tif"), raster.proj, raster.geot)
