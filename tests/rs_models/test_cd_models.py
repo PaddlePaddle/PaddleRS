@@ -22,7 +22,7 @@ __all__ = [
     'TestBITModel', 'TestCDNetModel', 'TestChangeStarModel', 'TestDSAMNetModel',
     'TestDSIFNModel', 'TestFCEarlyFusionModel', 'TestFCSiamConcModel',
     'TestFCSiamDiffModel', 'TestSNUNetModel', 'TestSTANetModel',
-    'TestChangeFormerModel'
+    'TestChangeFormerModel', "TestFCCDNModel"
 ]
 
 
@@ -225,6 +225,17 @@ class TestChangeFormerModel(TestCDModel):
             base_spec,
             dict(**base_spec, decoder_softmax=True),
             dict(**base_spec, embed_dim=56)
+        ]   # yapf: disable
+
+
+class TestFCCDNModel(TestCDModel):
+    MODEL_CLASS = paddlers.rs_models.cd.FCCDN
+
+    def set_specs(self):
+        base_spec = dict(in_channels=3, num_classes=2)
+        self.specs = [
+            base_spec,
+            dict(**base_spec, mode="infer"),
         ]   # yapf: disable
 
 
