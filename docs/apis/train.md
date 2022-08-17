@@ -10,23 +10,27 @@
 
 - 一般支持设置`num_classes`、`use_mixed_loss`以及`in_channels`参数，分别表示模型输出类别数、是否使用预置的混合损失以及输入通道数。部分子类如`DSIFN`暂不支持对`in_channels`参数的设置。
 - `use_mixed_loss`参将在未来被弃用，因此不建议使用。
+- 可通过`losses`参数指定模型训练时使用的损失函数。`losses`需为一个字典，其中`'types'`键和`'coef'`键对应的值为两个等长的列表，分别表示损失函数对象（一个可调用对象）和损失函数的权重。例如：`losses={'types': [LossType1(), LossType2()], 'coef': [1.0, 0.5]}`在训练过程中将等价于计算如下损失函数：`1.0*LossType1()(logits, labels)+0.5*LossType2()(logits, labels)`，其中`logits`和`labels`分别是模型输出和真值标签。
 - 不同的子类支持与模型相关的输入参数，详情请参考[模型定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/rs_models/cd)和[训练器定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/change_detector.py)。
 
 ### 初始化`BaseClassifier`子类对象
 
 - 一般支持设置`num_classes`和`use_mixed_loss`参数，分别表示模型输出类别数以及是否使用预置的混合损失。
 - `use_mixed_loss`参将在未来被弃用，因此不建议使用。
+- 可通过`losses`参数指定模型训练时使用的损失函数，传入实参需为`paddlers.models.clas_losses.CombinedLoss`类型对象。
 - 不同的子类支持与模型相关的输入参数，详情请参考[模型定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/rs_models/clas)和[训练器定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/classifier.py)。
 
-### 初始化`Baseetector`子类对象
+### 初始化`BaseDetector`子类对象
 
 - 一般支持设置`num_classes`和`backbone`参数，分别表示模型输出类别数以及所用的骨干网络类型。相比其它任务，目标检测任务的训练器支持设置的初始化参数较多，囊括网络结构、损失函数、后处理策略等方面。
+- 与分割、分类、变化检测等任务不同，检测任务不支持通过`losses`参数指定损失函数。不过对于部分训练器如`PPYOLO`，可通过`use_iou_loss`等参数定制损失函数。
 - 不同的子类支持与模型相关的输入参数，详情请参考[模型定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/rs_models/det)和[训练器定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/object_detector.py)。
 
 ### 初始化`BaseSegmenter`子类对象
 
 - 一般支持设置`input_channel`、`num_classes`以及`use_mixed_loss`参数，分别表示输入通道数、输出类别数以及是否使用预置的混合损失。部分模型如`FarSeg`暂不支持对`input_channel`参数的设置。
 - `use_mixed_loss`参将在未来被弃用，因此不建议使用。
+- 可通过`losses`参数指定模型训练时使用的损失函数。`losses`需为一个字典，其中`'types'`键和`'coef'`键对应的值为两个等长的列表，分别表示损失函数对象（一个可调用对象）和损失函数的权重。例如：`losses={'types': [LossType1(), LossType2()], 'coef': [1.0, 0.5]}`在训练过程中将等价于计算如下损失函数：`1.0*LossType1()(logits, labels)+0.5*LossType2()(logits, labels)`，其中`logits`和`labels`分别是模型输出和真值标签。
 - 不同的子类支持与模型相关的输入参数，详情请参考[模型定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/rs_models/seg)和[训练器定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/segmentor.py)。
 
 ## `train()`
