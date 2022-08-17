@@ -25,9 +25,9 @@ import paddle.nn.functional as F
 from paddle.static import InputSpec
 
 import paddlers
+import paddlers.models.ppseg as ppseg
 import paddlers.rs_models.cd as cmcd
 import paddlers.utils.logging as logging
-import paddlers.models.ppseg.utils.metrics as metrics
 from paddlers.models import seg_losses
 from paddlers.transforms import Resize, decode_image
 from paddlers.utils import get_single_card_bs, DisablePrint
@@ -146,7 +146,7 @@ class BaseChangeDetector(BaseModel):
             origin_shape = [label.shape[-2:]]
             pred = self._postprocess(
                 pred, origin_shape, transforms=inputs[3])[0]  # NCHW
-            intersect_area, pred_area, label_area = metrics.calculate_area(
+            intersect_area, pred_area, label_area = ppseg.utils.metrics.calculate_area(
                 pred, label, self.num_classes)
             outputs['intersect_area'] = intersect_area
             outputs['pred_area'] = pred_area
@@ -488,11 +488,13 @@ class BaseChangeDetector(BaseModel):
                     pred_area_all = pred_area_all + pred_area
                     label_area_all = label_area_all + label_area
                     conf_mat_all.append(conf_mat)
-        class_iou, miou = metrics.mean_iou(intersect_area_all, pred_area_all,
-                                           label_area_all)
+        class_iou, miou = ppseg.utils.metrics.mean_iou(
+            intersect_area_all, pred_area_all, label_area_all)
         # TODO 确认是按oacc还是macc
-        class_acc, oacc = metrics.accuracy(intersect_area_all, pred_area_all)
-        kappa = metrics.kappa(intersect_area_all, pred_area_all, label_area_all)
+        class_acc, oacc = ppseg.utils.metrics.accuracy(intersect_area_all,
+                                                       pred_area_all)
+        kappa = ppseg.utils.metrics.kappa(intersect_area_all, pred_area_all,
+                                          label_area_all)
         category_f1score = metrics.f1_score(intersect_area_all, pred_area_all,
                                             label_area_all)
 
@@ -637,7 +639,7 @@ class BaseChangeDetector(BaseModel):
                     int(xoff), int(yoff), xsize, ysize).transpose((1, 2, 0))
                 im2 = src2_data.ReadAsArray(
                     int(xoff), int(yoff), xsize, ysize).transpose((1, 2, 0))
-                # fill
+                # Fill
                 h, w = im1.shape[:2]
                 im1_fill = np.zeros(
                     (block_size[1], block_size[0], bands), dtype=im1.dtype)
@@ -645,10 +647,10 @@ class BaseChangeDetector(BaseModel):
                 im1_fill[:h, :w, :] = im1
                 im2_fill[:h, :w, :] = im2
                 im_fill = (im1_fill, im2_fill)
-                # predict
+                # Predict
                 pred = self.predict(im_fill,
                                     transforms)["label_map"].astype("uint8")
-                # overlap
+                # Overlap
                 rd_block = band.ReadAsArray(int(xoff), int(yoff), xsize, ysize)
                 mask = (rd_block == pred[:h, :w]) | (rd_block == 255)
                 temp = pred[:h, :w].copy()

@@ -58,8 +58,7 @@ class VOCDetDataset(BaseDataset):
                  allow_empty=False,
                  empty_ratio=1.):
         # matplotlib.use() must be called *before* pylab, matplotlib.pyplot,
-        # or matplotlib.backends is imported for the first time
-        # pycocotools import matplotlib
+        # or matplotlib.backends is imported for the first time.
         import matplotlib
         matplotlib.use('Agg')
         from pycocotools.coco import COCO

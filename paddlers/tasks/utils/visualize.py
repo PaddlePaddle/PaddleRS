@@ -309,7 +309,7 @@ def draw_pr_curve(eval_details_file=None,
         aind = [i for i, aRng in enumerate(p.areaRngLbl) if aRng == areaRng]
         mind = [i for i, mDet in enumerate(p.maxDets) if mDet == maxDets]
         if ap == 1:
-            # dimension of precision: [TxRxKxAxM]
+            # Dimension of precision: [TxRxKxAxM]
             s = coco_gt.eval['precision']
             # IoU
             if iouThr is not None:
@@ -317,7 +317,7 @@ def draw_pr_curve(eval_details_file=None,
                 s = s[t]
             s = s[:, :, :, aind, mind]
         else:
-            # dimension of recall: [TxKxAxM]
+            # Dimension of recall: [TxKxAxM]
             s = coco_gt.eval['recall']
             if iouThr is not None:
                 t = np.where(iouThr == p.iouThrs)[0]

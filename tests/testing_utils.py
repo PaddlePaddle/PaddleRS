@@ -82,7 +82,7 @@ class _CommonTestNamespace:
             def wrapper(self, *args, **kwargs):
                 with warnings.catch_warnings(record=True) as w:
                     warnings.resetwarnings()
-                    # ignore specified warnings
+                    # Ignore specified warnings
                     warning_white_list = [UserWarning]
                     for warning in warning_white_list:
                         warnings.simplefilter("ignore", warning)

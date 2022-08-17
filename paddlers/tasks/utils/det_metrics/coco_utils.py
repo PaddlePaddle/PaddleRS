@@ -142,20 +142,19 @@ def cocoapi_eval(anns,
         logging.info('Per-category of {} AP: \n{}'.format(style, table.table))
         logging.info("per-category PR curve has output to {} folder.".format(
             style + '_pr_curve'))
-    # flush coco evaluation result
+    # Flush coco evaluation result
     sys.stdout.flush()
     return coco_eval.stats
 
 
 def loadRes(coco_obj, anns):
     # This function has the same functionality as pycocotools.COCO.loadRes,
-    # except that the input anns is list of results rather than a json file.
+    # excepting that the input anns is list of results rather than a json file.
     # Refer to
     # https://github.com/cocodataset/cocoapi/blob/8c9bcc3cf640524c4c20a9c40e89cb6a2f2fa0e9/PythonAPI/pycocotools/coco.py#L305,
 
     # matplotlib.use() must be called *before* pylab, matplotlib.pyplot,
-    # or matplotlib.backends is imported for the first time
-    # pycocotools import matplotlib
+    # or matplotlib.backends is imported for the first time.
     import matplotlib
     matplotlib.use('Agg')
     from pycocotools.coco import COCO
@@ -192,7 +191,7 @@ def loadRes(coco_obj, anns):
         res.dataset['categories'] = copy.deepcopy(coco_obj.dataset[
             'categories'])
         for id, ann in enumerate(anns):
-            # now only support compressed RLE format as segmentation results
+            # Now only supports compressed RLE format as segmentation results.
             ann['area'] = maskUtils.area(ann['segmentation'])
             if not 'bbox' in ann:
                 ann['bbox'] = maskUtils.toBbox(ann['segmentation'])
@@ -291,8 +290,7 @@ def analyze_individual_category(k, cocoDt, cocoGt, catId, iou_type, areas=None):
     """
 
     # matplotlib.use() must be called *before* pylab, matplotlib.pyplot,
-    # or matplotlib.backends is imported for the first time
-    # pycocotools import matplotlib
+    # or matplotlib.backends is imported for the first time.
     import matplotlib
     matplotlib.use('Agg')
     from pycocotools.coco import COCO
@@ -311,7 +309,7 @@ def analyze_individual_category(k, cocoDt, cocoGt, catId, iou_type, areas=None):
             select_dt_anns.append(ann)
     dt.dataset['annotations'] = select_dt_anns
     dt.createIndex()
-    # compute precision but ignore superclass confusion
+    # Compute precision but ignore superclass confusion.
     gt = copy.deepcopy(cocoGt)
     child_catIds = gt.getCatIds(supNms=[nm['supercategory']])
     for idx, ann in enumerate(gt.dataset['annotations']):
@@ -379,8 +377,7 @@ def coco_error_analysis(eval_details_file=None,
 
     import multiprocessing as mp
     # matplotlib.use() must be called *before* pylab, matplotlib.pyplot,
-    # or matplotlib.backends is imported for the first time
-    # pycocotools import matplotlib
+    # or matplotlib.backends is imported for the first time.
     import matplotlib
     matplotlib.use('Agg')
     from pycocotools.coco import COCO
@@ -446,11 +443,11 @@ def coco_error_analysis(eval_details_file=None,
             assert k == analyze_result[0], ""
             ps_supercategory = analyze_result[1]['ps_supercategory']
             ps_allcategory = analyze_result[1]['ps_allcategory']
-            # compute precision but ignore superclass confusion
+            # Compute precision but ignore superclass confusion.
             ps[3, :, k, :, :] = ps_supercategory
-            # compute precision but ignore any class confusion
+            # Compute precision but ignore any class confusion.
             ps[4, :, k, :, :] = ps_allcategory
-            # fill in background and false negative errors and plot
+            # Fill in background and false negative errors and plot.
             ps[ps == -1] = 0
             ps[5, :, k, :, :] = ps[4, :, k, :, :] > 0
             ps[6, :, k, :, :] = 1.0

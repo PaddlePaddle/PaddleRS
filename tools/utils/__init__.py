@@ -14,7 +14,7 @@
 
 import sys
 import os.path as osp
-sys.path.insert(0, osp.abspath(".."))  # add workspace
+sys.path.insert(0, osp.abspath(".."))  # Add workspace
 
 from .raster import Raster, raster2uint8, save_geotiff
 from .vector import translate_vector
