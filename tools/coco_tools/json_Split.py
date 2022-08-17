@@ -87,7 +87,7 @@ def js_split(js_all_path, js_train_path, js_val_path, val_split_rate,
 def get_args():
     parser = argparse.ArgumentParser(description='Json Merge')
 
-    # parameters
+    # Parameters
     parser.add_argument('--json_all_path', type=str, help='json path to split')
     parser.add_argument(
         '--json_train_path',

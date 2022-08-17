@@ -263,7 +263,7 @@ class PAMBlock(nn.Layer):
 
     def _attend(self, query, key, value):
         energy = paddle.bmm(query.transpose((0, 2, 1)),
-                            key)  # batch matrix multiplication
+                            key)  # Batched matrix multiplication
         energy = (self.key_ch**(-0.5)) * energy
         attention = F.softmax(energy, axis=-1)
         out = paddle.bmm(value, attention.transpose((0, 2, 1)))

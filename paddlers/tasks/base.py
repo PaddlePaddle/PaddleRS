@@ -76,10 +76,10 @@ class BaseModel(metaclass=ModelMeta):
         self.eval_metrics = None
         self.best_accuracy = -1.
         self.best_model_epoch = -1
-        # 是否使用多卡间同步BatchNorm均值和方差
+        # Whether to use synchronized BN
         self.sync_bn = False
         self.status = 'Normal'
-        # 已完成迭代轮数，为恢复训练时的起始轮数
+        # The initial epoch when training is resumed
         self.completed_epochs = 0
         self.pruner = None
         self.pruning_ratios = None
@@ -239,7 +239,7 @@ class BaseModel(metaclass=ModelMeta):
                 mode='w') as f:
             yaml.dump(model_info, f)
 
-        # 评估结果保存
+        # Save evaluation details
         if hasattr(self, 'eval_details'):
             with open(osp.join(save_dir, 'eval_details.json'), 'w') as f:
                 json.dump(self.eval_details, f)
@@ -258,7 +258,7 @@ class BaseModel(metaclass=ModelMeta):
                     mode='w') as f:
                 yaml.dump(quant_info, f)
 
-        # 模型保存成功的标志
+        # Success flag
         open(osp.join(save_dir, '.success'), 'w').close()
         logging.info("Model saved in {}.".format(save_dir))
 
@@ -391,7 +391,7 @@ class BaseModel(metaclass=ModelMeta):
                 step_time_tic = step_time_toc
                 current_step += 1
 
-                # 每间隔log_interval_steps，输出loss信息
+                # Log loss info every log_interval_steps
                 if current_step % log_interval_steps == 0 and local_rank == 0:
                     if use_vdl:
                         for k, v in outputs.items():
@@ -399,7 +399,7 @@ class BaseModel(metaclass=ModelMeta):
                                 '{}-Metrics/Training(Step): {}'.format(
                                     task_id, k), v, current_step)
 
-                    # 估算剩余时间
+                    # Estimation remaining time
                     avg_step_time = train_step_time.avg()
                     eta = avg_step_time * (train_total_step - current_step)
                     if eval_dataset is not None:
@@ -427,14 +427,14 @@ class BaseModel(metaclass=ModelMeta):
                 self.net.set_state_dict(ema.apply())
             eval_epoch_tic = time.time()
 
-            # 每间隔save_interval_epochs, 在验证集上评估和对模型进行保存
+            # Every save_interval_epochs, evaluate and save the model
             if (i + 1) % save_interval_epochs == 0 or i == num_epochs - 1:
                 if eval_dataset is not None and eval_dataset.num_samples > 0:
                     eval_result = self.evaluate(
                         eval_dataset,
                         batch_size=eval_batch_size,
                         return_details=True)
-                    # 保存最优模型
+                    # Save the optimial model
                     if local_rank == 0:
                         self.eval_metrics, self.eval_details = eval_result
                         if use_vdl:
@@ -548,7 +548,7 @@ class BaseModel(metaclass=ModelMeta):
                 "Exported inference model does not support quantization-aware training.",
                 exit=True)
         if quant_config is None:
-            # default quantization configuration
+            # Default quantization configuration
             quant_config = {
                 # {None, 'PACT'}. Weight preprocess type. If None, no preprocessing is performed.
                 'weight_preprocess_type': None,
@@ -669,7 +669,7 @@ class BaseModel(metaclass=ModelMeta):
                 mode='w') as f:
             yaml.dump(pipeline_info, f)
 
-        # 模型保存成功的标志
+        # Success flag
         open(osp.join(save_dir, '.success'), 'w').close()
         logging.info("The inference model for deployment is saved in {}.".
                      format(save_dir))

@@ -154,9 +154,9 @@ class DisablePrint(object):
 class Times(object):
     def __init__(self):
         self.time = 0.
-        # start time
+        # Start time
         self.st = 0.
-        # end time
+        # End time
         self.et = 0.
 
     def start(self):

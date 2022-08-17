@@ -58,11 +58,11 @@ class COCODetDataset(BaseDataset):
                  allow_empty=False,
                  empty_ratio=1.):
         # matplotlib.use() must be called *before* pylab, matplotlib.pyplot,
-        # or matplotlib.backends is imported for the first time
-        # pycocotools import matplotlib
+        # or matplotlib.backends is imported for the first time.
         import matplotlib
         matplotlib.use('Agg')
         from pycocotools.coco import COCO
+
         super(COCODetDataset, self).__init__(data_dir, label_list, transforms,
                                              num_workers, shuffle)
 
@@ -159,7 +159,7 @@ class COCODetDataset(BaseDataset):
             difficults = []
 
             for inst in instances:
-                # check gt bbox
+                # Check gt bbox
                 if inst.get('ignore', False):
                     continue
                 if 'bbox' not in inst.keys():
@@ -168,7 +168,7 @@ class COCODetDataset(BaseDataset):
                     if not any(np.array(inst['bbox'])):
                         continue
 
-                # read box
+                # Read the box
                 x1, y1, box_w, box_h = inst['bbox']
                 x2 = x1 + box_w
                 y2 = y1 + box_h

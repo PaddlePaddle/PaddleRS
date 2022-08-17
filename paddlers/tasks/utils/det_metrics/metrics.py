@@ -41,11 +41,11 @@ class Metric(paddle.metric.Metric):
     # paddle.metric.Metric defined :metch:`update`, :meth:`accumulate`
     # :metch:`reset`, in ppdet, we also need following 2 methods:
 
-    # abstract method for logging metric results
+    # Abstract method for logging metric results
     def log(self):
         pass
 
-    # abstract method for getting metric results
+    # Abstract method for getting metric results
     def get_results(self):
         pass
 
@@ -162,7 +162,7 @@ class COCOMetric(Metric):
         self.reset()
 
     def reset(self):
-        # only bbox and mask evaluation support currently
+        # Only bbox and mask evaluation are supported currently.
         self.details = {
             'gt': copy.deepcopy(self.coco_gt.dataset),
             'bbox': [],
@@ -172,7 +172,7 @@ class COCOMetric(Metric):
 
     def update(self, inputs, outputs):
         outs = {}
-        # outputs Tensor -> numpy.ndarray
+        # Tensor -> numpy.ndarray
         for k, v in outputs.items():
             outs[k] = v.numpy() if isinstance(v, paddle.Tensor) else v
 

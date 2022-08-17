@@ -218,7 +218,7 @@ class DecodeImg(Transform):
                 raise IOError('Cannot open', img_path)
             im_data = dataset.ReadAsArray()
             if im_data.ndim == 2 and self.decode_sar:
-                im_data = to_intensity(im_data)  # is read SAR
+                im_data = to_intensity(im_data)
                 im_data = im_data[:, :, np.newaxis]
             else:
                 if im_data.ndim == 3:
@@ -1421,7 +1421,7 @@ class MixupImage(Transform):
         image = self.apply_im(sample[0]['image'], sample[1]['image'], factor)
         result = copy.deepcopy(sample[0])
         result['image'] = image
-        # apply bbox and score
+        # Apply bbox and score
         if 'gt_bbox' in sample[0]:
             gt_bbox1 = sample[0]['gt_bbox']
             gt_bbox2 = sample[1]['gt_bbox']
@@ -1514,7 +1514,7 @@ class RandomDistort(Transform):
         if np.random.uniform(0., 1.) < self.hue_prob:
             return image
 
-        # it works, but result differ from HSV version
+        # It works, but the result differs from HSV version.
         delta = np.random.uniform(low, high)
         u = np.cos(delta * np.pi)
         w = np.sin(delta * np.pi)
@@ -1550,7 +1550,7 @@ class RandomDistort(Transform):
         for i in range(channel // 3):
             sub_img = image[:, :, 3 * i:3 * (i + 1)]
             sub_img = sub_img.astype(np.float32)
-            # it works, but result differ from HSV version
+            # It works, but the result differs from HSV version.
             gray = sub_img * np.array(
                 [[[0.299, 0.587, 0.114]]], dtype=np.float32)
             gray = gray.sum(axis=2, keepdims=True)
@@ -1765,9 +1765,9 @@ class _PadBox(Transform):
             if gt_num > 0:
                 pad_score[:gt_num] = sample['gt_score'][:gt_num, 0]
             sample['gt_score'] = pad_score
-        # in training, for example in op ExpandImage,
-        # the bbox and gt_class is expanded, but the difficult is not,
-        # so, judging by it's length
+        # In training, for example in op ExpandImage,
+        # bbox and gt_class are expanded, but difficult is not,
+        # so judge by its length.
         if 'difficult' in sample:
             pad_diff = np.zeros((num_max, ), dtype=np.int32)
             if gt_num > 0:

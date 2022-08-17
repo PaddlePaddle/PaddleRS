@@ -127,7 +127,7 @@ class Predictor(object):
                     )
                 else:
                     try:
-                        # Cache 10 different shapes for mkldnn to avoid memory leak
+                        # Cache 10 different shapes for mkldnn to avoid memory leak.
                         config.set_mkldnn_cache_capacity(10)
                         config.enable_mkldnn()
                         config.set_cpu_math_library_num_threads(mkl_thread_num)
