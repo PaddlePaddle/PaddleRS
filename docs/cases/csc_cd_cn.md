@@ -588,5 +588,5 @@ Image.frombytes('RGB', fig.canvas.get_width_height(), fig.canvas.tostring_rgb())
 
 ## 参考资料
 
-- [遥感数据介绍](https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/data/rs_data_cn.md)
+- [遥感数据介绍](https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/data/rs_data.md)
 - [PaddleRS文档](https://github.com/PaddlePaddle/PaddleRS/blob/develop/tutorials/train/README.md)

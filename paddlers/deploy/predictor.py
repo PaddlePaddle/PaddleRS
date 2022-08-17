@@ -260,8 +260,8 @@ class Predictor(object):
 
         Args:
             img_file(list[str|tuple|np.ndarray] | str | tuple | np.ndarray): For scene classification, image restoration, 
-                object detection and semantic segmentation tasks, `img_file` should be either the path of the image to predict
-                , a decoded image (a np.ndarray, which should be consistent with what you get from passing image path to
+                object detection and semantic segmentation tasks, `img_file` should be either the path of the image to predict,
+                a decoded image (a np.ndarray, which should be consistent with what you get from passing image path to
                 paddlers.transforms.decode_image()), or a list of image paths or decoded images. For change detection tasks,
                 img_file should be a tuple of image paths, a tuple of decoded images, or a list of tuples.
             topk(int, optional): Top-k values to reserve in a classification result. Defaults to 1.

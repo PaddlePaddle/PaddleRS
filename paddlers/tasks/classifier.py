@@ -209,7 +209,7 @@ class BaseClassifier(BaseModel):
             train_dataset (paddlers.datasets.ClasDataset): Training dataset.
             train_batch_size (int, optional): Total batch size among all cards used in 
                 training. Defaults to 2.
-            eval_dataset (paddlers.datasets.ClasDataset, optional): Evaluation dataset. 
+            eval_dataset (paddlers.datasets.ClasDataset|None, optional): Evaluation dataset. 
                 If None, the model will not be evaluated during training process. 
                 Defaults to None.
             optimizer (paddle.optimizer.Optimizer|None, optional): Optimizer used in 
@@ -320,7 +320,7 @@ class BaseClassifier(BaseModel):
             train_dataset (paddlers.datasets.ClasDataset): Training dataset.
             train_batch_size (int, optional): Total batch size among all cards used in 
                 training. Defaults to 2.
-            eval_dataset (paddlers.datasets.ClasDataset, optional): Evaluation dataset. 
+            eval_dataset (paddlers.datasets.ClasDataset|None, optional): Evaluation dataset. 
                 If None, the model will not be evaluated during training process. 
                 Defaults to None.
             optimizer (paddle.optimizer.Optimizer|None, optional): Optimizer used in 
@@ -439,7 +439,9 @@ class BaseClassifier(BaseModel):
         Returns:
             If `img_file` is a string or np.array, the result is a dict with key-value 
                 pairs:
-                {"label map": `class_ids_map`, "scores_map": `label_names_map`}.
+                {"label map": `class_ids_map`, 
+                 "scores_map": `scores_map`, 
+                 "label_names_map": `label_names_map`}.
             If `img_file` is a list, the result is a list composed of dicts with the 
                 corresponding fields:
                 class_ids_map (np.ndarray): class_ids

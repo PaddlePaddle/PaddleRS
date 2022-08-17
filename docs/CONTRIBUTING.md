@@ -68,7 +68,7 @@ from paddlers.transforms import DecodeImg
 
 ### 3 代码风格规范
 
-PaddleRS对代码风格的规范基本与[Google Python风格规范](https://zh-google-styleguide.readthedocs.io/en/latest/google-python-styleguide/python_style_rules/)一致，但PaddleRS对类型注释不做强制要求。较为重要的代码风格规范如下：
+PaddleRS对代码风格的规范基本与[Google Python风格规范](https://zh-google-styleguide.readthedocs.io/en/latest/google-python-styleguide/python_style_rules/)一致，但PaddleRS对类型注解（即type hints，参见[PEP 483](https://peps.python.org/pep-0483/)与[PEP 484](https://peps.python.org/pep-0484/)）不做强制要求。较为重要的代码风格规范如下：
 
 - 空行：顶层定义（例如顶层的函数或者类的定义）之间空2行。类内部不同方法的定义之间、以及类名与第一个方法定义之间空1行。在函数内部需要注意在逻辑上有间断的地方添加1个空行。
 
