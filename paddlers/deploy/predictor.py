@@ -97,7 +97,7 @@ class Predictor(object):
             osp.join(self.model_dir, 'model.pdiparams'))
 
         if use_gpu:
-            # 设置GPU初始显存(单位M)和Device ID
+            # Set memory on GPUs (in MB) and device ID
             config.enable_use_gpu(200, gpu_id)
             config.switch_ir_optim(True)
             if use_trt:
@@ -127,7 +127,7 @@ class Predictor(object):
                     )
                 else:
                     try:
-                        # cache 10 different shapes for mkldnn to avoid memory leak
+                        # Cache 10 different shapes for mkldnn to avoid memory leak.
                         config.set_mkldnn_cache_capacity(10)
                         config.enable_mkldnn()
                         config.set_cpu_math_library_num_threads(mkl_thread_num)

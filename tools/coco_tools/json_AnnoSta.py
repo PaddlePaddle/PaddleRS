@@ -166,7 +166,7 @@ def get_args():
     parser = argparse.ArgumentParser(
         description='Json Images Infomation Statistic')
 
-    # parameters
+    # Parameters
     parser.add_argument(
         '--json_path',
         type=str,

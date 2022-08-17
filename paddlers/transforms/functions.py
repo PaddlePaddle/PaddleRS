@@ -55,7 +55,6 @@ def center_crop(im, crop_size=224):
     return im
 
 
-# region flip
 def img_flip(im, method=0):
     """
     Flip an image. 
@@ -168,10 +167,6 @@ def lt2rb_flip(im):
     return im
 
 
-# endregion
-
-
-# region rotation
 def img_simple_rotate(im, method=0):
     """
     Rotate an image. 
@@ -253,9 +248,6 @@ def rot_270(im):
     axs_list[:2] = [1, 0]
     im = im[:, ::-1, ...].transpose(axs_list)
     return im
-
-
-# endregion
 
 
 def rgb2bgr(im):
@@ -405,7 +397,7 @@ def to_uint8(im, is_linear=False):
     # 2% linear stretch
     def _two_percent_linear(image, max_out=255, min_out=0):
         def _gray_process(gray, maxout=max_out, minout=min_out):
-            # get the corresponding gray level at 98% histogram
+            # Get the corresponding gray level at 98% in the histogram.
             high_value = np.percentile(gray, 98)
             low_value = np.percentile(gray, 2)
             truncated_gray = np.clip(gray, a_min=low_value, a_max=high_value)
@@ -422,7 +414,7 @@ def to_uint8(im, is_linear=False):
             result = _gray_process(image)
         return np.uint8(result)
 
-    # simple image standardization
+    # Simple image standardization
     def _sample_norm(image):
         stretches = []
         if len(image.shape) == 3:
@@ -456,7 +448,7 @@ def to_intensity(im):
 
     if len(im.shape) != 2:
         raise ValueError("`len(im.shape) must be 2.")
-    # the type is complex means this is a SAR data
+    # If the type is complex, this is SAR data.
     if isinstance(type(im[0, 0]), complex):
         im = abs(im)
     return im
@@ -475,7 +467,7 @@ def select_bands(im, band_list=[1, 2, 3]):
         np.ndarray: Image with selected bands.
     """
 
-    if len(im.shape) == 2:  # just have one channel
+    if len(im.shape) == 2:  # Image has only one channel
         return im
     if not isinstance(band_list, list) or len(band_list) == 0:
         raise TypeError("band_list must be non empty list.")
@@ -517,7 +509,7 @@ def dehaze(im, gamma=False):
         return m_a * I + m_b
 
     def _dehaze(im, r, w, maxatmo_mask, eps):
-        # im is RGB and range[0, 1]
+        # im is a RGB image and the value ranges in [0, 1].
         atmo_mask = np.min(im, 2)
         dark_channel = cv2.erode(atmo_mask, np.ones((15, 15)))
         atmo_mask = _guided_filter(atmo_mask, dark_channel, r, eps)

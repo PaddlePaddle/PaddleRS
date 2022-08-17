@@ -229,7 +229,7 @@ class _Gt2YoloTarget(Transform):
                     if gw <= 0. or gh <= 0. or score <= 0.:
                         continue
 
-                    # find best match anchor index
+                    # Find best matched anchor index
                     best_iou = 0.
                     best_idx = -1
                     for an_idx in range(an_hw.shape[0]):
@@ -243,8 +243,8 @@ class _Gt2YoloTarget(Transform):
                     gi = int(gx * grid_w)
                     gj = int(gy * grid_h)
 
-                    # gtbox should be regresed in this layes if best match
-                    # anchor index in anchor mask of this layer
+                    # gtbox should be regressed in this layer if best matched
+                    # anchor index is in the anchor mask of this layer.
                     if best_idx in mask:
                         best_n = mask.index(best_idx)
 
@@ -257,14 +257,14 @@ class _Gt2YoloTarget(Transform):
                             gh * h / self.anchors[best_idx][1])
                         target[best_n, 4, gj, gi] = 2.0 - gw * gh
 
-                        # objectness record gt_score
+                        # Record gt_score
                         target[best_n, 5, gj, gi] = score
 
-                        # classification
+                        # Do classification
                         target[best_n, 6 + cls, gj, gi] = 1.
 
                     # For non-matched anchors, calculate the target if the iou
-                    # between anchor and gt is larger than iou_thresh
+                    # between anchor and gt is larger than iou_thresh.
                     if self.iou_thresh < 1:
                         for idx, mask_i in enumerate(mask):
                             if mask_i == best_idx: continue
@@ -282,14 +282,14 @@ class _Gt2YoloTarget(Transform):
                                     gh * h / self.anchors[mask_i][1])
                                 target[idx, 4, gj, gi] = 2.0 - gw * gh
 
-                                # objectness record gt_score
+                                # Record gt_score
                                 target[idx, 5, gj, gi] = score
 
-                                # classification
+                                # Do classification
                                 target[idx, 5 + cls, gj, gi] = 1.
                 sample['target{}'.format(i)] = target
 
-            # remove useless gt_class and gt_score after target calculated
+            # Remove useless gt_class and gt_score items after target has been calculated.
             sample.pop('gt_class')
             sample.pop('gt_score')
 

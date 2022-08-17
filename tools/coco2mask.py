@@ -96,7 +96,7 @@ def convert_data(raw_dir, end_dir):
         shutil.copy(img_path, img_save_path)
         if k in anns.keys():
             _save_mask(anns[k], sizes[k], lab_save_path)
-        else:  # have not anns
+        else:
             _save_palette(np.zeros(sizes[k], dtype="uint8"), \
                           lab_save_path)
 

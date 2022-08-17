@@ -87,11 +87,11 @@ class Conv(nn.Sequential):
 def ShuffleLayer(x, groups):
     batchsize, num_channels, height, width = x.shape
     channels_per_group = num_channels // groups
-    # reshape
+    # Reshape
     x = x.reshape((batchsize, groups, channels_per_group, height, width))
-    # transpose
+    # Transpose
     x = x.transpose((0, 2, 1, 3, 4))
-    # reshape
+    # Reshape
     x = x.reshape((batchsize, groups * channels_per_group, height, width))
     return x
 
@@ -99,11 +99,11 @@ def ShuffleLayer(x, groups):
 def ShuffleLayerTrans(x, groups):
     batchsize, num_channels, height, width = x.shape
     channels_per_group = num_channels // groups
-    # reshape
+    # Reshape
     x = x.reshape((batchsize, channels_per_group, groups, height, width))
-    # transpose
+    # Transpose
     x = x.transpose((0, 2, 1, 3, 4))
-    # reshape
+    # Reshape
     x = x.reshape((batchsize, channels_per_group * groups, height, width))
     return x
 
@@ -385,7 +385,7 @@ class CondenseNetV2(nn.Layer):
         return out
 
     def _initialize(self):
-        # initialize
+        # Initialize
         for m in self.sublayers():
             if isinstance(m, nn.Conv2D):
                 nn.initializer.KaimingNormal()(m.weight)
