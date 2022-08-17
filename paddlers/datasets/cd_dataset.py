@@ -32,7 +32,7 @@ class CDDataset(BaseDataset):
             bi-temporal images, the path of the change mask, and the paths of the segmentation masks in both
             temporal phases.
         transforms (paddlers.transforms.Compose): Data preprocessing and data augmentation operators to apply.
-        label_list (str, optional): Path of the file that contains the category names. Defaults to None.
+        label_list (str|None, optional): Path of the file that contains the category names. Defaults to None.
         num_workers (int|str, optional): Number of processes used for data loading. If `num_workers` is 'auto',
             the number of workers will be automatically determined according to the number of CPU cores: If 
             there are more than 16 cores，8 workers will be used. Otherwise, the number of workers will be half 

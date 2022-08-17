@@ -23,7 +23,7 @@ pdrs.utils.download_and_decompress(
 
 # 定义训练和验证时使用的数据变换（数据增强、预处理等）
 # 使用Compose组合多种变换方式。Compose中包含的变换将按顺序串行执行
-# API说明：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/transforms.md
+# API说明：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/data.md
 train_transforms = T.Compose([
     # 读取影像
     T.DecodeImg(),
@@ -66,7 +66,7 @@ eval_dataset = pdrs.datasets.ClasDataset(
     shuffle=False)
 
 # 使用默认参数构建MobileNetV3模型
-# 目前已支持的模型请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/model_zoo.md
+# 目前已支持的模型请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/intro/model_zoo.md
 # 模型输入参数请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/classifier.py
 model = pdrs.tasks.clas.MobileNetV3_small_x1_0(
     num_classes=len(train_dataset.labels))

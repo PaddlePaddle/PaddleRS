@@ -2,7 +2,7 @@
 
 Linux GPU/CPU 基础训练推理测试的主程序为`test_train_inference_python.sh`，可以测试基于Python的模型训练、评估、推理等基本功能。
 
-## 1. 测试结论汇总
+## 1 测试结论汇总
 
 - 训练相关：
 
@@ -23,7 +23,7 @@ Linux GPU/CPU 基础训练推理测试的主程序为`test_train_inference_pytho
 |  图像分割  |  UNet |  支持 | 支持 | 1 |
 
 
-## 2. 测试流程
+## 2 测试流程
 
 ### 2.1 环境配置
 
