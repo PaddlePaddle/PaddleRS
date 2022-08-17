@@ -211,7 +211,7 @@ class BaseDetector(BaseModel):
                 Training dataset.
             train_batch_size (int, optional): Total batch size among all cards used in 
                 training. Defaults to 64.
-            eval_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset, optional): 
+            eval_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset|None, optional): 
                 Evaluation dataset. If None, the model will not be evaluated during training 
                 process. Defaults to None.
             optimizer (paddle.optimizer.Optimizer|None, optional): Optimizer used for 
@@ -405,7 +405,7 @@ class BaseDetector(BaseModel):
                 Training dataset.
             train_batch_size (int, optional): Total batch size among all cards used in 
                 training. Defaults to 64.
-            eval_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset, optional): 
+            eval_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset|None, optional): 
                 Evaluation dataset. If None, the model will not be evaluated during training 
                 process. Defaults to None.
             optimizer (paddle.optimizer.Optimizer or None, optional): Optimizer used for 
@@ -486,7 +486,7 @@ class BaseDetector(BaseModel):
 
         Returns:
             collections.OrderedDict with key-value pairs: 
-                {"mAP(0.50, 11point)":`mean average precision`}.
+                {"bbox_mmap":`mean average precision (0.50, 11point)`}.
         """
 
         if metric is None:
@@ -585,9 +585,13 @@ class BaseDetector(BaseModel):
         Returns:
             If `img_file` is a string or np.array, the result is a list of dict with 
                 key-value pairs:
-                {"category_id": `category_id`, "category": `category`, "bbox": `[x, y, w, h]`, "score": `score`}.
-            If `img_file` is a list, the result is a list composed of dicts with the 
-                corresponding fields:
+                {"category_id": `category_id`, 
+                 "category": `category`, 
+                 "bbox": `[x, y, w, h]`, 
+                 "score": `score`, 
+                 "mask": `mask`}.
+            If `img_file` is a list, the result is a list composed of list of dicts 
+                with the corresponding fields:
                 category_id(int): the predicted category ID. 0 represents the first 
                     category in the dataset, and so on.
                 category(str): category name

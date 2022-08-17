@@ -242,7 +242,7 @@ class BaseSegmenter(BaseModel):
             pretrain_weights (str|None, optional): None or name/path of pretrained 
                 weights. If None, no pretrained weights will be loaded. 
                 Defaults to 'CITYSCAPES'.
-            learning_rate (float, optional): Learning rate for training. Defaults to .025.
+            learning_rate (float, optional): Learning rate for training. Defaults to .01.
             lr_decay_power (float, optional): Learning decay power. Defaults to .9.
             early_stop (bool, optional): Whether to adopt early stop strategy. Defaults 
                 to False.

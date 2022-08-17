@@ -2,10 +2,10 @@
 
 ## 目录
 
-* [模型格式说明](#1)
-  * [训练模型格式](#11)
-  * [部署模型格式](#12)
-* [部署模型导出](#2)
+- [模型格式说明](#1)
+  - [训练模型格式](#11)
+  - [部署模型格式](#12)
+- [部署模型导出](#2)
 
 ## <h2 id="1">模型格式说明</h2>
 
@@ -23,6 +23,7 @@
 ### <h3 id="12">部署模型格式</h3>
 
 在服务端部署模型时，需要将训练过程中保存的模型导出为专用的格式。具体而言，在部署阶段，使用下述五个文件描述训练好的模型：
+
 - `model.pdmodel`，记录模型的网络结构；
 - `model.pdiparams`，包含模型权重参数；
 - `model.pdiparams.info`，包含模型权重名称；
@@ -33,7 +34,7 @@
 
 使用如下指令导出部署格式的模型:
 
-```commandline
+```shell
 python deploy/export/export_model.py --model_dir=./output/deeplabv3p/best_model/ --save_dir=./inference_model/
 ```
 
@@ -51,11 +52,12 @@ python deploy/export/export_model.py --model_dir=./output/deeplabv3p/best_model/
 
 完整命令示例：
 
-```commandline
+```shell
 python deploy/export_model.py --model_dir=./output/deeplabv3p/best_model/ --save_dir=./inference_model/ --fixed_input_shape=[224,224]
 ```
 
 对于`--fixed_input_shape`选项，**请注意**：
+
 - 在推理阶段若需固定分类模型的输入形状，请保持其与训练阶段的输入形状一致。
 - 对于检测模型中的YOLO/PPYOLO系列模型，请保证输入影像的`w`和`h`有相同取值、且均为32的倍数；指定`--fixed_input_shape`时，R-CNN模型的`w`和`h`也均需为32的倍数。
 - 指定`[w,h]`时，请使用半角逗号（`,`）分隔`w`和`h`，二者之间不允许存在空格等其它字符。

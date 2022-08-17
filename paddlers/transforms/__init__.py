@@ -24,11 +24,13 @@ def decode_image(im_path,
                  to_rgb=True,
                  to_uint8=True,
                  decode_bgr=True,
-                 decode_sar=True):
+                 decode_sar=True,
+                 read_geo_info=False):
     """
     Decode an image.
     
     Args:
+        im_path (str): Path of the image to decode.
         to_rgb (bool, optional): If True, convert input image(s) from BGR format to 
             RGB format. Defaults to True.
         to_uint8 (bool, optional): If True, quantize and convert decoded image(s) to 
@@ -38,9 +40,14 @@ def decode_image(im_path,
         decode_sar (bool, optional): If True, automatically interpret a two-channel 
             geo image (e.g. geotiff images) as a SAR image, set this argument to 
             True. Defaults to True.
+        read_geo_info (bool, optional): If True, read geographical information from 
+            the image. Deafults to False.
     
     Returns:
-        np.ndarray: Decoded image.
+        np.ndarray|tuple: If `read_geo_info` is False, return the decoded image. 
+            Otherwise, return a tuple that contains the decoded image and a dictionary
+            of geographical information (e.g. geographical transform and geographical 
+            projection).
     """
 
     # Do a presence check. osp.exists() assumes `im_path` is a path-like object.
@@ -50,11 +57,15 @@ def decode_image(im_path,
         to_rgb=to_rgb,
         to_uint8=to_uint8,
         decode_bgr=decode_bgr,
-        decode_sar=decode_sar)
+        decode_sar=decode_sar,
+        read_geo_info=read_geo_info)
     # Deepcopy to avoid inplace modification
     sample = {'image': copy.deepcopy(im_path)}
     sample = decoder(sample)
-    return sample['image']
+    if read_geo_info:
+        return sample['image'], sample['geo_info_dict']
+    else:
+        return sample['image']
 
 
 def build_transforms(transforms_info):
