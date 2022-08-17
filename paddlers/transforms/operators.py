@@ -616,10 +616,10 @@ class RandomFlipOrRotate(Transform):
         probs (list[float]): Probabilities of performing flipping and rotation. 
             Default: [0.35,0.25].
         probsf (list[float]): Probabilities of 5 flipping modes (horizontal, 
-            vertical, both horizontal diction and vertical, diagonal, 
-            anti-diagonal). Default: [0.3, 0.3, 0.2, 0.1, 0.1].
+            vertical, both horizontal and vertical, diagonal, anti-diagonal). 
+            Default: [0.3, 0.3, 0.2, 0.1, 0.1].
         probsr (list[float]): Probabilities of 3 rotation modes (90°, 180°, 270° 
-            clockwise). Default: [0.25,0.5,0.25].
+            clockwise). Default: [0.25, 0.5, 0.25].
 
     Examples:
 

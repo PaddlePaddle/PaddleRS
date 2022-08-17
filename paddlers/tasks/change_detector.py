@@ -1066,11 +1066,12 @@ class ChangeStar(BaseChangeDetector):
 
 class ChangeFormer(BaseChangeDetector):
     def __init__(self,
-                 in_channels=3,
                  num_classes=2,
+                 use_mixed_loss=False,
+                 losses=None,
+                 in_channels=3,
                  decoder_softmax=False,
                  embed_dim=256,
-                 use_mixed_loss=False,
                  **params):
         params.update({
             'in_channels': in_channels,
@@ -1081,4 +1082,5 @@ class ChangeFormer(BaseChangeDetector):
             model_name='ChangeFormer',
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
+            losses=losses,
             **params)

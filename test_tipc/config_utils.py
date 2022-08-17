@@ -152,6 +152,7 @@ def parse_args(*args, **kwargs):
     if osp.exists(cfg_path):
         cfg = parse_configs(cfg_path, inherit_on)
         parser, node_keys = _cfg2args(cfg, parser, '')
+        node_keys = sorted(node_keys, reverse=True)
         args = parser.parse_args(*args, **kwargs)
         return _args2cfg(dict(), args, node_keys)
     elif cfg_path != '':
@@ -178,7 +179,7 @@ class CfgNode(yaml.YAMLObject, metaclass=_CfgNodeMeta):
         super().__init__()
         self.type = dict_['type']
         self.args = dict_.get('args', [])
-        self.module = self._get_module(dict_.get('module', ''))
+        self.module = dict_.get('module', '')
 
     @classmethod
     def set_context(cls, ctx):
@@ -189,7 +190,7 @@ class CfgNode(yaml.YAMLObject, metaclass=_CfgNodeMeta):
 
     def build_object(self, mod=None):
         if mod is None:
-            mod = self.module
+            mod = self._get_module(self.module)
         cls = getattr(mod, self.type)
         if isinstance(self.args, list):
             args = build_objects(self.args)
