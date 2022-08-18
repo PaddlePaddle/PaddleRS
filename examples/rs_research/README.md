@@ -110,7 +110,7 @@ class IterativeBIT(nn.Layer):
 2. 包含模型整体逻辑结构的最外层模块须用`@attach`装饰；
 3. 对于变化检测任务，`forward()`方法除`self`参数外还接受两个参数`t1`、`t2`，分别表示第一时相和第二时相影像。
 
-关于模型定义的更多细节请参考[API文档]()。
+关于模型定义的更多细节请参考[文档](https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/dev/dev_guide.md)。
 
 #### 3.3.2 自定义训练器
 
@@ -145,7 +145,9 @@ class IterativeBIT(BaseChangeDetector):
 2. 与模型一样，训练器也须用`@attach`装饰；
 3. 训练器和模型可以同名。
 
-关于训练器定义的更多细节请参考[API文档]()。
+在本案例中，仅仅重写了训练器的`__init__()`方法。在实际科研过程中，可以通过重写`train()`、`evaluate()`、`default_loss()`等方法定制更加复杂的训练、评估策略或更换默认损失函数。
+
+关于训练器的更多细节请参考[API文档](https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/train.md)。
 
 ### 3.4 进行参数分析与消融实验
 
@@ -187,7 +189,8 @@ PaddleRS提供了，只需要。`attach_tools.Attach`对象自动。
 
 ### 5.2 展望
 
-耗时，模型大小，FLOPs
+- 本案例对所有参与比较的算法使用了相同的训练超参数，但由于模型之间存在差异，使用统一的超参训练往往难以保证所有模型都能取得较好的效果。在后续工作中，可以对每个对比算法进行调参，使其获得最优精度。
+- 在评估算法效果时，仅仅对比了精度指标，而未对耗时、模型大小、FLOPs等指标进行考量。后续应当从精度和性能两个方面对算法进行综合评估。
 
 ## 参考文献
 

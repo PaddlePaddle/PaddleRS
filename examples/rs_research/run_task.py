@@ -2,6 +2,10 @@
 
 import os
 
+# Import cv2 and sklearn before paddlers to solve the
+# "ImportError: dlopen: cannot load any more object with static TLS" issue.
+import cv2
+import sklearn
 import paddle
 import paddlers
 from paddlers import transforms as T

@@ -45,7 +45,7 @@ class IterativeBIT(nn.Layer):
         return logits_list
 
     def _constr_iter_input(self, im, rate_map):
-        return paddle.concat([im.rate_map], axis=1)
+        return paddle.concat([im, rate_map], axis=1)
 
     def _init_rate_map(self, im_shape):
         b, _, h, w = im_shape

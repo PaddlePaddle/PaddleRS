@@ -1,0 +1,6 @@
+_base_: ./svcd.yaml
+
+save_dir: ./exp/svcd/stanet/
+
+model: !Node
+    type: STANet

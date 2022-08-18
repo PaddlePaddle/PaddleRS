@@ -1,0 +1,12 @@
+_base_: ./svcd.yaml
+
+save_dir: ./exp/svcd/custom_model/
+
+model: !Node
+    type: IterativeBIT
+    args:
+        num_iters: 3
+        gamma: 0.5
+        num_classes: 2
+        bit_kwargs:
+            in_channels: 4

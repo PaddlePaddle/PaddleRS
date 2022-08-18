@@ -52,7 +52,7 @@ transforms:
           args: ['eval']
 download_on: False
 
-num_epochs: 40
+num_epochs: 50
 train_batch_size: 8
 optimizer: !Node
     type: Adam
@@ -62,11 +62,11 @@ optimizer: !Node
             module: paddle.optimizer.lr
             args:
                 learning_rate: 0.002
-                step_size: 30
+                step_size: 35000
                 gamma: 0.2
-save_interval_epochs: 10
-log_interval_steps: 500
-save_dir: ./exp/
+save_interval_epochs: 5
+log_interval_steps: 50
+save_dir: ./exp/levircd/
 learning_rate: 0.002
 early_stop: False
 early_stop_patience: 5

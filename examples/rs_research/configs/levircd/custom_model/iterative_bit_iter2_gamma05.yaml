@@ -1,6 +1,6 @@
 _base_: ../levircd.yaml
 
-save_dir: ./exp/custom_model/iter2_gamma05/
+save_dir: ./exp/levircd/custom_model/iter2_gamma05/
 
 model: !Node
     type: IterativeBIT
