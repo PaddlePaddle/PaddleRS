@@ -11,38 +11,27 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
+from layers import BasicConv,MaxPool2x2, Conv1x1, Conv3x3
+
 bn_mom = 0.0003
-"""
-NL_FPN模块
-"""
 
-
-class NL_Block(nn.Layer):
+class NLBlock(nn.Layer):
     def __init__(self, in_channels):
-        super(NL_Block, self).__init__()
-        self.conv_v = nn.Sequential(
-            nn.Conv2D(
-                in_channels=in_channels,
-                out_channels=in_channels,
-                kernel_size=3,
-                stride=1,
-                padding=1),
-            nn.BatchNorm2D(
-                in_channels, momentum=0.1), )
-        self.W = nn.Sequential(
-            nn.Conv2D(
-                in_channels=in_channels,
-                out_channels=in_channels,
-                kernel_size=3,
-                stride=1,
-                padding=1),
-            nn.BatchNorm2D(
-                in_channels, momentum=0.1),
-            nn.ReLU())
+        super(NLBlock, self).__init__()
+        self.conv_v = BasicConv(in_ch=in_channels,
+                                out_ch=in_channels,
+                                kernel_size=3,
+                                norm=nn.BatchNorm2D(in_channels, momentum=0.1))
+        self.W = BasicConv(in_ch=in_channels,
+                            out_ch=in_channels,
+                            kernel_size=3,
+                            norm=nn.BatchNorm2D(in_channels, momentum=0.1),
+                            act=nn.ReLU())
 
     def forward(self, x):
         batch_size, c, h, w = x.shape[0], x.shape[1], x.shape[2], x.shape[3]
@@ -52,13 +41,13 @@ class NL_Block(nn.Layer):
         key = x.reshape([batch_size, c, h * w])  # B * key_channels * (H*W)
         query = x.reshape([batch_size, c, h * w])
         query = query.transpose([0, 2, 1])
+
         sim_map = paddle.matmul(query, key)  # B * (H*W) * (H*W)
         sim_map = (c**-.5) * sim_map  # B * (H*W) * (H*W)
-        sim_map = paddle.nn.functional.softmax(
+        sim_map = nn.functional.softmax(
             sim_map, axis=-1)  # B * (H*W) * (H*W)
+
         context = paddle.matmul(sim_map, value)
-        # TODO:how to contiguous() in paddle
-        # context = context.transpose([0, 2, 1]).contiguous()
         context = context.transpose([0, 2, 1])
         context = context.reshape([batch_size, c, *x.shape[2:]])
         context = self.W(context)
@@ -66,67 +55,47 @@ class NL_Block(nn.Layer):
         return context
 
 
-class NL_FPN(nn.Layer):
+class NLFPN(nn.Layer):
     """ non-local feature parymid network"""
 
     def __init__(self, in_dim, reduction=True):
-        super(NL_FPN, self).__init__()
+        super(NLFPN, self).__init__()
         if reduction:
-            self.reduction = nn.Sequential(
-                nn.Conv2D(
-                    in_dim, in_dim // 4, kernel_size=1, stride=1, padding=0),
-                nn.BatchNorm2D(
-                    in_dim // 4, momentum=bn_mom),
-                nn.ReLU(), )
-            self.re_reduction = nn.Sequential(
-                nn.Conv2D(
-                    in_dim // 4, in_dim, kernel_size=1, stride=1, padding=0),
-                nn.BatchNorm2D(
-                    in_dim, momentum=bn_mom),
-                nn.ReLU(), )
+            self.reduction = BasicConv(in_ch=in_dim,
+                                       out_ch=in_dim // 4,
+                                       kernel_size=1,
+                                       norm=nn.BatchNorm2D(in_dim // 4, momentum=bn_mom),
+                                       act=nn.ReLU())
+            self.re_reduction = BasicConv(in_ch=in_dim // 4,
+                                          out_ch=in_dim,
+                                          kernel_size=1,
+                                          norm=nn.BatchNorm2D(in_dim, momentum=bn_mom),
+                                          act=nn.ReLU())
             in_dim = in_dim // 4
         else:
             self.reduction = None
             self.re_reduction = None
-        self.conv_e1 = nn.Sequential(
-            nn.Conv2D(
-                in_dim, in_dim, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2D(
-                in_dim, momentum=bn_mom),
-            nn.ReLU(), )
-        self.conv_e2 = nn.Sequential(
-            nn.Conv2D(
-                in_dim, in_dim * 2, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2D(
-                in_dim * 2, momentum=bn_mom),
-            nn.ReLU(), )
-        self.conv_e3 = nn.Sequential(
-            nn.Conv2D(
-                in_dim * 2, in_dim * 4, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2D(
-                in_dim * 4, momentum=bn_mom),
-            nn.ReLU(), )
-        self.conv_d1 = nn.Sequential(
-            nn.Conv2D(
-                in_dim, in_dim, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2D(
-                in_dim, momentum=bn_mom),
-            nn.ReLU(), )
-        self.conv_d2 = nn.Sequential(
-            nn.Conv2D(
-                in_dim * 2, in_dim, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2D(
-                in_dim, momentum=bn_mom),
-            nn.ReLU(), )
-        self.conv_d3 = nn.Sequential(
-            nn.Conv2D(
-                in_dim * 4, in_dim * 2, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2D(
-                in_dim * 2, momentum=bn_mom),
-            nn.ReLU(), )
-        self.nl3 = NL_Block(in_dim * 2)
-        self.nl2 = NL_Block(in_dim)
-        self.nl1 = NL_Block(in_dim)
+        self.conv_e1 = BasicConv(in_dim, in_dim, kernel_size=3,
+                                 norm=nn.BatchNorm2D(in_dim, momentum=bn_mom),
+                                 act=nn.ReLU())
+        self.conv_e2 = BasicConv(in_dim, in_dim*2, kernel_size=3,
+                                 norm=nn.BatchNorm2D(in_dim*2, momentum=bn_mom),
+                                 act=nn.ReLU())
+        self.conv_e3 = BasicConv(in_dim*2, in_dim*4, kernel_size=3,
+                                 norm=nn.BatchNorm2D(in_dim*4, momentum=bn_mom),
+                                 act=nn.ReLU())
+        self.conv_d1 = BasicConv(in_dim, in_dim, kernel_size=3,
+                                 norm=nn.BatchNorm2D(in_dim, momentum=bn_mom),
+                                 act=nn.ReLU())
+        self.conv_d2 = BasicConv(in_dim*2, in_dim, kernel_size=3,
+                                 norm=nn.BatchNorm2D(in_dim, momentum=bn_mom),
+                                 act=nn.ReLU())
+        self.conv_d3 = BasicConv(in_dim*4, in_dim*2, kernel_size=3,
+                                 norm=nn.BatchNorm2D(in_dim*2, momentum=bn_mom),
+                                 act=nn.ReLU())
+        self.nl3 = NLBlock(in_dim * 2)
+        self.nl2 = NLBlock(in_dim)
+        self.nl1 = NLBlock(in_dim)
 
         self.downsample_x2 = nn.MaxPool2D(stride=2, kernel_size=2)
         self.upsample_x2 = nn.UpsamplingBilinear2D(scale_factor=2)
@@ -153,60 +122,40 @@ class NL_FPN(nn.Layer):
         return d1
 
 
-"""
-基础单元模块
-"""
-
-
-class cat(paddle.nn.Layer):
+class Cat(nn.Layer):
     def __init__(self, in_chn_high, in_chn_low, out_chn, upsample=False):
-        super(cat, self).__init__()  ##parent's init func
+        super(Cat, self).__init__()
         self.do_upsample = upsample
-        self.upsample = paddle.nn.Upsample(scale_factor=2, mode="nearest")
-        self.conv2d = paddle.nn.Sequential(
-            paddle.nn.Conv2D(
-                in_chn_high + in_chn_low,
-                out_chn,
-                kernel_size=1,
-                stride=1,
-                padding=0),
-            nn.BatchNorm2D(
-                out_chn, momentum=bn_mom),
-            paddle.nn.ReLU(), )
+        self.upsample = nn.Upsample(scale_factor=2, mode="nearest")
+        self.conv2d = BasicConv(in_chn_high + in_chn_low, out_chn,
+                                kernel_size=1,
+                                norm=nn.BatchNorm2D(out_chn, momentum=bn_mom),
+                                act=nn.ReLU())
 
     def forward(self, x, y):
-        # import ipdb
-        # ipdb.set_trace()
         if self.do_upsample:
             x = self.upsample(x)
 
-        # x,y shape(batch_sizxe,channel,w,h), concat at the dim of channel
         x = paddle.concat((x, y), 1)
+
         return self.conv2d(x)
 
 
-class double_conv(paddle.nn.Layer):
-    def __init__(
-            self, in_chn, out_chn, stride=1, dilation=1
-    ):  # params:in_chn(input channel of double conv),out_chn(output channel of double conv)
-        super(double_conv, self).__init__()
-
-        self.conv = paddle.nn.Sequential(
-            paddle.nn.Conv2D(
-                in_chn,
-                out_chn,
-                kernel_size=3,
-                stride=stride,
-                dilation=dilation,
-                padding=dilation),
-            nn.BatchNorm2D(
-                out_chn, momentum=bn_mom),
-            paddle.nn.ReLU(),
-            paddle.nn.Conv2D(
-                out_chn, out_chn, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2D(
-                out_chn, momentum=bn_mom),
-            paddle.nn.ReLU())
+class DoubleConv(nn.Layer):
+    def __init__(self, in_chn, out_chn, stride=1, dilation=1):
+        super(DoubleConv, self).__init__()
+        self.conv = nn.Sequential(
+            nn.Conv2D(in_chn, out_chn,
+                      kernel_size=3,
+                      stride=stride,
+                      dilation=dilation,
+                      padding=dilation),
+            nn.BatchNorm2D(out_chn, momentum=bn_mom),
+            nn.ReLU(),
+            nn.Conv2D(out_chn, out_chn,
+                      kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2D(out_chn, momentum=bn_mom),
+            nn.ReLU())
 
     def forward(self, x):
         x = self.conv(x)
@@ -216,23 +165,17 @@ class double_conv(paddle.nn.Layer):
 class SEModule(nn.Layer):
     def __init__(self, channels, reduction_channels):
         super(SEModule, self).__init__()
-        # self.avg_pool = nn.AdaptiveAvgPool2d(1)
-        self.fc1 = nn.Conv2D(
-            channels,
-            reduction_channels,
-            kernel_size=1,
-            padding=0,
-            bias_attr=True)
+        self.fc1 = nn.Conv2D(channels, reduction_channels,
+                             kernel_size=1,
+                             padding=0,
+                             bias_attr=True)
         self.ReLU = nn.ReLU()
-        self.fc2 = nn.Conv2D(
-            reduction_channels,
-            channels,
-            kernel_size=1,
-            padding=0,
-            bias_attr=True)
+        self.fc2 = nn.Conv2D(reduction_channels, channels,
+                             kernel_size=1,
+                             padding=0,
+                             bias_attr=True)
 
     def forward(self, x):
-        # x_se = self.avg_pool(x)
         x_se = x.reshape(
             [x.shape[0], x.shape[1], x.shape[2] * x.shape[3]]).mean(-1).reshape(
                 [x.shape[0], x.shape[1], 1, 1])
@@ -245,7 +188,6 @@ class SEModule(nn.Layer):
 
 class BasicBlock(nn.Layer):
     expansion = 1
-
     def __init__(self,
                  inplanes,
                  planes,
@@ -254,20 +196,17 @@ class BasicBlock(nn.Layer):
                  stride=1,
                  dilation=1):
         super(BasicBlock, self).__init__()
-
         first_planes = planes
         outplanes = planes * self.expansion
 
-        self.conv1 = double_conv(inplanes, first_planes)
-        self.conv2 = double_conv(
-            first_planes, outplanes, stride=stride, dilation=dilation)
+        self.conv1 = DoubleConv(inplanes, first_planes)
+        self.conv2 = DoubleConv(first_planes, outplanes,
+                                stride=stride, dilation=dilation)
         self.se = SEModule(outplanes, planes // 4) if use_se else None
-        self.downsample = paddle.nn.MaxPool2D(
-            stride=2, kernel_size=2) if downsample else None
+        self.downsample = MaxPool2x2() if downsample else None
         self.ReLU = nn.ReLU()
 
     def forward(self, x):
-
         out = self.conv1(x)
         residual = out
         out = self.conv2(out)
@@ -280,37 +219,25 @@ class BasicBlock(nn.Layer):
 
         out = out + residual
         out = self.ReLU(out)
-
         return out
 
 
-"""
-DFM模块
-"""
-
-
-class densecat_cat_add(nn.Layer):
+class DensecatCatAdd(nn.Layer):
     def __init__(self, in_chn, out_chn):
-        super(densecat_cat_add, self).__init__()
-
-        self.conv1 = paddle.nn.Sequential(
-            paddle.nn.Conv2D(
-                in_chn, in_chn, kernel_size=3, padding=1),
-            paddle.nn.ReLU(), )
-        self.conv2 = paddle.nn.Sequential(
-            paddle.nn.Conv2D(
-                in_chn, in_chn, kernel_size=3, padding=1),
-            paddle.nn.ReLU(), )
-        self.conv3 = paddle.nn.Sequential(
-            paddle.nn.Conv2D(
-                in_chn, in_chn, kernel_size=3, padding=1),
-            paddle.nn.ReLU(), )
-        self.conv_out = paddle.nn.Sequential(
-            paddle.nn.Conv2D(
-                in_chn, out_chn, kernel_size=1, padding=0),
-            nn.BatchNorm2D(
-                out_chn, momentum=bn_mom),
-            paddle.nn.ReLU(), )
+        super(DensecatCatAdd, self).__init__()
+        self.conv1 = BasicConv(in_chn, in_chn,
+                               kernel_size=3,
+                               act=nn.ReLU())
+        self.conv2 = BasicConv(in_chn, in_chn,
+                               kernel_size=3,
+                               act=nn.ReLU())
+        self.conv3 = BasicConv(in_chn, in_chn,
+                               kernel_size=3,
+                               act=nn.ReLU())
+        self.conv_out = BasicConv(in_chn, out_chn,
+                                  kernel_size=1,
+                                  norm=nn.BatchNorm2D(out_chn,momentum=bn_mom),
+                                  act=nn.ReLU())
 
     def forward(self, x, y):
         x1 = self.conv1(x)
@@ -324,27 +251,23 @@ class densecat_cat_add(nn.Layer):
         return self.conv_out(x1 + x2 + x3 + y1 + y2 + y3)
 
 
-class densecat_cat_diff(nn.Layer):
+class DensecatCatDiff(nn.Layer):
     def __init__(self, in_chn, out_chn):
-        super(densecat_cat_diff, self).__init__()
-        self.conv1 = paddle.nn.Sequential(
-            paddle.nn.Conv2D(
-                in_chn, in_chn, kernel_size=3, padding=1),
-            paddle.nn.ReLU(), )
-        self.conv2 = paddle.nn.Sequential(
-            paddle.nn.Conv2D(
-                in_chn, in_chn, kernel_size=3, padding=1),
-            paddle.nn.ReLU(), )
-        self.conv3 = paddle.nn.Sequential(
-            paddle.nn.Conv2D(
-                in_chn, in_chn, kernel_size=3, padding=1),
-            paddle.nn.ReLU(), )
-        self.conv_out = paddle.nn.Sequential(
-            paddle.nn.Conv2D(
-                in_chn, out_chn, kernel_size=1, padding=0),
-            nn.BatchNorm2D(
-                out_chn, momentum=bn_mom),
-            paddle.nn.ReLU(), )
+        super(DensecatCatDiff, self).__init__()
+        self.conv1 = BasicConv(in_chn, in_chn,
+                               kernel_size=3,
+                               act=nn.ReLU())
+        self.conv2 = BasicConv(in_chn, in_chn,
+                               kernel_size=3,
+                               act=nn.ReLU())
+        self.conv3 = BasicConv(in_chn, in_chn,
+                               kernel_size=3,
+                               act=nn.ReLU())
+        self.conv_out = BasicConv(in_ch=in_chn,
+                                  out_ch=out_chn,
+                                  kernel_size=1,
+                                  norm=nn.BatchNorm2D(out_chn,momentum=bn_mom),
+                                  act=nn.ReLU())
 
     def forward(self, x, y):
         x1 = self.conv1(x)
@@ -358,27 +281,23 @@ class densecat_cat_diff(nn.Layer):
         return out
 
 
-class DF_Module(nn.Layer):
+class DFModule(nn.Layer):
+    """dense connection-based feature fusion module"""
+
     def __init__(self, dim_in, dim_out, reduction=True):
-        super(DF_Module, self).__init__()
+        super(DFModule, self).__init__()
         if reduction:
-            self.reduction = paddle.nn.Sequential(
-                paddle.nn.Conv2D(
-                    dim_in, dim_in // 2, kernel_size=1, padding=0),
-                nn.BatchNorm2D(
-                    dim_in // 2, momentum=bn_mom),
-                paddle.nn.ReLU(), )
+            self.reduction = Conv1x1(dim_in, dim_in // 2,
+                                     norm=nn.BatchNorm2D(dim_in // 2, momentum=bn_mom),
+                                     act=nn.ReLU())
             dim_in = dim_in // 2
         else:
             self.reduction = None
-        self.cat1 = densecat_cat_add(dim_in, dim_out)
-        self.cat2 = densecat_cat_diff(dim_in, dim_out)
-        self.conv1 = nn.Sequential(
-            nn.Conv2D(
-                dim_out, dim_out, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2D(
-                dim_out, momentum=bn_mom),
-            nn.ReLU(), )
+        self.cat1 = DensecatCatAdd(dim_in, dim_out)
+        self.cat2 = DensecatCatDiff(dim_in, dim_out)
+        self.conv1 = Conv3x3(dim_out, dim_out,
+                             norm=nn.BatchNorm2D(dim_out, momentum=bn_mom),
+                             act=nn.ReLU())
 
     def forward(self, x1, x2):
         if self.reduction is not None:
@@ -390,216 +309,7 @@ class DF_Module(nn.Layer):
         return y
 
 
-class FCS(paddle.nn.Layer):
-    def __init__(self, in_channels, os=16, use_se=False, **kwargs):
-        super(FCS, self).__init__()
-        if os >= 16:
-            dilation_list = [1, 1, 1, 1]
-            stride_list = [2, 2, 2, 2]
-            pool_list = [True, True, True, True]
-        elif os == 8:
-            dilation_list = [2, 1, 1, 1]
-            stride_list = [1, 2, 2, 2]
-            pool_list = [False, True, True, True]
-        else:
-            dilation_list = [2, 2, 1, 1]
-            stride_list = [1, 1, 2, 2]
-            pool_list = [False, False, True, True]
-        se_list = [use_se, use_se, use_se, use_se]
-        channel_list = [256, 128, 64, 32]
-        # encoder
-        self.block1 = BasicBlock(in_channels, channel_list[3], pool_list[3],
-                                 se_list[3], stride_list[3], dilation_list[3])
-        self.block2 = BasicBlock(channel_list[3], channel_list[2], pool_list[2],
-                                 se_list[2], stride_list[2], dilation_list[2])
-        self.block3 = BasicBlock(channel_list[2], channel_list[1], pool_list[1],
-                                 se_list[1], stride_list[1], dilation_list[1])
-        self.block4 = BasicBlock(channel_list[1], channel_list[0], pool_list[0],
-                                 se_list[0], stride_list[0], dilation_list[0])
-        # decoder
-        self.decoder3 = cat(channel_list[0],
-                            channel_list[1],
-                            channel_list[1],
-                            upsample=pool_list[0])
-        self.decoder2 = cat(channel_list[1],
-                            channel_list[2],
-                            channel_list[2],
-                            upsample=pool_list[1])
-        self.decoder1 = cat(channel_list[2],
-                            channel_list[3],
-                            channel_list[3],
-                            upsample=pool_list[2])
-
-        self.df1 = cat(channel_list[3],
-                       channel_list[3],
-                       channel_list[3],
-                       upsample=False)
-        self.df2 = cat(channel_list[2],
-                       channel_list[2],
-                       channel_list[2],
-                       upsample=False)
-        self.df3 = cat(channel_list[1],
-                       channel_list[1],
-                       channel_list[1],
-                       upsample=False)
-        self.df4 = cat(channel_list[0],
-                       channel_list[0],
-                       channel_list[0],
-                       upsample=False)
-
-        self.upsample_x2 = nn.Sequential(
-            nn.Conv2D(
-                channel_list[3], 8, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2D(
-                8, momentum=bn_mom),
-            nn.ReLU(),
-            nn.UpsamplingBilinear2D(scale_factor=2))
-        self.conv_out = paddle.nn.Conv2D(
-            8, 1, kernel_size=3, stride=1, padding=1)
-
-    def forward(self, x):
-        e1_1 = self.block1(x[0])
-        e2_1 = self.block2(e1_1)
-        e3_1 = self.block3(e2_1)
-        y1 = self.block4(e3_1)
-        e1_2 = self.block1(x[1])
-        e2_2 = self.block2(e1_2)
-        e3_2 = self.block3(e2_2)
-        y2 = self.block4(e3_2)
-
-        c1 = self.df1(e1_1, e1_2)
-        c2 = self.df2(e2_1, e2_2)
-        c3 = self.df3(e3_1, e3_2)
-        c4 = self.df4(y1, y2)
-
-        y = self.decoder3(c4, c3)
-        y = self.decoder2(y, c2)
-        y = self.decoder1(y, c1)
-
-        y = self.conv_out(self.upsample_x2(y))
-        return [y]
-
-
-class DED(paddle.nn.Layer):
-    def __init__(self, in_channels, os=16, use_se=False, **kwargs):
-        super(DED, self).__init__()
-        if os >= 16:
-            dilation_list = [1, 1, 1, 1]
-            stride_list = [2, 2, 2, 2]
-            pool_list = [True, True, True, True]
-        elif os == 8:
-            dilation_list = [2, 1, 1, 1]
-            stride_list = [1, 2, 2, 2]
-            pool_list = [False, True, True, True]
-        else:
-            dilation_list = [2, 2, 1, 1]
-            stride_list = [1, 1, 2, 2]
-            pool_list = [False, False, True, True]
-        se_list = [use_se, use_se, use_se, use_se]
-        channel_list = [256, 128, 64, 32]
-        # encoder
-        self.block1 = BasicBlock(in_channels, channel_list[3], pool_list[3],
-                                 se_list[3], stride_list[3], dilation_list[3])
-        self.block2 = BasicBlock(channel_list[3], channel_list[2], pool_list[2],
-                                 se_list[2], stride_list[2], dilation_list[2])
-        self.block3 = BasicBlock(channel_list[2], channel_list[1], pool_list[1],
-                                 se_list[1], stride_list[1], dilation_list[1])
-        self.block4 = BasicBlock(channel_list[1], channel_list[0], pool_list[0],
-                                 se_list[0], stride_list[0], dilation_list[0])
-
-        # center
-        # self.center = NL_FPN(channel_list[0], True)
-
-        # decoder
-        self.decoder3 = cat(channel_list[0],
-                            channel_list[1],
-                            channel_list[1],
-                            upsample=pool_list[0])
-        self.decoder2 = cat(channel_list[1],
-                            channel_list[2],
-                            channel_list[2],
-                            upsample=pool_list[1])
-        self.decoder1 = cat(channel_list[2],
-                            channel_list[3],
-                            channel_list[3],
-                            upsample=pool_list[2])
-
-        # self.df1 = DF_Module(channel_list[3], channel_list[3], True)
-        # self.df2 = DF_Module(channel_list[2], channel_list[2], True)
-        # self.df3 = DF_Module(channel_list[1], channel_list[1], True)
-        # self.df4 = DF_Module(channel_list[0], channel_list[0], True)
-
-        self.df1 = cat(channel_list[3],
-                       channel_list[3],
-                       channel_list[3],
-                       upsample=False)
-        self.df2 = cat(channel_list[2],
-                       channel_list[2],
-                       channel_list[2],
-                       upsample=False)
-        self.df3 = cat(channel_list[1],
-                       channel_list[1],
-                       channel_list[1],
-                       upsample=False)
-        self.df4 = cat(channel_list[0],
-                       channel_list[0],
-                       channel_list[0],
-                       upsample=False)
-
-        self.catc3 = cat(channel_list[0],
-                         channel_list[1],
-                         channel_list[1],
-                         upsample=pool_list[0])
-        self.catc2 = cat(channel_list[1],
-                         channel_list[2],
-                         channel_list[2],
-                         upsample=pool_list[1])
-        self.catc1 = cat(channel_list[2],
-                         channel_list[3],
-                         channel_list[3],
-                         upsample=pool_list[2])
-
-        self.upsample_x2 = nn.Sequential(
-            nn.Conv2D(
-                channel_list[3], 8, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2D(
-                8, momentum=bn_mom),
-            nn.ReLU(),
-            nn.UpsamplingBilinear2D(scale_factor=2))
-        self.conv_out = paddle.nn.Conv2D(
-            8, 1, kernel_size=3, stride=1, padding=1)
-
-    def forward(self, x):
-        e1_1 = self.block1(x[0])
-        e2_1 = self.block2(e1_1)
-        e3_1 = self.block3(e2_1)
-        y1 = self.block4(e3_1)
-        e1_2 = self.block1(x[1])
-        e2_2 = self.block2(e1_2)
-        e3_2 = self.block3(e2_2)
-        y2 = self.block4(e3_2)
-
-        # y1 = self.center(y1)
-        # y2 = self.center(y2)
-        c = self.df4(y1, y2)
-
-        y1 = self.decoder3(y1, e3_1)
-        y2 = self.decoder3(y2, e3_2)
-        c = self.catc3(c, self.df3(y1, y2))
-
-        y1 = self.decoder2(y1, e2_1)
-        y2 = self.decoder2(y2, e2_2)
-        c = self.catc2(c, self.df2(y1, y2))
-
-        y1 = self.decoder1(y1, e1_1)
-        y2 = self.decoder1(y2, e1_2)
-        c = self.catc1(c, self.df1(y1, y2))
-
-        y = self.conv_out(self.upsample_x2(c))
-        return [y]
-
-
-class FCCDN(paddle.nn.Layer):
+class FCCDN(nn.Layer):
     """
     The FCCDN implementation based on PaddlePaddle.
 
@@ -607,27 +317,22 @@ class FCCDN(paddle.nn.Layer):
         Pan Chen, et al., "FCCDN: Feature Constraint Network for VHR Image Change Detection"
         (https://arxiv.org/pdf/2105.10860.pdf).
 
-    Note that this implementation differs from the original code in two aspects:
-    1. the augmentations by albumentations is transformed to opencv,nummpy,paddle.
-    2. add min train epochs while training (80% of the epochs in paper)
-
     Args:
-        in_channels(int):Number of input channels(default:3)
-        num_classes (int): Number of target classes(default:2)
-        mode(str):which mode to use(default:"infer")
-        os(int):Number of downsample times(default:16)
-        use_se(bool):whether use SEModule(default:True)
+        in_channels(int): Number of input channels(default: 3).
+        num_classes (int): Number of target classes(default: 2).
+        training(bool): Decide whether output SSL head for training (default: False).
+        os(int): Number of output stride(default: 16).
+        use_se(bool): whether to use SEModule(default: True).
     """
 
     def __init__(self,
                  in_channels=3,
                  num_classes=2,
-                 mode="infer",
+                 training=False,
                  os=16,
-                 use_se=False,
-                 **kwargs):
+                 use_se=False):
         super(FCCDN, self).__init__()
-        self.mode = mode
+        self.training = training
         if os >= 16:
             dilation_list = [1, 1, 1, 1]
             stride_list = [2, 2, 2, 2]
@@ -642,7 +347,7 @@ class FCCDN(paddle.nn.Layer):
             pool_list = [False, False, True, True]
         se_list = [use_se, use_se, use_se, use_se]
         channel_list = [256, 128, 64, 32]
-        # encoder
+        # Encoder
         self.block1 = BasicBlock(in_channels, channel_list[3], pool_list[3],
                                  se_list[3], stride_list[3], dilation_list[3])
         self.block2 = BasicBlock(channel_list[3], channel_list[2], pool_list[2],
@@ -652,65 +357,60 @@ class FCCDN(paddle.nn.Layer):
         self.block4 = BasicBlock(channel_list[1], channel_list[0], pool_list[0],
                                  se_list[0], stride_list[0], dilation_list[0])
 
-        # center
-        self.center = NL_FPN(channel_list[0], True)
+        # Center
+        self.center = NLFPN(channel_list[0], True)
 
-        # decoder
-        self.decoder3 = cat(channel_list[0],
+        # Decoder
+        self.decoder3 = Cat(channel_list[0],
                             channel_list[1],
                             channel_list[1],
                             upsample=pool_list[0])
-        self.decoder2 = cat(channel_list[1],
+        self.decoder2 = Cat(channel_list[1],
                             channel_list[2],
                             channel_list[2],
                             upsample=pool_list[1])
-        self.decoder1 = cat(channel_list[2],
+        self.decoder1 = Cat(channel_list[2],
                             channel_list[3],
                             channel_list[3],
                             upsample=pool_list[2])
 
-        self.df1 = DF_Module(channel_list[3], channel_list[3], True)
-        self.df2 = DF_Module(channel_list[2], channel_list[2], True)
-        self.df3 = DF_Module(channel_list[1], channel_list[1], True)
-        self.df4 = DF_Module(channel_list[0], channel_list[0], True)
+        self.df1 = DFModule(channel_list[3], channel_list[3], True)
+        self.df2 = DFModule(channel_list[2], channel_list[2], True)
+        self.df3 = DFModule(channel_list[1], channel_list[1], True)
+        self.df4 = DFModule(channel_list[0], channel_list[0], True)
 
-        # self.df1 = cat(channel_list[3],channel_list[3], channel_list[3], upsample=False)
-        # self.df2 = cat(channel_list[2],channel_list[2], channel_list[2], upsample=False)
-        # self.df3 = cat(channel_list[1],channel_list[1], channel_list[1], upsample=False)
-        # self.df4 = cat(channel_list[0],channel_list[0], channel_list[0], upsample=False)
-
-        self.catc3 = cat(channel_list[0],
+        self.catc3 = Cat(channel_list[0],
                          channel_list[1],
                          channel_list[1],
                          upsample=pool_list[0])
-        self.catc2 = cat(channel_list[1],
+        self.catc2 = Cat(channel_list[1],
                          channel_list[2],
                          channel_list[2],
                          upsample=pool_list[1])
-        self.catc1 = cat(channel_list[2],
+        self.catc1 = Cat(channel_list[2],
                          channel_list[3],
                          channel_list[3],
                          upsample=pool_list[2])
 
         self.upsample_x2 = nn.Sequential(
-            nn.Conv2D(
-                channel_list[3], 8, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2D(
-                8, momentum=bn_mom),
+            nn.Conv2D(channel_list[3], 8,
+                      kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2D(8, momentum=bn_mom),
             nn.ReLU(),
             nn.UpsamplingBilinear2D(scale_factor=2))
-        self.conv_out = paddle.nn.Conv2D(
-            8, num_classes, kernel_size=3, stride=1, padding=1)
-        self.conv_out_class = paddle.nn.Conv2D(
-            channel_list[3], num_classes, kernel_size=1, stride=1, padding=0)
 
-    def forward(self, x1, x2):
-        e1_1 = self.block1(x1)
+        self.conv_out = nn.Conv2D(8, 1,
+                                  kernel_size=3, stride=1, padding=1)
+        self.conv_out_class = nn.Conv2D(channel_list[3], num_classes,
+                                        kernel_size=1, stride=1, padding=0)
+
+    def forward(self, t1, t2):
+        e1_1 = self.block1(t1)
         e2_1 = self.block2(e1_1)
         e3_1 = self.block3(e2_1)
         y1 = self.block4(e3_1)
 
-        e1_2 = self.block1(x2)
+        e1_2 = self.block1(t2)
         e2_2 = self.block2(e1_2)
         e3_2 = self.block3(e2_2)
         y2 = self.block4(e3_2)
@@ -732,8 +432,8 @@ class FCCDN(paddle.nn.Layer):
 
         c = self.catc1(c, self.df1(y1, y2))
         y = self.conv_out(self.upsample_x2(c))
-        if self.mode == "infer":
-            return [F.sigmoid(y)]
+        if self.training is False:
+            return [y]
         else:
             y1 = self.conv_out_class(y1)
             y2 = self.conv_out_class(y2)
