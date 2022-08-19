@@ -22,15 +22,15 @@ train_use_gpu_value=$(func_parser_value "${lines[4]}")
 autocast_list=$(func_parser_value "${lines[5]}")
 autocast_key=$(func_parser_key "${lines[5]}")
 epoch_key=$(func_parser_key "${lines[6]}")
-epoch_num=$(func_parser_params "${lines[6]}")
+epoch_value=$(func_parser_params "${lines[6]}")
 save_model_key=$(func_parser_key "${lines[7]}")
 train_batch_key=$(func_parser_key "${lines[8]}")
 train_batch_value=$(func_parser_params "${lines[8]}")
 pretrain_model_key=$(func_parser_key "${lines[9]}")
 pretrain_model_value=$(func_parser_value "${lines[9]}")
-train_model_name=$(func_parser_value "${lines[10]}")
-train_infer_img_dir=$(parse_first_value "${lines[11]}")
-train_infer_img_file_list=$(parse_second_value "${lines[11]}")
+train_config_key=$(func_parser_key "${lines[10]}")
+train_config_value=$(func_parser_params "${lines[10]}")
+train_model_name=$(func_parser_value "${lines[11]}")
 train_param_key1=$(func_parser_key "${lines[12]}")
 train_param_value1=$(func_parser_value "${lines[12]}")
 
@@ -85,9 +85,8 @@ use_trt_list=$(func_parser_value "${lines[45]}")
 precision_key=$(func_parser_key "${lines[46]}")
 precision_list=$(func_parser_value "${lines[46]}")
 infer_model_key=$(func_parser_key "${lines[47]}")
-file_list_key=$(func_parser_key "${lines[48]}")
-infer_img_dir=$(parse_first_value "${lines[48]}")
-infer_img_file_list=$(parse_second_value "${lines[48]}")
+infer_config_key=$(func_parser_key "${lines[48]}")
+infer_config_value=$(func_parser_value "${lines[48]}")
 save_log_key=$(func_parser_key "${lines[49]}")
 benchmark_key=$(func_parser_key "${lines[50]}")
 benchmark_value=$(func_parser_value "${lines[50]}")
@@ -117,37 +116,37 @@ function func_inference() {
     local _script="$2"
     local _model_dir="$3"
     local _log_path="$4"
-    local _img_dir="$5"
-    local _file_list="$6"
+    local _config="$5"
+
+    local set_infer_config=$(func_set_params "${infer_config_key}" "${_config}")
+    local set_model_dir=$(func_set_params "${infer_model_key}" "${_model_dir}")
+    local set_benchmark=$(func_set_params "${benchmark_key}" "${benchmark_value}")
+    local set_infer_params1=$(func_set_params "${infer_key1}" "${infer_value1}")
+    local set_infer_params2=$(func_set_params "${infer_key2}" "${infer_value2}")
 
     # Do inference
     for use_gpu in ${use_gpu_list[*]}; do
+        local set_device=$(func_set_params "${use_gpu_key}" "${use_gpu}")
         if [ ${use_gpu} = 'False' ] || [ ${use_gpu} = 'cpu' ]; then
             for use_mkldnn in ${use_mkldnn_list[*]}; do
                 if [ ${use_mkldnn} = 'False' ]; then
                     continue
                 fi
-                for threads in ${cpu_threads_list[*]}; do
-                    for batch_size in ${batch_size_list[*]}; do
-                        for precision in ${precision_list[*]}; do
-                            if [ ${use_mkldnn} = 'False' ] && [ ${precision} = 'fp16' ]; then
-                                continue
-                            fi # Skip when enable fp16 but disable mkldnn
+                for precision in ${precision_list[*]}; do
+                    if [ ${use_mkldnn} = 'False' ] && [ ${precision} = 'fp16' ]; then
+                        continue
+                    fi # Skip when enable fp16 but disable mkldnn
 
-                            set_precision=$(func_set_params "${precision_key}" "${precision}")
-
-                            _save_log_path="${_log_path}/python_infer_cpu_usemkldnn_${use_mkldnn}_threads_${threads}_precision_${precision}_batchsize_${batch_size}.log"
-                            infer_value1="${_log_path}/python_infer_cpu_usemkldnn_${use_mkldnn}_threads_${threads}_precision_${precision}_batchsize_${batch_size}_results"
-                            set_device=$(func_set_params "${use_gpu_key}" "${use_gpu}")
-                            set_mkldnn=$(func_set_params "${use_mkldnn_key}" "${use_mkldnn}")
-                            set_benchmark=$(func_set_params "${benchmark_key}" "${benchmark_value}")
-                            set_batchsize=$(func_set_params "${batch_size_key}" "${batch_size}")
-                            set_cpu_threads=$(func_set_params "${cpu_threads_key}" "${threads}")
-                            set_model_dir=$(func_set_params "${infer_model_key}" "${_model_dir}")
-                            set_infer_params1=$(func_set_params "${infer_key1}" "${infer_value1}")
-                            set_infer_params2=$(func_set_params "${infer_key2}" "${infer_value2}")
+                    for threads in ${cpu_threads_list[*]}; do
+                        for batch_size in ${batch_size_list[*]}; do
+                            local _save_log_path="${_log_path}/python_infer_cpu_usemkldnn_${use_mkldnn}_threads_${threads}_precision_${precision}_batchsize_${batch_size}.log"
+                            local infer_value1="${_log_path}/python_infer_cpu_usemkldnn_${use_mkldnn}_threads_${threads}_precision_${precision}_batchsize_${batch_size}_results"
+                            local set_mkldnn=$(func_set_params "${use_mkldnn_key}" "${use_mkldnn}")
+                            local set_precision=$(func_set_params "${precision_key}" "${precision}")
+                            local set_cpu_threads=$(func_set_params "${cpu_threads_key}" "${threads}")
+                            local set_batchsize=$(func_set_params "${batch_size_key}" "${batch_size}")
                             
-                            cmd="${_python} ${_script} ${file_list_key} ${_img_dir} ${_file_list} ${set_device} ${set_mkldnn} ${set_cpu_threads} ${set_model_dir} ${set_batchsize} ${set_benchmark} ${set_precision} ${set_infer_params1} ${set_infer_params2}"
+                            local cmd="${_python} ${_script} ${set_config} ${set_device} ${set_mkldnn} ${set_cpu_threads} ${set_model_dir} ${set_batchsize} ${set_benchmark} ${set_precision} ${set_infer_params1} ${set_infer_params2}"
                             echo ${cmd}
                             run_command "${cmd}" "${_save_log_path}"
                             
@@ -165,24 +164,18 @@ function func_inference() {
                     fi # Skip when enable fp16 but disable trt
 
                     for batch_size in ${batch_size_list[*]}; do
-                        _save_log_path="${_log_path}/python_infer_gpu_usetrt_${use_trt}_precision_${precision}_batchsize_${batch_size}.log"
-                        infer_value1="${_log_path}/python_infer_gpu_usetrt_${use_trt}_precision_${precision}_batchsize_${batch_size}_results"
-                        set_device=$(func_set_params "${use_gpu_key}" "${use_gpu}")
-                        set_benchmark=$(func_set_params "${benchmark_key}" "${benchmark_value}")
-                        set_batchsize=$(func_set_params "${batch_size_key}" "${batch_size}")
-                        set_tensorrt=$(func_set_params "${use_trt_key}" "${use_trt}")
-                        set_precision=$(func_set_params "${precision_key}" "${precision}")
-                        set_model_dir=$(func_set_params "${infer_model_key}" "${_model_dir}")
-                        set_infer_params1=$(func_set_params "${infer_key1}" "${infer_value1}")
-                        set_infer_params2=$(func_set_params "${infer_key2}" "${infer_value2}")
+                        local _save_log_path="${_log_path}/python_infer_gpu_usetrt_${use_trt}_precision_${precision}_batchsize_${batch_size}.log"
+                        local infer_value1="${_log_path}/python_infer_gpu_usetrt_${use_trt}_precision_${precision}_batchsize_${batch_size}_results"
+                        local set_tensorrt=$(func_set_params "${use_trt_key}" "${use_trt}")
+                        local set_precision=$(func_set_params "${precision_key}" "${precision}")
+                        local set_batchsize=$(func_set_params "${batch_size_key}" "${batch_size}")
                         
-                        cmd="${_python} ${_script} ${file_list_key} ${_img_dir} ${_file_list} ${set_device} ${set_tensorrt} ${set_precision} ${set_model_dir} ${set_batchsize} ${set_benchmark} ${set_infer_params2}"
+                        local cmd="${_python} ${_script} ${set_config} ${set_device} ${set_tensorrt} ${set_precision} ${set_model_dir} ${set_batchsize} ${set_benchmark} ${set_infer_params2}"
                         echo ${cmd}
                         run_command "${cmd}" "${_save_log_path}"
 
                         last_status=${PIPESTATUS[0]}
                         status_check $last_status "${cmd}" "${status_log}" "${model_name}"
-
                     done
                 done
             done
@@ -226,7 +219,7 @@ if [ ${MODE} = 'whole_infer' ]; then
             save_infer_dir=${infer_model}
         fi
         # Run inference
-        func_inference "${python}" "${inference_py}" "${save_infer_dir}" "${OUT_PATH}" "${infer_img_dir}" "${infer_img_file_list}"
+        func_inference "${python}" "${inference_py}" "${save_infer_dir}" "${OUT_PATH}" "${infer_config_value}"
         count=$((${count} + 1))
     done
 else
@@ -285,8 +278,9 @@ else
                 if [ ${run_train} = 'null' ]; then
                     continue
                 fi
+                set_config=$(func_set_params "${train_config_key}" "${train_config_value}")
                 set_autocast=$(func_set_params "${autocast_key}" "${autocast}")
-                set_epoch=$(func_set_params "${epoch_key}" "${epoch_num}")
+                set_epoch=$(func_set_params "${epoch_key}" "${epoch_value}")
                 set_pretrain=$(func_set_params "${pretrain_model_key}" "${pretrain_model_value}")
                 set_batchsize=$(func_set_params "${train_batch_key}" "${train_batch_value}")
                 set_train_params1=$(func_set_params "${train_param_key1}" "${train_param_value1}")
@@ -312,11 +306,11 @@ else
 
                 set_save_model=$(func_set_params "${save_model_key}" "${save_dir}")
                 if [ ${#gpu} -le 2 ]; then  # Train with cpu or single gpu
-                    cmd="${python} ${run_train} ${set_use_gpu}  ${set_save_model} ${set_epoch} ${set_pretrain} ${set_autocast} ${set_batchsize} ${set_train_params1} ${set_amp_config}"
+                    cmd="${python} ${run_train} ${set_config} ${set_use_gpu} ${set_save_model} ${set_epoch} ${set_pretrain} ${set_autocast} ${set_batchsize} ${set_train_params1} ${set_amp_config}"
                 elif [ ${#ips} -le 15 ]; then  # Train with multi-gpu
-                    cmd="${python} -m paddle.distributed.launch --gpus=${gpu} ${run_train} ${set_use_gpu} ${set_save_model} ${set_epoch} ${set_pretrain} ${set_autocast} ${set_batchsize} ${set_train_params1} ${set_amp_config}"
+                    cmd="${python} -m paddle.distributed.launch --gpus=${gpu} ${run_train} ${set_config} ${set_use_gpu} ${set_save_model} ${set_epoch} ${set_pretrain} ${set_autocast} ${set_batchsize} ${set_train_params1} ${set_amp_config}"
                 else     # Train with multi-machine
-                    cmd="${python} -m paddle.distributed.launch --ips=${ips} --gpus=${gpu} ${run_train} ${set_use_gpu} ${set_save_model} ${set_pretrain} ${set_epoch} ${set_autocast} ${set_batchsize} ${set_train_params1} ${set_amp_config}"
+                    cmd="${python} -m paddle.distributed.launch --ips=${ips} --gpus=${gpu} ${run_train} ${set_config} ${set_use_gpu} ${set_save_model} ${set_pretrain} ${set_epoch} ${set_autocast} ${set_batchsize} ${set_train_params1} ${set_amp_config}"
                 fi
 
                 echo ${cmd}
@@ -359,7 +353,7 @@ else
                     else
                         infer_model_dir=${save_infer_path}
                     fi
-                    func_inference "${python}" "${inference_py}" "${infer_model_dir}" "${OUT_PATH}" "${train_infer_img_dir}" "${train_infer_img_file_list}"
+                    func_inference "${python}" "${inference_py}" "${infer_model_dir}" "${OUT_PATH}" "${train_config_value}"
 
                     eval "unset CUDA_VISIBLE_DEVICES"
                 fi

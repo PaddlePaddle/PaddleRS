@@ -1,6 +1,6 @@
-_base_: ./svcd.yaml
+_base_: ../levircd.yaml
 
-save_dir: ./exp/svcd/custom_model/
+save_dir: ./exp/levircd/custom_model/iter3/
 
 model: !Node
     type: IterativeBIT

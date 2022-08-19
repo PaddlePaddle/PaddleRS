@@ -4,3 +4,5 @@ save_dir: ./exp/svcd/fc_ef/
 
 model: !Node
     type: FCEarlyFusion
+    args:
+        use_dropout: True

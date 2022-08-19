@@ -73,7 +73,8 @@ class IterativeBIT(nn.Layer):
         super().__init__()
 
         if num_iters <= 0:
-            raise ValueError(f"`num_iters` should have positive value, but got {num_iters}.")
+            raise ValueError(
+                f"`num_iters` should have positive value, but got {num_iters}.")
 
         self.num_iters = num_iters
         self.gamma = gamma
@@ -97,8 +98,7 @@ class IterativeBIT(nn.Layer):
             # Get logits
             logits_list = self.bit(x1, x2)
             # Construct rate map
-            prob_map = F.softmax(logits_list[0], axis=1)
-            rate_map = self._constr_rate_map(prob_map)
+            rate_map = self._constr_rate_map(logits_list[0])
 
         return logits_list
     ...
@@ -157,6 +157,8 @@ class IterativeBIT(BaseChangeDetector):
 
 #### 3.4.3 实验结果
 
+VisualDL、定量指标
+
 ### 3.5 \*Magic Behind
 
 本小节涉及技术细节，对于本案例来说属于进阶内容，您可以选择性了解。
@@ -179,9 +181,15 @@ PaddleRS提供了，只需要。`attach_tools.Attach`对象自动。
 
 #### 4.3.1 LEVIR-CD数据集上的对比结果
 
+**目视效果对比**
+
+**定量指标对比**
+
 #### 4.3.2 SVCD数据集上的对比结果
 
-精度
+**目视效果对比**
+
+**定量指标对比**
 
 ## 5 总结与展望
 

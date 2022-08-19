@@ -9,16 +9,17 @@ attach = Attach.to(paddlers.rs_models.cd)
 
 
 @attach
-class IterativeBIT(nn.Layer):
-    def __init__(self, num_iters=1, gamma=0.1, num_classes=2, bit_kwargs=None):
-        super().__init__()
-
+class IterativeBIT(BIT):
+    def __init__(self,
+                 num_iters=1,
+                 feat_channels=32,
+                 num_classes=2,
+                 bit_kwargs=None):
         if num_iters <= 0:
             raise ValueError(
                 f"`num_iters` should have positive value, but got {num_iters}.")
 
         self.num_iters = num_iters
-        self.gamma = gamma
 
         if bit_kwargs is None:
             bit_kwargs = dict()
@@ -27,32 +28,62 @@ class IterativeBIT(nn.Layer):
             raise KeyError("'num_classes' should not be set in `bit_kwargs`.")
         bit_kwargs['num_classes'] = num_classes
 
-        self.bit = BIT(**bit_kwargs)
+        super().__init__(**bit_kwargs)
+
+        self.conv_fuse = nn.Sequential(
+            nn.Conv2D(feat_channels + 1, feat_channels, 1), nn.Sigmoid())
 
     def forward(self, t1, t2):
-        rate_map = self._init_rate_map(t1.shape)
+        # Extract features via shared backbone.
+        x1 = self.backbone(t1)
+        x2 = self.backbone(t2)
+
+        # Tokenization
+        if self.use_tokenizer:
+            token1 = self._get_semantic_tokens(x1)
+            token2 = self._get_semantic_tokens(x2)
+        else:
+            token1 = self._get_reshaped_tokens(x1)
+            token2 = self._get_reshaped_tokens(x2)
+
+        # Transformer encoder forward
+        token = paddle.concat([token1, token2], axis=1)
+        token = self.encode(token)
+        token1, token2 = paddle.chunk(token, 2, axis=1)
+
+        # Get initial rate map
+        rate_map = self._init_rate_map(x1.shape)
 
         for it in range(self.num_iters):
             # Construct inputs
-            x1 = self._constr_iter_input(t1, rate_map)
-            x2 = self._constr_iter_input(t2, rate_map)
-            # Get logits
-            logits_list = self.bit(x1, x2)
+            x1_iter = self._constr_iter_input(x1, rate_map)
+            x2_iter = self._constr_iter_input(x2, rate_map)
+
+            # Transformer decoder forward
+            y1 = self.decode(x1_iter, token1)
+            y2 = self.decode(x2_iter, token2)
+
+            # Feature differencing
+            y = paddle.abs(y1 - y2)
+
             # Construct rate map
-            prob_map = F.softmax(logits_list[0], axis=1)
-            rate_map = self._constr_rate_map(prob_map)
+            rate_map = self._constr_rate_map(y)
 
-        return logits_list
+        y = self.upsample(y)
+        pred = self.conv_out(y)
 
-    def _constr_iter_input(self, im, rate_map):
-        return paddle.concat([im, rate_map], axis=1)
+        return [pred]
 
     def _init_rate_map(self, im_shape):
         b, _, h, w = im_shape
-        return paddle.zeros((b, 1, h, w))
+        return paddle.full((b, 1, h, w), 0.5)
 
-    def _constr_rate_map(self, prob_map):
-        if prob_map.shape[1] != 2:
-            raise ValueError(
-                f"`prob_map.shape[1]` must be 2, but got {prob_map.shape[1]}.")
-        return (prob_map[:, 1:2] * self.gamma)
+    def _constr_iter_input(self, x, rate_map):
+        return self.conv_fuse(paddle.concat([x, rate_map], axis=1))
+
+    def _constr_rate_map(self, x):
+        rate_map = x.mean(1, keepdim=True).detach()  # Cut off gradient workflow
+        # min-max normalization
+        rate_map -= rate_map.min()
+        rate_map /= rate_map.max()
+        return rate_map

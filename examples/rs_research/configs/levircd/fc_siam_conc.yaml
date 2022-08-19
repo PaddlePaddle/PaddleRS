@@ -4,3 +4,5 @@ save_dir: ./exp/levircd/fc_siam_conc/
 
 model: !Node
     type: FCSiamConc
+    args:
+        use_dropout: True

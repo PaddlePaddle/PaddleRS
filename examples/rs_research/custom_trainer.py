@@ -13,12 +13,12 @@ class IterativeBIT(BaseChangeDetector):
                  use_mixed_loss=False,
                  losses=None,
                  num_iters=1,
-                 gamma=0.1,
+                 feat_channels=32,
                  bit_kwargs=None,
                  **params):
         params.update({
             'num_iters': num_iters,
-            'gamma': gamma,
+            'feat_channels': feat_channels,
             'bit_kwargs': bit_kwargs
         })
         super().__init__(
