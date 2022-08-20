@@ -146,7 +146,6 @@ class RCAN(nn.Layer):
         n_feats = n_feats
         kernel_size = kernel_size
         reduction = reduction
-        scale = scale
         act = nn.ReLU()
 
         rgb_mean = (0.4488, 0.4371, 0.4040)
@@ -167,7 +166,7 @@ class RCAN(nn.Layer):
         # Define tail module
         modules_tail = [
             Upsampler(
-                conv, scale, n_feats, act=False),
+                conv, self.scale, n_feats, act=False),
             conv(n_feats, n_colors, kernel_size)
         ]
 

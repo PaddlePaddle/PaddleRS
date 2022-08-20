@@ -307,7 +307,7 @@ class BaseModel(metaclass=ModelMeta):
                    use_vdl=True):
         self._check_transforms(train_dataset.transforms, 'train')
 
-        if "RCNN" in self.__class__.__name__ and train_dataset.pos_num < len(
+        if self.model_type == 'detector' and 'RCNN' in self.__class__.__name__ and train_dataset.pos_num < len(
                 train_dataset.file_list):
             nranks = 1
         else:
