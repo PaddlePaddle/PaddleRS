@@ -84,6 +84,9 @@
 
 - file list中的每一行应该包含2个以空格分隔的项，依次表示输入影像相对`data_dir`的路径以及[Pascal VOC格式](http://host.robots.ox.ac.uk/pascal/VOC/)标注文件相对`data_dir`的路径。
 
+### 图像复原数据集`ResDataset`
+
+
 ### 图像分割数据集`SegDataset`
 
 `SegDataset`定义在：https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/datasets/seg_dataset.py
@@ -143,6 +146,7 @@
 |`'aux_masks'`|图像分割/变化检测任务中的辅助标签路径或数据。|
 |`'gt_bbox'`|目标检测任务中的检测框标注数据。|
 |`'gt_poly'`|目标检测任务中的多边形标注数据。|
+|`'target'`|图像复原中的目标影像路径或数据。|
 
 ### 组合数据变换算子
 

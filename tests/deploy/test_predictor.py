@@ -24,7 +24,7 @@ from testing_utils import CommonTest, run_script
 
 __all__ = [
     'TestCDPredictor', 'TestClasPredictor', 'TestDetPredictor',
-    'TestSegPredictor'
+    'TestResPredictor', 'TestSegPredictor'
 ]
 
 
@@ -300,6 +300,14 @@ class TestDetPredictor(TestPredictor):
         self.assertEqual(len(out_multi_array_p), num_inputs)
         out_multi_array_t = trainer.predict(input_, transforms=transforms)
         self.assertEqual(len(out_multi_array_t), num_inputs)
+
+
+@TestPredictor.add_tests
+class TestResPredictor(TestPredictor):
+    MODULE = pdrs.tasks.restorer
+
+    def check_predictor(self, predictor, trainer):
+        pass
 
 
 @TestPredictor.add_tests
