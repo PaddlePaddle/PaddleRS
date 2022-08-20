@@ -83,6 +83,11 @@ class BaseClassifier(BaseModel):
                 self.in_channels = 3
         return net
 
+    def _build_inference_net(self):
+        infer_net = self.net
+        infer_net.eval()
+        return infer_net
+
     def _fix_transforms_shape(self, image_shape):
         if hasattr(self, 'test_transforms'):
             if self.test_transforms is not None:
@@ -375,7 +380,8 @@ class BaseClassifier(BaseModel):
                 Defaults to False.
 
         Returns:
-            collections.OrderedDict with key-value pairs:
+            If `return_details` is False, return collections.OrderedDict with 
+                key-value pairs:
                 {"top1": `acc of top1`,
                  "top5": `acc of top5`}.
         """
@@ -420,7 +426,7 @@ class BaseClassifier(BaseModel):
         top5 = np.mean(top5s)
         eval_metrics = OrderedDict(zip(['top1', 'top5'], [top1, top5]))
         if return_details:
-            # TODO: add details
+            # TODO: Add details
             return eval_metrics, None
         return eval_metrics
 
@@ -437,16 +443,14 @@ class BaseClassifier(BaseModel):
                 Defaults to None.
 
         Returns:
-            If `img_file` is a string or np.array, the result is a dict with key-value 
-                pairs:
-                {"label map": `class_ids_map`, 
-                 "scores_map": `scores_map`, 
-                 "label_names_map": `label_names_map`}.
+            If `img_file` is a string or np.array, the result is a dict with the 
+                following key-value pairs:
+                class_ids_map (np.ndarray): IDs of predicted classes.
+                scores_map (np.ndarray): Scores of predicted classes.
+                label_names_map (np.ndarray): Names of predicted classes.
+            
             If `img_file` is a list, the result is a list composed of dicts with the 
-                corresponding fields:
-                class_ids_map (np.ndarray): class_ids
-                scores_map (np.ndarray): scores
-                label_names_map (np.ndarray): label_names
+                above keys.
         """
 
         if transforms is None and not hasattr(self, 'test_transforms'):

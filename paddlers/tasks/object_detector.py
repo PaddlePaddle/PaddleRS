@@ -61,6 +61,11 @@ class BaseDetector(BaseModel):
             net = ppdet.modeling.__dict__[self.model_name](**params)
         return net
 
+    def _build_inference_net(self):
+        infer_net = self.net
+        infer_net.eval()
+        return infer_net
+
     def _fix_transforms_shape(self, image_shape):
         raise NotImplementedError("_fix_transforms_shape: not implemented!")
 
@@ -457,7 +462,7 @@ class BaseDetector(BaseModel):
                 Defaults to False.
 
         Returns:
-            collections.OrderedDict with key-value pairs: 
+            If `return_details` is False, return collections.OrderedDict with key-value pairs: 
                 {"bbox_mmap":`mean average precision (0.50, 11point)`}.
         """
 
@@ -556,21 +561,17 @@ class BaseDetector(BaseModel):
 
         Returns:
             If `img_file` is a string or np.array, the result is a list of dict with 
-                key-value pairs:
-                {"category_id": `category_id`, 
-                 "category": `category`, 
-                 "bbox": `[x, y, w, h]`, 
-                 "score": `score`, 
-                 "mask": `mask`}.
-            If `img_file` is a list, the result is a list composed of list of dicts 
-                with the corresponding fields:
-                category_id(int): the predicted category ID. 0 represents the first 
+                the following key-value pairs:
+                category_id (int): Predicted category ID. 0 represents the first 
                     category in the dataset, and so on.
-                category(str): category name
-                bbox(list): bounding box in [x, y, w, h] format
-                score(str): confidence
-                mask(dict): Only for instance segmentation task. Mask of the object in 
-                    RLE format
+                category (str): Category name.
+                bbox (list): Bounding box in [x, y, w, h] format.
+                score (str): Confidence.
+                mask (dict): Only for instance segmentation task. Mask of the object in 
+                    RLE format.
+
+            If `img_file` is a list, the result is a list composed of list of dicts 
+                with the above keys.
         """
 
         if transforms is None and not hasattr(self, 'test_transforms'):

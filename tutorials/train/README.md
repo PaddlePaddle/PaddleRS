@@ -17,9 +17,10 @@
 |classification/hrnet.py | 场景分类 | HRNet |
 |classification/mobilenetv3.py | 场景分类 | MobileNetV3 |
 |classification/resnet50_vd.py | 场景分类 | ResNet50-vd |
-|image_restoration/drn.py | 超分辨率 | DRN |
-|image_restoration/esrgan.py | 超分辨率 | ESRGAN |
-|image_restoration/lesrcnn.py | 超分辨率 | LESRCNN |
+|image_restoration/drn.py | 图像复原 | DRN |
+|image_restoration/esrgan.py | 图像复原 | ESRGAN |
+|image_restoration/lesrcnn.py | 图像复原 | LESRCNN |
+|image_restoration/rcan.py | 图像复原 | RCAN |
 |object_detection/faster_rcnn.py | 目标检测 | Faster R-CNN |
 |object_detection/ppyolo.py | 目标检测 | PP-YOLO |
 |object_detection/ppyolotiny.py | 目标检测 | PP-YOLO Tiny |

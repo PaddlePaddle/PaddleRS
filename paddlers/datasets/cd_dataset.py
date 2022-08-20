@@ -95,23 +95,23 @@ class CDDataset(BaseDataset):
                                      full_path_label))):
                     continue
                 if not osp.exists(full_path_im_t1):
-                    raise IOError('Image file {} does not exist!'.format(
+                    raise IOError("Image file {} does not exist!".format(
                         full_path_im_t1))
                 if not osp.exists(full_path_im_t2):
-                    raise IOError('Image file {} does not exist!'.format(
+                    raise IOError("Image file {} does not exist!".format(
                         full_path_im_t2))
                 if not osp.exists(full_path_label):
-                    raise IOError('Label file {} does not exist!'.format(
+                    raise IOError("Label file {} does not exist!".format(
                         full_path_label))
 
                 if with_seg_labels:
                     full_path_seg_label_t1 = osp.join(data_dir, items[3])
                     full_path_seg_label_t2 = osp.join(data_dir, items[4])
                     if not osp.exists(full_path_seg_label_t1):
-                        raise IOError('Label file {} does not exist!'.format(
+                        raise IOError("Label file {} does not exist!".format(
                             full_path_seg_label_t1))
                     if not osp.exists(full_path_seg_label_t2):
-                        raise IOError('Label file {} does not exist!'.format(
+                        raise IOError("Label file {} does not exist!".format(
                             full_path_seg_label_t2))
 
                 item_dict = dict(

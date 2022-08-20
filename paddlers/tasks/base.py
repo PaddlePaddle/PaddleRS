@@ -35,7 +35,6 @@ from paddlers.utils import (seconds_to_hms, get_single_card_bs, dict2str,
                             load_checkpoint, SmoothedValue, TrainingStats,
                             _get_shared_memory_size_in_M, EarlyStop)
 from .slim.prune import _pruner_eval_fn, _pruner_template_input, sensitive_prune
-from .utils.infer_nets import InferNet, InferCDNet
 
 
 class ModelMeta(type):
@@ -268,7 +267,7 @@ class BaseModel(metaclass=ModelMeta):
                 'The volume of dataset({}) must be larger than batch size({}).'
                 .format(dataset.num_samples, batch_size))
         batch_size_each_card = get_single_card_bs(batch_size=batch_size)
-        # TODO detection eval阶段需做判断
+        # TODO: Make judgement in detection eval phase.
         batch_sampler = DistributedBatchSampler(
             dataset,
             batch_size=batch_size_each_card,
@@ -365,24 +364,12 @@ class BaseModel(metaclass=ModelMeta):
 
             for step, data in enumerate(self.train_data_loader()):
                 if nranks > 1:
-                    outputs = self.run(ddp_net, data, mode='train')
+                    outputs = self.train_step(step, data, ddp_net)
                 else:
-                    outputs = self.run(self.net, data, mode='train')
-                loss = outputs['loss']
-                loss.backward()
-                self.optimizer.step()
-                self.optimizer.clear_grad()
-                lr = self.optimizer.get_lr()
-                if isinstance(self.optimizer._learning_rate,
-                              paddle.optimizer.lr.LRScheduler):
-                    # If ReduceOnPlateau is used as the scheduler, use the loss value as the metric.
-                    if isinstance(self.optimizer._learning_rate,
-                                  paddle.optimizer.lr.ReduceOnPlateau):
-                        self.optimizer._learning_rate.step(loss.item())
-                    else:
-                        self.optimizer._learning_rate.step()
+                    outputs = self.train_step(step, data, self.net)
 
                 train_avg_metrics.update(outputs)
+                lr = self.optimizer.get_lr()
                 outputs['lr'] = lr
                 if ema is not None:
                     ema.update(self.net)
@@ -622,14 +609,7 @@ class BaseModel(metaclass=ModelMeta):
         return pipeline_info
 
     def _build_inference_net(self):
-        if self.model_type in ('classifier', 'detector'):
-            infer_net = self.net
-        elif self.model_type == 'change_detector':
-            infer_net = InferCDNet(self.net)
-        else:
-            infer_net = InferNet(self.net, self.model_type)
-        infer_net.eval()
-        return infer_net
+        raise NotImplementedError
 
     def _export_inference_model(self, save_dir, image_shape=None):
         self.test_inputs = self._get_test_inputs(image_shape)
@@ -673,6 +653,25 @@ class BaseModel(metaclass=ModelMeta):
         open(osp.join(save_dir, '.success'), 'w').close()
         logging.info("The inference model for deployment is saved in {}.".
                      format(save_dir))
+
+    def train_step(self, step, data, net):
+        outputs = self.run(net, data, mode='train')
+
+        loss = outputs['loss']
+        loss.backward()
+        self.optimizer.step()
+        self.optimizer.clear_grad()
+
+        if isinstance(self.optimizer._learning_rate,
+                      paddle.optimizer.lr.LRScheduler):
+            # If ReduceOnPlateau is used as the scheduler, use the loss value as the metric.
+            if isinstance(self.optimizer._learning_rate,
+                          paddle.optimizer.lr.ReduceOnPlateau):
+                self.optimizer._learning_rate.step(loss.item())
+            else:
+                self.optimizer._learning_rate.step()
+
+        return outputs
 
     def _check_transforms(self, transforms, mode):
         # NOTE: Check transforms and transforms.arrange and give user-friendly error messages.

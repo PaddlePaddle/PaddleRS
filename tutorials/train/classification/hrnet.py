@@ -65,7 +65,7 @@ eval_dataset = pdrs.datasets.ClasDataset(
     num_workers=0,
     shuffle=False)
 
-# 使用默认参数构建HRNet模型
+# 构建HRNet模型
 # 目前已支持的模型请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/intro/model_zoo.md
 # 模型输入参数请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/classifier.py
 model = pdrs.tasks.clas.HRNet_W18_C(num_classes=len(train_dataset.labels))

@@ -4,8 +4,6 @@ import math
 import paddle
 import paddle.nn as nn
 
-from .builder import GENERATORS
-
 
 def default_conv(in_channels, out_channels, kernel_size, bias=True):
     weight_attr = paddle.ParamAttr(
@@ -128,21 +126,19 @@ class Upsampler(nn.Sequential):
         super(Upsampler, self).__init__(*m)
 
 
-@GENERATORS.register()
 class RCAN(nn.Layer):
-    def __init__(
-            self,
-            scale,
-            n_resgroups,
-            n_resblocks,
-            n_feats=64,
-            n_colors=3,
-            rgb_range=255,
-            kernel_size=3,
-            reduction=16,
-            conv=default_conv, ):
+    def __init__(self,
+                 sr_factor=4,
+                 n_resgroups=10,
+                 n_resblocks=20,
+                 n_feats=64,
+                 n_colors=3,
+                 rgb_range=255,
+                 kernel_size=3,
+                 reduction=16,
+                 conv=default_conv):
         super(RCAN, self).__init__()
-        self.scale = scale
+        self.scale = sr_factor
         act = nn.ReLU()
 
         n_resgroups = n_resgroups
