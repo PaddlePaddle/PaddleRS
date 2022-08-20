@@ -18,10 +18,14 @@
 - `use_mixed_loss`参将在未来被弃用，因此不建议使用。
 - 不同的子类支持与模型相关的输入参数，详情请参考[模型定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/rs_models/clas)和[训练器定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/classifier.py)。
 
-### 初始化`Baseetector`子类对象
+### 初始化`BaseDetector`子类对象
 
 - 一般支持设置`num_classes`和`backbone`参数，分别表示模型输出类别数以及所用的骨干网络类型。相比其它任务，目标检测任务的训练器支持设置的初始化参数较多，囊括网络结构、损失函数、后处理策略等方面。
 - 不同的子类支持与模型相关的输入参数，详情请参考[模型定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/rs_models/det)和[训练器定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/object_detector.py)。
+
+### 初始化`BaseRestorer`子类对象
+
+
 
 ### 初始化`BaseSegmenter`子类对象
 
@@ -170,6 +174,9 @@ def train(self,
 |`use_vdl`|`bool`|是否启用VisualDL日志。|`True`|
 |`resume_checkpoint`|`str` \| `None`|检查点路径。PaddleRS支持从检查点（包含先前训练过程中存储的模型权重和优化器权重）继续训练，但需注意`resume_checkpoint`与`pretrain_weights`不得同时设置为`None`以外的值。|`None`|
 
+### `BaseRestorer.train()`
+
+
 ### `BaseSegmenter.train()`
 
 接口形式：
@@ -310,6 +317,9 @@ def evaluate(self,
  "bbox": 预测得到的目标框信息,
  "mask": 预测得到的掩模图信息}
 ```
+
+### `BaseRestorer.evaluate()`
+
 
 ### `BaseSegmenter.evaluate()`
 
