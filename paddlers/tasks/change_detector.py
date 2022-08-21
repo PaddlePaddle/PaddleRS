@@ -30,7 +30,6 @@ import paddlers.rs_models.cd as cmcd
 import paddlers.utils.logging as logging
 from paddlers.models import seg_losses
 from paddlers.transforms import Resize, decode_image
-from cmcd.losses import fccdn_loss_bcd as loss_fccdn
 from paddlers.utils import get_single_card_bs, DisablePrint
 from paddlers.utils.checkpoint import seg_pretrain_weights_dict
 from .base import BaseModel
@@ -1056,7 +1055,7 @@ class ChangeStar(BaseChangeDetector):
         if self.use_mixed_loss is False:
             return {
                 # XXX: make sure the shallow copy works correctly here.
-                'types': [seglosses.CrossEntropyLoss()] * 4,
+                'types': [seg_losses.CrossEntropyLoss()] * 4,
                 'coef': [1.0] * 4
             }
         else:
@@ -1102,11 +1101,7 @@ class FCCDN(BaseChangeDetector):
 
     def default_loss(self):
         if self.use_mixed_loss is False:
-            return {
-                # Build fccdn loss
-                'types': [loss_fccdn],
-                'coef': [1.0]
-            }
+            return {'types': [cmcd.losses.fccdn_loss_bcd], 'coef': [1.0]}
         else:
             raise ValueError(
                 f"Currently `use_mixed_loss` must be set to False for {self.__class__}"
