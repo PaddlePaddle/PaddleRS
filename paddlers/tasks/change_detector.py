@@ -37,7 +37,7 @@ from .utils import seg_metrics as metrics
 
 __all__ = [
     "CDNet", "FCEarlyFusion", "FCSiamConc", "FCSiamDiff", "STANet", "BIT",
-    "SNUNet", "DSIFN", "DSAMNet", "ChangeStar", "ChangeFormer"
+    "SNUNet", "DSIFN", "DSAMNet", "ChangeStar", "ChangeFormer", "FCCDN"
 ]
 
 
@@ -1081,4 +1081,20 @@ class ChangeFormer(BaseChangeDetector):
             model_name='ChangeFormer',
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
+            **params)
+
+
+class FCCDN(BaseChangeDetector):
+    def __init__(self,
+                 in_channels=3,
+                 num_classes=2,
+                 use_mixed_loss=False,
+                 losses=None,
+                 **params):
+        params.update({'in_channels': in_channels})
+        super(FCCDN, self).__init__(
+            model_name='FCCDN',
+            num_classes=num_classes,
+            use_mixed_loss=use_mixed_loss,
+            losses=losses,
             **params)
