@@ -1,0 +1,10 @@
+# Basic configurations of FCCDN
+
+_base_: ../_base_/airchange.yaml
+
+save_dir: ./test_tipc/output/cd/fccdn/
+
+learning_rate: 0.03
+
+model: !Node
+       type: FCCDN
