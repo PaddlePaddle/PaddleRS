@@ -25,8 +25,8 @@ pdrs.utils.download_and_decompress(
 train_transforms = T.Compose([
     # 读取影像
     T.DecodeImg(),
-    # 将输入影像缩放到256x256大小
-    T.Resize(target_size=256),
+    # 从输入影像中裁剪32x32大小的影像块
+    T.RandomCrop(crop_size=32),
     # 以50%的概率实施随机水平翻转
     T.RandomHorizontalFlip(prob=0.5),
     # 以50%的概率实施随机垂直翻转
@@ -39,6 +39,7 @@ train_transforms = T.Compose([
 
 eval_transforms = T.Compose([
     T.DecodeImg(),
+    # 将输入影像缩放到256x256大小
     T.Resize(target_size=256),
     # 验证阶段与训练阶段的数据归一化方式必须相同
     T.Normalize(
@@ -52,14 +53,16 @@ train_dataset = pdrs.datasets.ResDataset(
     file_list=TRAIN_FILE_LIST_PATH,
     transforms=train_transforms,
     num_workers=0,
-    shuffle=True)
+    shuffle=True,
+    sr_factor=4)
 
 eval_dataset = pdrs.datasets.ResDataset(
     data_dir=DATA_DIR,
     file_list=EVAL_FILE_LIST_PATH,
     transforms=eval_transforms,
     num_workers=0,
-    shuffle=False)
+    shuffle=False,
+    sr_factor=4)
 
 # 使用默认参数构建LESRCNN模型
 # 目前已支持的模型请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/intro/model_zoo.md
@@ -74,10 +77,10 @@ model.train(
     eval_dataset=eval_dataset,
     save_interval_epochs=1,
     # 每多少次迭代记录一次日志
-    log_interval_steps=50,
+    log_interval_steps=5,
     save_dir=EXP_DIR,
     # 初始学习率大小
-    learning_rate=0.01,
+    learning_rate=0.001,
     # 是否使用early stopping策略，当精度不再改善时提前终止训练
     early_stop=False,
     # 是否启用VisualDL日志功能

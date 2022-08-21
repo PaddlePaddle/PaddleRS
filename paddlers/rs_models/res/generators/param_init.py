@@ -12,13 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import logging
-from . import utils
-from .utils import (seconds_to_hms, get_encoding, get_single_card_bs, dict2str,
-                    EarlyStop, norm_path, is_pic, MyEncoder, DisablePrint,
-                    Timer, to_data_parallel, scheduler_step)
-from .checkpoint import get_pretrain_weights, load_pretrain_weights, load_checkpoint
-from .env import get_environ_info, get_num_workers, init_parallel_env
-from .download import download_and_decompress, decompress
-from .stats import SmoothedValue, TrainingStats
-from .shm import _get_shared_memory_size_in_M
+import paddle
+import paddle.nn as nn
+
+from paddlers.models.ppgan.modules.init import reset_parameters
+
+
+def init_sr_weight(net):
+    def reset_func(m):
+        if hasattr(m, 'weight') and (
+                not isinstance(m, (nn.BatchNorm, nn.BatchNorm2D))):
+            reset_parameters(m)
+
+    net.apply(reset_func)

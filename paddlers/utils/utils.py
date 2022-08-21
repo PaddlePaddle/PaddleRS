@@ -20,11 +20,12 @@ import math
 import imghdr
 import chardet
 import json
+import platform
 
 import numpy as np
+import paddle
 
 from . import logging
-import platform
 import paddlers
 
 
@@ -237,3 +238,33 @@ class Timer(Times):
         self.postprocess_time_s.reset()
         self.img_num = 0
         self.repeats = 0
+
+
+def to_data_parallel(layers, *args, **kwargs):
+    from paddlers.tasks.utils.res_adapters import GANAdapter
+    if isinstance(layers, GANAdapter):
+        # Inplace modification for efficiency
+        layers.generators = [
+            paddle.DataParallel(g, *args, **kwargs) for g in layers.generators
+        ]
+        layers.discriminators = [
+            paddle.DataParallel(d, *args, **kwargs)
+            for d in layers.discriminators
+        ]
+    else:
+        layers = paddle.DataParallel(layers, *args, **kwargs)
+    return layers
+
+
+def scheduler_step(optimizer):
+    from paddlers.tasks.utils.res_adapters import OptimizerAdapter
+    if not isinstance(optimizer, OptimizerAdapter):
+        optimizer = [optimizer]
+    for optim in optimizer:
+        if isinstance(optim._learning_rate, paddle.optimizer.lr.LRScheduler):
+            # If ReduceOnPlateau is used as the scheduler, use the loss value as the metric.
+            if isinstance(optim._learning_rate,
+                          paddle.optimizer.lr.ReduceOnPlateau):
+                optim._learning_rate.step(loss.item())
+            else:
+                optim._learning_rate.step()

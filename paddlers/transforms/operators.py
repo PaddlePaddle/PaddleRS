@@ -1207,7 +1207,7 @@ class RandomCrop(Transform):
             if 'target' in sample:
                 if 'sr_factor' in sample:
                     sample['target'] = self.apply_im(
-                        sample['image'],
+                        sample['target'],
                         calc_hr_shape(crop_box, sample['sr_factor']))
                 else:
                     sample['target'] = self.apply_im(sample['image'], crop_box)
@@ -1993,8 +1993,9 @@ class ArrangeDetector(Arrange):
 
 class ArrangeRestorer(Arrange):
     def apply(self, sample):
+        if 'target' in sample:
+            target = permute(sample['target'], False)
         image = permute(sample['image'], False)
-        target = permute(sample['target'], False)
         if self.mode == 'train':
             return image, target
         if self.mode == 'eval':

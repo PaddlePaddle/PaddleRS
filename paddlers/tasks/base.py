@@ -30,10 +30,10 @@ from paddleslim import L1NormFilterPruner, FPGMFilterPruner
 
 import paddlers
 import paddlers.utils.logging as logging
-from paddlers.utils import (seconds_to_hms, get_single_card_bs, dict2str,
-                            get_pretrain_weights, load_pretrain_weights,
-                            load_checkpoint, SmoothedValue, TrainingStats,
-                            _get_shared_memory_size_in_M, EarlyStop)
+from paddlers.utils import (
+    seconds_to_hms, get_single_card_bs, dict2str, get_pretrain_weights,
+    load_pretrain_weights, load_checkpoint, SmoothedValue, TrainingStats,
+    _get_shared_memory_size_in_M, EarlyStop, to_data_parallel, scheduler_step)
 from .slim.prune import _pruner_eval_fn, _pruner_template_input, sensitive_prune
 
 
@@ -320,10 +320,10 @@ class BaseModel(metaclass=ModelMeta):
             if not paddle.distributed.parallel.parallel_helper._is_parallel_ctx_initialized(
             ):
                 paddle.distributed.init_parallel_env()
-                ddp_net = paddle.DataParallel(
+                ddp_net = to_data_parallel(
                     self.net, find_unused_parameters=find_unused_parameters)
             else:
-                ddp_net = paddle.DataParallel(
+                ddp_net = to_data_parallel(
                     self.net, find_unused_parameters=find_unused_parameters)
 
         if use_vdl:
@@ -367,6 +367,8 @@ class BaseModel(metaclass=ModelMeta):
                     outputs = self.train_step(step, data, ddp_net)
                 else:
                     outputs = self.train_step(step, data, self.net)
+
+                scheduler_step(self.optimizer)
 
                 train_avg_metrics.update(outputs)
                 lr = self.optimizer.get_lr()
@@ -661,15 +663,6 @@ class BaseModel(metaclass=ModelMeta):
         loss.backward()
         self.optimizer.step()
         self.optimizer.clear_grad()
-
-        if isinstance(self.optimizer._learning_rate,
-                      paddle.optimizer.lr.LRScheduler):
-            # If ReduceOnPlateau is used as the scheduler, use the loss value as the metric.
-            if isinstance(self.optimizer._learning_rate,
-                          paddle.optimizer.lr.ReduceOnPlateau):
-                self.optimizer._learning_rate.step(loss.item())
-            else:
-                self.optimizer._learning_rate.step()
 
         return outputs
 

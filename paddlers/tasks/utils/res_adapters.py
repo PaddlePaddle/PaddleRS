@@ -122,7 +122,11 @@ class OptimizerAdapter(Adapter):
     __ducktype__ = paddle.optimizer.Optimizer
     __ava__ = ('state_dict', 'set_state_dict', 'clear_grad', 'step', 'get_lr')
 
-    # Special dispatching rule
     def set_state_dict(self, state_dicts):
+        # Special dispatching rule
         for optim, state_dict in zip(self, state_dicts):
             optim.set_state_dict(state_dict)
+
+    def get_lr(self):
+        # Return the lr of the first optimizer
+        return self[0].get_lr()
