@@ -14,7 +14,6 @@
 
 import os.path as osp
 import re
-import imghdr
 import platform
 from collections import OrderedDict
 from functools import partial, wraps
@@ -32,20 +31,6 @@ def norm_path(path):
     else:
         path = other_sep.join(path.split(win_sep))
     return path
-
-
-def is_pic(im_path):
-    valid_suffix = [
-        'JPEG', 'jpeg', 'JPG', 'jpg', 'BMP', 'bmp', 'PNG', 'png', 'npy'
-    ]
-    suffix = im_path.split('.')[-1]
-    if suffix in valid_suffix:
-        return True
-    im_format = imghdr.what(im_path)
-    _, ext = osp.splitext(im_path)
-    if im_format == 'tiff' or ext == '.img':
-        return True
-    return False
 
 
 def get_full_path(p, prefix=''):
@@ -323,15 +308,34 @@ class ConstrDetSample(ConstrSample):
         return samples
 
 
-def build_input_from_file(file_list, prefix='', task='auto', label_list=None):
+class ConstrResSample(ConstrSample):
+    def __init__(self, prefix, label_list, sr_factor=None):
+        super().__init__(prefix, label_list)
+        self.sr_factor = sr_factor
+
+    def __call__(self, src_path, tar_path):
+        sample = {
+            'image': self.get_full_path(src_path),
+            'target': self.get_full_path(tar_path)
+        }
+        if self.sr_factor is not None:
+            sample['sr_factor'] = self.sr_factor
+        return sample
+
+
+def build_input_from_file(file_list,
+                          prefix='',
+                          task='auto',
+                          label_list=None,
+                          **kwargs):
     """
     Construct a list of dictionaries from file. Each dict in the list can be used as the input to paddlers.transforms.Transform objects.
 
     Args:
-        file_list (str): Path of file_list.
+        file_list (str): Path of file list.
         prefix (str, optional): A nonempty `prefix` specifies the directory that stores the images and annotation files. Default: ''.
-        task (str, optional): Supported values are 'seg', 'det', 'cd', 'clas', and 'auto'. When `task` is set to 'auto', automatically determine the task based on the input. 
-            Default: 'auto'.
+        task (str, optional): Supported values are 'seg', 'det', 'cd', 'clas', 'res', and 'auto'. When `task` is set to 'auto', 
+            automatically determine the task based on the input. Default: 'auto'.
         label_list (str|None, optional): Path of label_list. Default: None.
 
     Returns:
@@ -339,22 +343,21 @@ def build_input_from_file(file_list, prefix='', task='auto', label_list=None):
     """
 
     def _determine_task(parts):
+        task = 'unknown'
         if len(parts) in (3, 5):
             task = 'cd'
         elif len(parts) == 2:
             if parts[1].isdigit():
                 task = 'clas'
-            elif is_pic(osp.join(prefix, parts[1])):
-                task = 'seg'
-            else:
+            elif parts[1].endswith('.xml'):
                 task = 'det'
-        else:
+        if task == 'unknown':
             raise RuntimeError(
                 "Cannot automatically determine the task type. Please specify `task` manually."
             )
         return task
 
-    if task not in ('seg', 'det', 'cd', 'clas', 'auto'):
+    if task not in ('seg', 'det', 'cd', 'clas', 'res', 'auto'):
         raise ValueError("Invalid value of `task`")
 
     samples = []
@@ -366,9 +369,8 @@ def build_input_from_file(file_list, prefix='', task='auto', label_list=None):
             if task == 'auto':
                 task = _determine_task(parts)
             if ctor is None:
-                # Select and build sample constructor
                 ctor_class = globals()['Constr' + task.capitalize() + 'Sample']
-                ctor = ctor_class(prefix, label_list)
+                ctor = ctor_class(prefix, label_list, **kwargs)
             sample = ctor(*parts)
             if isinstance(sample, list):
                 samples.extend(sample)

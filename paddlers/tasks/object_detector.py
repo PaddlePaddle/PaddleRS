@@ -983,6 +983,26 @@ class PicoDet(BaseDetector):
             use_vdl=use_vdl,
             resume_checkpoint=resume_checkpoint)
 
+    def build_data_loader(self, dataset, batch_size, mode='train'):
+        if dataset.num_samples < batch_size:
+            raise ValueError(
+                'The volume of dataset({}) must be larger than batch size({}).'
+                .format(dataset.num_samples, batch_size))
+
+        if mode != 'train':
+            return paddle.io.DataLoader(
+                dataset,
+                batch_size=batch_size,
+                shuffle=dataset.shuffle,
+                drop_last=False,
+                collate_fn=dataset.batch_transforms,
+                num_workers=dataset.num_workers,
+                return_list=True,
+                use_shared_memory=False)
+        else:
+            return super(BaseDetector, self).build_data_loader(dataset,
+                                                               batch_size, mode)
+
 
 class YOLOv3(BaseDetector):
     def __init__(self,

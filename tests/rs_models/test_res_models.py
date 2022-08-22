@@ -15,22 +15,32 @@
 import paddlers
 from rs_models.test_model import TestModel
 
-__all__ = ['TestRCANModel']
+__all__ = []
 
 
 class TestResModel(TestModel):
     def check_output(self, output, target):
-        pass
+        output = output.numpy()
+        self.check_output_equal(output.shape, target.shape)
 
     def set_inputs(self):
-        pass
+        def _gen_data(specs):
+            for spec in specs:
+                c = spec.get('in_channels', 3)
+                yield self.get_randn_tensor(c)
+
+        self.inputs = _gen_data(self.specs)
 
     def set_targets(self):
-        pass
+        def _gen_data(specs):
+            for spec in specs:
+                # XXX: Hard coding
+                if 'out_channels' in spec:
+                    c = spec['out_channels']
+                elif 'in_channels' in spec:
+                    c = spec['in_channels']
+                else:
+                    c = 3
+                yield [self.get_zeros_array(c)]
 
-
-class TestRCANModel(TestSegModel):
-    MODEL_CLASS = paddlers.rs_models.res.RCAN
-
-    def set_specs(self):
-        pass
+        self.targets = _gen_data(self.specs)

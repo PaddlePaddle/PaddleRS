@@ -35,7 +35,7 @@ from .base import BaseModel
 from .utils.res_adapters import GANAdapter, OptimizerAdapter
 from .utils.infer_nets import InferResNet
 
-__all__ = []
+__all__ = ["DRN", "LESRCNN", "ESRGAN"]
 
 
 class BaseRestorer(BaseModel):
@@ -381,22 +381,22 @@ class BaseRestorer(BaseModel):
             ):
                 paddle.distributed.init_parallel_env()
 
-        batch_size_each_card = get_single_card_bs(batch_size)
-        if batch_size_each_card > 1:
-            batch_size_each_card = 1
-            batch_size = batch_size_each_card * paddlers.env_info['num']
-            logging.warning(
-                "Restorer only supports batch_size=1 for each gpu/cpu card " \
-                "during evaluation, so batch_size " \
-                "is forcibly set to {}.".format(batch_size))
-
         # TODO: Distributed evaluation
+        if batch_size > 1:
+            logging.warning(
+                "Restorer only supports single card evaluation with batch_size=1 "
+                "during evaluation, so batch_size is forcibly set to 1.")
+            batch_size = 1
+
         if nranks < 2 or local_rank == 0:
             self.eval_data_loader = self.build_data_loader(
                 eval_dataset, batch_size=batch_size, mode='eval')
             # XXX: Hard-code crop_border and test_y_channel
             psnr = metrics.PSNR(crop_border=4, test_y_channel=True)
             ssim = metrics.SSIM(crop_border=4, test_y_channel=True)
+            logging.info(
+                "Start to evaluate(total_samples={}, total_steps={})...".format(
+                    eval_dataset.num_samples, eval_dataset.num_samples))
             with paddle.no_grad():
                 for step, data in enumerate(self.eval_data_loader):
                     data.append(eval_dataset.transforms.transforms)
@@ -404,14 +404,18 @@ class BaseRestorer(BaseModel):
                     psnr.update(outputs['pred'], outputs['tar'])
                     ssim.update(outputs['pred'], outputs['tar'])
 
-        eval_metrics = OrderedDict(
-            zip(['psnr', 'ssim'], [psnr.accumulate(), ssim.accumulate()]))
+            # DO NOT use psnr.accumulate() here, otherwise the program hangs in multi-card training.
+            assert len(psnr.results) > 0
+            assert len(ssim.results) > 0
+            eval_metrics = OrderedDict(
+                zip(['psnr', 'ssim'],
+                    [np.mean(psnr.results), np.mean(ssim.results)]))
 
-        if return_details:
-            # TODO: Add details
-            return eval_metrics, None
+            if return_details:
+                # TODO: Add details
+                return eval_metrics, None
 
-        return eval_metrics
+            return eval_metrics
 
     def predict(self, img_file, transforms=None):
         """
@@ -590,6 +594,26 @@ class BaseRestorer(BaseModel):
                           paddlers.transforms.ArrangeRestorer):
             raise TypeError(
                 "`transforms.arrange` must be an ArrangeRestorer object.")
+
+    def build_data_loader(self, dataset, batch_size, mode='train'):
+        if dataset.num_samples < batch_size:
+            raise ValueError(
+                'The volume of dataset({}) must be larger than batch size({}).'
+                .format(dataset.num_samples, batch_size))
+
+        if mode != 'train':
+            return paddle.io.DataLoader(
+                dataset,
+                batch_size=batch_size,
+                shuffle=dataset.shuffle,
+                drop_last=False,
+                collate_fn=dataset.batch_transforms,
+                num_workers=dataset.num_workers,
+                return_list=True,
+                use_shared_memory=False)
+        else:
+            return super(BaseRestorer, self).build_data_loader(dataset,
+                                                               batch_size, mode)
 
     def set_losses(self, losses):
         self.losses = losses

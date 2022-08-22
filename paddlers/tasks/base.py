@@ -267,7 +267,7 @@ class BaseModel(metaclass=ModelMeta):
                 'The volume of dataset({}) must be larger than batch size({}).'
                 .format(dataset.num_samples, batch_size))
         batch_size_each_card = get_single_card_bs(batch_size=batch_size)
-        # TODO: Make judgement in detection eval phase.
+
         batch_sampler = DistributedBatchSampler(
             dataset,
             batch_size=batch_size_each_card,

@@ -9,11 +9,11 @@
 |change_detection/changeformer.py | 变化检测 | ChangeFormer |
 |change_detection/dsamnet.py | 变化检测 | DSAMNet |
 |change_detection/dsifn.py | 变化检测 | DSIFN |
-|change_detection/snunet.py | 变化检测 | SNUNet |
-|change_detection/stanet.py | 变化检测 | STANet |
 |change_detection/fc_ef.py | 变化检测 | FC-EF |
 |change_detection/fc_siam_conc.py | 变化检测 | FC-Siam-conc |
 |change_detection/fc_siam_diff.py | 变化检测 | FC-Siam-diff |
+|change_detection/snunet.py | 变化检测 | SNUNet |
+|change_detection/stanet.py | 变化检测 | STANet |
 |classification/hrnet.py | 场景分类 | HRNet |
 |classification/mobilenetv3.py | 场景分类 | MobileNetV3 |
 |classification/resnet50_vd.py | 场景分类 | ResNet50-vd |

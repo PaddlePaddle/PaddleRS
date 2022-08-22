@@ -75,9 +75,9 @@ model.train(
     train_dataset=train_dataset,
     train_batch_size=8,
     eval_dataset=eval_dataset,
-    save_interval_epochs=1,
+    save_interval_epochs=5,
     # 每多少次迭代记录一次日志
-    log_interval_steps=5,
+    log_interval_steps=10,
     save_dir=EXP_DIR,
     # 初始学习率大小
     learning_rate=0.001,

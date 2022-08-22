@@ -1793,7 +1793,7 @@ class SelectBand(Transform):
     def __init__(self, band_list=[1, 2, 3], apply_to_tar=True):
         super(SelectBand, self).__init__()
         self.band_list = band_list
-        self.appy_to_tar = apply_to_tar
+        self.apply_to_tar = apply_to_tar
 
     def apply_im(self, image):
         image = select_bands(image, self.band_list)

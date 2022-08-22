@@ -72,7 +72,7 @@ eval_dataset = pdrs.datasets.CDDataset(
     binarize_labels=True)
 
 # 使用默认参数构建ChangeFormer模型
-# 目前已支持的模型请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/model_zoo.md
+# 目前已支持的模型请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/intro/model_zoo.md
 # 模型输入参数请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/change_detector.py
 model = pdrs.tasks.cd.ChangeFormer()
 

@@ -164,12 +164,15 @@ class TestTransform(CpuCommonTest):
                 prefix="./data/ssst"),
             build_input_from_file(
                 "data/ssst/test_optical_seg.txt",
+                task='seg',
                 prefix="./data/ssst"),
             build_input_from_file(
                 "data/ssst/test_sar_seg.txt",
+                task='seg',
                 prefix="./data/ssst"),
             build_input_from_file(
                 "data/ssst/test_multispectral_seg.txt",
+                task='seg',
                 prefix="./data/ssst"),
             build_input_from_file(
                 "data/ssst/test_optical_det.txt",
@@ -185,7 +188,23 @@ class TestTransform(CpuCommonTest):
                 label_list="data/ssst/labels_det.txt"),
             build_input_from_file(
                 "data/ssst/test_det_coco.txt",
+                task='det',
                 prefix="./data/ssst"),
+            build_input_from_file(
+                "data/ssst/test_optical_res.txt",
+                task='res',
+                prefix="./data/ssst",
+                sr_factor=4),
+            build_input_from_file(
+                "data/ssst/test_sar_res.txt",
+                task='res',
+                prefix="./data/ssst",
+                sr_factor=4),
+            build_input_from_file(
+                "data/ssst/test_multispectral_res.txt",
+                task='res',
+                prefix="./data/ssst",
+                sr_factor=4),
             build_input_from_file(
                 "data/ssmt/test_mixed_binary.txt",
                 prefix="./data/ssmt"),
@@ -227,6 +246,8 @@ class TestTransform(CpuCommonTest):
                 self.aux_mask_values = [
                     set(aux_mask.ravel()) for aux_mask in sample['aux_masks']
                 ]
+            if 'target' in sample:
+                self.target_shape = sample['target'].shape
             return sample
 
         def _out_hook_not_keep_ratio(sample):
@@ -243,6 +264,21 @@ class TestTransform(CpuCommonTest):
                 for aux_mask, amv in zip(sample['aux_masks'],
                                          self.aux_mask_values):
                     self.assertLessEqual(set(aux_mask.ravel()), amv)
+            if 'target' in sample:
+                if 'sr_factor' in sample:
+                    self.check_output_equal(
+                        sample['target'].shape[:2],
+                        T.functions.calc_hr_shape(TARGET_SIZE,
+                                                  sample['sr_factor']))
+                else:
+                    self.check_output_equal(sample['target'].shape[:2],
+                                            TARGET_SIZE)
+                self.check_output_equal(
+                    sample['target'].shape[0] / self.target_shape[0],
+                    sample['image'].shape[0] / self.image_shape[0])
+                self.check_output_equal(
+                    sample['target'].shape[1] / self.target_shape[1],
+                    sample['image'].shape[1] / self.image_shape[1])
             # TODO: Test gt_bbox and gt_poly
             return sample
 
@@ -260,6 +296,13 @@ class TestTransform(CpuCommonTest):
                 for aux_mask, ori_aux_mask_shape in zip(sample['aux_masks'],
                                                         self.aux_mask_shapes):
                     __check_ratio(aux_mask.shape, ori_aux_mask_shape)
+            if 'target' in sample:
+                self.check_output_equal(
+                    sample['target'].shape[0] / self.target_shape[0],
+                    sample['image'].shape[0] / self.image_shape[0])
+                self.check_output_equal(
+                    sample['target'].shape[1] / self.target_shape[1],
+                    sample['image'].shape[1] / self.image_shape[1])
             # TODO: Test gt_bbox and gt_poly
             return sample
 
