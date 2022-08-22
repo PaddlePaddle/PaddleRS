@@ -7,22 +7,22 @@ attach = Attach.to(paddlers.tasks.change_detector)
 
 
 @attach
-class IterativeBIT(BaseChangeDetector):
+class CustomTrainer(BaseChangeDetector):
     def __init__(self,
                  num_classes=2,
                  use_mixed_loss=False,
                  losses=None,
-                 num_iters=1,
-                 feat_channels=32,
-                 bit_kwargs=None,
+                 in_channels=3,
+                 att_types='cst',
+                 use_dropout=False,
                  **params):
         params.update({
-            'num_iters': num_iters,
-            'feat_channels': feat_channels,
-            'bit_kwargs': bit_kwargs
+            'in_channels': in_channels,
+            'att_types': att_types,
+            'use_dropout': use_dropout
         })
         super().__init__(
-            model_name='IterativeBIT',
+            model_name='CustomModel',
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
             losses=losses,
