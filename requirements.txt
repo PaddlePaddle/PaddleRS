@@ -19,5 +19,6 @@ natsort
 geojson
 colorama
 filelock
+tqdm
 # # Self installation
 # GDAL >= 3.1.3
