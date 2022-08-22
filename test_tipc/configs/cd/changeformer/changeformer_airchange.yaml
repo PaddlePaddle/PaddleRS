@@ -1,4 +1,4 @@
-# Basic configurations of ChangeFormer
+# Configurations of ChangeFormer with AirChange dataset
 
 _base_: ../_base_/airchange.yaml
 

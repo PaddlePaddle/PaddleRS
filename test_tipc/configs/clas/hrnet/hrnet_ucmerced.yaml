@@ -1,4 +1,4 @@
-# Basic configurations of HRNet
+# Configurations of HRNet with UCMerced dataset
 
 _base_: ../_base_/ucmerced.yaml
 

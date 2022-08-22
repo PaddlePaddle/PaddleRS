@@ -48,6 +48,8 @@ elif [[ ${MODE} == 'whole_train_whole_infer' ]]; then
             --out_dataset_dir "${DATA_DIR}/levircd" \
             --crop_size 256 \
             --crop_stride 256
+    elif [[ ${task_name} == 'clas' ]]; then
+        download_and_unzip_dataset "${DATA_DIR}" ucmerced https://paddlers.bj.bcebos.com/datasets/ucmerced.zip
     fi
 
 fi
