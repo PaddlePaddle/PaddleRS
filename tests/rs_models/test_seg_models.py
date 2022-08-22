@@ -52,3 +52,7 @@ class TestFarSegModel(TestSegModel):
         self.specs = [
             dict(), dict(num_classes=20), dict(encoder_pretrained=False)
         ]
+
+    def set_targets(self):
+        self.targets = [[self.get_zeros_array(16)], [self.get_zeros_array(20)],
+                        [self.get_zeros_array(16)]]
