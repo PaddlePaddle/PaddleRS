@@ -12,4 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .fccdn_loss import fccdn_loss_bcd
+from .fccdn_loss import fccdn_loss_ssl

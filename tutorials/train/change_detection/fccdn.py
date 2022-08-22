@@ -72,8 +72,8 @@ eval_dataset = pdrs.datasets.CDDataset(
     binarize_labels=True)
 
 # 使用默认参数构建FCCDN模型
-# 目前已支持的模型请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/model_zoo.md
-# 模型输入参数请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/change_detector.py
+# 目前已支持的模型及模型输入参数请参考：
+# https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/change_detector.py
 model = pdrs.tasks.cd.FCCDN()
 
 # 执行模型训练
@@ -82,7 +82,7 @@ model.train(
     train_dataset=train_dataset,
     train_batch_size=4,
     eval_dataset=eval_dataset,
-    save_interval_epochs=1,
+    save_interval_epochs=2,
     # 每多少次迭代记录一次日志
     log_interval_steps=50,
     save_dir=EXP_DIR,

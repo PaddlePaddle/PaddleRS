@@ -1101,7 +1101,11 @@ class FCCDN(BaseChangeDetector):
 
     def default_loss(self):
         if self.use_mixed_loss is False:
-            return {'types': [cmcd.losses.fccdn_loss_bcd], 'coef': [1.0]}
+            return {
+                'types':
+                [seg_losses.CrossEntropyLoss(), cmcd.losses.fccdn_loss_ssl],
+                'coef': [1.0, 1.0]
+            }
         else:
             raise ValueError(
                 f"Currently `use_mixed_loss` must be set to False for {self.__class__}"

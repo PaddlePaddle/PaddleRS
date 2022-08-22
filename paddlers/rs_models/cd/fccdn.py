@@ -473,6 +473,6 @@ class FCCDN(nn.Layer):
         if self.training:
             y1 = self.conv_out_class(y1)
             y2 = self.conv_out_class(y2)
-            return [[y, y1, y2]]
+            return [y, [y1, y2]]
         else:
             return [y]
