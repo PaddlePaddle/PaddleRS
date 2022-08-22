@@ -4,5 +4,3 @@ save_dir: ./exp/svcd/fc_siam_diff/
 
 model: !Node
     type: FCSiamDiff
-    args:
-        use_dropout: True
