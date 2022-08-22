@@ -1,6 +1,0 @@
-_base_: ./levircd.yaml
-
-save_dir: ./exp/levircd/bit/
-
-model: !Node
-    type: BIT

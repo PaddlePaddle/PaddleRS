@@ -3,7 +3,7 @@
 set -e 
 
 CONFIG_DIR='configs/levircd/custom_model'
-LOG_DIR='exp/logs/parameter_analysis'
+LOG_DIR='exp/logs/ablation'
 
 mkdir -p "${LOG_DIR}"
 

@@ -3,9 +3,4 @@ _base_: ./svcd.yaml
 save_dir: ./exp/svcd/custom_model/
 
 model: !Node
-    type: IterativeBIT
-    args:
-        num_iters: 2
-        num_classes: 2
-        bit_kwargs:
-            in_channels: 3
+    type: CustomTrainer
