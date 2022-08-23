@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build_and_test_cpu:
+  build_cpu:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
