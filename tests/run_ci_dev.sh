@@ -27,9 +27,11 @@ pip install -e .
 pip install https://versaweb.dl.sourceforge.net/project/gdal-wheels-for-linux/GDAL-3.4.1-cp37-cp37m-manylinux_2_5_x86_64.manylinux1_x86_64.whl
 
 git clone https://github.com/LDOUBLEV/AutoLog
+cd AutoLog
 pip install -r requirements.txt
 python setup.py bdist_wheel
 pip install ./dist/auto_log*.whl
+cd ..
 
 unset http_proxy https_proxy
 
