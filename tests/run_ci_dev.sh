@@ -29,7 +29,7 @@ pip install https://versaweb.dl.sourceforge.net/project/gdal-wheels-for-linux/GD
 git clone https://github.com/LDOUBLEV/AutoLog
 pip install -r requirements.txt
 python setup.py bdist_wheel
-pip install ./dist/auto_log-1.0.0-py3-none-any.whl
+pip install ./dist/auto_log*.whl
 
 unset http_proxy https_proxy
 
@@ -42,4 +42,9 @@ cd ..
 for config in $(ls test_tipc/configs/*/*/train_infer_python.txt); do
     bash test_tipc/prepare.sh ${config} lite_train_lite_infer
     bash test_tipc/test_train_inference_python.sh ${config} lite_train_lite_infer
+    task="$(basename $(dirname $(dirname ${config})))"
+    model="$(basename $(dirname ${config}))"
+    if grep -q "test_tipc/output/${task}/${model}/lite_train_lite_infer/results_python.log"; then
+        exit 1
+    fi
 done
