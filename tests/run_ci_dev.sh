@@ -25,6 +25,10 @@ git rev-parse HEAD
 pip install -r requirements.txt --ignore-installed
 pip install -e .
 
+unset http_proxy https_proxy
+
+set -e
+
 cd tests/
 bash run_fast_tests.sh
 
