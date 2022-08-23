@@ -4,7 +4,7 @@
     <img src="./docs/images/logo.png" align="middle" width = "500" />
   </p>
 
-  **基于飞桨框架开发的高性能遥感影像处理开发套件，帮助您端到端地完成从数据预处理到模型部署的全流程遥感深度学习应用。**
+  **飞桨高性能遥感影像开发套件，端到端完成从数据到部署的全流程遥感应用。**
 
   <!-- [![version](https://img.shields.io/github/release/PaddlePaddle/PaddleRS.svg)](https://github.com/PaddlePaddle/PaddleRS/releases) -->
   [![license](https://img.shields.io/badge/license-Apache%202-blue.svg)](LICENSE)
