@@ -62,7 +62,7 @@ class BaseClassifier(BaseModel):
         self.metrics = None
         self.losses = losses
         self.labels = None
-        self._postprocess = None
+        self.postprocess = None
         if params.get('with_net', True):
             params.pop('with_net', None)
             self.net = self.build_net(**params)
@@ -127,13 +127,12 @@ class BaseClassifier(BaseModel):
         net_out = net(inputs[0])
 
         if mode == 'test':
-            return self._postprocess(net_out)
+            return self.postprocess(net_out)
 
         outputs = OrderedDict()
         label = paddle.to_tensor(inputs[1], dtype="int64")
 
         if mode == 'eval':
-            # print(self._postprocess(net_out)[0])  # for test
             label = paddle.unsqueeze(label, axis=-1)
             metric_dict = self.metrics(net_out, label)
             outputs['top1'] = metric_dict["top1"]
@@ -182,13 +181,13 @@ class BaseClassifier(BaseModel):
         label_dict = dict()
         for i, label in enumerate(self.labels):
             label_dict[i] = label
-        self._postprocess = build_postprocess({
+        self.postprocess = build_postprocess({
             "name": "Topk",
             "topk": topk,
             "class_id_map_file": None
         })
         # Add class_id_map from model.yml
-        self._postprocess.class_id_map = label_dict
+        self.postprocess.class_id_map = label_dict
 
     def train(self,
               num_epochs,
@@ -253,8 +252,7 @@ class BaseClassifier(BaseModel):
         if self.losses is None:
             self.losses = self.default_loss()
         self.metrics = self.default_metric()
-        self._postprocess = self.default_postprocess(train_dataset.label_list)
-        # print(self._postprocess.class_id_map)
+        self.postprocess = self.default_postprocess(train_dataset.label_list)
 
         if optimizer is None:
             num_steps_each_epoch = train_dataset.num_samples // train_batch_size
@@ -460,12 +458,12 @@ class BaseClassifier(BaseModel):
             images = [img_file]
         else:
             images = img_file
-        batch_im, batch_origin_shape = self._preprocess(images, transforms,
-                                                        self.model_type)
+        batch_im, batch_origin_shape = self.preprocess(images, transforms,
+                                                       self.model_type)
         self.net.eval()
         data = (batch_im, batch_origin_shape, transforms.transforms)
 
-        if self._postprocess is None:
+        if self.postprocess is None:
             self.build_postprocess_from_labels()
 
         outputs = self.run(self.net, data, 'test')
@@ -486,7 +484,7 @@ class BaseClassifier(BaseModel):
             }
         return prediction
 
-    def _preprocess(self, images, transforms, to_tensor=True):
+    def preprocess(self, images, transforms, to_tensor=True):
         self._check_transforms(transforms, 'test')
         batch_im = list()
         batch_ori_shape = list()

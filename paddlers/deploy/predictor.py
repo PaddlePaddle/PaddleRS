@@ -146,7 +146,7 @@ class Predictor(object):
         return predictor
 
     def preprocess(self, images, transforms):
-        preprocessed_samples = self._model._preprocess(
+        preprocessed_samples = self._model.preprocess(
             images, transforms, to_tensor=False)
         if self._model.model_type == 'classifier':
             preprocessed_samples = {'image': preprocessed_samples[0]}
@@ -182,12 +182,12 @@ class Predictor(object):
                     transforms=None):
         if self._model.model_type == 'classifier':
             true_topk = min(self._model.num_classes, topk)
-            if self._model._postprocess is None:
-                self._model.build_postprocess_from_labels(true_topk)
-            # XXX: Convert ndarray to tensor as self._model._postprocess requires
+            if self._model.postprocess is None:
+                self._model.build_postprocess_from_labels(topk)
+            # XXX: Convert ndarray to tensor as self._model.postprocess requires
             assert len(net_outputs) == 1
             net_outputs = paddle.to_tensor(net_outputs[0])
-            outputs = self._model._postprocess(net_outputs)
+            outputs = self._model.postprocess(net_outputs)
             class_ids = map(itemgetter('class_ids'), outputs)
             scores = map(itemgetter('scores'), outputs)
             label_names = map(itemgetter('label_names'), outputs)
@@ -197,7 +197,7 @@ class Predictor(object):
                 'label_names_map': n,
             } for l, s, n in zip(class_ids, scores, label_names)]
         elif self._model.model_type in ('segmenter', 'change_detector'):
-            label_map, score_map = self._model._postprocess(
+            label_map, score_map = self._model.postprocess(
                 net_outputs,
                 batch_origin_shape=ori_shape,
                 transforms=transforms.transforms)
@@ -210,9 +210,9 @@ class Predictor(object):
                 k: v
                 for k, v in zip(['bbox', 'bbox_num', 'mask'], net_outputs)
             }
-            preds = self._model._postprocess(net_outputs)
+            preds = self._model.postprocess(net_outputs)
         elif self._model.model_type == 'restorer':
-            res_maps = self._model._postprocess(
+            res_maps = self._model.postprocess(
                 net_outputs[0],
                 batch_tar_shape=tar_shape,
                 transforms=transforms.transforms)

@@ -117,10 +117,10 @@ class BaseSegmenter(BaseModel):
         if mode == 'test':
             origin_shape = inputs[1]
             if self.status == 'Infer':
-                label_map_list, score_map_list = self._postprocess(
+                label_map_list, score_map_list = self.postprocess(
                     net_out, origin_shape, transforms=inputs[2])
             else:
-                logit_list = self._postprocess(
+                logit_list = self.postprocess(
                     logit, origin_shape, transforms=inputs[2])
                 label_map_list = []
                 score_map_list = []
@@ -148,7 +148,7 @@ class BaseSegmenter(BaseModel):
                 raise ValueError("Expected label.ndim == 4 but got {}".format(
                     label.ndim))
             origin_shape = [label.shape[-2:]]
-            pred = self._postprocess(
+            pred = self.postprocess(
                 pred, origin_shape, transforms=inputs[2])[0]  # NCHW
             intersect_area, pred_area, label_area = ppseg.utils.metrics.calculate_area(
                 pred, label, self.num_classes)
@@ -526,8 +526,8 @@ class BaseSegmenter(BaseModel):
             images = [img_file]
         else:
             images = img_file
-        batch_im, batch_origin_shape = self._preprocess(images, transforms,
-                                                        self.model_type)
+        batch_im, batch_origin_shape = self.preprocess(images, transforms,
+                                                       self.model_type)
         self.net.eval()
         data = (batch_im, batch_origin_shape, transforms.transforms)
         outputs = self.run(self.net, data, 'test')
@@ -631,7 +631,7 @@ class BaseSegmenter(BaseModel):
         dst_data = None
         print("GeoTiff saved in {}.".format(save_file))
 
-    def _preprocess(self, images, transforms, to_tensor=True):
+    def preprocess(self, images, transforms, to_tensor=True):
         self._check_transforms(transforms, 'test')
         batch_im = list()
         batch_ori_shape = list()
@@ -698,7 +698,7 @@ class BaseSegmenter(BaseModel):
             batch_restore_list.append(restore_list)
         return batch_restore_list
 
-    def _postprocess(self, batch_pred, batch_origin_shape, transforms):
+    def postprocess(self, batch_pred, batch_origin_shape, transforms):
         batch_restore_list = BaseSegmenter.get_transforms_shape_info(
             batch_origin_shape, transforms)
         if isinstance(batch_pred, (tuple, list)) and self.status == 'Infer':
@@ -786,7 +786,7 @@ class BaseSegmenter(BaseModel):
 
 class UNet(BaseSegmenter):
     def __init__(self,
-                 input_channel=3,
+                 in_channels=3,
                  num_classes=2,
                  use_mixed_loss=False,
                  losses=None,
@@ -799,7 +799,7 @@ class UNet(BaseSegmenter):
         })
         super(UNet, self).__init__(
             model_name='UNet',
-            input_channel=input_channel,
+            input_channel=in_channels,
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
             losses=losses,
@@ -808,7 +808,7 @@ class UNet(BaseSegmenter):
 
 class DeepLabV3P(BaseSegmenter):
     def __init__(self,
-                 input_channel=3,
+                 in_channels=3,
                  num_classes=2,
                  backbone='ResNet50_vd',
                  use_mixed_loss=False,
