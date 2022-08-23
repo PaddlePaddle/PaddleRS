@@ -1,4 +1,4 @@
-name: build and test
+name: build
 
 on:
   push:
@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build_and_test_cpu:
+  build_cpu:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -53,8 +53,3 @@ jobs:
           python -m pip install -e .
       - name: Install GDAL
         run: python -m pip install ${{ matrix.gdal-whl-url }}
-      - name: Run unittests
-        run: |
-          cd tests
-          bash run_fast_tests.sh
-        shell: bash

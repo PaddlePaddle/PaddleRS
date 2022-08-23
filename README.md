@@ -8,7 +8,7 @@
 
   <!-- [![version](https://img.shields.io/github/release/PaddlePaddle/PaddleRS.svg)](https://github.com/PaddlePaddle/PaddleRS/releases) -->
   [![license](https://img.shields.io/badge/license-Apache%202-blue.svg)](LICENSE)
-  [![build status](https://github.com/PaddlePaddle/PaddleRS/actions/workflows/build_and_test.yaml/badge.svg?branch=develop)](https://github.com/PaddlePaddle/PaddleRS/actions)
+  [![build status](https://github.com/PaddlePaddle/PaddleRS/actions/workflows/build.yaml/badge.svg?branch=develop)](https://github.com/PaddlePaddle/PaddleRS/actions)
   ![python version](https://img.shields.io/badge/python-3.7+-orange.svg)
   ![support os](https://img.shields.io/badge/os-linux%2C%20win%2C%20mac-yellow.svg)
 </div>

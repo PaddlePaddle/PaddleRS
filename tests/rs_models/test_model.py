@@ -129,10 +129,12 @@ def allow_oom(cls):
         def _wrapper(self, *args, **kwargs):
             try:
                 func(self, *args, **kwargs)
-            except (SystemError, RuntimeError, OSError) as e:
+            except (SystemError, RuntimeError, OSError, MemoryError) as e:
+                # XXX: This may not cover all OOM cases.
                 msg = str(e)
                 if "Out of memory error" in msg \
-                    or "(External) CUDNN error(4), CUDNN_STATUS_INTERNAL_ERROR." in msg:
+                    or "(External) CUDNN error(4), CUDNN_STATUS_INTERNAL_ERROR." in msg \
+                    or isinstance(e, MemoryError):
                     logging.warning("An OOM error has been ignored.")
                 else:
                     raise
