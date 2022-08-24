@@ -4,7 +4,7 @@ python:python
 gpu_list:0|0
 use_gpu:null|null
 --precision:null
---num_epochs:lite_train_lite_infer=30|lite_train_whole_infer=30|whole_train_whole_infer=30
+--num_epochs:lite_train_lite_infer=15|lite_train_whole_infer=15|whole_train_whole_infer=15
 --save_dir:adaptive
 --train_batch_size:lite_train_lite_infer=4|lite_train_whole_infer=4|whole_train_whole_infer=4
 --model_path:null

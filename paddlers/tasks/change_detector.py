@@ -1103,7 +1103,7 @@ class FCCDN(BaseChangeDetector):
         if self.use_mixed_loss is False:
             return {
                 'types':
-                [seg_losses.CrossEntropyLoss(), cmcd.losses.fccdn_loss_ssl],
+                [seg_losses.CrossEntropyLoss(), cmcd.losses.fccdn_ssl_loss],
                 'coef': [1.0, 1.0]
             }
         else:

@@ -12,13 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
-
 import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
-
-from paddlers.models import seg_losses
 
 
 class DiceLoss(nn.Layer):
@@ -26,7 +22,7 @@ class DiceLoss(nn.Layer):
         super(DiceLoss, self).__init__()
         self.batch = batch
 
-    def soft_dice_coeff(self, y_true, y_pred):
+    def soft_dice_coeff(self, y_pred, y_true):
         smooth = 0.00001
         if self.batch:
             i = paddle.sum(y_true)
@@ -39,30 +35,30 @@ class DiceLoss(nn.Layer):
         score = (2. * intersection + smooth) / (i + j + smooth)
         return score.mean()
 
-    def soft_dice_loss(self, y_true, y_pred):
-        loss = 1 - self.soft_dice_coeff(y_true, y_pred)
+    def soft_dice_loss(self, y_pred, y_true):
+        loss = 1 - self.soft_dice_coeff(y_pred, y_true)
         return loss
 
-    def __call__(self, y_true, y_pred):
-        return self.soft_dice_loss(y_true, y_pred.astype(paddle.float32))
+    def forward(self, y_pred, y_true):
+        return self.soft_dice_loss(y_pred.astype(paddle.float32), y_true)
 
 
 class MultiClassDiceLoss(nn.Layer):
     def __init__(
             self,
-            weight: paddle.Tensor,
-            batch: Optional[bool]=True,
-            ignore_index: Optional[int]=-1,
-            do_sigmoid: Optional[bool]=False,
-            **kwargs, ) -> paddle.Tensor:
+            weight,
+            batch=True,
+            ignore_index=-1,
+            do_softmax=False,
+            **kwargs, ):
         super(MultiClassDiceLoss, self).__init__()
         self.ignore_index = ignore_index
         self.weight = weight
-        self.do_sigmoid = do_sigmoid
+        self.do_softmax = do_softmax
         self.binary_diceloss = DiceLoss(batch)
 
-    def __call__(self, y_pred, y_true):
-        if self.do_sigmoid:
+    def forward(self, y_pred, y_true):
+        if self.do_softmax:
             y_pred = paddle.nn.functional.softmax(y_pred, axis=1)
         y_true = F.one_hot(y_true.long(), y_pred.shape[1]).permute(0, 3, 1, 2)
         total_loss = 0.0
@@ -76,16 +72,15 @@ class MultiClassDiceLoss(nn.Layer):
         return total_loss / tmp_i
 
 
-class DiceBceLoss(nn.Layer):
-    """Binary loss"""
+class DiceBCELoss(nn.Layer):
+    """Binary change detection task loss"""
 
     def __init__(self):
-        super(DiceBceLoss, self).__init__()
+        super(DiceBCELoss, self).__init__()
         self.bce_loss = nn.BCELoss()
         self.binnary_dice = DiceLoss()
 
-    def __call__(self, scores, labels, do_sigmoid=True):
-
+    def forward(self, scores, labels, do_sigmoid=True):
         if len(scores.shape) > 3:
             scores = scores.squeeze(1)
         if len(labels.shape) > 3:
@@ -97,16 +92,15 @@ class DiceBceLoss(nn.Layer):
         return diceloss + bceloss
 
 
-class McDiceBceLoss(nn.Layer):
-    """Multi-class loss"""
+class McDiceBCELoss(nn.Layer):
+    """Multi-class change detection task loss"""
 
     def __init__(self, weight, do_sigmoid=True):
-        super(McDiceBceLoss, self).__init__()
+        super(McDiceBCELoss, self).__init__()
         self.ce_loss = nn.CrossEntropyLoss(weight)
         self.dice = MultiClassDiceLoss(weight, do_sigmoid)
 
-    def __call__(self, scores, labels):
-
+    def forward(self, scores, labels):
         if len(scores.shape) < 4:
             scores = scores.unsqueeze(1)
         if len(labels.shape) < 4:
@@ -116,21 +110,20 @@ class McDiceBceLoss(nn.Layer):
         return diceloss + bceloss
 
 
-def fccdn_loss_ssl(scores, labels):
+def fccdn_ssl_loss(scores, labels):
     """
     FCCDN change detection self-supervised learning loss
     Args:
-        scores(list) = model(input) = [y1, y2]
-        labels(tensor-int64) = binary_cd_labels
+        scores (list) = model(input) = [y1, y2]
+        labels (tensor-int64) = binary_cd_labels
     """
 
     # Create loss
-    criterion_ssl = DiceBceLoss()
+    criterion_ssl = DiceBCELoss()
 
     # Get downsampled change map
-    labels_downsample = labels.unsqueeze(1).astype(paddle.float32)
-    pool = paddle.nn.MaxPool2D(kernel_size=2, stride=(2, 2), padding=(0, 0))
-    labels_downsample = pool(labels_downsample)
+    h, w = scores[0].shape[-2], scores[0].shape[-1]
+    labels_downsample = F.interpolate(x=labels.unsqueeze(1), size=[h, w])
 
     # Seg map
     out1 = paddle.nn.functional.sigmoid(scores[0]).clone()
@@ -138,22 +131,27 @@ def fccdn_loss_ssl(scores, labels):
     out3 = out1.clone()
     out4 = out2.clone()
 
-    out1[labels_downsample == 1] = 0
-    out2[labels_downsample == 1] = 0
-    out3[labels_downsample != 1] = 0
-    out4[labels_downsample != 1] = 0
+    out1 = paddle.where(labels_downsample == 1, paddle.zeros_like(out1), out1)
+    out2 = paddle.where(labels_downsample == 1, paddle.zeros_like(out2), out2)
+    out3 = paddle.where(labels_downsample != 1, paddle.zeros_like(out3), out3)
+    out4 = paddle.where(labels_downsample != 1, paddle.zeros_like(out4), out4)
 
-    pred_seg_pre_tmp1 = paddle.ones(out1.shape)
-    pred_seg_pre_tmp1[out1 <= 0.5] = 0
-    pred_seg_post_tmp1 = paddle.ones(out2.shape)
-    pred_seg_post_tmp1[out2 <= 0.5] = 0
+    pred_seg_pre_tmp1 = paddle.where(out1 <= 0.5,
+                                     paddle.zeros_like(out1),
+                                     paddle.ones_like(out1))
+    pred_seg_post_tmp1 = paddle.where(out2 <= 0.5,
+                                      paddle.zeros_like(out2),
+                                      paddle.ones_like(out2))
 
-    pred_seg_pre_tmp2 = paddle.ones(scores[0].shape)
-    pred_seg_pre_tmp2[out3 <= 0.5] = 0
-    pred_seg_post_tmp2 = paddle.ones(scores[1].shape)
-    pred_seg_post_tmp2[out4 <= 0.5] = 0
+    pred_seg_pre_tmp2 = paddle.where(out3 <= 0.5,
+                                     paddle.zeros_like(out3),
+                                     paddle.ones_like(out3))
+    pred_seg_post_tmp2 = paddle.where(out4 <= 0.5,
+                                      paddle.zeros_like(out4),
+                                      paddle.ones_like(out4))
 
     # Seg loss
+    labels_downsample = labels_downsample.astype(paddle.float32)
     loss_aux = 0.2 * criterion_ssl(out1, pred_seg_post_tmp1, False)
     loss_aux += 0.2 * criterion_ssl(out2, pred_seg_pre_tmp1, False)
     loss_aux += 0.2 * criterion_ssl(

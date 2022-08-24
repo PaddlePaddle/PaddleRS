@@ -16,7 +16,7 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from paddlers.rs_models.cd.layers import BasicConv, MaxPool2x2, Conv1x1, Conv3x3
+from .layers import BasicConv, MaxPool2x2, Conv1x1, Conv3x3
 
 bn_mom = 1 - 0.0003
 
@@ -60,7 +60,7 @@ class NLBlock(nn.Layer):
 
 
 class NLFPN(nn.Layer):
-    """ non-local feature parymid network"""
+    """ Non-local feature parymid network"""
 
     def __init__(self, in_dim, reduction=True):
         super(NLFPN, self).__init__()
@@ -266,9 +266,9 @@ class BasicBlock(nn.Layer):
         return out
 
 
-class DensecatCatAdd(nn.Layer):
+class DenseCatAdd(nn.Layer):
     def __init__(self, in_chn, out_chn):
-        super(DensecatCatAdd, self).__init__()
+        super(DenseCatAdd, self).__init__()
         self.conv1 = BasicConv(in_chn, in_chn, kernel_size=3, act=nn.ReLU())
         self.conv2 = BasicConv(in_chn, in_chn, kernel_size=3, act=nn.ReLU())
         self.conv3 = BasicConv(in_chn, in_chn, kernel_size=3, act=nn.ReLU())
@@ -292,9 +292,9 @@ class DensecatCatAdd(nn.Layer):
         return self.conv_out(x1 + x2 + x3 + y1 + y2 + y3)
 
 
-class DensecatCatDiff(nn.Layer):
+class DenseCatDiff(nn.Layer):
     def __init__(self, in_chn, out_chn):
-        super(DensecatCatDiff, self).__init__()
+        super(DenseCatDiff, self).__init__()
         self.conv1 = BasicConv(in_chn, in_chn, kernel_size=3, act=nn.ReLU())
         self.conv2 = BasicConv(in_chn, in_chn, kernel_size=3, act=nn.ReLU())
         self.conv3 = BasicConv(in_chn, in_chn, kernel_size=3, act=nn.ReLU())
@@ -319,7 +319,7 @@ class DensecatCatDiff(nn.Layer):
 
 
 class DFModule(nn.Layer):
-    """dense connection-based feature fusion module"""
+    """Dense connection-based feature fusion module"""
 
     def __init__(self, dim_in, dim_out, reduction=True):
         super(DFModule, self).__init__()
@@ -333,8 +333,8 @@ class DFModule(nn.Layer):
             dim_in = dim_in // 2
         else:
             self.reduction = None
-        self.cat1 = DensecatCatAdd(dim_in, dim_out)
-        self.cat2 = DensecatCatDiff(dim_in, dim_out)
+        self.cat1 = DenseCatAdd(dim_in, dim_out)
+        self.cat2 = DenseCatDiff(dim_in, dim_out)
         self.conv1 = Conv3x3(
             dim_out,
             dim_out,
@@ -361,10 +361,10 @@ class FCCDN(nn.Layer):
         (https://arxiv.org/pdf/2105.10860.pdf).
 
     Args:
-        in_channels(int): Number of input channels(default: 3).
+        in_channels (int): Number of input channels(default: 3).
         num_classes (int): Number of target classes(default: 2).
-        os(int): Number of output stride(default: 16).
-        use_se(bool): Whether to use SEModule(default: True).
+        os (int): Number of output stride(default: 16).
+        use_se (bool): Whether to use SEModule(default: True).
     """
 
     def __init__(self, in_channels=3, num_classes=2, os=16, use_se=True):
