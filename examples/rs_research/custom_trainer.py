@@ -13,7 +13,7 @@ class CustomTrainer(BaseChangeDetector):
                  use_mixed_loss=False,
                  losses=None,
                  in_channels=3,
-                 att_types='cst',
+                 att_types='ct',
                  use_dropout=False,
                  **params):
         params.update({

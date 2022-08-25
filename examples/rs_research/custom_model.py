@@ -3,7 +3,7 @@ import paddle.nn as nn
 import paddle.nn.functional as F
 import paddlers
 from paddlers.rs_models.cd.layers import Conv3x3, MaxPool2x2, ConvTransposed3x3, Identity
-from paddlers.rs_models.cd.layers import ChannelAttention, SpatialAttention
+from paddlers.rs_models.cd.layers import ChannelAttention
 
 from attach_tools import Attach
 
@@ -15,7 +15,7 @@ class CustomModel(nn.Layer):
     def __init__(self,
                  in_channels,
                  num_classes,
-                 att_types='cst',
+                 att_types='ct',
                  use_dropout=False):
         super(CustomModel, self).__init__()
 
@@ -53,7 +53,7 @@ class CustomModel(nn.Layer):
 
         self.upconv4 = ConvTransposed3x3(C4, C4, output_padding=1)
 
-        self.conv43d = Conv3x3(C5, C4, norm=True, act=True)
+        self.conv43d = Conv3x3(C5 + C4, C4, norm=True, act=True)
         self.do43d = self._make_dropout()
         self.conv42d = Conv3x3(C4, C4, norm=True, act=True)
         self.do42d = self._make_dropout()
@@ -62,7 +62,7 @@ class CustomModel(nn.Layer):
 
         self.upconv3 = ConvTransposed3x3(C3, C3, output_padding=1)
 
-        self.conv33d = Conv3x3(C4, C3, norm=True, act=True)
+        self.conv33d = Conv3x3(C4 + C3, C3, norm=True, act=True)
         self.do33d = self._make_dropout()
         self.conv32d = Conv3x3(C3, C3, norm=True, act=True)
         self.do32d = self._make_dropout()
@@ -71,31 +71,20 @@ class CustomModel(nn.Layer):
 
         self.upconv2 = ConvTransposed3x3(C2, C2, output_padding=1)
 
-        self.conv22d = Conv3x3(C3, C2, norm=True, act=True)
+        self.conv22d = Conv3x3(C3 + C2, C2, norm=True, act=True)
         self.do22d = self._make_dropout()
         self.conv21d = Conv3x3(C2, C1, norm=True, act=True)
         self.do21d = self._make_dropout()
 
         self.upconv1 = ConvTransposed3x3(C1, C1, output_padding=1)
 
-        self.conv12d = Conv3x3(C2, C1, norm=True, act=True)
+        self.conv12d = Conv3x3(C2 + C1, C1, norm=True, act=True)
         self.do12d = self._make_dropout()
         self.conv11d = Conv3x3(C1, num_classes)
 
-        if 'c' in att_types:
-            self.att_c = ChannelAttention(C4)
-        else:
-            self.att_c = Identity()
-        if 's' in att_types:
-            self.att_s = SpatialAttention()
-        else:
-            self.att_s = Identity()
-        if 't' in att_types:
-            self.att_t = ChannelAttention(2, ratio=1)
-        else:
-            self.att_t = Identity()
-
         self.init_weight()
+
+        self.att4 = MixedAttention(C4, att_types)
 
     def forward(self, t1, t2):
         # Encode t1
@@ -144,25 +133,14 @@ class CustomModel(nn.Layer):
         x43_2 = self.do43(self.conv43(x42))
         x4p = self.pool4(x43_2)
 
-        # Attend
-        x43_1 = self.att_c(x43_1) * x43_1
-        x43_1 = self.att_s(x43_1) * x43_1
-        x43_2 = self.att_c(x43_2) * x43_2
-        x43_2 = self.att_s(x43_2) * x43_2
-        x43 = paddle.stack([x43_1, x43_2], axis=1)
-        x43 = paddle.transpose(x43, [0, 2, 1, 3, 4])
-        x43 = paddle.flatten(x43, stop_axis=1)
-        x43 = self.att_t(x43) * x43
-        x43 = x43.reshape((x43_1.shape[0], -1, 2, *x43.shape[2:]))
-        x43_1, x43_2 = x43[:, :, 0], x43[:, :, 1]
-
         # Decode
         # Stage 4d
         x4d = self.upconv4(x4p)
         pad4 = (0, x43_1.shape[3] - x4d.shape[3], 0,
                 x43_1.shape[2] - x4d.shape[2])
         x4d = F.pad(x4d, pad=pad4, mode='replicate')
-        x4d = paddle.concat([x4d, paddle.abs(x43_1 - x43_2)], 1)
+        x43_1, x43_2 = self.att4(x43_1, x43_2)
+        x4d = paddle.concat([x4d, x43_1, x43_2], 1)
         x43d = self.do43d(self.conv43d(x4d))
         x42d = self.do42d(self.conv42d(x43d))
         x41d = self.do41d(self.conv41d(x42d))
@@ -172,7 +150,7 @@ class CustomModel(nn.Layer):
         pad3 = (0, x33_1.shape[3] - x3d.shape[3], 0,
                 x33_1.shape[2] - x3d.shape[2])
         x3d = F.pad(x3d, pad=pad3, mode='replicate')
-        x3d = paddle.concat([x3d, paddle.abs(x33_1 - x33_2)], 1)
+        x3d = paddle.concat([x3d, x33_1, x33_2], 1)
         x33d = self.do33d(self.conv33d(x3d))
         x32d = self.do32d(self.conv32d(x33d))
         x31d = self.do31d(self.conv31d(x32d))
@@ -182,7 +160,7 @@ class CustomModel(nn.Layer):
         pad2 = (0, x22_1.shape[3] - x2d.shape[3], 0,
                 x22_1.shape[2] - x2d.shape[2])
         x2d = F.pad(x2d, pad=pad2, mode='replicate')
-        x2d = paddle.concat([x2d, paddle.abs(x22_1 - x22_2)], 1)
+        x2d = paddle.concat([x2d, x22_1, x22_2], 1)
         x22d = self.do22d(self.conv22d(x2d))
         x21d = self.do21d(self.conv21d(x22d))
 
@@ -191,7 +169,7 @@ class CustomModel(nn.Layer):
         pad1 = (0, x12_1.shape[3] - x1d.shape[3], 0,
                 x12_1.shape[2] - x1d.shape[2])
         x1d = F.pad(x1d, pad=pad1, mode='replicate')
-        x1d = paddle.concat([x1d, paddle.abs(x12_1 - x12_2)], 1)
+        x1d = paddle.concat([x1d, x12_1, x12_2], 1)
         x12d = self.do12d(self.conv12d(x1d))
         x11d = self.conv11d(x12d)
 
@@ -205,3 +183,51 @@ class CustomModel(nn.Layer):
             return nn.Dropout2D(p=0.2)
         else:
             return Identity()
+
+
+class MixedAttention(nn.Layer):
+    def __init__(self, in_channels, att_types='ct'):
+        super(MixedAttention, self).__init__()
+
+        self.att_types = att_types
+
+        if self.has_att_c:
+            self.att_c = ChannelAttention(in_channels, ratio=1)
+            self.norm_c1 = nn.BatchNorm(in_channels)
+            self.norm_c2 = nn.BatchNorm(in_channels)
+        else:
+            self.att_c = Identity()
+            self.norm_c1 = Identity()
+            self.norm_c2 = Identity()
+
+        if self.has_att_t:
+            self.att_t = ChannelAttention(2, ratio=1)
+        else:
+            self.att_t = Identity()
+
+    def forward(self, x1, x2):
+        if self.has_att_c:
+            x1 = self.att_c(x1) * x1
+            x1 = self.norm_c1(x1)
+            x2 = self.att_c(x2) * x2
+            x2 = self.norm_c2(x2)
+
+        if self.has_att_t:
+            b, c = x1.shape[:2]
+            y = paddle.stack([x1, x2], axis=2)
+            y = paddle.flatten(y, stop_axis=1)
+            y = self.att_t(y) * y
+            y = y.reshape((b, c, 2, *y.shape[2:]))
+            y1, y2 = y[:, :, 0], y[:, :, 1]
+        else:
+            y1, y2 = x1, x2
+
+        return y1, y2
+
+    @property
+    def has_att_c(self):
+        return 'c' in self.att_types
+
+    @property
+    def has_att_t(self):
+        return 't' in self.att_types
