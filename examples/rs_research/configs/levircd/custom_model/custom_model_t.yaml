@@ -1,8 +1,0 @@
-_base_: ../levircd.yaml
-
-save_dir: ./exp/levircd/custom_model/att_t/
-
-model: !Node
-    type: CustomTrainer
-    args:
-        att_types: t
