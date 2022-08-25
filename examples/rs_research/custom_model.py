@@ -193,12 +193,8 @@ class MixedAttention(nn.Layer):
 
         if self.has_att_c:
             self.att_c = ChannelAttention(in_channels, ratio=1)
-            self.norm_c1 = nn.BatchNorm(in_channels)
-            self.norm_c2 = nn.BatchNorm(in_channels)
         else:
             self.att_c = Identity()
-            self.norm_c1 = Identity()
-            self.norm_c2 = Identity()
 
         if self.has_att_t:
             self.att_t = ChannelAttention(2, ratio=1)
@@ -207,16 +203,14 @@ class MixedAttention(nn.Layer):
 
     def forward(self, x1, x2):
         if self.has_att_c:
-            x1 = self.att_c(x1) * x1
-            x1 = self.norm_c1(x1)
-            x2 = self.att_c(x2) * x2
-            x2 = self.norm_c2(x2)
+            x1 = (1 + self.att_c(x1)) * x1
+            x2 = (1 + self.att_c(x2)) * x2
 
         if self.has_att_t:
             b, c = x1.shape[:2]
             y = paddle.stack([x1, x2], axis=2)
             y = paddle.flatten(y, stop_axis=1)
-            y = self.att_t(y) * y
+            y = (1 + self.att_t(y)) * y
             y = y.reshape((b, c, 2, *y.shape[2:]))
             y1, y2 = y[:, :, 0], y[:, :, 1]
         else:

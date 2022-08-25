@@ -10,6 +10,7 @@ import numpy as np
 import cv2
 import paddle
 import paddlers
+from sklearn.decomposition import PCA
 
 _dir = osp.dirname(osp.abspath(__file__))
 sys.path.append(osp.abspath(osp.join(_dir, '../')))
@@ -45,7 +46,12 @@ class FeatureContainer:
 
 
 class HookHelper:
-    def __init__(self, model, fetch_dict, out_dict, hook_type='forward_out'):
+    def __init__(self,
+                 model,
+                 fetch_dict,
+                 out_dict,
+                 hook_type='forward_out',
+                 auto_key=True):
         # XXX: A HookHelper object should only be used as a context manager and should not 
         # persist in memory since it may keep references to some very large objects.
         self.model = model
@@ -53,6 +59,7 @@ class HookHelper:
         self.out_dict = out_dict
         self._handles = []
         self.hook_type = hook_type
+        self.auto_key = auto_key
 
     def __enter__(self):
         def _hook_proto(x, entry):
@@ -62,7 +69,12 @@ class HookHelper:
                 for key, f in zip(entry, x):
                     self.out_dict[key] = f.detach().clone()
             else:
-                self.out_dict[entry] = x.detach().clone()
+                if isinstance(x, tuple) and self.auto_key:
+                    for i, f in enumerate(x):
+                        key = self._gen_key(entry, i)
+                        self.out_dict[key] = f.detach().clone()
+                else:
+                    self.out_dict[entry] = x.detach().clone()
 
         if self.hook_type == 'forward_in':
             # NOTE: Register forward hooks for LAYERs
@@ -102,6 +114,9 @@ class HookHelper:
     def __exit__(self, exc_type, exc_val, ext_tb):
         for handle in self._handles:
             handle.remove()
+
+    def _gen_key(self, key, i):
+        return key + f'_{i}'
 
 
 def parse_args():
@@ -153,8 +168,13 @@ def to_pseudo_color(gray, color_map=cv2.COLORMAP_JET):
 def process_fetched_feat(feat, to_pcolor=True):
     # Convert tensor to array
     feat = feat.squeeze(0).numpy()
-    # Average along channel dimension
-    feat = normalize_minmax(feat.mean(0))
+    # Get principal component
+    shape = feat.shape
+    x = feat.reshape(shape[0], -1).transpose((1, 0))
+    pca = PCA(n_components=1)
+    y = pca.fit_transform(x)
+    feat = y.reshape(shape[1:])
+    feat = normalize_minmax(feat)
     feat = quantize_8bit(feat)
     if to_pcolor:
         feat = to_pseudo_color(feat)
@@ -191,3 +211,4 @@ if __name__ == '__main__':
                 FILENAME_PATTERN.format(
                     key=key.replace('.', '_'), idx=idx))
             cv2.imwrite(out_path, im_vis)
+            print(f"Write feature map to {out_path}")

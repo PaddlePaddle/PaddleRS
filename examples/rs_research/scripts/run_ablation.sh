@@ -12,9 +12,6 @@ for config_file in $(ls "${CONFIG_DIR}"/*.yaml); do
     printf '=%.0s' {1..100} && echo
     echo -e "\033[33m ${config_file} \033[0m"
     printf '=%.0s' {1..100} && echo
-    if [ ${filename} = 'custom_model_cs.yaml' ] || [ ${filename} = 'custom_model_ct.yaml' ]; then
-        continue
-    fi
     python run_task.py train cd --config "${config_file}" 2>&1 | tee "${LOG_DIR}/${filename%.*}.log"
     echo
 done
