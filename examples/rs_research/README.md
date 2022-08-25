@@ -35,7 +35,7 @@ python ../../tools/prepare_dataset/prepare_levircd.py \
 
 随着深度学习技术应用的不断深入，近年来，变化检测领域涌现了许多基于全卷积神经网络（fully convolutional network, FCN）的遥感影像变化检测算法。与基于特征和基于影像块的方法相比，基于FCN的方法具有处理效率高、依赖超参数少等优势，但其缺点在于参数量往往较大，因而对训练样本的数量更为依赖。尽管中、大型变化检测数据集的数量与日俱增，训练样本日益丰富，但深度学习变化检测模型的参数量也越来越大。下图显示了从2018年到2021年一些已发表的文献中提出的基于FCN的变化检测模型的参数量与其在SVCD数据集[3]上取得的F1分数（柱状图中bar的高度与模型参数量成正比）：
 
-![params_versus_f1](params_versus_f1.png)
+![params_versus_f1](https://user-images.githubusercontent.com/21275753/186670936-5f79983c-914c-4e81-8f01-11df2beadf09.png)
 
 诚然，增大参数数量在大多数情况下等同于增加模型容量，而模型容量的增加意味着模型拟合能力的提升，从而有助于模型在实验数据集上取得更高的精度指标。但是，“更大”一定意味着“更好”吗？答案显然是否定的。在实际应用中，“更大”的遥感影像变化检测模型常常遭遇如下问题：
 
@@ -46,7 +46,7 @@ python ../../tools/prepare_dataset/prepare_levircd.py \
 
 FC-Siam-conc的网络结构如图所示：
 
-![fc_siam_conc](fc_siam_conc.png)
+![fc_siam_conc](https://user-images.githubusercontent.com/21275753/186671480-d869a500-6409-4f97-b48b-50ce95ea3a71.jpg)
 
 本案例计划在解码器中首个Concat模块之前添加通道与时间注意力模块组合而成的混合注意力模块以优化从编码器传来的特征，并将新模型称为CustomModel。
 
@@ -281,8 +281,8 @@ python tools/analyze_model.py --model_dir "exp/levircd/{模型名称}/best_model
 
 |时相1影像|时相2影像|FC-EF|FC-Siam-diff|FC-Siam-conc|CustomModel|变化标签|
 |:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-|![]()|![]()|![]()|![]()|![]()|![]()|![]()|
-|![]()|![]()|![]()|![]()|![]()|![]()|![]()|
+|![](https://user-images.githubusercontent.com/21275753/186671764-2dc990a8-b297-43a2-ae81-e31f2d5582e5.png)|![](https://user-images.githubusercontent.com/21275753/186672204-e8e46e9a-7f29-4506-9ed4-31314284a6fb.png)|![](https://user-images.githubusercontent.com/21275753/186672237-ee5f67d8-8966-457d-8a80-0452bdb7af89.png)|![](https://user-images.githubusercontent.com/21275753/186671987-7da0023a-0c96-413f-9088-0f6730ab54dd.png)|![](https://user-images.githubusercontent.com/21275753/186671895-c6c40196-b86a-49d1-a4b0-48a7f40cba06.png)|![](https://user-images.githubusercontent.com/21275753/186672068-89a60f8c-c80e-4f73-bb3e-b9ad146e795d.png)|![](https://user-images.githubusercontent.com/21275753/186672106-37e8dcd0-b0f0-46e1-90a1-bd5f566ef97b.png)|
+|![](https://user-images.githubusercontent.com/21275753/186672287-efa1209d-2786-4543-b136-5f50b7b0dd8c.png)|![](https://user-images.githubusercontent.com/21275753/186671791-beb82760-8c3f-480f-8ada-9c1081860691.png)|![](https://user-images.githubusercontent.com/21275753/186671861-7b7989e4-15d8-4342-9abe-2d6efa82811a.png)|![](https://user-images.githubusercontent.com/21275753/186672362-94993c68-7c31-4501-b009-755c193a00a8.png)|![](https://user-images.githubusercontent.com/21275753/186672348-3134129c-e2cd-4011-8894-901ef332a43d.png)|![](https://user-images.githubusercontent.com/21275753/186672415-da3984b2-0354-49ad-8dba-9c796a18d282.png)|![](https://user-images.githubusercontent.com/21275753/186672449-fd225e4f-ac58-4506-8b66-3a255567998a.png)|
 
 从图中可以看出，虽然结果中仍存在一定程度的漏检与误检，但相比其它算法，CustomModel对变化区域的刻画相对更为准确。
 
@@ -398,7 +398,7 @@ python tools/visualize_feats.py \
 
 |时相1影像|时相2影像|变化标签|x1|x2|y1|y2|
 |:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-||||||||
+|![](https://user-images.githubusercontent.com/21275753/186672741-45c819f0-2591-4b97-ad32-05d787be1a0a.png)|![](https://user-images.githubusercontent.com/21275753/186672761-eb6958be-688d-4bc2-839b-6a60cb6cc3b5.png)|![](https://user-images.githubusercontent.com/21275753/186672791-ceb78cf7-5029-4991-88c2-6c4550fb27d8.png)|![](https://user-images.githubusercontent.com/21275753/186672835-7fda3499-33e0-4af1-b990-8d82f6c5c410.png)|![](https://user-images.githubusercontent.com/21275753/186672870-dba57441-509f-4cd0-bcc9-af343ddf07df.png)|![](https://user-images.githubusercontent.com/21275753/186672893-7bc692a7-c963-4686-b93c-895b5c51fecb.png)|![](https://user-images.githubusercontent.com/21275753/186672914-b99ffee3-9eb4-4f95-96f4-93cb00e0b109.png)|
 
 对比x2和y2可以看出，经过通道和时间注意力模块处理后，变化特征得到了增强，发生变化的区域在特征图中更加凸显。
 
