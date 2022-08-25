@@ -1,6 +1,6 @@
 # PaddleRS科研实战：设计深度学习变化检测模型
 
-本案例演示如何使用PaddleRS设计变化检测模型，并开展消融实验和对比实验。
+本案例演示如何使用PaddleRS设计变化检测模型，并开展对比实验、消融实验和特征可视化实验。
 
 ## 1 环境配置
 
@@ -35,28 +35,32 @@ python ../../tools/prepare_dataset/prepare_levircd.py \
 
 随着深度学习技术应用的不断深入，近年来，变化检测领域涌现了许多基于全卷积神经网络（fully convolutional network, FCN）的遥感影像变化检测算法。与基于特征和基于影像块的方法相比，基于FCN的方法具有处理效率高、依赖超参数少等优势，但其缺点在于参数量往往较大，因而对训练样本的数量更为依赖。尽管中、大型变化检测数据集的数量与日俱增，训练样本日益丰富，但深度学习变化检测模型的参数量也越来越大。下图显示了从2018年到2021年一些已发表的文献中提出的基于FCN的变化检测模型的参数量与其在SVCD数据集[3]上取得的F1分数（柱状图中bar的高度与模型参数量成正比）：
 
-![params_versus_f1](https://user-images.githubusercontent.com/21275753/186670936-5f79983c-914c-4e81-8f01-11df2beadf09.png)
+<p align="center">
+<img src="https://user-images.githubusercontent.com/21275753/186670936-5f79983c-914c-4e81-8f01-11df2beadf09.png" width="850">
+</p>
 
 诚然，增大参数数量在大多数情况下等同于增加模型容量，而模型容量的增加意味着模型拟合能力的提升，从而有助于模型在实验数据集上取得更高的精度指标。但是，“更大”一定意味着“更好”吗？答案显然是否定的。在实际应用中，“更大”的遥感影像变化检测模型常常遭遇如下问题：
 
 1. 巨大的参数量意味着巨大的存储开销。在许多实际场景中，硬件资源往往是有限的，过多的模型参数将给部署造成困难。
-2. 在数据有限的情况下，大模型更易遭受过拟合，其在实验数据集上看起来良好的结果也难以泛化到真实场景。
+2. 在数据有限的情况下，大模型更易遭受过拟合，其在实验数据集上看起来良好的检测效果也难以泛化到真实场景。
 
-本案例认为，上述问题的根源在于参数量与数据量的失衡所导致的特征冗余。既然模型的特征存在冗余，也即存在一部分“无用”的特征，是否存在某种手段，能够在固定模型参数量的前提下对特征进行优化，从而“榨取”小模型的更多潜力，获取更多更加有效的特征？基于这个观点，本案例的基本思路是为现有的变化检测模型添加一个“插件式”的特征优化模块，在仅引入较少额外的参数数量的情况下，实现变化特征增强。本案例计划以变化检测领域经典的FC-Siam-conc[4]为baseline网络，利用通道和时间注意力模块对网络的中间层特征进行优化，从而减小特征冗余，提升检测效果。在具体的模块设计方面，选用论文[5]中提出的通道注意力模块实现通道和时间维度的特征增强。
+本案例认为，上述问题的根源在于参数量与数据量的失衡所导致的特征冗余。既然模型的特征存在冗余，也即存在一部分“无用”的特征，是否存在某种手段，能够在固定模型参数量的前提下对特征进行优化，从而“榨取”小模型的更多潜力，获取更多更加有效的特征？基于这个观点，本案例的基本思路是为现有的变化检测模型添加一个“插件式”的特征优化模块，在仅引入较少额外的参数数量的情况下，实现变化特征增强。本案例计划以变化检测领域经典的FC-Siam-conc[4]为基线（baseline）网络，利用通道和时间注意力模块对网络的中间层特征进行优化，从而减小特征冗余，提升检测效果。在具体的模块设计方面，选用论文[5]中提出的通道注意力模块实现通道和时间维度的特征增强。
 
 FC-Siam-conc的网络结构如图所示：
 
-![fc_siam_conc](https://user-images.githubusercontent.com/21275753/186671480-d869a500-6409-4f97-b48b-50ce95ea3a71.jpg)
+<p align="center">
+<img src="https://user-images.githubusercontent.com/21275753/186671480-d869a500-6409-4f97-b48b-50ce95ea3a71.jpg" width="500">
+</p>
 
 本案例计划在解码器中首个Concat模块之前添加通道与时间注意力模块组合而成的混合注意力模块以优化从编码器传来的特征，并将新模型称为CustomModel。
 
 ### 3.2 模型定义
 
-本小节基于PaddlePaddle框架与PaddleRS库实现[3.1节](#3.1-问题分析与思路拟定)中提出的想法。
+本小节基于PaddlePaddle框架与PaddleRS库实现[3.1节](#31-问题分析与思路拟定)中提出的想法。
 
 #### 3.2.1 自定义模型组网
 
-在`custom_model.py`中定义模型的宏观（macro）结构以及组成模型的各个微观（micro）模块。本案例在`custom_model.py`中定义了改进后的FC-Siam-conc结构，其核心部分实现如下：
+在`custom_model.py`中定义模型的整体结构以及组成模型的各个模块。本案例在`custom_model.py`中定义了改进后的FC-Siam-conc结构，其核心部分实现如下：
 
 ```python
 ...
@@ -103,7 +107,6 @@ class MixedAttention(nn.Layer):
 
         self.att_types = att_types
 
-        # 从`att_types`参数中获取要使用的注意力类型
         # 每个注意力模块都是可选的
         if self.has_att_c:
             self.att_c = ChannelAttention(in_channels, ratio=1)
@@ -159,7 +162,7 @@ class MixedAttention(nn.Layer):
 2. 包含模型整体逻辑结构的最外层模块（如本例中的`CustomModel`类）须用`@attach`装饰；
 3. 对于变化检测任务，最外层模块的`forward()`方法除`self`参数外还接受两个参数`t1`、`t2`，分别表示第一时相和第二时相影像。
 
-关于模型定义的更多细节请参考[开发指南](https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/dev/dev_guide.md)。
+关于模型定义的更多细节请参考[《开发指南》](https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/dev/dev_guide.md)。
 
 #### 3.2.2 自定义训练器
 
@@ -196,7 +199,7 @@ class CustomTrainer(BaseChangeDetector):
 
 在本案例中，仅仅重写了训练器的`__init__()`方法。在实际科研过程中，可以通过重写`train()`、`evaluate()`、`default_loss()`等方法定制更加复杂的训练、评估策略或更换默认损失函数。
 
-关于训练器的更多细节请参考[API文档](https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/train.md)。
+关于训练器的更多细节请参考[《API文档》](https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/train.md)。
 
 ## 4 对比实验
 
@@ -242,8 +245,8 @@ python predict_cd.py \
 之后，可在`exp/predict/levircd/{模型名称}`目录查看保存的输出结果。
 
 可以通过`tools/collect_imgs.py`脚本将输入图像、变化标签以及多个模型的预测结果放置在一个目录下以便于观察比较。该脚本接受三个命令行选项：
-- `--globs`指定一系列通配符（可用于Python的[`glob.glob()`函数](https://docs.python.org/zh-cn/3/library/glob.html#glob.glob)，用于匹配需要收集的图像；
-- `--tags`为`--globs`中的每一项指定一个别名，在存储目录中，相应的图像名将被替换为存储的别名；
+- `--globs`指定一系列通配符（可用于Python的[`glob.glob()`函数](https://docs.python.org/zh-cn/3/library/glob.html#glob.glob)），用于匹配需要收集的图像；
+- `--tags`为`--globs`中的每一项指定一个别名，在存储目录中，相应的图像名将被替换为指定的别名；
 - `--save_dir`指定输出目录路径，若目录不存在将被自动创建。
 
 例如，对于LEVIR-CD数据集，执行如下指令：
@@ -281,8 +284,8 @@ python tools/analyze_model.py --model_dir "exp/levircd/{模型名称}/best_model
 
 |时相1影像|时相2影像|FC-EF|FC-Siam-diff|FC-Siam-conc|CustomModel|变化标签|
 |:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-|![](https://user-images.githubusercontent.com/21275753/186671764-2dc990a8-b297-43a2-ae81-e31f2d5582e5.png)|![](https://user-images.githubusercontent.com/21275753/186672204-e8e46e9a-7f29-4506-9ed4-31314284a6fb.png)|![](https://user-images.githubusercontent.com/21275753/186672237-ee5f67d8-8966-457d-8a80-0452bdb7af89.png)|![](https://user-images.githubusercontent.com/21275753/186671987-7da0023a-0c96-413f-9088-0f6730ab54dd.png)|![](https://user-images.githubusercontent.com/21275753/186671895-c6c40196-b86a-49d1-a4b0-48a7f40cba06.png)|![](https://user-images.githubusercontent.com/21275753/186672068-89a60f8c-c80e-4f73-bb3e-b9ad146e795d.png)|![](https://user-images.githubusercontent.com/21275753/186672106-37e8dcd0-b0f0-46e1-90a1-bd5f566ef97b.png)|
-|![](https://user-images.githubusercontent.com/21275753/186672287-efa1209d-2786-4543-b136-5f50b7b0dd8c.png)|![](https://user-images.githubusercontent.com/21275753/186671791-beb82760-8c3f-480f-8ada-9c1081860691.png)|![](https://user-images.githubusercontent.com/21275753/186671861-7b7989e4-15d8-4342-9abe-2d6efa82811a.png)|![](https://user-images.githubusercontent.com/21275753/186672362-94993c68-7c31-4501-b009-755c193a00a8.png)|![](https://user-images.githubusercontent.com/21275753/186672348-3134129c-e2cd-4011-8894-901ef332a43d.png)|![](https://user-images.githubusercontent.com/21275753/186672415-da3984b2-0354-49ad-8dba-9c796a18d282.png)|![](https://user-images.githubusercontent.com/21275753/186672449-fd225e4f-ac58-4506-8b66-3a255567998a.png)|
+|<img src="https://user-images.githubusercontent.com/21275753/186671764-2dc990a8-b297-43a2-ae81-e31f2d5582e5.png" width="100">|<img src="https://user-images.githubusercontent.com/21275753/186672204-e8e46e9a-7f29-4506-9ed4-31314284a6fb.png" width="100">|<img src="https://user-images.githubusercontent.com/21275753/186672237-ee5f67d8-8966-457d-8a80-0452bdb7af89.png" width="100">|<img src="https://user-images.githubusercontent.com/21275753/186671987-7da0023a-0c96-413f-9088-0f6730ab54dd.png" width="100">|<img src="https://user-images.githubusercontent.com/21275753/186671895-c6c40196-b86a-49d1-a4b0-48a7f40cba06.png" width="100">|<img src="https://user-images.githubusercontent.com/21275753/186672068-89a60f8c-c80e-4f73-bb3e-b9ad146e795d.png" width="100">|<img src="https://user-images.githubusercontent.com/21275753/186672106-37e8dcd0-b0f0-46e1-90a1-bd5f566ef97b.png" width="100">|
+|<img src="https://user-images.githubusercontent.com/21275753/186672287-efa1209d-2786-4543-b136-5f50b7b0dd8c.png" width="100">|<img src="https://user-images.githubusercontent.com/21275753/186671791-beb82760-8c3f-480f-8ada-9c1081860691.png" width="100">|<img src="https://user-images.githubusercontent.com/21275753/186671861-7b7989e4-15d8-4342-9abe-2d6efa82811a.png" width="100">|<img src="https://user-images.githubusercontent.com/21275753/186672362-94993c68-7c31-4501-b009-755c193a00a8.png" width="100">|<img src="https://user-images.githubusercontent.com/21275753/186672348-3134129c-e2cd-4011-8894-901ef332a43d.png" width="100">|<img src="https://user-images.githubusercontent.com/21275753/186672415-da3984b2-0354-49ad-8dba-9c796a18d282.png" width="100">|<img src="https://user-images.githubusercontent.com/21275753/186672449-fd225e4f-ac58-4506-8b66-3a255567998a.png" width="100">|
 
 从图中可以看出，虽然结果中仍存在一定程度的漏检与误检，但相比其它算法，CustomModel对变化区域的刻画相对更为准确。
 
@@ -291,15 +294,15 @@ python tools/analyze_model.py --model_dir "exp/levircd/{模型名称}/best_model
 |模型名称|FLOPs（G）|参数量（M）|IoU%|F1%|
 |:-:|:-:|:-:|:-:|:-:|
 |FC-EF|3.57|1.35|79.05|88.30|
-|FC-Siam-diff|4.71|1.35|<u>81.33</u>|<u>89.70</u>|
+|FC-Siam-diff|4.71|1.35|81.33|89.70|
 |FC-Siam-conc|5.31|1.55|81.31|89.69|
 |CustomModel|5.31|1.58|**82.14**|**90.19**|
 
-表中最高的精度指标用粗体表示、次高的指标用下划线标示。从表中可以看出，CustomModel取得了所有算法中最高的IoU和F1分数指标（与FC-EF对比IoU增加3.09%，F1增加1.89%），而其相比baseline FC-Siam-conc仅仅引入0.03 M的额外参数量。
+最高的精度指标用粗体表示。从表中可以看出，CustomModel取得了所有算法中最高的IoU和F1分数指标（与FC-EF对比IoU增加3.09%，F1增加1.89%），而其相比baseline模型FC-Siam-conc仅仅引入0.03 M的额外参数量。
 
 ## 5 消融实验
 
-在科研过程中，为了验证在baseline上所做修改的有效性，常常需要开展消融实验。例如，在本案例中，CustomModel在FC-Siam-conc模型的基础上添加了通道和时间两种注意力模块，因此需要通过消融实验探讨各个注意力模块对最终精度的贡献。具体而言，包括以下4种实验情形（配置文件均存储在`configs/levircd/ablation`目录）：
+在科研过程中，为了验证在baseline上所做修改的有效性，常常需要开展消融实验。在本案例中，CustomModel在FC-Siam-conc模型的基础上添加了通道和时间两种注意力模块，因此需要通过消融实验探讨各个注意力模块对最终精度的贡献。具体而言，包括以下4种实验情形（消融模型相关的配置文件存储在`configs/levircd/ablation`目录）：
 
 1. 基础情况：不使用任何注意力模块，即baseline模型FC-Siam-conc；
 2. 仅添加通道注意力模块，对应的配置文件名称为`custom_model_c.yaml`；
@@ -335,8 +338,6 @@ python run_task.py eval cd \
 
 注意，形如`custom_model_c.yaml`的配置文件默认对应的消融模型名称为`att_c`。
 
-训练程序默认开启VisualDL日志记录功能。训练过程中或训练完成后，可使用VisualDL观察损失函数和精度指标的变化情况。在PaddleRS中使用VisualDL的方式请参考[使用教程](https://github.com/PaddlePaddle/PaddleRS/blob/develop/tutorials/train/README.md#visualdl%E5%8F%AF%E8%A7%86%E5%8C%96%E8%AE%AD%E7%BB%83%E6%8C%87%E6%A0%87)。
-
 ### 5.2 实验结果
 
 实验得到的定量指标如下表所示：
@@ -344,7 +345,7 @@ python run_task.py eval cd \
 |通道注意力模块|时间注意力模块|IoU%|F1%|
 |:-:|:-:|:-:|:-:|
 |||81.31|89.69|
-|✓||<u>81.97</u>|<u>90.09</u>|
+|✓||81.97|90.09|
 ||✓|81.59|89.86|
 |✓|✓|**82.14**|**90.19**|
 
@@ -352,7 +353,7 @@ python run_task.py eval cd \
 
 ## 6 特征可视化实验
 
-本节主要对模型的中间特征进行可视化，以进一步验证对baseline模型所做的修改的确实现了增强特征的效果。
+本节主要对模型的中间特征进行可视化，以进一步验证对baseline模型所做的修改是否实现了增强特征的效果。
 
 ### 6.1 实验过程
 
@@ -398,19 +399,19 @@ python tools/visualize_feats.py \
 
 |时相1影像|时相2影像|变化标签|x1|x2|y1|y2|
 |:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-|![](https://user-images.githubusercontent.com/21275753/186672741-45c819f0-2591-4b97-ad32-05d787be1a0a.png)|![](https://user-images.githubusercontent.com/21275753/186672761-eb6958be-688d-4bc2-839b-6a60cb6cc3b5.png)|![](https://user-images.githubusercontent.com/21275753/186672791-ceb78cf7-5029-4991-88c2-6c4550fb27d8.png)|![](https://user-images.githubusercontent.com/21275753/186672835-7fda3499-33e0-4af1-b990-8d82f6c5c410.png)|![](https://user-images.githubusercontent.com/21275753/186672870-dba57441-509f-4cd0-bcc9-af343ddf07df.png)|![](https://user-images.githubusercontent.com/21275753/186672893-7bc692a7-c963-4686-b93c-895b5c51fecb.png)|![](https://user-images.githubusercontent.com/21275753/186672914-b99ffee3-9eb4-4f95-96f4-93cb00e0b109.png)|
+|<img src="https://user-images.githubusercontent.com/21275753/186672741-45c819f0-2591-4b97-ad32-05d787be1a0a.png" width="100">|<img src="https://user-images.githubusercontent.com/21275753/186672761-eb6958be-688d-4bc2-839b-6a60cb6cc3b5.png" width="100">|<img src="https://user-images.githubusercontent.com/21275753/186672791-ceb78cf7-5029-4991-88c2-6c4550fb27d8.png" width="100">|<img src="https://user-images.githubusercontent.com/21275753/186672835-7fda3499-33e0-4af1-b990-8d82f6c5c410.png" width="100">|<img src="https://user-images.githubusercontent.com/21275753/186672870-dba57441-509f-4cd0-bcc9-af343ddf07df.png" width="100">|<img src="https://user-images.githubusercontent.com/21275753/186672893-7bc692a7-c963-4686-b93c-895b5c51fecb.png" width="100">|<img src="https://user-images.githubusercontent.com/21275753/186672914-b99ffee3-9eb4-4f95-96f4-93cb00e0b109.png" width="100">|
 
 对比x2和y2可以看出，经过通道和时间注意力模块处理后，变化特征得到了增强，发生变化的区域在特征图中更加凸显。
 
-## 5 总结与展望
+## 7 总结与展望
 
-### 5.1 总结
+### 7.1 总结
 
 - 本案例以为经典的FC-Siam-conc模型添加注意力模块为例，演示了使用PaddleRS开展科研工作的典型流程。
-- 本案例中对模型的改进带来了一定的目视效果的改善和检测精度提升。
+- 本案例中对模型的改进带来了一定的目视效果的改善和检测精度的提升。
 - 本案例通过消融实验和特征可视化实验证实了所提出改进的有效性。
 
-### 5.2 展望
+### 7.2 展望
 
 - 本案例对所有参与比较的算法使用了相同的训练超参数，但由于模型之间存在差异，使用统一的超参训练往往难以保证所有模型都能取得较好的效果。在后续工作中，可以对每个对比算法进行调参，使其获得最优精度。
 - 本案例作为使用PaddleRS开展科研工作的简单例子，并未在算法设计上做出较大改进，因此所提出算法相比baseline的精度提升也较为有限。未来可以考虑更复杂的算法设计，以及使用更加先进的模型结构。
