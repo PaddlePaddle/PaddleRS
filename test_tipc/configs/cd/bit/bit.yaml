@@ -1,4 +1,4 @@
-# Basic configurations of BIT with AirChange dataset
+# Basic configurations of BIT
 
 _base_: ../_base_/airchange.yaml
 

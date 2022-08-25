@@ -1,4 +1,4 @@
-# Configurations of BIT with LEVIR-CD dataset
+# Basic configurations of BIT with LEVIR-CD dataset
 
 _base_: ../_base_/levircd.yaml
 

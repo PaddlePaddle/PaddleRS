@@ -13,8 +13,6 @@ from paddle.inference import PrecisionType
 from paddlers.tasks import load_model
 from paddlers.utils import logging
 
-from config_utils import parse_configs
-
 
 class _bool(object):
     def __new__(cls, x):
@@ -287,8 +285,7 @@ class TIPCPredictor(object):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--config', type=str)
-    parser.add_argument('--inherit_off', action='store_true')
+    parser.add_argument('--file_list', type=str, nargs=2)
     parser.add_argument('--model_dir', type=str, default='./')
     parser.add_argument(
         '--device', type=str, choices=['cpu', 'gpu'], default='cpu')
@@ -303,11 +300,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    cfg = parse_configs(args.config, not args.inherit_off)
-    eval_dataset = cfg['datasets']['eval']
-    data_dir = eval_dataset.args['data_dir']
-    file_list = eval_dataset.args['file_list']
-
     predictor = TIPCPredictor(
         args.model_dir,
         device=args.device,
@@ -318,7 +310,7 @@ if __name__ == '__main__':
         trt_precision_mode=args.precision,
         benchmark=args.benchmark)
 
-    predictor.predict(data_dir, file_list)
+    predictor.predict(args.file_list[0], args.file_list[1])
 
     if args.benchmark:
         predictor.autolog.report()
