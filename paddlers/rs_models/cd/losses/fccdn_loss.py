@@ -110,27 +110,32 @@ class McDiceBCELoss(nn.Layer):
         return diceloss + bceloss
 
 
-def fccdn_ssl_loss(scores, labels):
+def fccdn_ssl_loss(logits_list, labels):
     """
-    FCCDN change detection self-supervised learning loss
+    Self-supervised learning loss for change detection.
+
+    The original article refers to
+        Pan Chen, et al., "FCCDN: Feature Constraint Network for VHR Image Change Detection"
+        (https://arxiv.org/pdf/2105.10860.pdf).
+        
     Args:
-        scores (list) = model(input)[1] = [y1, y2]
-        labels (tensor-int64) = binary_cd_labels
+        logits_list (list[paddle.Tensor]): Single-channel segmentation logit maps for each of the two temporal phases.
+        labels (paddle.Tensor): Binary change labels.
     """
 
     # Create loss
     criterion_ssl = DiceBCELoss()
 
     # Get downsampled change map
-    h, w = scores[0].shape[-2], scores[0].shape[-1]
+    h, w = logits_list[0].shape[-2], logits_list[0].shape[-1]
     labels_downsample = F.interpolate(x=labels.unsqueeze(1), size=[h, w])
     labels_type = str(labels_downsample.dtype)
     assert "int" in labels_type or "bool" in labels_type,\
-        f"Expect labels type int or bool, but the type is {labels_type}"
+        f"Expected dtype of labels to be int or bool, but got {labels_type}"
 
     # Seg map
-    out1 = paddle.nn.functional.sigmoid(scores[0]).clone()
-    out2 = paddle.nn.functional.sigmoid(scores[1]).clone()
+    out1 = paddle.nn.functional.sigmoid(logits_list[0]).clone()
+    out2 = paddle.nn.functional.sigmoid(logits_list[1]).clone()
     out3 = out1.clone()
     out4 = out2.clone()
 
