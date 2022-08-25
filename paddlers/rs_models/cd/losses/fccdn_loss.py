@@ -114,7 +114,7 @@ def fccdn_ssl_loss(scores, labels):
     """
     FCCDN change detection self-supervised learning loss
     Args:
-        scores (list) = model(input) = [y1, y2]
+        scores (list) = model(input)[1] = [y1, y2]
         labels (tensor-int64) = binary_cd_labels
     """
 
@@ -124,6 +124,9 @@ def fccdn_ssl_loss(scores, labels):
     # Get downsampled change map
     h, w = scores[0].shape[-2], scores[0].shape[-1]
     labels_downsample = F.interpolate(x=labels.unsqueeze(1), size=[h, w])
+    labels_type = str(labels_downsample.dtype)
+    assert "int" in labels_type or "bool" in labels_type,\
+        f"Expect labels type int or bool, but the type is {labels_type}"
 
     # Seg map
     out1 = paddle.nn.functional.sigmoid(scores[0]).clone()

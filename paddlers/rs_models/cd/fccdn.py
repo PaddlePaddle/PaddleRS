@@ -361,10 +361,10 @@ class FCCDN(nn.Layer):
         (https://arxiv.org/pdf/2105.10860.pdf).
 
     Args:
-        in_channels (int): Number of input channels(default: 3).
-        num_classes (int): Number of target classes(default: 2).
-        os (int): Number of output stride(default: 16).
-        use_se (bool): Whether to use SEModule(default: True).
+        in_channels (int): Number of input channels. Default: 3.
+        num_classes (int): Number of target classes. Default: 2.
+        os (int): Number of output stride. Default: 16.
+        use_se (bool): Whether to use SEModule. Default: True.
     """
 
     def __init__(self, in_channels=3, num_classes=2, os=16, use_se=True):
