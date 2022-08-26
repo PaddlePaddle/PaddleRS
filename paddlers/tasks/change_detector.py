@@ -52,9 +52,7 @@ class BaseChangeDetector(BaseModel):
         if 'with_net' in self.init_params:
             del self.init_params['with_net']
         super(BaseChangeDetector, self).__init__('change_detector')
-        if model_name not in __all__:
-            raise ValueError("ERROR: There is no model named {}.".format(
-                model_name))
+
         self.model_name = model_name
         self.num_classes = num_classes
         self.use_mixed_loss = use_mixed_loss

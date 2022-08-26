@@ -76,8 +76,7 @@ test_dataset = pdrs.datasets.CDDataset(
 
 # 构建自定义模型CustomModel并为其自动生成训练器
 # make_trainer()的首个参数为模型类型，剩余参数为模型构造所需参数
-# 这里使用默认参数构造
-model = make_trainer(CustomModel)
+model = make_trainer(CustomModel, in_channels=3)
 
 # 构建学习率调度器
 # 使用定步长学习率衰减策略
@@ -86,7 +85,7 @@ lr_scheduler = paddle.optimizer.lr.StepDecay(
 
 # 构建优化器
 optimizer = paddle.optimizer.Adam(
-    model.net.parameters(), learning_rate=lr_scheduler)
+    parameters=model.net.parameters(), learning_rate=lr_scheduler)
 
 # 执行模型训练
 model.train(
