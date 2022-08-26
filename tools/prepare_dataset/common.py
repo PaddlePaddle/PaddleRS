@@ -11,6 +11,15 @@ from tqdm import tqdm
 
 
 def get_default_parser():
+    """
+    Get argument parser with commonly used options.
+    
+    Returns:
+        argparse.ArgumentParser: Argument parser with the following arguments:
+            --in_dataset_dir: Input dataset directory.
+            --out_dataset_dir: Output dataset directory.
+    """
+
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--in_dataset_dir',
@@ -23,6 +32,19 @@ def get_default_parser():
 
 
 def add_crop_options(parser):
+    """
+    Add patch cropping related arguments to an argument parser. The parser will be
+        modified in place.
+    
+    Args:
+        parser (argparse.ArgumentParser): Argument parser.
+    
+    Returns:
+        argparse.ArgumentParser: Argument parser with the following arguments:
+            --crop_size: Size of cropped patches.
+            --crop_stride: Stride of sliding windows when cropping patches.
+    """
+
     parser.add_argument(
         '--crop_size', type=int, help="Size of cropped patches.")
     parser.add_argument(
@@ -58,8 +80,33 @@ def crop_patches(crop_size,
                  subdirs=('A', 'B', 'label'),
                  glob_pattern='*',
                  max_workers=0):
+    """
+    Crop patches from images in specific directories.
+    
+    Args:
+        crop_size (int): Height and width of the cropped patches will be `crop_size`.
+        stride (int): Stride of sliding windows when cropping patches.
+        data_dir (str): Root directory of the dataset that contains the input images.
+        out_dir (str): Directory to save the cropped patches.
+        subsets (tuple|list|None, optional): List or tuple of names of subdirectories 
+            or None. Images to be cropped should be stored in `data_dir/subset/subdir/` 
+            or `data_dir/subdir/` (when `subsets` is set to None), where `subset` is an 
+            element of `subsets`. Defaults to ('train', 'val', 'test').
+        subdirs (tuple|list, optional): List or tuple of names of subdirectories. Images 
+            to be cropped should be stored in `data_dir/subset/subdir/` or 
+            `data_dir/subdir/` (when `subsets` is set to None), where `subdir` is an 
+            element of `subdirs`. Defaults to ('A', 'B', 'label').
+        glob_pattern (str, optional): Glob pattern used to match image files. 
+            Defaults to '*', which matches arbitrary file. 
+        max_workers (int, optional): Number of worker threads to perform the cropping 
+            operation. Deafults to 0.
+    """
+
     if max_workers < 0:
         raise ValueError("`max_workers` must be a non-negative integer!")
+
+    if subset is None:
+        subsets = ('', )
 
     if max_workers == 0:
         for subset in subsets:
@@ -95,6 +142,34 @@ def crop_patches(crop_size,
 
 
 def get_path_tuples(*dirs, glob_pattern='*', data_dir=None):
+    """
+    Get tuples of image paths. Each tuple corresponds to a sample in the dataset.
+    
+    Args:
+        *dirs (str): Directories that contains the images.
+        glob_pattern (str, optional): Glob pattern used to match image files. 
+            Defaults to '*', which matches arbitrary file. 
+        data_dir (str|None, optional): Root directory of the dataset that 
+            contains the images. If not None, `data_dir` will be used to 
+            determine relative paths of images. Defaults to None.
+    
+    Returns:
+        list[tuple]: For directories with the following structure:
+            ├── img  
+            │   ├── im1.png
+            │   ├── im2.png
+            │   └── im3.png
+            │
+            ├── mask
+            │   ├── im1.png
+            │   ├── im2.png
+            │   └── im3.png
+            └── ...
+
+        `get_path_tuples('img', 'mask', '*.png')` will return list of tuples:
+            [('img/im1.png', 'mask/im1.png'), ('img/im2.png', 'mask/im2.png'), ('img/im3.png', 'mask/im3.png')]
+    """
+
     all_paths = []
     for dir_ in dirs:
         paths = glob(osp.join(dir_, glob_pattern), recursive=True)
@@ -107,6 +182,16 @@ def get_path_tuples(*dirs, glob_pattern='*', data_dir=None):
 
 
 def create_file_list(file_list, path_tuples, sep=' '):
+    """
+    Create file list.
+    
+    Args:
+        file_list (str): Path of file list to create.
+        path_tuples (list[tuple]): See get_path_tuples().
+        sep (str, optional): Delimiter to use when writing lines to file list. 
+            Defaults to ' '.
+    """
+
     with open(file_list, 'w') as f:
         for tup in path_tuples:
             line = sep.join(tup)
@@ -114,6 +199,14 @@ def create_file_list(file_list, path_tuples, sep=' '):
 
 
 def link_dataset(src, dst):
+    """
+    Make a symbolic link to a dataset.
+    
+    Args:
+        src (str): Path of the original dataset.
+        dst (str): Path of the symbolic link.
+    """
+
     if osp.exists(dst) and not osp.isdir(dst):
         raise ValueError(f"{dst} exists and is not a directory.")
     elif not osp.exists(dst):
