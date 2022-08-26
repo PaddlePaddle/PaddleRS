@@ -914,9 +914,9 @@ class Normalize(Transform):
         std (list[float] | tuple[float], optional): Standard deviation of input 
             image(s). Defaults to [0.229, 0.224, 0.225].
         min_val (list[float] | tuple[float], optional): Minimum value of input 
-            image(s). Defaults to [0, 0, 0, ].
-        max_val (list[float] | tuple[float], optional): Max value of input image(s). 
-            Defaults to [255., 255., 255.].
+            image(s). If None, use 0 for all channels. Defaults to None.
+        max_val (list[float] | tuple[float], optional): Maximum value of input 
+            image(s). If None, use 255. for all channels. Defaults to None.
         apply_to_tar (bool, optional): Whether to apply transformation to the target
             image. Defaults to True.
     """

@@ -38,7 +38,7 @@ from .utils.infer_nets import InferCDNet
 
 __all__ = [
     "CDNet", "FCEarlyFusion", "FCSiamConc", "FCSiamDiff", "STANet", "BIT",
-    "SNUNet", "DSIFN", "DSAMNet", "ChangeStar", "ChangeFormer"
+    "SNUNet", "DSIFN", "DSAMNet", "ChangeStar", "ChangeFormer", "FCCDN"
 ]
 
 
@@ -1062,7 +1062,7 @@ class ChangeStar(BaseChangeDetector):
         if self.use_mixed_loss is False:
             return {
                 # XXX: make sure the shallow copy works correctly here.
-                'types': [seglosses.CrossEntropyLoss()] * 4,
+                'types': [seg_losses.CrossEntropyLoss()] * 4,
                 'coef': [1.0] * 4
             }
         else:
@@ -1089,3 +1089,31 @@ class ChangeFormer(BaseChangeDetector):
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
             **params)
+
+
+class FCCDN(BaseChangeDetector):
+    def __init__(self,
+                 in_channels=3,
+                 num_classes=2,
+                 use_mixed_loss=False,
+                 losses=None,
+                 **params):
+        params.update({'in_channels': in_channels})
+        super(FCCDN, self).__init__(
+            model_name='FCCDN',
+            num_classes=num_classes,
+            use_mixed_loss=use_mixed_loss,
+            losses=losses,
+            **params)
+
+    def default_loss(self):
+        if self.use_mixed_loss is False:
+            return {
+                'types':
+                [seg_losses.CrossEntropyLoss(), cmcd.losses.fccdn_ssl_loss],
+                'coef': [1.0, 1.0]
+            }
+        else:
+            raise ValueError(
+                f"Currently `use_mixed_loss` must be set to False for {self.__class__}"
+            )

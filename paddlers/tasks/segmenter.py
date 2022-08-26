@@ -827,7 +827,7 @@ class DeepLabV3P(BaseSegmenter):
         if params.get('with_net', True):
             with DisablePrint():
                 backbone = getattr(ppseg.models, backbone)(
-                    input_channel=input_channel, output_stride=output_stride)
+                    input_channel=in_channels, output_stride=output_stride)
         else:
             backbone = None
         params.update({
