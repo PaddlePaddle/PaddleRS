@@ -4,7 +4,7 @@
 
 ## 1 环境配置
 
-根据[教程](https://github.com/PaddlePaddle/PaddleRS/tree/develop/tutorials/train#环境准备)安装PaddleRS及相关依赖。在本项目中，GDAL库并不是必需的。
+根据[教程](https://github.com/PaddlePaddle/PaddleRS/tree/develop/tutorials/train#环境准备)安装PaddleRS及相关依赖。在本案例中，GDAL库并不是必需的。
 
 配置好环境后，在PaddleRS仓库根目录中执行如下指令切换到本案例所在目录：
 
@@ -57,8 +57,6 @@ FC-Siam-conc的网络结构如图所示：
 ### 3.2 模型定义
 
 本小节基于PaddlePaddle框架与PaddleRS库实现[3.1节](#31-问题分析与思路拟定)中提出的想法。
-
-#### 3.2.1 自定义模型组网
 
 在`custom_model.py`中定义模型的整体结构以及组成模型的各个模块。本案例在`custom_model.py`中定义了改进后的FC-Siam-conc结构，其核心部分实现如下：
 
@@ -164,9 +162,39 @@ class MixedAttention(nn.Layer):
 
 关于模型定义的更多细节请参考[《开发指南》](https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/dev/dev_guide.md)。
 
-#### 3.2.2 自定义训练器
+## 4 模型训练
 
-在`custom_trainer.py`中定义训练器。例如，本案例中，`custom_trainer.py`中定义了与`CustomModel`模型对应的训练器：
+本案例提供两种模型训练方式：基于脚本编写的方式与基于配置文件的方式。
+
+- 对于初学者，建议使用脚本编写的方式：该方式更易理解，代码逻辑简单，且无需编写自定义训练器。
+- 对于较为熟练的科研者，或者是有开展大量对比实验、消融实验需求的科研者，建议使用基于配置文件的方式：该方式能够更方便地管理模型的不同配置，且易于并行执行多组实验。
+
+需要说明的是，本文档中的实验结果均来自以基于配置文件方式训练的模型。本案例提供了本文档中涉及的全部实验的配置文件，存储在`configs`目录中。
+
+### 4.1 基于脚本编写的方式
+
+本案例提供`train_cd.py`脚本对模型进行训练和验证，并汇报验证集上最优模型在测试集上的精度。通过如下指令执行脚本：
+
+```bash
+python train_cd.py
+```
+
+阅读脚本中的注释有助于使用者理解每个步骤的含义。脚本默认实现LEVIR-CD数据集上对自定义模型CustomModel的训练和验证。在实验过程中，可以根据需要修改脚本中的部分代码，以实现超参数调优或是对不同模型进行训练的功能。
+
+训练程序默认开启VisualDL日志记录功能。训练过程中或训练完成后，可使用VisualDL观察损失函数和精度指标的变化情况。在PaddleRS中使用VisualDL的方式请参考[使用教程](https://github.com/PaddlePaddle/PaddleRS/blob/develop/tutorials/train/README.md#visualdl%E5%8F%AF%E8%A7%86%E5%8C%96%E8%AE%AD%E7%BB%83%E6%8C%87%E6%A0%87)。
+
+### 4.2 基于配置文件的方式
+
+#### 4.2.1 配置文件编写
+
+本案例提供一个基于[YAML][https://yaml.org/]的轻量级配置系统，使用者可以通过修改yaml文件达到调整超参数、更换模型、更换数据集等目的，或通过编写yaml文件增加新的配置。
+
+关于本案例中配置文件的编写规则，请参考[此项目](https://aistudio.baidu.com/aistudio/projectdetail/4203534)。
+
+#### 4.2.2 自定义训练器
+
+在使用基于配置文件方式进行模型训练时，需要在`custom_trainer.py`中定义训练器。例如，本案例在`custom_trainer.py`中定义了与`CustomModel`模型对应的训练器：
+
 ```python
 @attach
 class CustomTrainer(BaseChangeDetector):
@@ -201,19 +229,20 @@ class CustomTrainer(BaseChangeDetector):
 
 关于训练器的更多细节请参考[《API文档》](https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/train.md)。
 
-## 4 对比实验
+配置文件中的`model`项可以指定训练器名称与构造参数。例如：
 
-为了验证模型设计的有效性，通常需要开展对比实验，在一个或多个数据集上比较所提出模型与其它模型的精度和性能。在本案例中，将自定义模型CustomModel与FC-EF、FC-Siam-diff、FC-Siam-conc三种结构进行比较，这三个模型均来自论文[4]。
-
-### 4.1 实验过程
-
-使用如下指令在LEVIR-CD数据集上执行对所有参与对比的模型的训练：
-
-```bash
-bash scripts/run_benchmark.sh
+```yaml
+model: !Node
+    type: CustomTrainer
+    args:
+        att_types: c
 ```
 
-或者，可以按照以下格式执行对某个模型的训练：
+上述配置指定构造这样的一个训练器对象：`CustomTrainer(att_types=c)`。
+
+#### 4.2.3 训练指令
+
+按照以下格式执行对某个模型的训练：
 
 ```bash
 python run_task.py train cd \
@@ -230,7 +259,19 @@ python run_task.py eval cd \
     --resume_checkpoint "exp/levircd/{模型名称}/best_model"
 ```
 
-训练程序默认开启VisualDL日志记录功能。训练过程中或训练完成后，可使用VisualDL观察损失函数和精度指标的变化情况。在PaddleRS中使用VisualDL的方式请参考[使用教程](https://github.com/PaddlePaddle/PaddleRS/blob/develop/tutorials/train/README.md#visualdl%E5%8F%AF%E8%A7%86%E5%8C%96%E8%AE%AD%E7%BB%83%E6%8C%87%E6%A0%87)。
+## 5 对比实验
+
+为了验证模型设计的有效性，通常需要开展对比实验，在一个或多个数据集上比较所提出模型与其它模型的精度和性能。在本案例中，将自定义模型CustomModel与FC-EF、FC-Siam-diff、FC-Siam-conc三种结构进行比较，这三个模型均来自论文[4]。
+
+### 5.1 实验过程
+
+**当使用基于配置文件的方式进行模型训练和验证时**，可以通过如下指令在LEVIR-CD数据集上执行对所有参与对比的模型的训练：
+
+```bash
+bash scripts/run_benchmark.sh
+```
+
+**当使用`train_cd.py`脚本进行模型训练和验证时**，需要为每个实验手动更改模型的类型和构造参数。此外，可通过修改`EXP_DIR`变量为不同值，将每个模型对应的结果保存到不同的目录中，方便比较。本小节中的指令示例均假设实验过程中将`EXP_DIR`设置为`exp/levircd/{模型名称}`。
 
 在训练和精度指标验证完成后，可以通过如下指令保存模型输出的二值变化图：
 
@@ -274,11 +315,11 @@ python tools/collect_imgs.py --globs "exp/predict/levircd/{新增模型名称}/*
 python tools/analyze_model.py --model_dir "exp/levircd/{模型名称}/best_model"
 ```
 
-### 4.2 实验结果
+### 5.2 实验结果
 
 本案例使用变化类的[交并比（intersection over union, IoU）](https://paddlepedia.readthedocs.io/en/latest/tutorials/computer_vision/semantic_segmentation/Overview/Overview.html#id6)和[F1分数](https://baike.baidu.com/item/F1%E5%88%86%E6%95%B0/13864979)作为定量评价指标，这两个指标越高，表示算法的检测效果越好。在每个数据集上，从目视效果和定量指标两个方面对算法效果进行评判。
 
-#### 4.2.1 目视效果对比
+#### 5.2.1 目视效果对比
 
 下图展示了两个时相的输入影像、各算法输出的二值变化图（binary change map）以及变化标签。所选取的样本均来自LEVIR-CD数据集的测试集。
 
@@ -289,7 +330,7 @@ python tools/analyze_model.py --model_dir "exp/levircd/{模型名称}/best_model
 
 从图中可以看出，虽然结果中仍存在一定程度的漏检与误检，但相比其它算法，CustomModel对变化区域的刻画相对更为准确。
 
-#### 4.2.2 定量指标对比
+#### 5.2.2 定量指标对比
 
 |模型名称|FLOPs（G）|参数量（M）|IoU%|F1%|
 |:-:|:-:|:-:|:-:|:-:|
@@ -300,7 +341,7 @@ python tools/analyze_model.py --model_dir "exp/levircd/{模型名称}/best_model
 
 最高的精度指标用粗体表示。从表中可以看出，CustomModel取得了所有算法中最高的IoU和F1分数指标（与FC-EF对比IoU增加3.09%，F1增加1.89%），而其相比baseline模型FC-Siam-conc仅仅引入0.03 M的额外参数量。
 
-## 5 消融实验
+## 6 消融实验
 
 在科研过程中，为了验证在baseline上所做修改的有效性，常常需要开展消融实验。在本案例中，CustomModel在FC-Siam-conc模型的基础上添加了通道和时间两种注意力模块，因此需要通过消融实验探讨各个注意力模块对最终精度的贡献。具体而言，包括以下4种实验情形（消融模型相关的配置文件存储在`configs/levircd/ablation`目录）：
 
@@ -309,11 +350,11 @@ python tools/analyze_model.py --model_dir "exp/levircd/{模型名称}/best_model
 3. 仅添加时间注意力模块，对应的配置文件名称为`custom_model_t.yaml`；
 4. 标准情况：同时添加通道和时间注意力模块的完整模型。
 
-其中第1和第4个模型，即baseline和完整模型，在[第4节](#4-对比实验)中已经得到了训练、验证和测试。因此，本节只需要关注情形2、3。
+其中第1和第4个模型，即baseline和完整模型，在[第4节](#4-模型训练)和[第5节](#5-对比实验)中已经得到了训练、验证和测试。因此，本节只需要关注情形2、3。
 
-### 5.1 实验过程
+### 6.1 实验过程
 
-使用如下指令执行全部消融模型的训练：
+**当使用基于配置文件的方式进行模型训练时**，可通过如下指令训练全部消融模型：
 
 ```bash
 bash scripts/run_ablation.sh
@@ -338,7 +379,9 @@ python run_task.py eval cd \
 
 注意，形如`custom_model_c.yaml`的配置文件默认对应的消融模型名称为`att_c`。
 
-### 5.2 实验结果
+**当使用`train_cd.py`进行模型训练时**，需要修改模型构造时的`att_types`参数，以得到不同消融模型的结果。例如，对于仅添加通道注意力模块的消融模型，应设置`att_types='c'`。此外，可通过修改`EXP_DIR`变量为不同值，将每个实验的结果保存到不同的目录中，方便比较。
+
+### 6.2 实验结果
 
 实验得到的定量指标如下表所示：
 
@@ -351,11 +394,11 @@ python run_task.py eval cd \
 
 从表中数据可知，无论是通道注意力模块还是时间注意力模块都能对算法的IoU和F1分数指标带来正面贡献，而同时添加两种注意力模块带来的增益是最大的（相比baseline模型IoU增加0.83%，F1分数增加0.50%）。
 
-## 6 特征可视化实验
+## 7 特征可视化实验
 
 本节主要对模型的中间特征进行可视化，以进一步验证对baseline模型所做的修改是否实现了增强特征的效果。
 
-### 6.1 实验过程
+### 7.1 实验过程
 
 通过`tools/visualize_feats.py`脚本实现对模型中间特征的可视化。该脚本接受如下命令行选项：
 - `--model_dir`指定需要加载的模型的存储路径。
@@ -393,7 +436,7 @@ python tools/visualize_feats.py \
 
 执行上述指令将在`exp/vis/test_13_3/{模型名称}`目录中产生2个子目录，每个子目录中有2个文件，其中`in/att4_0_0_vis.png`和`in/att4_1_0_vis.png`分别表示输入`att4`模块的两个时相特征的可视化结果，`out/att4_0_0_vis.png`和`out/att4_1_0_vis.png`分别表示`att4`模块输出的两个时相特征的可视化结果。
 
-### 6.2 实验结果
+### 7.2 实验结果
 
 下图从左往右分别为两个时相的输入影像、变化标签、输入混合注意力模块`att4`的两个时相特征图的可视化结果（分别用x1和x2代指）以及`att4`输出的两个时相特征图的可视化结果（分别用y1和y2代指）：
 
@@ -403,15 +446,15 @@ python tools/visualize_feats.py \
 
 对比x2和y2可以看出，经过通道和时间注意力模块处理后，变化特征得到了增强，发生变化的区域在特征图中更加凸显。
 
-## 7 总结与展望
+## 8 总结与展望
 
-### 7.1 总结
+### 8.1 总结
 
 - 本案例以为经典的FC-Siam-conc模型添加注意力模块为例，演示了使用PaddleRS开展科研工作的典型流程。
 - 本案例中对模型的改进带来了一定的目视效果的改善和检测精度的提升。
 - 本案例通过消融实验和特征可视化实验证实了所提出改进的有效性。
 
-### 7.2 展望
+### 8.2 展望
 
 - 本案例对所有参与比较的算法使用了相同的训练超参数，但由于模型之间存在差异，使用统一的超参训练往往难以保证所有模型都能取得较好的效果。在后续工作中，可以对每个对比算法进行调参，使其获得最优精度。
 - 本案例作为使用PaddleRS开展科研工作的简单例子，并未在算法设计上做出较大改进，因此所提出算法相比baseline的精度提升也较为有限。未来可以考虑更复杂的算法设计，以及使用更加先进的模型结构。

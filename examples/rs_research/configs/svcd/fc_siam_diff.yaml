@@ -1,6 +1,0 @@
-_base_: ./svcd.yaml
-
-save_dir: ./exp/svcd/fc_siam_diff/
-
-model: !Node
-    type: FCSiamDiff
