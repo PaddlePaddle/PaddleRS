@@ -187,7 +187,7 @@ python train_cd.py
 
 #### 4.2.1 配置文件编写
 
-本案例提供一个基于[YAML][https://yaml.org/]的轻量级配置系统，使用者可以通过修改yaml文件达到调整超参数、更换模型、更换数据集等目的，或通过编写yaml文件增加新的配置。
+本案例提供一个基于[YAML](https://yaml.org/)的轻量级配置系统，使用者可以通过修改yaml文件达到调整超参数、更换模型、更换数据集等目的，或通过编写yaml文件增加新的配置。
 
 关于本案例中配置文件的编写规则，请参考[此项目](https://aistudio.baidu.com/aistudio/projectdetail/4203534)。
 
