@@ -27,7 +27,6 @@ DATA_DIR='./test_tipc/data/'
 mkdir -p "${DATA_DIR}"
 if [[ ${MODE} == 'lite_train_lite_infer' \
     || ${MODE} == 'lite_train_whole_infer' \
-    || ${MODE} == 'whole_train_whole_infer' \
     || ${MODE} == 'whole_infer' ]]; then
 
     if [[ ${task_name} == 'cd' ]]; then
@@ -38,6 +37,17 @@ if [[ ${MODE} == 'lite_train_lite_infer' \
         download_and_unzip_dataset "${DATA_DIR}" sarship https://paddlers.bj.bcebos.com/datasets/sarship.zip
     elif [[ ${task_name} == 'seg' ]]; then
         download_and_unzip_dataset "${DATA_DIR}" rsseg https://paddlers.bj.bcebos.com/datasets/rsseg_mini.zip
+    fi
+
+elif [[ ${MODE} == 'whole_train_whole_infer' ]]; then
+
+    if [[ ${task_name} == 'cd' ]]; then
+        download_and_unzip_dataset "${DATA_DIR}" raw_levircd https://paddlers.bj.bcebos.com/datasets/raw/LEVIR-CD.zip \
+        && python tools/prepare_dataset/prepare_levircd.py \
+            --in_dataset_dir "${DATA_DIR}/raw_levircd" \
+            --out_dataset_dir "${DATA_DIR}/levircd" \
+            --crop_size 256 \
+            --crop_stride 256
     fi
 
 fi

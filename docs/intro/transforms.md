@@ -12,7 +12,7 @@ PaddleRS对不同遥感任务需要的数据预处理/数据增强（合称为�
 | RandomResizeByShort  | 随机调整输入影像大小，保持纵横比不变（根据短边计算缩放系数）。 | 所有任务 | ... |
 | ResizeByLong         | 调整输入影像大小，保持纵横比不变（根据长边计算缩放系数）。 | 所有任务 | ... |
 | RandomHorizontalFlip | 随机水平翻转输入影像。 | 所有任务 | ... |
-| RandomVerticalFlip   | 随机竖直翻转输入影像。 | 所有任务 | ... |
+| RandomVerticalFlip   | 随机垂直翻转输入影像。 | 所有任务 | ... |
 | Normalize            | 对输入影像应用标准化。 | 所有任务 | ... |
 | CenterCrop           | 对输入影像进行中心裁剪。 | 所有任务 | ... |
 | RandomCrop           | 对输入影像进行随机中心裁剪。 | 所有任务 | ... |

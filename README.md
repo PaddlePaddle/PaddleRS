@@ -200,8 +200,7 @@ PaddleRS目录树中关键部分如下：
   * [Python部署](./deploy/README.md)
   * [模型推理API说明](./docs/apis/infer.md)
 * 实践案例
-  * [遥感影像变化检测案例](./docs/cases/csc_cd_cn.md)
-  * [遥感影像超分辨率重建案例](./docs/cases/sr_seg_cn.md)
+  * [PaddleRS实践案例库](./examples/README.md)
 * 代码贡献
   * [贡献指南](./docs/CONTRIBUTING.md)
   * [开发指南](./docs/dev/dev_guide.md)

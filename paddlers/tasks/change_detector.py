@@ -52,9 +52,7 @@ class BaseChangeDetector(BaseModel):
         if 'with_net' in self.init_params:
             del self.init_params['with_net']
         super(BaseChangeDetector, self).__init__('change_detector')
-        if model_name not in __all__:
-            raise ValueError("ERROR: There is no model named {}.".format(
-                model_name))
+
         self.model_name = model_name
         self.num_classes = num_classes
         self.use_mixed_loss = use_mixed_loss
@@ -1066,11 +1064,12 @@ class ChangeStar(BaseChangeDetector):
 
 class ChangeFormer(BaseChangeDetector):
     def __init__(self,
-                 in_channels=3,
                  num_classes=2,
+                 use_mixed_loss=False,
+                 losses=None,
+                 in_channels=3,
                  decoder_softmax=False,
                  embed_dim=256,
-                 use_mixed_loss=False,
                  **params):
         params.update({
             'in_channels': in_channels,
@@ -1081,6 +1080,7 @@ class ChangeFormer(BaseChangeDetector):
             model_name='ChangeFormer',
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
+            losses=losses,
             **params)
 
 
