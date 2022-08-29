@@ -1,10 +1,10 @@
-#   Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#    http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,15 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import copy
+import paddle
+import paddle.nn as nn
 
-from ....models.ppgan.utils.registry import Registry
-
-GENERATORS = Registry("GENERATOR")
+from paddlers.models.ppgan.modules.init import reset_parameters
 
 
-def build_generator(cfg):
-    cfg_copy = copy.deepcopy(cfg)
-    name = cfg_copy.pop('name')
-    generator = GENERATORS.get(name)(**cfg_copy)
-    return generator
+def init_sr_weight(net):
+    def reset_func(m):
+        if hasattr(m, 'weight') and (
+                not isinstance(m, (nn.BatchNorm, nn.BatchNorm2D))):
+            reset_parameters(m)
+
+    net.apply(reset_func)

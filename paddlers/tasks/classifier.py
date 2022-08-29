@@ -83,6 +83,11 @@ class BaseClassifier(BaseModel):
                 self.in_channels = 3
         return net
 
+    def _build_inference_net(self):
+        infer_net = self.net
+        infer_net.eval()
+        return infer_net
+
     def _fix_transforms_shape(self, image_shape):
         if hasattr(self, 'test_transforms'):
             if self.test_transforms is not None:
@@ -373,7 +378,8 @@ class BaseClassifier(BaseModel):
                 Defaults to False.
 
         Returns:
-            collections.OrderedDict with key-value pairs:
+            If `return_details` is False, return collections.OrderedDict with 
+                key-value pairs:
                 {"top1": `acc of top1`,
                  "top5": `acc of top5`}.
         """
@@ -389,38 +395,37 @@ class BaseClassifier(BaseModel):
             ):
                 paddle.distributed.init_parallel_env()
 
-        batch_size_each_card = get_single_card_bs(batch_size)
-        if batch_size_each_card > 1:
-            batch_size_each_card = 1
-            batch_size = batch_size_each_card * paddlers.env_info['num']
+        if batch_size > 1:
             logging.warning(
-                "Classifier only supports batch_size=1 for each gpu/cpu card " \
-                "during evaluation, so batch_size " \
-                "is forcibly set to {}.".format(batch_size))
-        self.eval_data_loader = self.build_data_loader(
-            eval_dataset, batch_size=batch_size, mode='eval')
+                "Classifier only supports single card evaluation with batch_size=1 "
+                "during evaluation, so batch_size is forcibly set to 1.")
+            batch_size = 1
 
-        logging.info(
-            "Start to evaluate(total_samples={}, total_steps={})...".format(
-                eval_dataset.num_samples,
-                math.ceil(eval_dataset.num_samples * 1.0 / batch_size)))
+        if nranks < 2 or local_rank == 0:
+            self.eval_data_loader = self.build_data_loader(
+                eval_dataset, batch_size=batch_size, mode='eval')
+            logging.info(
+                "Start to evaluate(total_samples={}, total_steps={})...".format(
+                    eval_dataset.num_samples, eval_dataset.num_samples))
 
-        top1s = []
-        top5s = []
-        with paddle.no_grad():
-            for step, data in enumerate(self.eval_data_loader):
-                data.append(eval_dataset.transforms.transforms)
-                outputs = self.run(self.net, data, 'eval')
-                top1s.append(outputs["top1"])
-                top5s.append(outputs["top5"])
+            top1s = []
+            top5s = []
+            with paddle.no_grad():
+                for step, data in enumerate(self.eval_data_loader):
+                    data.append(eval_dataset.transforms.transforms)
+                    outputs = self.run(self.net, data, 'eval')
+                    top1s.append(outputs["top1"])
+                    top5s.append(outputs["top5"])
 
-        top1 = np.mean(top1s)
-        top5 = np.mean(top5s)
-        eval_metrics = OrderedDict(zip(['top1', 'top5'], [top1, top5]))
-        if return_details:
-            # TODO: add details
-            return eval_metrics, None
-        return eval_metrics
+            top1 = np.mean(top1s)
+            top5 = np.mean(top5s)
+            eval_metrics = OrderedDict(zip(['top1', 'top5'], [top1, top5]))
+
+            if return_details:
+                # TODO: Add details
+                return eval_metrics, None
+
+            return eval_metrics
 
     def predict(self, img_file, transforms=None):
         """
@@ -435,16 +440,14 @@ class BaseClassifier(BaseModel):
                 Defaults to None.
 
         Returns:
-            If `img_file` is a string or np.array, the result is a dict with key-value 
-                pairs:
-                {"label map": `class_ids_map`, 
-                 "scores_map": `scores_map`, 
-                 "label_names_map": `label_names_map`}.
+            If `img_file` is a string or np.array, the result is a dict with the 
+                following key-value pairs:
+                class_ids_map (np.ndarray): IDs of predicted classes.
+                scores_map (np.ndarray): Scores of predicted classes.
+                label_names_map (np.ndarray): Names of predicted classes.
+            
             If `img_file` is a list, the result is a list composed of dicts with the 
-                corresponding fields:
-                class_ids_map (np.ndarray): class_ids
-                scores_map (np.ndarray): scores
-                label_names_map (np.ndarray): label_names
+                above keys.
         """
 
         if transforms is None and not hasattr(self, 'test_transforms'):
@@ -554,6 +557,26 @@ class BaseClassifier(BaseModel):
                           paddlers.transforms.ArrangeClassifier):
             raise TypeError(
                 "`transforms.arrange` must be an ArrangeClassifier object.")
+
+    def build_data_loader(self, dataset, batch_size, mode='train'):
+        if dataset.num_samples < batch_size:
+            raise ValueError(
+                'The volume of dataset({}) must be larger than batch size({}).'
+                .format(dataset.num_samples, batch_size))
+
+        if mode != 'train':
+            return paddle.io.DataLoader(
+                dataset,
+                batch_size=batch_size,
+                shuffle=dataset.shuffle,
+                drop_last=False,
+                collate_fn=dataset.batch_transforms,
+                num_workers=dataset.num_workers,
+                return_list=True,
+                use_shared_memory=False)
+        else:
+            return super(BaseClassifier, self).build_data_loader(
+                dataset, batch_size, mode)
 
 
 class ResNet50_vd(BaseClassifier):

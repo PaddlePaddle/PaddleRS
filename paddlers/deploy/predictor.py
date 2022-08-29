@@ -163,13 +163,23 @@ class Predictor(object):
                 'image2': preprocessed_samples[1],
                 'ori_shape': preprocessed_samples[2]
             }
+        elif self._model.model_type == 'restorer':
+            preprocessed_samples = {
+                'image': preprocessed_samples[0],
+                'tar_shape': preprocessed_samples[1]
+            }
         else:
             logging.error(
                 "Invalid model type {}".format(self._model.model_type),
                 exit=True)
         return preprocessed_samples
 
-    def postprocess(self, net_outputs, topk=1, ori_shape=None, transforms=None):
+    def postprocess(self,
+                    net_outputs,
+                    topk=1,
+                    ori_shape=None,
+                    tar_shape=None,
+                    transforms=None):
         if self._model.model_type == 'classifier':
             true_topk = min(self._model.num_classes, topk)
             if self._model.postprocess is None:
@@ -201,6 +211,12 @@ class Predictor(object):
                 for k, v in zip(['bbox', 'bbox_num', 'mask'], net_outputs)
             }
             preds = self._model.postprocess(net_outputs)
+        elif self._model.model_type == 'restorer':
+            res_maps = self._model.postprocess(
+                net_outputs[0],
+                batch_tar_shape=tar_shape,
+                transforms=transforms.transforms)
+            preds = [{'res_map': res_map} for res_map in res_maps]
         else:
             logging.error(
                 "Invalid model type {}.".format(self._model.model_type),
@@ -244,6 +260,7 @@ class Predictor(object):
             net_outputs,
             topk,
             ori_shape=preprocessed_input.get('ori_shape', None),
+            tar_shape=preprocessed_input.get('tar_shape', None),
             transforms=transforms)
         self.timer.postprocess_time_s.end(iter_num=len(images))
 

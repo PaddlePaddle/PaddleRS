@@ -19,65 +19,62 @@ from .base import BaseDataset
 from paddlers.utils import logging, get_encoding, norm_path, is_pic
 
 
-class SegDataset(BaseDataset):
+class ResDataset(BaseDataset):
     """
-    Dataset for semantic segmentation tasks.
+    Dataset for image restoration tasks.
 
     Args:
         data_dir (str): Root directory of the dataset.
-        file_list (str): Path of the file that contains relative paths of images and annotation files.
+        file_list (str): Path of the file that contains relative paths of source and target image files.
         transforms (paddlers.transforms.Compose): Data preprocessing and data augmentation operators to apply.
-        label_list (str|None, optional): Path of the file that contains the category names. Defaults to None.
         num_workers (int|str, optional): Number of processes used for data loading. If `num_workers` is 'auto',
             the number of workers will be automatically determined according to the number of CPU cores: If 
             there are more than 16 cores，8 workers will be used. Otherwise, the number of workers will be half 
             the number of CPU cores. Defaults: 'auto'.
         shuffle (bool, optional): Whether to shuffle the samples. Defaults to False.
+        sr_factor (int|None, optional): Scaling factor of image super-resolution task. None for other image 
+            restoration tasks. Defaults to None.
     """
 
     def __init__(self,
                  data_dir,
                  file_list,
                  transforms,
-                 label_list=None,
                  num_workers='auto',
-                 shuffle=False):
-        super(SegDataset, self).__init__(data_dir, label_list, transforms,
+                 shuffle=False,
+                 sr_factor=None):
+        super(ResDataset, self).__init__(data_dir, None, transforms,
                                          num_workers, shuffle)
-        # TODO: batch padding
         self.batch_transforms = None
         self.file_list = list()
-        self.labels = list()
 
-        if label_list is not None:
-            with open(label_list, encoding=get_encoding(label_list)) as f:
-                for line in f:
-                    item = line.strip()
-                    self.labels.append(item)
         with open(file_list, encoding=get_encoding(file_list)) as f:
             for line in f:
                 items = line.strip().split()
                 if len(items) > 2:
                     raise ValueError(
-                        "A space is defined as the delimiter to separate the image and label path, " \
-                        "so the space cannot be in the image or label path, but the line[{}] of " \
-                        " file_list[{}] has a space in the image or label path.".format(line, file_list))
+                        "A space is defined as the delimiter to separate the source and target image path, " \
+                        "so the space cannot be in the source image or target image path, but the line[{}] of " \
+                        " file_list[{}] has a space in the two paths.".format(line, file_list))
                 items[0] = norm_path(items[0])
                 items[1] = norm_path(items[1])
                 full_path_im = osp.join(data_dir, items[0])
-                full_path_label = osp.join(data_dir, items[1])
-                if not is_pic(full_path_im) or not is_pic(full_path_label):
+                full_path_tar = osp.join(data_dir, items[1])
+                if not is_pic(full_path_im) or not is_pic(full_path_tar):
                     continue
                 if not osp.exists(full_path_im):
-                    raise IOError('Image file {} does not exist!'.format(
+                    raise IOError("Source image file {} does not exist!".format(
                         full_path_im))
-                if not osp.exists(full_path_label):
-                    raise IOError('Label file {} does not exist!'.format(
-                        full_path_label))
-                self.file_list.append({
+                if not osp.exists(full_path_tar):
+                    raise IOError("Target image file {} does not exist!".format(
+                        full_path_tar))
+                sample = {
                     'image': full_path_im,
-                    'mask': full_path_label
-                })
+                    'target': full_path_tar,
+                }
+                if sr_factor is not None:
+                    sample['sr_factor'] = sr_factor
+                self.file_list.append(sample)
         self.num_samples = len(self.file_list)
         logging.info("{} samples in file {}".format(
             len(self.file_list), file_list))

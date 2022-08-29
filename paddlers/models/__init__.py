@@ -16,3 +16,4 @@ from . import ppcls, ppdet, ppseg, ppgan
 import paddlers.models.ppseg.models.losses as seg_losses
 import paddlers.models.ppdet.modeling.losses as det_losses
 import paddlers.models.ppcls.loss as clas_losses
+import paddlers.models.ppgan.models.criterions as res_losses

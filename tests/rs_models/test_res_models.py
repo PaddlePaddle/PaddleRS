@@ -12,26 +12,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from itertools import cycle
-
+import paddlers
 from rs_models.test_model import TestModel
 
 __all__ = []
 
 
-class TestDetModel(TestModel):
-    DEFAULT_HW = (608, 608)
-
+class TestResModel(TestModel):
     def check_output(self, output, target):
-        self.assertIsInstance(output, dict)
-        self.assertIsInstance(output['mask'], list)
-        self.assertIn('bbox', output)
-        self.assertIn('bbox_num', output)
-        if 'mask' in output:
-            self.assertIsInstance(output['mask'], list)
+        output = output.numpy()
+        self.check_output_equal(output.shape, target.shape)
 
     def set_inputs(self):
-        self.inputs = cycle([self.get_randn_tensor(3)])
+        def _gen_data(specs):
+            for spec in specs:
+                c = spec.get('in_channels', 3)
+                yield self.get_randn_tensor(c)
+
+        self.inputs = _gen_data(self.specs)
 
     def set_targets(self):
-        self.targets = cycle([None])
+        def _gen_data(specs):
+            for spec in specs:
+                # XXX: Hard coding
+                if 'out_channels' in spec:
+                    c = spec['out_channels']
+                elif 'in_channels' in spec:
+                    c = spec['in_channels']
+                else:
+                    c = 3
+                yield [self.get_zeros_array(c)]
+
+        self.targets = _gen_data(self.specs)

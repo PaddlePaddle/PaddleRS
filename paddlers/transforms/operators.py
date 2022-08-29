@@ -35,7 +35,7 @@ from .functions import (
     horizontal_flip_poly, horizontal_flip_rle, vertical_flip_poly,
     vertical_flip_rle, crop_poly, crop_rle, expand_poly, expand_rle,
     resize_poly, resize_rle, dehaze, select_bands, to_intensity, to_uint8,
-    img_flip, img_simple_rotate, decode_seg_mask)
+    img_flip, img_simple_rotate, decode_seg_mask, calc_hr_shape)
 
 __all__ = [
     "Compose", "DecodeImg", "Resize", "RandomResize", "ResizeByShort",
@@ -44,7 +44,7 @@ __all__ = [
     "RandomScaleAspect", "RandomExpand", "Pad", "MixupImage", "RandomDistort",
     "RandomBlur", "RandomSwap", "Dehaze", "ReduceDim", "SelectBand",
     "ArrangeSegmenter", "ArrangeChangeDetector", "ArrangeClassifier",
-    "ArrangeDetector", "RandomFlipOrRotate", "ReloadMask"
+    "ArrangeDetector", "ArrangeRestorer", "RandomFlipOrRotate", "ReloadMask"
 ]
 
 interp_dict = {
@@ -154,6 +154,8 @@ class Transform(object):
         if 'aux_masks' in sample:
             sample['aux_masks'] = list(
                 map(self.apply_mask, sample['aux_masks']))
+        if 'target' in sample:
+            sample['target'] = self.apply_im(sample['target'])
 
         return sample
 
@@ -336,6 +338,14 @@ class DecodeImg(Transform):
                 map(self.apply_mask, sample['aux_masks']))
             # TODO: check the shape of auxiliary masks
 
+        if 'target' in sample:
+            if self.read_geo_info:
+                target, geo_info_dict = self.apply_im(sample['target'])
+                sample['target'] = target
+                sample['geo_info_dict_tar'] = geo_info_dict
+            else:
+                sample['target'] = self.apply_im(sample['target'])
+
         sample['im_shape'] = np.array(
             sample['image'].shape[:2], dtype=np.float32)
         sample['scale_factor'] = np.array([1., 1.], dtype=np.float32)
@@ -457,6 +467,17 @@ class Resize(Transform):
         if 'gt_poly' in sample and len(sample['gt_poly']) > 0:
             sample['gt_poly'] = self.apply_segm(
                 sample['gt_poly'], [im_h, im_w], [im_scale_x, im_scale_y])
+        if 'target' in sample:
+            if 'sr_factor' in sample:
+                # For SR tasks
+                sample['target'] = self.apply_im(
+                    sample['target'], interp,
+                    calc_hr_shape(target_size, sample['sr_factor']))
+            else:
+                # For non-SR tasks
+                sample['target'] = self.apply_im(sample['target'], interp,
+                                                 target_size)
+
         sample['im_shape'] = np.asarray(
             sample['image'].shape[:2], dtype=np.float32)
         if 'scale_factor' in sample:
@@ -730,6 +751,9 @@ class RandomFlipOrRotate(Transform):
             if 'gt_poly' in sample and len(sample['gt_poly']) > 0:
                 sample['gt_poly'] = self.apply_segm(sample['gt_poly'], mode_id,
                                                     True)
+            if 'target' in sample:
+                sample['target'] = self.apply_im(sample['target'], mode_id,
+                                                 True)
         elif p_m < self.probs[1]:
             mode_p = random.random()
             mode_id = self.judge_probs_range(mode_p, self.probsr)
@@ -750,6 +774,9 @@ class RandomFlipOrRotate(Transform):
             if 'gt_poly' in sample and len(sample['gt_poly']) > 0:
                 sample['gt_poly'] = self.apply_segm(sample['gt_poly'], mode_id,
                                                     False)
+            if 'target' in sample:
+                sample['target'] = self.apply_im(sample['target'], mode_id,
+                                                 False)
 
         return sample
 
@@ -809,6 +836,8 @@ class RandomHorizontalFlip(Transform):
             if 'gt_poly' in sample and len(sample['gt_poly']) > 0:
                 sample['gt_poly'] = self.apply_segm(sample['gt_poly'], im_h,
                                                     im_w)
+            if 'target' in sample:
+                sample['target'] = self.apply_im(sample['target'])
         return sample
 
 
@@ -867,6 +896,8 @@ class RandomVerticalFlip(Transform):
             if 'gt_poly' in sample and len(sample['gt_poly']) > 0:
                 sample['gt_poly'] = self.apply_segm(sample['gt_poly'], im_h,
                                                     im_w)
+            if 'target' in sample:
+                sample['target'] = self.apply_im(sample['target'])
         return sample
 
 
@@ -884,15 +915,18 @@ class Normalize(Transform):
             image(s). Defaults to [0.229, 0.224, 0.225].
         min_val (list[float] | tuple[float], optional): Minimum value of input 
             image(s). If None, use 0 for all channels. Defaults to None.
-        max_val (list[float] | tuple[float], optional): Max value of input image(s). 
-            If None, use 255. for all channels. Defaults to None.
+        max_val (list[float] | tuple[float], optional): Maximum value of input 
+            image(s). If None, use 255. for all channels. Defaults to None.
+        apply_to_tar (bool, optional): Whether to apply transformation to the target
+            image. Defaults to True.
     """
 
     def __init__(self,
                  mean=[0.485, 0.456, 0.406],
                  std=[0.229, 0.224, 0.225],
                  min_val=None,
-                 max_val=None):
+                 max_val=None,
+                 apply_to_tar=True):
         super(Normalize, self).__init__()
         channel = len(mean)
         if min_val is None:
@@ -914,6 +948,7 @@ class Normalize(Transform):
         self.std = std
         self.min_val = min_val
         self.max_val = max_val
+        self.apply_to_tar = apply_to_tar
 
     def apply_im(self, image):
         image = image.astype(np.float32)
@@ -927,6 +962,8 @@ class Normalize(Transform):
         sample['image'] = self.apply_im(sample['image'])
         if 'image2' in sample:
             sample['image2'] = self.apply_im(sample['image2'])
+        if 'target' in sample and self.apply_to_tar:
+            sample['target'] = self.apply_im(sample['target'])
 
         return sample
 
@@ -964,6 +1001,8 @@ class CenterCrop(Transform):
         if 'aux_masks' in sample:
             sample['aux_masks'] = list(
                 map(self.apply_mask, sample['aux_masks']))
+        if 'target' in sample:
+            sample['target'] = self.apply_im(sample['target'])
         return sample
 
 
@@ -1165,6 +1204,14 @@ class RandomCrop(Transform):
                         self.apply_mask, crop=crop_box),
                         sample['aux_masks']))
 
+            if 'target' in sample:
+                if 'sr_factor' in sample:
+                    sample['target'] = self.apply_im(
+                        sample['target'],
+                        calc_hr_shape(crop_box, sample['sr_factor']))
+                else:
+                    sample['target'] = self.apply_im(sample['image'], crop_box)
+
         if self.crop_size is not None:
             sample = Resize(self.crop_size)(sample)
 
@@ -1266,6 +1313,7 @@ class Pad(Transform):
             pad_mode (int, optional): Pad mode. Currently only four modes are supported:
                 [-1, 0, 1, 2]. if -1, use specified offsets. If 0, only pad to right and bottom
                 If 1, pad according to center. If 2, only pad left and top. Defaults to 0.
+            offsets (list[int]|None, optional): Padding offsets. Defaults to None.
             im_padding_value (list[float] | tuple[float]): RGB value of padded area. 
                 Defaults to (127.5, 127.5, 127.5).
             label_padding_value (int, optional): Filling value for the mask. 
@@ -1332,6 +1380,17 @@ class Pad(Transform):
                     expand_rle(segm, x, y, height, width, h, w))
         return expanded_segms
 
+    def _get_offsets(self, im_h, im_w, h, w):
+        if self.pad_mode == -1:
+            offsets = self.offsets
+        elif self.pad_mode == 0:
+            offsets = [0, 0]
+        elif self.pad_mode == 1:
+            offsets = [(w - im_w) // 2, (h - im_h) // 2]
+        else:
+            offsets = [w - im_w, h - im_h]
+        return offsets
+
     def apply(self, sample):
         im_h, im_w = sample['image'].shape[:2]
         if self.target_size:
@@ -1349,14 +1408,7 @@ class Pad(Transform):
         if h == im_h and w == im_w:
             return sample
 
-        if self.pad_mode == -1:
-            offsets = self.offsets
-        elif self.pad_mode == 0:
-            offsets = [0, 0]
-        elif self.pad_mode == 1:
-            offsets = [(w - im_w) // 2, (h - im_h) // 2]
-        else:
-            offsets = [w - im_w, h - im_h]
+        offsets = self._get_offsets(im_h, im_w, h, w)
 
         sample['image'] = self.apply_im(sample['image'], offsets, (h, w))
         if 'image2' in sample:
@@ -1373,6 +1425,16 @@ class Pad(Transform):
         if 'gt_poly' in sample and len(sample['gt_poly']) > 0:
             sample['gt_poly'] = self.apply_segm(
                 sample['gt_poly'], offsets, im_size=[im_h, im_w], size=[h, w])
+        if 'target' in sample:
+            if 'sr_factor' in sample:
+                hr_shape = calc_hr_shape((h, w), sample['sr_factor'])
+                hr_offsets = self._get_offsets(*sample['target'].shape[:2],
+                                               *hr_shape)
+                sample['target'] = self.apply_im(sample['target'], hr_offsets,
+                                                 hr_shape)
+            else:
+                sample['target'] = self.apply_im(sample['target'], offsets,
+                                                 (h, w))
         return sample
 
 
@@ -1688,15 +1750,18 @@ class ReduceDim(Transform):
 
     Args: 
         joblib_path (str): Path of *.joblib file of PCA.
+        apply_to_tar (bool, optional): Whether to apply transformation to the target
+            image. Defaults to True.
     """
 
-    def __init__(self, joblib_path):
+    def __init__(self, joblib_path, apply_to_tar=True):
         super(ReduceDim, self).__init__()
         ext = joblib_path.split(".")[-1]
         if ext != "joblib":
             raise ValueError("`joblib_path` must be *.joblib, not *.{}.".format(
                 ext))
         self.pca = load(joblib_path)
+        self.apply_to_tar = apply_to_tar
 
     def apply_im(self, image):
         H, W, C = image.shape
@@ -1709,6 +1774,8 @@ class ReduceDim(Transform):
         sample['image'] = self.apply_im(sample['image'])
         if 'image2' in sample:
             sample['image2'] = self.apply_im(sample['image2'])
+        if 'target' in sample and self.apply_to_tar:
+            sample['target'] = self.apply_im(sample['target'])
         return sample
 
 
@@ -1719,11 +1786,14 @@ class SelectBand(Transform):
     Args: 
         band_list (list, optional): Bands to select (band index starts from 1). 
             Defaults to [1, 2, 3].
+        apply_to_tar (bool, optional): Whether to apply transformation to the target
+            image. Defaults to True.
     """
 
-    def __init__(self, band_list=[1, 2, 3]):
+    def __init__(self, band_list=[1, 2, 3], apply_to_tar=True):
         super(SelectBand, self).__init__()
         self.band_list = band_list
+        self.apply_to_tar = apply_to_tar
 
     def apply_im(self, image):
         image = select_bands(image, self.band_list)
@@ -1733,6 +1803,8 @@ class SelectBand(Transform):
         sample['image'] = self.apply_im(sample['image'])
         if 'image2' in sample:
             sample['image2'] = self.apply_im(sample['image2'])
+        if 'target' in sample and self.apply_to_tar:
+            sample['target'] = self.apply_im(sample['target'])
         return sample
 
 
@@ -1820,6 +1892,8 @@ class _Permute(Transform):
         sample['image'] = permute(sample['image'], False)
         if 'image2' in sample:
             sample['image2'] = permute(sample['image2'], False)
+        if 'target' in sample:
+            sample['target'] = permute(sample['target'], False)
         return sample
 
 
@@ -1915,3 +1989,16 @@ class ArrangeDetector(Arrange):
         if self.mode == 'eval' and 'gt_poly' in sample:
             del sample['gt_poly']
         return sample
+
+
+class ArrangeRestorer(Arrange):
+    def apply(self, sample):
+        if 'target' in sample:
+            target = permute(sample['target'], False)
+        image = permute(sample['image'], False)
+        if self.mode == 'train':
+            return image, target
+        if self.mode == 'eval':
+            return image, target
+        if self.mode == 'test':
+            return image,
