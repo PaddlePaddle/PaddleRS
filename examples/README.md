@@ -8,9 +8,31 @@ PaddleRS提供从科学研究到产业应用的丰富示例，希望帮助遥感
 
 ## 2 社区贡献案例
 
-[AI Studio](https://aistudio.baidu.com/aistudio/index)是基于百度深度学习平台飞桨的人工智能学习与实训社区，提供在线编程环境、免费GPU算力、海量开源算法和开放数据，帮助开发者快速创建和部署模型。您可以在AI Studio上探索PaddleRS的更多玩法：
+### 2.1 基于PaddleRS的遥感解译平台
 
-[AI Studio上的PaddleRS相关项目](https://aistudio.baidu.com/aistudio/projectoverview/public?kw=PaddleRS)
+#### 小桨神瞳
+
+
+
+- 作者：白菜
+- 代码仓库：https://github.com/CrazyBoyM/webRS
+
+#### 遥感图像智能解译平台
+
+<p>
+<img src="demo2_1.gif", width="300", hspace="40"> <img src="demo2_2.gif", width="300">
+</p>
+<p>
+<img src="demo2_3.gif", width="300", hspace="40"> <img src="demo2_4.gif", width="300">
+</p>
+
+- 作者：HHU-河马海牛队
+- 代码仓库：https://github.com/terayco/Intelligent-RS-System
+- 演示视频：https://www.bilibili.com/video/BV1eY4y1u7Eq/?vd_source=75a73fc15a4e8b25195728ee93a5b322
+
+### 2.2 AI Studio上的PaddleRS相关项目
+
+[AI Studio](https://aistudio.baidu.com/aistudio/index)是基于百度深度学习平台飞桨的人工智能学习与实训社区，提供在线编程环境、免费GPU算力、海量开源算法和开放数据，帮助开发者快速创建和部署模型。您可以[在AI Studio上探索PaddleRS的更多玩法](https://aistudio.baidu.com/aistudio/projectoverview/public?kw=PaddleRS)。
 
 本文档收集了部分由开源爱好者贡献的精品项目：
 
