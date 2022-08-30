@@ -33,6 +33,7 @@ from paddlers.utils import get_single_card_bs, DisablePrint
 from paddlers.utils.checkpoint import seg_pretrain_weights_dict
 from .base import BaseModel
 from .utils import seg_metrics as metrics
+from .utils.infer_nets import InferSegNet
 
 __all__ = ["UNet", "DeepLabV3P", "FastSCNN", "HRNet", "BiSeNetV2", "FarSeg"]
 
@@ -64,10 +65,15 @@ class BaseSegmenter(BaseModel):
 
     def build_net(self, **params):
         # TODO: when using paddle.utils.unique_name.guard,
-        # DeepLabv3p and HRNet will raise a error
+        # DeepLabv3p and HRNet will raise an error.
         net = dict(ppseg.models.__dict__, **cmseg.__dict__)[self.model_name](
             num_classes=self.num_classes, **params)
         return net
+
+    def _build_inference_net(self):
+        infer_net = InferSegNet(self.net)
+        infer_net.eval()
+        return infer_net
 
     def _fix_transforms_shape(self, image_shape):
         if hasattr(self, 'test_transforms'):
@@ -472,7 +478,6 @@ class BaseSegmenter(BaseModel):
                     conf_mat_all.append(conf_mat)
         class_iou, miou = ppseg.utils.metrics.mean_iou(
             intersect_area_all, pred_area_all, label_area_all)
-        # TODO 确认是按oacc还是macc
         class_acc, oacc = ppseg.utils.metrics.accuracy(intersect_area_all,
                                                        pred_area_all)
         kappa = ppseg.utils.metrics.kappa(intersect_area_all, pred_area_all,
@@ -504,13 +509,13 @@ class BaseSegmenter(BaseModel):
                 Defaults to None.
 
         Returns:
-            If `img_file` is a string or np.array, the result is a dict with key-value 
-                pairs:
-                {"label map": `label map`, "score_map": `score map`}.
+            If `img_file` is a tuple of string or np.array, the result is a dict with 
+                the following key-value pairs:
+                label_map (np.ndarray): Predicted label map (HW).
+                score_map (np.ndarray): Prediction score map (HWC).
+
             If `img_file` is a list, the result is a list composed of dicts with the 
-                corresponding fields:
-                label_map (np.ndarray): the predicted label map (HW)
-                score_map (np.ndarray): the prediction score map (HWC)
+                above keys.
         """
 
         if transforms is None and not hasattr(self, 'test_transforms'):
@@ -750,11 +755,11 @@ class BaseSegmenter(BaseModel):
                 elif item[0] == 'padding':
                     x, y = item[2]
                     if isinstance(label_map, np.ndarray):
-                        label_map = label_map[..., y:y + h, x:x + w]
-                        score_map = score_map[..., y:y + h, x:x + w]
+                        label_map = label_map[y:y + h, x:x + w]
+                        score_map = score_map[y:y + h, x:x + w]
                     else:
-                        label_map = label_map[:, :, y:y + h, x:x + w]
-                        score_map = score_map[:, :, y:y + h, x:x + w]
+                        label_map = label_map[:, y:y + h, x:x + w, :]
+                        score_map = score_map[:, y:y + h, x:x + w, :]
                 else:
                     pass
             label_map = label_map.squeeze()

@@ -8,12 +8,12 @@ use_gpu:null|null
 --save_dir:adaptive
 --train_batch_size:lite_train_lite_infer=16|lite_train_whole_infer=16|whole_train_whole_infer=16
 --model_path:null
+--config:lite_train_lite_infer=./test_tipc/configs/clas/hrnet/hrnet_ucmerced.yaml|lite_train_whole_infer=./test_tipc/configs/clas/hrnet/hrnet_ucmerced.yaml|whole_train_whole_infer=./test_tipc/configs/clas/hrnet/hrnet_ucmerced.yaml
 train_model_name:best_model
-train_infer_file_list:./test_tipc/data/ucmerced/:./test_tipc/data/ucmerced/val.txt
 null:null
 ##
 trainer:norm
-norm_train:test_tipc/run_task.py train clas --config ./test_tipc/configs/clas/hrnet/hrnet.yaml
+norm_train:test_tipc/run_task.py train clas
 pact_train:null
 fpgm_train:null
 distill_train:null
@@ -46,7 +46,7 @@ inference:test_tipc/infer.py
 --use_trt:False
 --precision:fp32
 --model_dir:null
---file_list:null:null
+--config:null
 --save_log_path:null
 --benchmark:True
 --model_name:hrnet

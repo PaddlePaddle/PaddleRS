@@ -30,14 +30,15 @@ import paddlers.rs_models.cd as cmcd
 import paddlers.utils.logging as logging
 from paddlers.models import seg_losses
 from paddlers.transforms import Resize, decode_image
-from paddlers.utils import get_single_card_bs, DisablePrint
+from paddlers.utils import get_single_card_bs
 from paddlers.utils.checkpoint import seg_pretrain_weights_dict
 from .base import BaseModel
 from .utils import seg_metrics as metrics
+from .utils.infer_nets import InferCDNet
 
 __all__ = [
     "CDNet", "FCEarlyFusion", "FCSiamConc", "FCSiamDiff", "STANet", "BIT",
-    "SNUNet", "DSIFN", "DSAMNet", "ChangeStar", "ChangeFormer"
+    "SNUNet", "DSIFN", "DSAMNet", "ChangeStar", "ChangeFormer", "FCCDN"
 ]
 
 
@@ -68,6 +69,11 @@ class BaseChangeDetector(BaseModel):
         net = cmcd.__dict__[self.model_name](num_classes=self.num_classes,
                                              **params)
         return net
+
+    def _build_inference_net(self):
+        infer_net = InferCDNet(self.net)
+        infer_net.eval()
+        return infer_net
 
     def _fix_transforms_shape(self, image_shape):
         if hasattr(self, 'test_transforms'):
@@ -399,7 +405,8 @@ class BaseChangeDetector(BaseModel):
                 Defaults to False.
 
         Returns:
-            collections.OrderedDict with key-value pairs:
+            If `return_details` is False, return collections.OrderedDict with 
+                key-value pairs:
                 For binary change detection (number of classes == 2), the key-value 
                     pairs are like:
                     {"iou": `intersection over union for the change class`,
@@ -527,12 +534,12 @@ class BaseChangeDetector(BaseModel):
 
         Returns:
             If `img_file` is a tuple of string or np.array, the result is a dict with 
-                key-value pairs:
-                {"label map": `label map`, "score_map": `score map`}.
+                the following key-value pairs:
+                label_map (np.ndarray): Predicted label map (HW).
+                score_map (np.ndarray): Prediction score map (HWC).
+
             If `img_file` is a list, the result is a list composed of dicts with the 
-                corresponding fields:
-                label_map (np.ndarray): the predicted label map (HW)
-                score_map (np.ndarray): the prediction score map (HWC)
+                above keys.
         """
 
         if transforms is None and not hasattr(self, 'test_transforms'):
@@ -787,11 +794,11 @@ class BaseChangeDetector(BaseModel):
                 elif item[0] == 'padding':
                     x, y = item[2]
                     if isinstance(label_map, np.ndarray):
-                        label_map = label_map[..., y:y + h, x:x + w]
-                        score_map = score_map[..., y:y + h, x:x + w]
+                        label_map = label_map[y:y + h, x:x + w]
+                        score_map = score_map[y:y + h, x:x + w]
                     else:
-                        label_map = label_map[:, :, y:y + h, x:x + w]
-                        score_map = score_map[:, :, y:y + h, x:x + w]
+                        label_map = label_map[:, y:y + h, x:x + w, :]
+                        score_map = score_map[:, y:y + h, x:x + w, :]
                 else:
                     pass
             label_map = label_map.squeeze()
@@ -1053,7 +1060,7 @@ class ChangeStar(BaseChangeDetector):
         if self.use_mixed_loss is False:
             return {
                 # XXX: make sure the shallow copy works correctly here.
-                'types': [seglosses.CrossEntropyLoss()] * 4,
+                'types': [seg_losses.CrossEntropyLoss()] * 4,
                 'coef': [1.0] * 4
             }
         else:
@@ -1082,3 +1089,31 @@ class ChangeFormer(BaseChangeDetector):
             use_mixed_loss=use_mixed_loss,
             losses=losses,
             **params)
+
+
+class FCCDN(BaseChangeDetector):
+    def __init__(self,
+                 in_channels=3,
+                 num_classes=2,
+                 use_mixed_loss=False,
+                 losses=None,
+                 **params):
+        params.update({'in_channels': in_channels})
+        super(FCCDN, self).__init__(
+            model_name='FCCDN',
+            num_classes=num_classes,
+            use_mixed_loss=use_mixed_loss,
+            losses=losses,
+            **params)
+
+    def default_loss(self):
+        if self.use_mixed_loss is False:
+            return {
+                'types':
+                [seg_losses.CrossEntropyLoss(), cmcd.losses.fccdn_ssl_loss],
+                'coef': [1.0, 1.0]
+            }
+        else:
+            raise ValueError(
+                f"Currently `use_mixed_loss` must be set to False for {self.__class__}"
+            )

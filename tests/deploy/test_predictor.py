@@ -24,7 +24,7 @@ from testing_utils import CommonTest, run_script
 
 __all__ = [
     'TestCDPredictor', 'TestClasPredictor', 'TestDetPredictor',
-    'TestSegPredictor'
+    'TestResPredictor', 'TestSegPredictor'
 ]
 
 
@@ -105,7 +105,7 @@ class TestPredictor(CommonTest):
                     dict_[key], expected_dict[key], rtol=1.e-4, atol=1.e-6)
 
 
-@TestPredictor.add_tests
+# @TestPredictor.add_tests
 class TestCDPredictor(TestPredictor):
     MODULE = pdrs.tasks.change_detector
     TRAINER_NAME_TO_EXPORT_OPTS = {
@@ -177,7 +177,7 @@ class TestCDPredictor(TestPredictor):
         self.assertEqual(len(out_multi_array_t), num_inputs)
 
 
-@TestPredictor.add_tests
+# @TestPredictor.add_tests
 class TestClasPredictor(TestPredictor):
     MODULE = pdrs.tasks.classifier
     TRAINER_NAME_TO_EXPORT_OPTS = {
@@ -185,7 +185,7 @@ class TestClasPredictor(TestPredictor):
     }
 
     def check_predictor(self, predictor, trainer):
-        single_input = "data/ssmt/optical_t1.bmp"
+        single_input = "data/ssst/optical.bmp"
         num_inputs = 2
         transforms = pdrs.transforms.Compose([
             pdrs.transforms.DecodeImg(), pdrs.transforms.Normalize(),
@@ -242,7 +242,7 @@ class TestClasPredictor(TestPredictor):
         self.check_dict_equal(out_multi_array_p, out_multi_array_t)
 
 
-@TestPredictor.add_tests
+# @TestPredictor.add_tests
 class TestDetPredictor(TestPredictor):
     MODULE = pdrs.tasks.object_detector
     TRAINER_NAME_TO_EXPORT_OPTS = {
@@ -253,7 +253,7 @@ class TestDetPredictor(TestPredictor):
         # For detection tasks, do NOT ensure the consistence of bboxes.
         # This is because the coordinates of bboxes were observed to be very sensitive to numeric errors, 
         # given that the network is (partially?) randomly initialized.
-        single_input = "data/ssmt/optical_t1.bmp"
+        single_input = "data/ssst/optical.bmp"
         num_inputs = 2
         transforms = pdrs.transforms.Compose([
             pdrs.transforms.DecodeImg(), pdrs.transforms.Normalize(),
@@ -303,6 +303,59 @@ class TestDetPredictor(TestPredictor):
 
 
 @TestPredictor.add_tests
+class TestResPredictor(TestPredictor):
+    MODULE = pdrs.tasks.restorer
+
+    def check_predictor(self, predictor, trainer):
+        # For restoration tasks, do NOT ensure the consistence of numeric values, 
+        # because the output is of uint8 type.
+        single_input = "data/ssst/optical.bmp"
+        num_inputs = 2
+        transforms = pdrs.transforms.Compose([
+            pdrs.transforms.DecodeImg(), pdrs.transforms.Normalize(),
+            pdrs.transforms.ArrangeRestorer('test')
+        ])
+
+        # Single input (file path)
+        input_ = single_input
+        predictor.predict(input_, transforms=transforms)
+        trainer.predict(input_, transforms=transforms)
+        out_single_file_list_p = predictor.predict(
+            [input_], transforms=transforms)
+        self.assertEqual(len(out_single_file_list_p), 1)
+        out_single_file_list_t = trainer.predict(
+            [input_], transforms=transforms)
+        self.assertEqual(len(out_single_file_list_t), 1)
+
+        # Single input (ndarray)
+        input_ = decode_image(
+            single_input, to_rgb=False)  # Reuse the name `input_`
+        predictor.predict(input_, transforms=transforms)
+        trainer.predict(input_, transforms=transforms)
+        out_single_array_list_p = predictor.predict(
+            [input_], transforms=transforms)
+        self.assertEqual(len(out_single_array_list_p), 1)
+        out_single_array_list_t = trainer.predict(
+            [input_], transforms=transforms)
+        self.assertEqual(len(out_single_array_list_t), 1)
+
+        # Multiple inputs (file paths)
+        input_ = [single_input] * num_inputs  # Reuse the name `input_`
+        out_multi_file_p = predictor.predict(input_, transforms=transforms)
+        self.assertEqual(len(out_multi_file_p), num_inputs)
+        out_multi_file_t = trainer.predict(input_, transforms=transforms)
+        self.assertEqual(len(out_multi_file_t), num_inputs)
+
+        # Multiple inputs (ndarrays)
+        input_ = [decode_image(
+            single_input, to_rgb=False)] * num_inputs  # Reuse the name `input_`
+        out_multi_array_p = predictor.predict(input_, transforms=transforms)
+        self.assertEqual(len(out_multi_array_p), num_inputs)
+        out_multi_array_t = trainer.predict(input_, transforms=transforms)
+        self.assertEqual(len(out_multi_array_t), num_inputs)
+
+
+# @TestPredictor.add_tests
 class TestSegPredictor(TestPredictor):
     MODULE = pdrs.tasks.segmenter
     TRAINER_NAME_TO_EXPORT_OPTS = {
@@ -310,7 +363,7 @@ class TestSegPredictor(TestPredictor):
     }
 
     def check_predictor(self, predictor, trainer):
-        single_input = "data/ssmt/optical_t1.bmp"
+        single_input = "data/ssst/optical.bmp"
         num_inputs = 2
         transforms = pdrs.transforms.Compose([
             pdrs.transforms.DecodeImg(), pdrs.transforms.Normalize(),

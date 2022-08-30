@@ -33,9 +33,7 @@ class TestCDModel(TestModel):
         self.check_output_equal(len(output), len(target))
         for o, t in zip(output, target):
             o = o.numpy()
-            self.check_output_equal(o.shape[0], t.shape[0])
-            self.check_output_equal(len(o.shape), 4)
-            self.check_output_equal(o.shape[2:], t.shape[2:])
+            self.check_output_equal(o.shape, t.shape)
 
     def set_inputs(self):
         if self.EF_MODE == 'Concat':

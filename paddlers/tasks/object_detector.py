@@ -61,6 +61,11 @@ class BaseDetector(BaseModel):
             net = ppdet.modeling.__dict__[self.model_name](**params)
         return net
 
+    def _build_inference_net(self):
+        infer_net = self.net
+        infer_net.eval()
+        return infer_net
+
     def _fix_transforms_shape(self, image_shape):
         raise NotImplementedError("_fix_transforms_shape: not implemented!")
 
@@ -250,32 +255,18 @@ class BaseDetector(BaseModel):
         """
 
         args = self._pre_train(locals())
+        args.pop('self')
         return self._real_train(**args)
 
     def _pre_train(self, in_args):
         return in_args
 
-    def _real_train(self,
-                    num_epochs,
-                    train_dataset,
-                    train_batch_size=64,
-                    eval_dataset=None,
-                    optimizer=None,
-                    save_interval_epochs=1,
-                    log_interval_steps=10,
-                    save_dir='output',
-                    pretrain_weights='IMAGENET',
-                    learning_rate=.001,
-                    warmup_steps=0,
-                    warmup_start_lr=0.0,
-                    lr_decay_epochs=(216, 243),
-                    lr_decay_gamma=0.1,
-                    metric=None,
-                    use_ema=False,
-                    early_stop=False,
-                    early_stop_patience=5,
-                    use_vdl=True,
-                    resume_checkpoint=None):
+    def _real_train(
+            self, num_epochs, train_dataset, train_batch_size, eval_dataset,
+            optimizer, save_interval_epochs, log_interval_steps, save_dir,
+            pretrain_weights, learning_rate, warmup_steps, warmup_start_lr,
+            lr_decay_epochs, lr_decay_gamma, metric, use_ema, early_stop,
+            early_stop_patience, use_vdl, resume_checkpoint):
 
         if self.status == 'Infer':
             logging.error(
@@ -485,7 +476,7 @@ class BaseDetector(BaseModel):
                 Defaults to False.
 
         Returns:
-            collections.OrderedDict with key-value pairs: 
+            If `return_details` is False, return collections.OrderedDict with key-value pairs: 
                 {"bbox_mmap":`mean average precision (0.50, 11point)`}.
         """
 
@@ -584,21 +575,17 @@ class BaseDetector(BaseModel):
 
         Returns:
             If `img_file` is a string or np.array, the result is a list of dict with 
-                key-value pairs:
-                {"category_id": `category_id`, 
-                 "category": `category`, 
-                 "bbox": `[x, y, w, h]`, 
-                 "score": `score`, 
-                 "mask": `mask`}.
-            If `img_file` is a list, the result is a list composed of list of dicts 
-                with the corresponding fields:
-                category_id(int): the predicted category ID. 0 represents the first 
+                the following key-value pairs:
+                category_id (int): Predicted category ID. 0 represents the first 
                     category in the dataset, and so on.
-                category(str): category name
-                bbox(list): bounding box in [x, y, w, h] format
-                score(str): confidence
-                mask(dict): Only for instance segmentation task. Mask of the object in 
-                    RLE format
+                category (str): Category name.
+                bbox (list): Bounding box in [x, y, w, h] format.
+                score (str): Confidence.
+                mask (dict): Only for instance segmentation task. Mask of the object in 
+                    RLE format.
+
+            If `img_file` is a list, the result is a list composed of list of dicts 
+                with the above keys.
         """
 
         if transforms is None and not hasattr(self, 'test_transforms'):
@@ -925,6 +912,26 @@ class PicoDet(BaseDetector):
                 num_epochs=in_args['num_epochs'])
             in_args['optimizer'] = optimizer
         return in_args
+
+    def build_data_loader(self, dataset, batch_size, mode='train'):
+        if dataset.num_samples < batch_size:
+            raise ValueError(
+                'The volume of dataset({}) must be larger than batch size({}).'
+                .format(dataset.num_samples, batch_size))
+
+        if mode != 'train':
+            return paddle.io.DataLoader(
+                dataset,
+                batch_size=batch_size,
+                shuffle=dataset.shuffle,
+                drop_last=False,
+                collate_fn=dataset.batch_transforms,
+                num_workers=dataset.num_workers,
+                return_list=True,
+                use_shared_memory=False)
+        else:
+            return super(BaseDetector, self).build_data_loader(dataset,
+                                                               batch_size, mode)
 
 
 class YOLOv3(BaseDetector):
