@@ -1,0 +1,6 @@
+_base_: ./levircd.yaml
+
+save_dir: ./exp/levircd/fc_siam_diff/
+
+model: !Node
+    type: FCSiamDiff

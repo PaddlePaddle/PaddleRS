@@ -64,7 +64,7 @@ num_epochs: 2
 train_batch_size: 16
 save_interval_epochs: 5
 log_interval_steps: 50
-save_dir: e./test_tipc/output/clas/
+save_dir: ./test_tipc/output/clas/
 learning_rate: 0.01
 early_stop: False
 early_stop_patience: 5

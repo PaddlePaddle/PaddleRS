@@ -17,7 +17,7 @@ coco_tools是PaddleRS提供的用于处理COCO格式标注文件的工具集，�
 
 ## 3 使用示例
 
-## 3.1 示例数据集
+### 3.1 示例数据集
 
 本文档以COCO 2017数据集作为示例数据进行演示。您可以在以下链接下载该数据集：
 
@@ -47,11 +47,11 @@ coco_tools是PaddleRS提供的用于处理COCO格式标注文件的工具集，�
 |  |--...
 ```
 
-## 3.2 打印json信息
+### 3.2 打印json信息
 
 使用`json_InfoShow.py`可以打印json文件中的各个键值对的key， 并输出value中排列靠前的元素，从而帮助您快速了解标注信息。对于COCO格式标注数据而言，您应该特别留意`'image'`和`'annotation'`字段的内容。
 
-### 3.2.1 命令演示
+#### 3.2.1 命令演示
 
 执行如下命令，打印`instances_val2017.json`中的信息：
 
@@ -61,7 +61,7 @@ python ./coco_tools/json_InfoShow.py \
        --show_num 5
 ```
 
-### 3.2.2 参数说明
+#### 3.2.2 参数说明
 
 
 | 参数名         | 含义                                 | 默认值    |
@@ -70,7 +70,7 @@ python ./coco_tools/json_InfoShow.py \
 | `--show_num`  | （可选）输出value中排列靠前的元素的个数   | `5`      |
 | `--Args_show` | （可选）是否打印输入参数信息             | `True`   |
 
-### 3.2.3 结果展示
+#### 3.2.3 结果展示
 
 执行上述命令后，输出结果如下：
 
@@ -151,7 +151,7 @@ contributor : COCO Consortium
 
 ```
 
-### 3.2.4 结果说明
+#### 3.2.4 结果说明
 
 `instances_val2017.json`的key有5个，分别为：
 
@@ -166,11 +166,11 @@ contributor : COCO Consortium
 - `annotations`键对应的值为列表，共有36781个元素，输出展示了前5个；
 - `categories`键对应的值为列表，共有80个元素，输出展示了前5个。
 
-## 3.3 统计图像信息
+### 3.3 统计图像信息
 
 使用`json_ImgSta.py`可以从`instances_val2017.json`中快速提取图像信息，生成csv表格，并生成统计图。
 
-### 3.3.1 命令演示
+#### 3.3.1 命令演示
 
 执行如下命令，打印`instances_val2017.json`信息：
 
@@ -182,7 +182,7 @@ python ./coco_tools/json_ImgSta.py \
     --png_shapeRate_path=./img_sta/images_shapeRate.png
 ```
 
-### 3.3.2 参数说明
+#### 3.3.2 参数说明
 
 | 参数名                  | 含义                                                                   | 默认值    |
 | ---------------------- | --------------------------------------------------------------------- | -------- |
@@ -193,7 +193,7 @@ python ./coco_tools/json_ImgSta.py \
 | `--image_keyname`      | （可选）json文件中，图像所对应的key                                        |`'images'`|
 | `--Args_show`          | （可选）是否打印输入参数信息                                               |`True`    |
 
-### 3.3.3 结果展示
+#### 3.3.3 结果展示
 
 执行上述命令后，输出结果如下：
 
@@ -232,11 +232,11 @@ csv save to ./img_sta/images.csv
 所有图像shape比例(宽/高)的一维分布：
 ![image.png](./assets/1650011634205-image.png)
 
-## 3.4 统计目标检测标注框信息
+### 3.4 统计目标检测标注框信息
 
 使用`json_AnnoSta.py`，可以从`instances_val2017.json`中快速提取标注信息，生成csv表格，并生成统计图。
 
-### 3.4.1 命令演示
+#### 3.4.1 命令演示
 
 执行如下命令，打印`instances_val2017.json`信息：
 
@@ -253,7 +253,7 @@ python ./coco_tools/json_AnnoSta.py \
     --get_relative=True
 ```
 
-### 3.4.2 参数说明
+#### 3.4.2 参数说明
 
 | 参数名                  | 含义                                                                                                                       | 默认值         |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------- | ------------- |
@@ -270,7 +270,7 @@ python ./coco_tools/json_AnnoSta.py \
 | `--anno_keyname`       | （可选）json文件中，标注所对应的key                                                                                             | `'annotations'`|
 | `--Args_show`          | （可选）是否打印输入参数信息                                                                                                    | `True`        |
 
-### 3.4.3 结果展示
+#### 3.4.3 结果展示
 
 执行上述命令后，输出结果如下：
 
@@ -344,11 +344,11 @@ csv save to ./anno_sta/annos.csv
 
 ![image.png](./assets/1650026559309-image.png)
 
-## 3.5 统计图像信息生成json
+### 3.5 统计图像信息生成json
 
 使用`json_Test2Json.py`，可以根据`test2017`中的文件信息与训练集json文件快速提取图像信息，生成测试集json文件。
 
-### 3.5.1 命令演示
+#### 3.5.1 命令演示
 
 执行如下命令，统计并生成`test2017`信息：
 
@@ -359,7 +359,7 @@ python ./coco_tools/json_Img2Json.py \
     --json_test_path=./test.json
 ```
 
-### 3.5.2 参数说明
+#### 3.5.2 参数说明
 
 
 | 参数名               | 含义                                      | 默认值        |
@@ -371,7 +371,7 @@ python ./coco_tools/json_Img2Json.py \
 | `--cat_keyname`     | （可选）json文件中，类别对应的key            | `'categories'`|
 | `--Args_show`       | （可选）是否打印输入参数信息                 | `True`        |
 
-### 3.5.3 结果展示
+#### 3.5.3 结果展示
 
 执行上述命令后，输出结果如下：
 
@@ -431,11 +431,11 @@ json keys: dict_keys(['images', 'categories'])
 ...
 ```
 
-## 3.6 json文件拆分
+### 3.6 json文件拆分
 
 使用`json_Split.py`，可以将`instances_val2017.json`文件拆分为2个子集。
 
-### 3.6.1 命令演示
+#### 3.6.1 命令演示
 
 执行如下命令，拆分`instances_val2017.json`文件：
 
@@ -446,7 +446,7 @@ python ./coco_tools/json_Split.py \
     --json_val_path=./instances_val2017_val.json
 ```
 
-### 3.6.2 参数说明
+#### 3.6.2 参数说明
 
 
 | 参数名                | 含义                                                                                   | 默认值        |
@@ -461,7 +461,7 @@ python ./coco_tools/json_Split.py \
 | `--cat_keyname`      | （可选）json文件中，类别对应的key                                                         | `'categories'`|
 | `--Args_show`        | （可选）是否打印输入参数信息                                                              | `'True'`      |
 
-### 3.6.3 结果展示
+#### 3.6.3 结果展示
 
 执行上述命令后，输出结果如下：
 
@@ -485,11 +485,11 @@ image total 5000, train 4500, val 500
 anno total 36781, train 33119, val 3662
 ```
 
-## 3.7 json文件合并
+### 3.7 json文件合并
 
 使用`json_Merge.py`，可以合并2个json文件。
 
-### 3.7.1 命令演示
+#### 3.7.1 命令演示
 
 执行如下命令，合并`instances_train2017.json`与`instances_val2017.json`：
 
@@ -500,7 +500,7 @@ python ./coco_tools/json_Merge.py \
     --save_path=./instances_trainval2017.json
 ```
 
-### 3.7.2 参数说明
+#### 3.7.2 参数说明
 
 
 | 参数名          | 含义                             | 默认值                       |
@@ -511,7 +511,7 @@ python ./coco_tools/json_Merge.py \
 | `--merge_keys` | （可选）合并过程中需要合并的key      | `['images', 'annotations']` |
 | `--Args_show`  | （可选）是否打印输入参数信息         | `True`                      |
 
-### 3.7.3 结果展示
+#### 3.7.3 结果展示
 
 执行上述命令后，输出结果如下：
 

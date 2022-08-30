@@ -44,7 +44,7 @@ class SegDataset(BaseDataset):
                  shuffle=False):
         super(SegDataset, self).__init__(data_dir, label_list, transforms,
                                          num_workers, shuffle)
-        # TODO batch padding
+        # TODO: batch padding
         self.batch_transforms = None
         self.file_list = list()
         self.labels = list()

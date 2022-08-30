@@ -16,7 +16,7 @@ from . import logging
 from . import utils
 from .utils import (seconds_to_hms, get_encoding, get_single_card_bs, dict2str,
                     EarlyStop, norm_path, is_pic, MyEncoder, DisablePrint,
-                    Timer)
+                    Timer, to_data_parallel, scheduler_step)
 from .checkpoint import get_pretrain_weights, load_pretrain_weights, load_checkpoint
 from .env import get_environ_info, get_num_workers, init_parallel_env
 from .download import download_and_decompress, decompress

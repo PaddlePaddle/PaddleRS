@@ -7,5 +7,5 @@ save_dir: ./test_tipc/output/seg/unet/
 model: !Node
        type: UNet
        args:
-           input_channel: 10
+           in_channels: 10
            num_classes: 5

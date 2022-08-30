@@ -26,7 +26,7 @@ def predict(self, img_file, transforms=None):
 若`img_file`是一个元组，则返回对象为包含下列键值对的字典：
 
 ```
-{"label map": 输出类别标签（以[h, w]格式排布），"score_map": 模型输出的各类别概率（以[h, w, c]格式排布）}
+{"label_map": 输出类别标签（以[h, w]格式排布），"score_map": 模型输出的各类别概率（以[h, w, c]格式排布）}
 ```
 
 若`img_file`是一个列表，则返回对象为与`img_file`等长的列表，其中的每一项为一个字典（键值对如上所示），顺序对应`img_file`中的每个元素。
@@ -51,7 +51,7 @@ def predict(self, img_file, transforms=None):
 若`img_file`是一个字符串或NumPy数组，则返回对象为包含下列键值对的字典：
 
 ```
-{"label map": 输出类别标签,
+{"label_map": 输出类别标签,
  "scores_map": 输出类别概率,
  "label_names_map": 输出类别名称}
 ```
@@ -87,6 +87,10 @@ def predict(self, img_file, transforms=None):
 
 若`img_file`是一个列表，则返回对象为与`img_file`等长的列表，其中的每一项为一个由字典（键值对如上所示）构成的列表，顺序对应`img_file`中的每个元素。
 
+#### `BaseRestorer.predict()`
+
+
+
 #### `BaseSegmenter.predict()`
 
 接口形式：
@@ -107,7 +111,7 @@ def predict(self, img_file, transforms=None):
 若`img_file`是一个字符串或NumPy数组，则返回对象为包含下列键值对的字典：
 
 ```
-{"label map": 输出类别标签（以[h, w]格式排布），"score_map": 模型输出的各类别概率（以[h, w, c]格式排布）}
+{"label_map": 输出类别标签（以[h, w]格式排布），"score_map": 模型输出的各类别概率（以[h, w, c]格式排布）}
 ```
 
 若`img_file`是一个列表，则返回对象为与`img_file`等长的列表，其中的每一项为一个字典（键值对如上所示），顺序对应`img_file`中的每个元素。

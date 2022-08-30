@@ -17,4 +17,4 @@ from .coco import COCODetDataset
 from .seg_dataset import SegDataset
 from .cd_dataset import CDDataset
 from .clas_dataset import ClasDataset
-from .sr_dataset import SRdataset, ComposeTrans
+from .res_dataset import ResDataset

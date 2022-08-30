@@ -32,3 +32,6 @@ class TestDetModel(TestModel):
 
     def set_inputs(self):
         self.inputs = cycle([self.get_randn_tensor(3)])
+
+    def set_targets(self):
+        self.targets = cycle([None])

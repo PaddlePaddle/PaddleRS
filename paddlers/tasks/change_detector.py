@@ -30,14 +30,15 @@ import paddlers.rs_models.cd as cmcd
 import paddlers.utils.logging as logging
 from paddlers.models import seg_losses
 from paddlers.transforms import Resize, decode_image
-from paddlers.utils import get_single_card_bs, DisablePrint
+from paddlers.utils import get_single_card_bs
 from paddlers.utils.checkpoint import seg_pretrain_weights_dict
 from .base import BaseModel
 from .utils import seg_metrics as metrics
+from .utils.infer_nets import InferCDNet
 
 __all__ = [
     "CDNet", "FCEarlyFusion", "FCSiamConc", "FCSiamDiff", "STANet", "BIT",
-    "SNUNet", "DSIFN", "DSAMNet", "ChangeStar", "ChangeFormer"
+    "SNUNet", "DSIFN", "DSAMNet", "ChangeStar", "ChangeFormer", "FCCDN"
 ]
 
 
@@ -52,9 +53,7 @@ class BaseChangeDetector(BaseModel):
         if 'with_net' in self.init_params:
             del self.init_params['with_net']
         super(BaseChangeDetector, self).__init__('change_detector')
-        if model_name not in __all__:
-            raise ValueError("ERROR: There is no model named {}.".format(
-                model_name))
+
         self.model_name = model_name
         self.num_classes = num_classes
         self.use_mixed_loss = use_mixed_loss
@@ -70,6 +69,11 @@ class BaseChangeDetector(BaseModel):
         net = cmcd.__dict__[self.model_name](num_classes=self.num_classes,
                                              **params)
         return net
+
+    def _build_inference_net(self):
+        infer_net = InferCDNet(self.net)
+        infer_net.eval()
+        return infer_net
 
     def _fix_transforms_shape(self, image_shape):
         if hasattr(self, 'test_transforms'):
@@ -113,10 +117,10 @@ class BaseChangeDetector(BaseModel):
         if mode == 'test':
             origin_shape = inputs[2]
             if self.status == 'Infer':
-                label_map_list, score_map_list = self._postprocess(
+                label_map_list, score_map_list = self.postprocess(
                     net_out, origin_shape, transforms=inputs[3])
             else:
-                logit_list = self._postprocess(
+                logit_list = self.postprocess(
                     logit, origin_shape, transforms=inputs[3])
                 label_map_list = []
                 score_map_list = []
@@ -144,7 +148,7 @@ class BaseChangeDetector(BaseModel):
                 raise ValueError("Expected label.ndim == 4 but got {}".format(
                     label.ndim))
             origin_shape = [label.shape[-2:]]
-            pred = self._postprocess(
+            pred = self.postprocess(
                 pred, origin_shape, transforms=inputs[3])[0]  # NCHW
             intersect_area, pred_area, label_area = ppseg.utils.metrics.calculate_area(
                 pred, label, self.num_classes)
@@ -401,7 +405,8 @@ class BaseChangeDetector(BaseModel):
                 Defaults to False.
 
         Returns:
-            collections.OrderedDict with key-value pairs:
+            If `return_details` is False, return collections.OrderedDict with 
+                key-value pairs:
                 For binary change detection (number of classes == 2), the key-value 
                     pairs are like:
                     {"iou": `intersection over union for the change class`,
@@ -529,12 +534,12 @@ class BaseChangeDetector(BaseModel):
 
         Returns:
             If `img_file` is a tuple of string or np.array, the result is a dict with 
-                key-value pairs:
-                {"label map": `label map`, "score_map": `score map`}.
+                the following key-value pairs:
+                label_map (np.ndarray): Predicted label map (HW).
+                score_map (np.ndarray): Prediction score map (HWC).
+
             If `img_file` is a list, the result is a list composed of dicts with the 
-                corresponding fields:
-                label_map (np.ndarray): the predicted label map (HW)
-                score_map (np.ndarray): the prediction score map (HWC)
+                above keys.
         """
 
         if transforms is None and not hasattr(self, 'test_transforms'):
@@ -549,7 +554,7 @@ class BaseChangeDetector(BaseModel):
             images = [img_file]
         else:
             images = img_file
-        batch_im1, batch_im2, batch_origin_shape = self._preprocess(
+        batch_im1, batch_im2, batch_origin_shape = self.preprocess(
             images, transforms, self.model_type)
         self.net.eval()
         data = (batch_im1, batch_im2, batch_origin_shape, transforms.transforms)
@@ -660,7 +665,7 @@ class BaseChangeDetector(BaseModel):
         dst_data = None
         print("GeoTiff saved in {}.".format(save_file))
 
-    def _preprocess(self, images, transforms, to_tensor=True):
+    def preprocess(self, images, transforms, to_tensor=True):
         self._check_transforms(transforms, 'test')
         batch_im1, batch_im2 = list(), list()
         batch_ori_shape = list()
@@ -732,7 +737,7 @@ class BaseChangeDetector(BaseModel):
             batch_restore_list.append(restore_list)
         return batch_restore_list
 
-    def _postprocess(self, batch_pred, batch_origin_shape, transforms):
+    def postprocess(self, batch_pred, batch_origin_shape, transforms):
         batch_restore_list = BaseChangeDetector.get_transforms_shape_info(
             batch_origin_shape, transforms)
         if isinstance(batch_pred, (tuple, list)) and self.status == 'Infer':
@@ -789,11 +794,11 @@ class BaseChangeDetector(BaseModel):
                 elif item[0] == 'padding':
                     x, y = item[2]
                     if isinstance(label_map, np.ndarray):
-                        label_map = label_map[..., y:y + h, x:x + w]
-                        score_map = score_map[..., y:y + h, x:x + w]
+                        label_map = label_map[y:y + h, x:x + w]
+                        score_map = score_map[y:y + h, x:x + w]
                     else:
-                        label_map = label_map[:, :, y:y + h, x:x + w]
-                        score_map = score_map[:, :, y:y + h, x:x + w]
+                        label_map = label_map[:, y:y + h, x:x + w, :]
+                        score_map = score_map[:, y:y + h, x:x + w, :]
                 else:
                     pass
             label_map = label_map.squeeze()
@@ -1055,7 +1060,7 @@ class ChangeStar(BaseChangeDetector):
         if self.use_mixed_loss is False:
             return {
                 # XXX: make sure the shallow copy works correctly here.
-                'types': [seglosses.CrossEntropyLoss()] * 4,
+                'types': [seg_losses.CrossEntropyLoss()] * 4,
                 'coef': [1.0] * 4
             }
         else:
@@ -1066,11 +1071,12 @@ class ChangeStar(BaseChangeDetector):
 
 class ChangeFormer(BaseChangeDetector):
     def __init__(self,
-                 in_channels=3,
                  num_classes=2,
+                 use_mixed_loss=False,
+                 losses=None,
+                 in_channels=3,
                  decoder_softmax=False,
                  embed_dim=256,
-                 use_mixed_loss=False,
                  **params):
         params.update({
             'in_channels': in_channels,
@@ -1081,4 +1087,33 @@ class ChangeFormer(BaseChangeDetector):
             model_name='ChangeFormer',
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
+            losses=losses,
             **params)
+
+
+class FCCDN(BaseChangeDetector):
+    def __init__(self,
+                 in_channels=3,
+                 num_classes=2,
+                 use_mixed_loss=False,
+                 losses=None,
+                 **params):
+        params.update({'in_channels': in_channels})
+        super(FCCDN, self).__init__(
+            model_name='FCCDN',
+            num_classes=num_classes,
+            use_mixed_loss=use_mixed_loss,
+            losses=losses,
+            **params)
+
+    def default_loss(self):
+        if self.use_mixed_loss is False:
+            return {
+                'types':
+                [seg_losses.CrossEntropyLoss(), cmcd.losses.fccdn_ssl_loss],
+                'coef': [1.0, 1.0]
+            }
+        else:
+            raise ValueError(
+                f"Currently `use_mixed_loss` must be set to False for {self.__class__}"
+            )

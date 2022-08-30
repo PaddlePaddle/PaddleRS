@@ -16,7 +16,7 @@ import paddlers.tasks.object_detector as detector
 import paddlers.tasks.segmenter as segmenter
 import paddlers.tasks.change_detector as change_detector
 import paddlers.tasks.classifier as classifier
-import paddlers.tasks.image_restorer as restorer
+import paddlers.tasks.restorer as restorer
 from .load_model import load_model
 
 # Shorter aliases

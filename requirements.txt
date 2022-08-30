@@ -1,4 +1,4 @@
-paddleslim >= 2.2.1
+paddleslim >= 2.2.1,<2.3.3
 visualdl >= 2.1.1
 opencv-contrib-python == 4.3.0.38
 numba == 0.53.1

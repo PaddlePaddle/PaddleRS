@@ -26,9 +26,13 @@
 - 与分割、分类、变化检测等任务不同，检测任务不支持通过`losses`参数指定损失函数。不过对于部分训练器如`PPYOLO`，可通过`use_iou_loss`等参数定制损失函数。
 - 不同的子类支持与模型相关的输入参数，详情请参考[模型定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/rs_models/det)和[训练器定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/object_detector.py)。
 
+### 初始化`BaseRestorer`子类对象
+
+
+
 ### 初始化`BaseSegmenter`子类对象
 
-- 一般支持设置`input_channel`、`num_classes`以及`use_mixed_loss`参数，分别表示输入通道数、输出类别数以及是否使用预置的混合损失。部分模型如`FarSeg`暂不支持对`input_channel`参数的设置。
+- 一般支持设置`in_channels`、`num_classes`以及`use_mixed_loss`参数，分别表示输入通道数、输出类别数以及是否使用预置的混合损失。部分模型如`FarSeg`暂不支持对`in_channels`参数的设置。
 - `use_mixed_loss`参将在未来被弃用，因此不建议使用。
 - 可通过`losses`参数指定模型训练时使用的损失函数。`losses`需为一个字典，其中`'types'`键和`'coef'`键对应的值为两个等长的列表，分别表示损失函数对象（一个可调用对象）和损失函数的权重。例如：`losses={'types': [LossType1(), LossType2()], 'coef': [1.0, 0.5]}`在训练过程中将等价于计算如下损失函数：`1.0*LossType1()(logits, labels)+0.5*LossType2()(logits, labels)`，其中`logits`和`labels`分别是模型输出和真值标签。
 - 不同的子类支持与模型相关的输入参数，详情请参考[模型定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/rs_models/seg)和[训练器定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/segmentor.py)。
@@ -174,6 +178,9 @@ def train(self,
 |`use_vdl`|`bool`|是否启用VisualDL日志。|`True`|
 |`resume_checkpoint`|`str` \| `None`|检查点路径。PaddleRS支持从检查点（包含先前训练过程中存储的模型权重和优化器权重）继续训练，但需注意`resume_checkpoint`与`pretrain_weights`不得同时设置为`None`以外的值。|`None`|
 
+### `BaseRestorer.train()`
+
+
 ### `BaseSegmenter.train()`
 
 接口形式：
@@ -314,6 +321,9 @@ def evaluate(self,
  "bbox": 预测得到的目标框信息,
  "mask": 预测得到的掩模图信息}
 ```
+
+### `BaseRestorer.evaluate()`
+
 
 ### `BaseSegmenter.evaluate()`
 

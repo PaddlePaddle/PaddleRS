@@ -12,11 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import platform
 from itertools import cycle
 
 import paddlers
-from rs_models.test_model import TestModel
+from rs_models.test_model import TestModel, allow_oom
 
 __all__ = [
     'TestBITModel', 'TestCDNetModel', 'TestChangeStarModel', 'TestDSAMNetModel',
@@ -34,9 +33,7 @@ class TestCDModel(TestModel):
         self.check_output_equal(len(output), len(target))
         for o, t in zip(output, target):
             o = o.numpy()
-            self.check_output_equal(o.shape[0], t.shape[0])
-            self.check_output_equal(len(o.shape), 4)
-            self.check_output_equal(o.shape[2:], t.shape[2:])
+            self.check_output_equal(o.shape, t.shape)
 
     def set_inputs(self):
         if self.EF_MODE == 'Concat':
@@ -202,6 +199,7 @@ class TestSNUNetModel(TestCDModel):
         ]   # yapf: disable
 
 
+@allow_oom
 class TestSTANetModel(TestCDModel):
     MODEL_CLASS = paddlers.rs_models.cd.STANet
 
@@ -216,6 +214,7 @@ class TestSTANetModel(TestCDModel):
         ]   # yapf: disable
 
 
+@allow_oom
 class TestChangeFormerModel(TestCDModel):
     MODEL_CLASS = paddlers.rs_models.cd.ChangeFormer
 
@@ -226,9 +225,3 @@ class TestChangeFormerModel(TestCDModel):
             dict(**base_spec, decoder_softmax=True),
             dict(**base_spec, embed_dim=56)
         ]   # yapf: disable
-
-
-# HACK:FIXME: We observe an OOM error when running TestSTANetModel.test_forward() on a Windows machine.
-# Currently, we do not perform this test.
-if platform.system() == 'Windows':
-    TestSTANetModel.test_forward = lambda self: None

@@ -638,3 +638,7 @@ def decode_seg_mask(mask_path):
     mask = np.asarray(Image.open(mask_path))
     mask = mask.astype('int64')
     return mask
+
+
+def calc_hr_shape(lr_shape, sr_factor):
+    return tuple(int(s * sr_factor) for s in lr_shape)

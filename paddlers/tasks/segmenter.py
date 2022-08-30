@@ -33,6 +33,7 @@ from paddlers.utils import get_single_card_bs, DisablePrint
 from paddlers.utils.checkpoint import seg_pretrain_weights_dict
 from .base import BaseModel
 from .utils import seg_metrics as metrics
+from .utils.infer_nets import InferSegNet
 
 __all__ = ["UNet", "DeepLabV3P", "FastSCNN", "HRNet", "BiSeNetV2", "FarSeg"]
 
@@ -64,10 +65,15 @@ class BaseSegmenter(BaseModel):
 
     def build_net(self, **params):
         # TODO: when using paddle.utils.unique_name.guard,
-        # DeepLabv3p and HRNet will raise a error
+        # DeepLabv3p and HRNet will raise an error.
         net = dict(ppseg.models.__dict__, **cmseg.__dict__)[self.model_name](
             num_classes=self.num_classes, **params)
         return net
+
+    def _build_inference_net(self):
+        infer_net = InferSegNet(self.net)
+        infer_net.eval()
+        return infer_net
 
     def _fix_transforms_shape(self, image_shape):
         if hasattr(self, 'test_transforms'):
@@ -111,10 +117,10 @@ class BaseSegmenter(BaseModel):
         if mode == 'test':
             origin_shape = inputs[1]
             if self.status == 'Infer':
-                label_map_list, score_map_list = self._postprocess(
+                label_map_list, score_map_list = self.postprocess(
                     net_out, origin_shape, transforms=inputs[2])
             else:
-                logit_list = self._postprocess(
+                logit_list = self.postprocess(
                     logit, origin_shape, transforms=inputs[2])
                 label_map_list = []
                 score_map_list = []
@@ -142,7 +148,7 @@ class BaseSegmenter(BaseModel):
                 raise ValueError("Expected label.ndim == 4 but got {}".format(
                     label.ndim))
             origin_shape = [label.shape[-2:]]
-            pred = self._postprocess(
+            pred = self.postprocess(
                 pred, origin_shape, transforms=inputs[2])[0]  # NCHW
             intersect_area, pred_area, label_area = ppseg.utils.metrics.calculate_area(
                 pred, label, self.num_classes)
@@ -472,7 +478,6 @@ class BaseSegmenter(BaseModel):
                     conf_mat_all.append(conf_mat)
         class_iou, miou = ppseg.utils.metrics.mean_iou(
             intersect_area_all, pred_area_all, label_area_all)
-        # TODO 确认是按oacc还是macc
         class_acc, oacc = ppseg.utils.metrics.accuracy(intersect_area_all,
                                                        pred_area_all)
         kappa = ppseg.utils.metrics.kappa(intersect_area_all, pred_area_all,
@@ -504,13 +509,13 @@ class BaseSegmenter(BaseModel):
                 Defaults to None.
 
         Returns:
-            If `img_file` is a string or np.array, the result is a dict with key-value 
-                pairs:
-                {"label map": `label map`, "score_map": `score map`}.
+            If `img_file` is a tuple of string or np.array, the result is a dict with 
+                the following key-value pairs:
+                label_map (np.ndarray): Predicted label map (HW).
+                score_map (np.ndarray): Prediction score map (HWC).
+
             If `img_file` is a list, the result is a list composed of dicts with the 
-                corresponding fields:
-                label_map (np.ndarray): the predicted label map (HW)
-                score_map (np.ndarray): the prediction score map (HWC)
+                above keys.
         """
 
         if transforms is None and not hasattr(self, 'test_transforms'):
@@ -521,8 +526,8 @@ class BaseSegmenter(BaseModel):
             images = [img_file]
         else:
             images = img_file
-        batch_im, batch_origin_shape = self._preprocess(images, transforms,
-                                                        self.model_type)
+        batch_im, batch_origin_shape = self.preprocess(images, transforms,
+                                                       self.model_type)
         self.net.eval()
         data = (batch_im, batch_origin_shape, transforms.transforms)
         outputs = self.run(self.net, data, 'test')
@@ -626,7 +631,7 @@ class BaseSegmenter(BaseModel):
         dst_data = None
         print("GeoTiff saved in {}.".format(save_file))
 
-    def _preprocess(self, images, transforms, to_tensor=True):
+    def preprocess(self, images, transforms, to_tensor=True):
         self._check_transforms(transforms, 'test')
         batch_im = list()
         batch_ori_shape = list()
@@ -693,7 +698,7 @@ class BaseSegmenter(BaseModel):
             batch_restore_list.append(restore_list)
         return batch_restore_list
 
-    def _postprocess(self, batch_pred, batch_origin_shape, transforms):
+    def postprocess(self, batch_pred, batch_origin_shape, transforms):
         batch_restore_list = BaseSegmenter.get_transforms_shape_info(
             batch_origin_shape, transforms)
         if isinstance(batch_pred, (tuple, list)) and self.status == 'Infer':
@@ -750,11 +755,11 @@ class BaseSegmenter(BaseModel):
                 elif item[0] == 'padding':
                     x, y = item[2]
                     if isinstance(label_map, np.ndarray):
-                        label_map = label_map[..., y:y + h, x:x + w]
-                        score_map = score_map[..., y:y + h, x:x + w]
+                        label_map = label_map[y:y + h, x:x + w]
+                        score_map = score_map[y:y + h, x:x + w]
                     else:
-                        label_map = label_map[:, :, y:y + h, x:x + w]
-                        score_map = score_map[:, :, y:y + h, x:x + w]
+                        label_map = label_map[:, y:y + h, x:x + w, :]
+                        score_map = score_map[:, y:y + h, x:x + w, :]
                 else:
                     pass
             label_map = label_map.squeeze()
@@ -781,7 +786,7 @@ class BaseSegmenter(BaseModel):
 
 class UNet(BaseSegmenter):
     def __init__(self,
-                 input_channel=3,
+                 in_channels=3,
                  num_classes=2,
                  use_mixed_loss=False,
                  losses=None,
@@ -794,7 +799,7 @@ class UNet(BaseSegmenter):
         })
         super(UNet, self).__init__(
             model_name='UNet',
-            input_channel=input_channel,
+            input_channel=in_channels,
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
             losses=losses,
@@ -803,7 +808,7 @@ class UNet(BaseSegmenter):
 
 class DeepLabV3P(BaseSegmenter):
     def __init__(self,
-                 input_channel=3,
+                 in_channels=3,
                  num_classes=2,
                  backbone='ResNet50_vd',
                  use_mixed_loss=False,
@@ -822,7 +827,7 @@ class DeepLabV3P(BaseSegmenter):
         if params.get('with_net', True):
             with DisablePrint():
                 backbone = getattr(ppseg.models, backbone)(
-                    input_channel=input_channel, output_stride=output_stride)
+                    input_channel=in_channels, output_stride=output_stride)
         else:
             backbone = None
         params.update({

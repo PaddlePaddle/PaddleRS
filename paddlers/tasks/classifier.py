@@ -62,7 +62,7 @@ class BaseClassifier(BaseModel):
         self.metrics = None
         self.losses = losses
         self.labels = None
-        self._postprocess = None
+        self.postprocess = None
         if params.get('with_net', True):
             params.pop('with_net', None)
             self.net = self.build_net(**params)
@@ -82,6 +82,11 @@ class BaseClassifier(BaseModel):
                 net = model(class_num=self.num_classes, **params)
                 self.in_channels = 3
         return net
+
+    def _build_inference_net(self):
+        infer_net = self.net
+        infer_net.eval()
+        return infer_net
 
     def _fix_transforms_shape(self, image_shape):
         if hasattr(self, 'test_transforms'):
@@ -122,13 +127,12 @@ class BaseClassifier(BaseModel):
         net_out = net(inputs[0])
 
         if mode == 'test':
-            return self._postprocess(net_out)
+            return self.postprocess(net_out)
 
         outputs = OrderedDict()
         label = paddle.to_tensor(inputs[1], dtype="int64")
 
         if mode == 'eval':
-            # print(self._postprocess(net_out)[0])  # for test
             label = paddle.unsqueeze(label, axis=-1)
             metric_dict = self.metrics(net_out, label)
             outputs['top1'] = metric_dict["top1"]
@@ -177,13 +181,13 @@ class BaseClassifier(BaseModel):
         label_dict = dict()
         for i, label in enumerate(self.labels):
             label_dict[i] = label
-        self._postprocess = build_postprocess({
+        self.postprocess = build_postprocess({
             "name": "Topk",
             "topk": topk,
             "class_id_map_file": None
         })
         # Add class_id_map from model.yml
-        self._postprocess.class_id_map = label_dict
+        self.postprocess.class_id_map = label_dict
 
     def train(self,
               num_epochs,
@@ -248,8 +252,7 @@ class BaseClassifier(BaseModel):
         if self.losses is None:
             self.losses = self.default_loss()
         self.metrics = self.default_metric()
-        self._postprocess = self.default_postprocess(train_dataset.label_list)
-        # print(self._postprocess.class_id_map)
+        self.postprocess = self.default_postprocess(train_dataset.label_list)
 
         if optimizer is None:
             num_steps_each_epoch = train_dataset.num_samples // train_batch_size
@@ -375,7 +378,8 @@ class BaseClassifier(BaseModel):
                 Defaults to False.
 
         Returns:
-            collections.OrderedDict with key-value pairs:
+            If `return_details` is False, return collections.OrderedDict with 
+                key-value pairs:
                 {"top1": `acc of top1`,
                  "top5": `acc of top5`}.
         """
@@ -391,38 +395,37 @@ class BaseClassifier(BaseModel):
             ):
                 paddle.distributed.init_parallel_env()
 
-        batch_size_each_card = get_single_card_bs(batch_size)
-        if batch_size_each_card > 1:
-            batch_size_each_card = 1
-            batch_size = batch_size_each_card * paddlers.env_info['num']
+        if batch_size > 1:
             logging.warning(
-                "Classifier only supports batch_size=1 for each gpu/cpu card " \
-                "during evaluation, so batch_size " \
-                "is forcibly set to {}.".format(batch_size))
-        self.eval_data_loader = self.build_data_loader(
-            eval_dataset, batch_size=batch_size, mode='eval')
+                "Classifier only supports single card evaluation with batch_size=1 "
+                "during evaluation, so batch_size is forcibly set to 1.")
+            batch_size = 1
 
-        logging.info(
-            "Start to evaluate(total_samples={}, total_steps={})...".format(
-                eval_dataset.num_samples,
-                math.ceil(eval_dataset.num_samples * 1.0 / batch_size)))
+        if nranks < 2 or local_rank == 0:
+            self.eval_data_loader = self.build_data_loader(
+                eval_dataset, batch_size=batch_size, mode='eval')
+            logging.info(
+                "Start to evaluate(total_samples={}, total_steps={})...".format(
+                    eval_dataset.num_samples, eval_dataset.num_samples))
 
-        top1s = []
-        top5s = []
-        with paddle.no_grad():
-            for step, data in enumerate(self.eval_data_loader):
-                data.append(eval_dataset.transforms.transforms)
-                outputs = self.run(self.net, data, 'eval')
-                top1s.append(outputs["top1"])
-                top5s.append(outputs["top5"])
+            top1s = []
+            top5s = []
+            with paddle.no_grad():
+                for step, data in enumerate(self.eval_data_loader):
+                    data.append(eval_dataset.transforms.transforms)
+                    outputs = self.run(self.net, data, 'eval')
+                    top1s.append(outputs["top1"])
+                    top5s.append(outputs["top5"])
 
-        top1 = np.mean(top1s)
-        top5 = np.mean(top5s)
-        eval_metrics = OrderedDict(zip(['top1', 'top5'], [top1, top5]))
-        if return_details:
-            # TODO: add details
-            return eval_metrics, None
-        return eval_metrics
+            top1 = np.mean(top1s)
+            top5 = np.mean(top5s)
+            eval_metrics = OrderedDict(zip(['top1', 'top5'], [top1, top5]))
+
+            if return_details:
+                # TODO: Add details
+                return eval_metrics, None
+
+            return eval_metrics
 
     def predict(self, img_file, transforms=None):
         """
@@ -437,16 +440,14 @@ class BaseClassifier(BaseModel):
                 Defaults to None.
 
         Returns:
-            If `img_file` is a string or np.array, the result is a dict with key-value 
-                pairs:
-                {"label map": `class_ids_map`, 
-                 "scores_map": `scores_map`, 
-                 "label_names_map": `label_names_map`}.
+            If `img_file` is a string or np.array, the result is a dict with the 
+                following key-value pairs:
+                class_ids_map (np.ndarray): IDs of predicted classes.
+                scores_map (np.ndarray): Scores of predicted classes.
+                label_names_map (np.ndarray): Names of predicted classes.
+            
             If `img_file` is a list, the result is a list composed of dicts with the 
-                corresponding fields:
-                class_ids_map (np.ndarray): class_ids
-                scores_map (np.ndarray): scores
-                label_names_map (np.ndarray): label_names
+                above keys.
         """
 
         if transforms is None and not hasattr(self, 'test_transforms'):
@@ -457,12 +458,12 @@ class BaseClassifier(BaseModel):
             images = [img_file]
         else:
             images = img_file
-        batch_im, batch_origin_shape = self._preprocess(images, transforms,
-                                                        self.model_type)
+        batch_im, batch_origin_shape = self.preprocess(images, transforms,
+                                                       self.model_type)
         self.net.eval()
         data = (batch_im, batch_origin_shape, transforms.transforms)
 
-        if self._postprocess is None:
+        if self.postprocess is None:
             self.build_postprocess_from_labels()
 
         outputs = self.run(self.net, data, 'test')
@@ -483,7 +484,7 @@ class BaseClassifier(BaseModel):
             }
         return prediction
 
-    def _preprocess(self, images, transforms, to_tensor=True):
+    def preprocess(self, images, transforms, to_tensor=True):
         self._check_transforms(transforms, 'test')
         batch_im = list()
         batch_ori_shape = list()
@@ -556,6 +557,26 @@ class BaseClassifier(BaseModel):
                           paddlers.transforms.ArrangeClassifier):
             raise TypeError(
                 "`transforms.arrange` must be an ArrangeClassifier object.")
+
+    def build_data_loader(self, dataset, batch_size, mode='train'):
+        if dataset.num_samples < batch_size:
+            raise ValueError(
+                'The volume of dataset({}) must be larger than batch size({}).'
+                .format(dataset.num_samples, batch_size))
+
+        if mode != 'train':
+            return paddle.io.DataLoader(
+                dataset,
+                batch_size=batch_size,
+                shuffle=dataset.shuffle,
+                drop_last=False,
+                collate_fn=dataset.batch_transforms,
+                num_workers=dataset.num_workers,
+                return_list=True,
+                use_shared_memory=False)
+        else:
+            return super(BaseClassifier, self).build_data_loader(
+                dataset, batch_size, mode)
 
 
 class ResNet50_vd(BaseClassifier):

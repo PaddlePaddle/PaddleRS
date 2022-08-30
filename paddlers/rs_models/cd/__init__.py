@@ -23,3 +23,5 @@ from .fc_ef import FCEarlyFusion
 from .fc_siam_conc import FCSiamConc
 from .fc_siam_diff import FCSiamDiff
 from .changeformer import ChangeFormer
+from .fccdn import FCCDN
+from .losses import fccdn_ssl_loss

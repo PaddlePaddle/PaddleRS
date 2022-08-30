@@ -4,11 +4,11 @@
     <img src="./docs/images/logo.png" align="middle" width = "500" />
   </p>
 
-  **基于飞桨框架开发的高性能遥感影像处理开发套件，帮助您端到端地完成从数据预处理到模型部署的全流程遥感深度学习应用。**
+  **飞桨高性能遥感影像开发套件，端到端完成从数据到部署的全流程遥感应用。**
 
   <!-- [![version](https://img.shields.io/github/release/PaddlePaddle/PaddleRS.svg)](https://github.com/PaddlePaddle/PaddleRS/releases) -->
   [![license](https://img.shields.io/badge/license-Apache%202-blue.svg)](LICENSE)
-  [![build status](https://github.com/PaddlePaddle/PaddleRS/actions/workflows/build_and_test.yaml/badge.svg?branch=develop)](https://github.com/PaddlePaddle/PaddleRS/actions)
+  [![build status](https://github.com/PaddlePaddle/PaddleRS/actions/workflows/build.yaml/badge.svg?branch=develop)](https://github.com/PaddlePaddle/PaddleRS/actions)
   ![python version](https://img.shields.io/badge/python-3.7+-orange.svg)
   ![support os](https://img.shields.io/badge/os-linux%2C%20win%2C%20mac-yellow.svg)
 </div>
@@ -188,7 +188,7 @@ PaddleRS目录树中关键部分如下：
 * 如果您发现任何PaddleRS存在的问题或是对PaddleRS有建议, 欢迎通过[GitHub Issues](https://github.com/PaddlePaddle/PaddleRS/issues)向我们提出。
 * 欢迎加入PaddleRS微信群
 <div align="center">
-<img src="./docs/images/wechat.png"  width = "150" />  
+<img src="https://user-images.githubusercontent.com/21275753/187380802-cf1b551f-8127-4c78-993f-e3f65eca0398.png"  width = "150" />  
 </div>
 
 ## 使用教程 <img src="./docs/images/teach.png" width="30"/>
@@ -209,8 +209,7 @@ PaddleRS目录树中关键部分如下：
   * [Python部署](./deploy/README.md)
   * [模型推理API说明](./docs/apis/infer.md)
 * 实践案例
-  * [遥感影像变化检测案例](./docs/cases/csc_cd_cn.md)
-  * [遥感影像超分辨率重建案例](./docs/cases/sr_seg_cn.md)
+  * [PaddleRS实践案例库](./examples/README.md)
 * 代码贡献
   * [贡献指南](./docs/CONTRIBUTING.md)
   * [开发指南](./docs/dev/dev_guide.md)
