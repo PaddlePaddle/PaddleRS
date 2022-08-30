@@ -380,8 +380,8 @@ class BaseClassifier(BaseModel):
         Returns:
             If `return_details` is False, return collections.OrderedDict with 
                 key-value pairs:
-                {"top1": `acc of top1`,
-                 "top5": `acc of top5`}.
+                {"top1": acc of top1,
+                 "top5": acc of top5}.
         """
 
         self._check_transforms(eval_dataset.transforms, 'eval')

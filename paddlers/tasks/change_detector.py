@@ -409,18 +409,18 @@ class BaseChangeDetector(BaseModel):
                 key-value pairs:
                 For binary change detection (number of classes == 2), the key-value 
                     pairs are like:
-                    {"iou": `intersection over union for the change class`,
-                    "f1": `F1 score for the change class`,
-                    "oacc": `overall accuracy`,
-                    "kappa": ` kappa coefficient`}.
+                    {"iou": intersection over union for the change class,
+                    "f1": F1 score for the change class,
+                    "oacc": overall accuracy,
+                    "kappa": kappa coefficient}.
                 For multi-class change detection (number of classes > 2), the key-value 
                     pairs are like:
-                    {"miou": `mean intersection over union`,
-                    "category_iou": `category-wise mean intersection over union`,
-                    "oacc": `overall accuracy`,
-                    "category_acc": `category-wise accuracy`,
-                    "kappa": ` kappa coefficient`,
-                    "category_F1-score": `F1 score`}.
+                    {"miou": mean intersection over union,
+                    "category_iou": category-wise mean intersection over union,
+                    "oacc": overall accuracy,
+                    "category_acc": category-wise accuracy,
+                    "kappa": kappa coefficient,
+                    "category_F1-score": F1 score}.
         """
 
         self._check_transforms(eval_dataset.transforms, 'eval')

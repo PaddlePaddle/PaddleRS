@@ -89,7 +89,28 @@ def predict(self, img_file, transforms=None):
 
 #### `BaseRestorer.predict()`
 
+接口形式：
 
+```python
+def predict(self, img_file, transforms=None):
+```
+
+输入参数：
+
+|参数名称|类型|参数说明|默认值|
+|-------|----|--------|-----|
+|`img_file`|`list[str\|np.ndarray]` \| `str` \| `np.ndarray`|输入影像数据（NumPy数组形式）或输入影像路径。若需要一次性预测一组影像，以列表包含这些影像的数据或路径（每幅影像对应列表中的一个元素）。||
+|`transforms`|`paddlers.transforms.Compose` \| `None`|对输入数据应用的数据变换算子。若为`None`，则使用训练器在验证阶段使用的数据变换算子。|`None`|
+
+返回格式：
+
+若`img_file`是一个字符串或NumPy数组，则返回对象为包含下列键值对的字典：
+
+```
+{"res_map": 模型输出的复原或重建影像（以[h, w, c]格式排布）}
+```
+
+若`img_file`是一个列表，则返回对象为与`img_file`等长的列表，其中的每一项为一个字典（键值对如上所示），顺序对应`img_file`中的每个元素。
 
 #### `BaseSegmenter.predict()`
 
@@ -190,7 +211,7 @@ def predict(self,
 
 |参数名称|类型|参数说明|默认值|
 |-------|----|--------|-----|
-|`img_file`|`list[str\|tuple\|np.ndarray]` \| `str` \| `tuple` \| `np.ndarray`|对于场景分类、目标检测和图像分割任务来说，该参数可为单一图像路径，或是解码后的、排列格式为[h, w, c]且具有float32类型的图像数据（表示为NumPy数组形式），或者是一组图像路径或np.ndarray对象构成的列表；对于变化检测任务来说，该参数可以为图像路径二元组（分别表示前后两个时相影像路径），或是解码后的两幅图像组成的二元组，或者是上述两种二元组之一构成的列表。||
+|`img_file`|`list[str\|tuple\|np.ndarray]` \| `str` \| `tuple` \| `np.ndarray`|对于场景分类、目标检测、图像复原和图像分割任务来说，该参数可为单一图像路径，或是解码后的、排列格式为[h, w, c]且具有float32类型的图像数据（表示为NumPy数组形式），或者是一组图像路径或np.ndarray对象构成的列表；对于变化检测任务来说，该参数可以为图像路径二元组（分别表示前后两个时相影像路径），或是解码后的两幅图像组成的二元组，或者是上述两种二元组之一构成的列表。||
 |`topk`|`int`|场景分类模型预测时使用，表示选取模型输出概率大小排名前`topk`的类别作为最终结果。|`1`|
 |`transforms`|`paddlers.transforms.Compose`\|`None`|对输入数据应用的数据变换算子。若为`None`，则使用从`model.yml`中读取的算子。|`None`|
 |`warmup_iters`|`int`|预热轮数，用于评估模型推理以及前后处理速度。若大于1，将预先重复执行`warmup_iters`次推理，而后才开始正式的预测及其速度评估。|`0`|

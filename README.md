@@ -200,8 +200,9 @@ PaddleRS目录树中关键部分如下：
   * [智能标注工具EISeg](https://github.com/PaddlePaddle/PaddleSeg/tree/release/2.6/EISeg)
   * [遥感影像处理工具集](./docs/data/tools.md)
 * 组件介绍
-  * [数据预处理/数据增强](./docs/intro/transforms.md)
+  * [数据集预处理脚本](./docs/intro/data_prep.md)
   * [模型库](./docs/intro/model_zoo.md)
+  * [数据变换算子](./docs/intro/transforms.md)
 * 模型训练
   * [模型训练API说明](./docs/apis/train.md)
 * 模型部署

@@ -365,8 +365,8 @@ class BaseRestorer(BaseModel):
         Returns:
             If `return_details` is False, return collections.OrderedDict with 
                 key-value pairs:
-                {"psnr": `peak signal-to-noise ratio`,
-                 "ssim": `structural similarity`}.
+                {"psnr": peak signal-to-noise ratio,
+                 "ssim": structural similarity}.
 
         """
 

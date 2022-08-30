@@ -86,6 +86,22 @@
 
 ### 图像复原数据集`ResDataset`
 
+`ResDataset`定义在：https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/datasets/res_dataset.py
+
+其初始化参数列表如下：
+
+|参数名称|类型|参数说明|默认值|
+|-------|----|--------|-----|
+|`data_dir`|`str`|数据集存放目录。||
+|`file_list`|`str`|file list路径。file list是一个文本文件，其中每一行包含一个样本的路径信息。`ResDataset`对file list的具体要求请参见下文。||
+|`transforms`|`paddlers.transforms.Compose`|对输入数据应用的数据变换算子。||
+|`num_workers`|`int` \| `str`|加载数据时使用的辅助进程数。若设置为`'auto'`，则按照如下规则确定使用进程数：当CPU核心数大于16时，使用8个数据读取辅助进程；否则，使用CPU核心数一半数量的辅助进程。|`'auto'`|
+|`shuffle`|`bool`|是否随机打乱数据集中的样本。|`False`|
+|`sr_factor`|`int` \| `None`|对于超分辨率重建任务，指定为超分辨率倍数；对于其它任务，指定为`None`。|`None`|
+
+`ResDataset`对file list的要求如下：
+
+- file list中的每一行应该包含2个以空格分隔的项，依次表示输入影像（例如超分辨率重建任务中的低分辨率影像）相对`data_dir`的路径以及目标影像（例如超分辨率重建任务中的高分辨率影像）相对`data_dir`的路径。
 
 ### 图像分割数据集`SegDataset`
 

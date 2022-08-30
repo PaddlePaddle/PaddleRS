@@ -8,8 +8,9 @@ PaddleRS在`tools`目录中提供了丰富的遥感影像处理工具，包括�
 - `match.py`：用于实现两幅影像的配准。
 - `split.py`：用于对大幅面影像数据进行切片。
 - `coco_tools/`：COCO工具合集，用于统计处理COCO格式标注文件。
+- `prepare_dataset/`：数据集预处理脚本合集。
 
-## 使用示例
+## 使用说明
 
 首先请确保您已将PaddleRS下载到本地。进入`tools`目录：
 
@@ -101,3 +102,24 @@ python split.py --image_path {输入影像路径} [--mask_path {真值标签路�
 - `json_Merge.py`:       将多个json文件合并为一个。
 
 详细使用方法请参见[coco_tools使用说明](coco_tools.md)。
+
+### prepare_dataset
+
+`prepare_dataset`目录中包含一系列数据预处理脚本，主要用于预处理已下载到本地的遥感开源数据集，使其符合PaddleRS训练、验证、测试的标准。
+
+在执行脚本前，您可以通过`--help`选项获取帮助信息。例如：
+
+```shell
+python prepare_dataset/prepare_levircd.py --help
+```
+
+以下列出了脚本中常见的命令行选项：
+
+- `--in_dataset_dir`：下载到本地的原始数据集所在路径。示例：`--in_dataset_dir downloads/LEVIR-CD`。
+- `--out_dataset_dir`：处理后的数据集存放路径。示例：`--out_dataset_dir data/levircd`。
+- `--crop_size`：对于支持影像裁块的数据集，指定切分的影像块大小。示例：`--crop_size 256`。
+- `--crop_stride`：对于支持影像裁块的数据集，指定切分时滑窗移动的步长。示例：`--crop_stride 256`。
+- `--seed`：随机种子。可用于固定随机数生成器产生的伪随机数序列，从而得到固定的数据集划分结果。示例：`--seed 1919810`
+- `--ratios`：对于支持子集随机划分的数据集，指定需要划分的各个子集的样本比例。示例：`--ratios 0.7 0.2 0.1`。
+
+您可以在[此文档](https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/intro/data_prep.md)中查看PaddleRS提供哪些数据集的预处理脚本。
