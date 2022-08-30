@@ -20,10 +20,7 @@ PaddleRS提供从科学研究到产业应用的丰富示例，希望帮助遥感
 #### 遥感图像智能解译平台
 
 <p>
-<img src="demo2_1.gif", width="300", hspace="40"> <img src="demo2_2.gif", width="300">
-</p>
-<p>
-<img src="demo2_3.gif", width="300", hspace="40"> <img src="demo2_4.gif", width="300">
+<img src="https://user-images.githubusercontent.com/21275753/187441111-e992e0ff-93d1-4fb3-90b2-79ff698db8d8.gif", width="300", hspace="40"> <img src="https://user-images.githubusercontent.com/21275753/187441219-08668c78-8426-4e19-ad7d-d1a22e1def49.gif", width="300">
 </p>
 
 - 作者：HHU-河马海牛队
