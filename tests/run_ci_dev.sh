@@ -19,7 +19,7 @@ fi
 
 echo -e '*****************paddle_version*****'
 python -c 'import paddle;print(paddle.version.commit)'
-echo -e '*****************paddleseg_version****'
+echo -e '*****************paddlers_version****'
 git rev-parse HEAD
 
 pip install -r requirements.txt --ignore-installed
