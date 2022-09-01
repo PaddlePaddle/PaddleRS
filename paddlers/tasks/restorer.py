@@ -31,6 +31,7 @@ from paddlers.models import res_losses
 from paddlers.transforms import Resize, decode_image
 from paddlers.transforms.functions import calc_hr_shape
 from paddlers.utils import get_single_card_bs
+from paddlers.utils.checkpoint import res_pretrain_weights_dict
 from .base import BaseModel
 from .utils.res_adapters import GANAdapter, OptimizerAdapter
 from .utils.infer_nets import InferResNet
@@ -234,7 +235,7 @@ class BaseRestorer(BaseModel):
                 exit=True)
         if pretrain_weights is not None and resume_checkpoint is not None:
             logging.error(
-                "pretrain_weights and resume_checkpoint cannot be set simultaneously.",
+                "`pretrain_weights` and `resume_checkpoint` cannot be set simultaneously.",
                 exit=True)
 
         if self.losses is None:
@@ -256,14 +257,30 @@ class BaseRestorer(BaseModel):
         else:
             self.optimizer = optimizer
 
-        if pretrain_weights is not None and not osp.exists(pretrain_weights):
-            logging.warning("Path of pretrain_weights('{}') does not exist!".
-                            format(pretrain_weights))
-        elif pretrain_weights is not None and osp.exists(pretrain_weights):
-            if osp.splitext(pretrain_weights)[-1] != '.pdparams':
-                logging.error(
-                    "Invalid pretrain weights. Please specify a '.pdparams' file.",
-                    exit=True)
+        if pretrain_weights is not None:
+            if not osp.exists(pretrain_weights):
+                if self.model_name not in res_pretrain_weights_dict:
+                    logging.warning(
+                        "Path of pretrained weights ('{}') does not exist!".
+                        format(pretrain_weights))
+                    pretrain_weights = None
+                elif pretrain_weights not in res_pretrain_weights_dict[
+                        self.model_name]:
+                    logging.warning(
+                        "Path of pretrained weights ('{}') does not exist!".
+                        format(pretrain_weights))
+                    pretrain_weights = res_pretrain_weights_dict[
+                        self.model_name][0]
+                    logging.warning(
+                        "`pretrain_weights` is forcibly set to '{}'. "
+                        "If you don't want to use pretrained weights, "
+                        "please set `pretrain_weights` to None.".format(
+                            pretrain_weights))
+            else:
+                if osp.splitext(pretrain_weights)[-1] != '.pdparams':
+                    logging.error(
+                        "Invalid pretrained weights. Please specify a .pdparams file.",
+                        exit=True)
         pretrained_dir = osp.join(save_dir, 'pretrain')
         is_backbone_weights = pretrain_weights == 'IMAGENET'
         self.net_initialize(

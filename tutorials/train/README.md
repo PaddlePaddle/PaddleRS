@@ -26,6 +26,7 @@
 |object_detection/ppyolov2.py | 目标检测 | PP-YOLOv2 |
 |object_detection/yolov3.py | 目标检测 | YOLOv3 |
 |semantic_segmentation/deeplabv3p.py | 图像分割 | DeepLab V3+ |
+|semantic_segmentation/farseg.py | 图像分割 | FarSeg |
 |semantic_segmentation/unet.py | 图像分割 | UNet |
 
 ## 环境准备

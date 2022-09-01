@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# 图像分割模型UNet训练示例脚本
+# 图像分割模型FarSeg训练示例脚本
 # 执行此脚本前，请确认已正确安装PaddleRS库
 
 import paddlers as pdrs
@@ -15,7 +15,7 @@ EVAL_FILE_LIST_PATH = './data/rsseg/val.txt'
 # 数据集类别信息文件路径
 LABEL_LIST_PATH = './data/rsseg/labels.txt'
 # 实验目录，保存输出的模型权重和结果
-EXP_DIR = './output/unet/'
+EXP_DIR = './output/farseg/'
 
 # 影像波段数量
 NUM_BANDS = 10
@@ -67,10 +67,10 @@ eval_dataset = pdrs.datasets.SegDataset(
     num_workers=0,
     shuffle=False)
 
-# 构建UNet模型
+# 构建FarSeg模型
 # 目前已支持的模型请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/intro/model_zoo.md
 # 模型输入参数请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/segmenter.py
-model = pdrs.tasks.seg.UNet(
+model = pdrs.tasks.seg.FarSeg(
     in_channels=NUM_BANDS, num_classes=len(train_dataset.labels))
 
 # 执行模型训练
@@ -83,6 +83,7 @@ model.train(
     # 每多少次迭代记录一次日志
     log_interval_steps=4,
     save_dir=EXP_DIR,
+    pretrain_weights=None,
     # 初始学习率大小
     learning_rate=0.001,
     # 是否使用early stopping策略，当精度不再改善时提前终止训练
