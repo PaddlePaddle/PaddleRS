@@ -107,7 +107,7 @@ def crop_patches(crop_size,
     if max_workers < 0:
         raise ValueError("`max_workers` must be a non-negative integer!")
 
-    if subset is None:
+    if subsets is None:
         subsets = ('', )
 
     if max_workers == 0:
