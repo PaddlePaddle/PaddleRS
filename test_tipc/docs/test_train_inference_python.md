@@ -6,22 +6,62 @@ Linux GPU/CPU 基础训练推理测试的主程序为`test_train_inference_pytho
 
 - 训练相关：
 
-| 任务类别 | 模型名称 | 单机单卡 | 单机多卡 |
-|  :----: |   :----:  |    :----:  |  :----:   |
-|  变化检测  | BIT | 正常训练 | 正常训练 |
-|  场景分类  | HRNet | 正常训练 | 正常训练 |
-|  目标检测  | PP-YOLO | 正常训练 | 正常训练 |
-|  图像分割  | UNet | 正常训练 | 正常训练 |
+| 任务类别 | 模型名称 | 单机单卡 | 单机多卡 | 参考预测精度 |
+| :----: | :----: | :----: | :----: | :----: |
+|  变化检测  | BIT | 正常训练 | 正常训练 | IoU=71.02% |
+|  变化检测  | CDNet | 正常训练 | 正常训练 | IoU=56.02% |
+|  变化检测  | ChangeFormer | 正常训练 | 正常训练 | IoU=61.65% |
+|  变化检测  | DSAMNet | 正常训练 | 正常训练 | IoU=69.76% |
+|  变化检测  | DSIFN | 正常训练 | 正常训练 | IoU=72.88% |
+|  变化检测  | SNUNet | 正常训练 | 正常训练 | IoU=68.46% |
+|  变化检测  | STANet | 正常训练 | 正常训练 | IoU=65.11% |
+|  变化检测  | FC-EF | 正常训练 | 正常训练 | IoU=64.22% |
+|  变化检测  | FC-Siam-conc | 正常训练 | 正常训练 | IoU=65.79% |
+|  变化检测  | FC-Siam-diff | 正常训练 | 正常训练 | IoU=61.23% |
+|  变化检测  | FCCDN | 正常训练 | 正常训练 | IoU=24.42% |
+|  场景分类  | HRNet | 正常训练 | 正常训练 | Acc(top1)=99.37% |
+|  场景分类  | MobileNetV3 | 正常训练 | 正常训练 | Acc(top1)=99.58% |
+|  场景分类  | ResNet50-vd | 正常训练 | 正常训练 | Acc(top1)=99.26% |
+|  图像复原  | DRN | 正常训练 | 正常训练 | PSNR=24.23 |
+|  图像复原  | ESRGAN | 正常训练 | 正常训练 | PSNR=21.30 |
+|  图像复原  | LESRCNN | 正常训练 | 正常训练 | PSNR=23.18 |
+|  目标检测  | Faster R-CNN | 正常训练 | 正常训练 | mAP=46.99% |
+|  目标检测  | PP-YOLO | 正常训练 | 正常训练 | mAP=56.02% |
+|  目标检测  | PP-YOLO Tiny | 正常训练 | 正常训练 | mAP=44.27% |
+|  目标检测  | PP-YOLOv2 | 正常训练 | 正常训练 | mAP=59.37% |
+|  目标检测  | YOLOv3 | 正常训练 | 正常训练 | mAP=47.33% |
+|  图像分割  | DeepLab V3+ | 正常训练 | 正常训练 | mIoU=56.05% |
+|  图像分割  | UNet | 正常训练 | 正常训练 | mIoU=55.50% |
+
+*注：参考预测精度为whole_train_whole_infer模式下单卡训练汇报的精度数据。*
 
 - 推理相关：
 
 | 任务类别 | 模型名称 | device_CPU | device_GPU | batchsize |
 |  :----:   |  :----: |   :----:   |  :----:  |   :----:   |
-|  变化检测  |  BIT |  支持 | 支持 | 1 |
-|  场景分类  |  HRNet |  支持 | 支持 | 1 |
-|  目标检测  |  YOLO |  支持 | 支持 | 1 |
-|  图像分割  |  UNet |  支持 | 支持 | 1 |
-
+|  变化检测  | BIT | 支持 | 支持 | 1 |
+|  变化检测  | CDNet | 支持 | 支持 | 1 |
+|  变化检测  | ChangeFormer | 支持 | 支持 | 1 |
+|  变化检测  | DSAMNet | 支持 | 支持 | 1 |
+|  变化检测  | DSIFN | 支持 | 支持 | 1 |
+|  变化检测  | SNUNet | 支持 | 支持 | 1 |
+|  变化检测  | STANet | 支持 | 支持 | 1 |
+|  变化检测  | FC-EF | 支持 | 支持 | 1 |
+|  变化检测  | FC-Siam-conc | 支持 | 支持 | 1 |
+|  变化检测  | FC-Siam-diff | 支持 | 支持 | 1 |
+|  场景分类  | HRNet | 支持 | 支持 | 1 |
+|  场景分类  | MobileNetV3 | 支持 | 支持 | 1 |
+|  场景分类  | ResNet50-vd | 支持 | 支持 | 1 |
+|  图像复原  | DRN | 支持 | 支持 | 1 |
+|  图像复原  | ESRGAN | 支持 | 支持 | 1 |
+|  图像复原  | LESRCNN | 支持 | 支持 | 1 |
+|  目标检测  | Faster R-CNN | 支持 | 支持 | 1 |
+|  目标检测  | PP-YOLO | 支持 | 支持 | 1 |
+|  目标检测  | PP-YOLO Tiny | 支持 | 支持 | 1 |
+|  目标检测  | PP-YOLOv2 | 支持 | 支持 | 1 |
+|  目标检测  | YOLOv3 | 支持 | 支持 | 1 |
+|  图像分割  | DeepLab V3+ | 支持 | 支持 | 1 |
+|  图像分割  | UNet | 支持 | 支持 | 1 |
 
 ## 2 测试流程
 
@@ -67,7 +107,7 @@ bash ./test_tipc/test_train_inference_python.sh test_tipc/configs/clas/hrnet/tra
 
 运行相应指令后，在`test_tipc/output`目录中会自动保存运行日志。如lite_train_lite_infer模式下，该目录中可能存在以下文件：
 ```
-test_tipc/output/[task name]/[model name]/
+test_tipc/output/{task name}/{model name}/
 |- results_python.log    # 存储指令执行状态的日志
 |- norm_gpus_0_autocast_null/  # GPU 0号卡上的训练日志和模型保存目录
 ......

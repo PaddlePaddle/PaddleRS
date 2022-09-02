@@ -12,6 +12,7 @@
 |change_detection/fc_ef.py | 变化检测 | FC-EF |
 |change_detection/fc_siam_conc.py | 变化检测 | FC-Siam-conc |
 |change_detection/fc_siam_diff.py | 变化检测 | FC-Siam-diff |
+|change_detection/fccdn.py | 变化检测 | FCCDN |
 |change_detection/snunet.py | 变化检测 | SNUNet |
 |change_detection/stanet.py | 变化检测 | STANet |
 |classification/hrnet.py | 场景分类 | HRNet |
@@ -22,7 +23,7 @@
 |image_restoration/lesrcnn.py | 图像复原 | LESRCNN |
 |object_detection/faster_rcnn.py | 目标检测 | Faster R-CNN |
 |object_detection/ppyolo.py | 目标检测 | PP-YOLO |
-|object_detection/ppyolotiny.py | 目标检测 | PP-YOLO Tiny |
+|object_detection/ppyolo_tiny.py | 目标检测 | PP-YOLO Tiny |
 |object_detection/ppyolov2.py | 目标检测 | PP-YOLOv2 |
 |object_detection/yolov3.py | 目标检测 | YOLOv3 |
 |semantic_segmentation/deeplabv3p.py | 图像分割 | DeepLab V3+ |

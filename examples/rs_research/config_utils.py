@@ -132,7 +132,7 @@ def parse_args(*args, **kwargs):
         conflict_handler='resolve', parents=[cfg_parser])
     # Global settings
     parser.add_argument('cmd', choices=['train', 'eval'])
-    parser.add_argument('task', choices=['cd', 'clas', 'det', 'seg'])
+    parser.add_argument('task', choices=['cd', 'clas', 'det', 'res', 'seg'])
 
     # Data
     parser.add_argument('--datasets', type=dict, default={})

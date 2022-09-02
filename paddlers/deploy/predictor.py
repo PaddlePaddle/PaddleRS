@@ -105,7 +105,7 @@ class Predictor(object):
                     logging.warning(
                         "Semantic segmentation models do not support TensorRT acceleration, "
                         "TensorRT is forcibly disabled.")
-                elif 'RCNN' in self._model.__class__.__name__:
+                elif self._model.model_type == 'detector' and 'RCNN' in self._model.__class__.__name__:
                     logging.warning(
                         "RCNN models do not support TensorRT acceleration, "
                         "TensorRT is forcibly disabled.")
