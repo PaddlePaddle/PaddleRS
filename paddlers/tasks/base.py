@@ -368,7 +368,7 @@ class BaseModel(metaclass=ModelMeta):
                 else:
                     outputs = self.train_step(step, data, self.net)
 
-                scheduler_step(self.optimizer)
+                scheduler_step(self.optimizer, outputs['loss'])
 
                 train_avg_metrics.update(outputs)
                 lr = self.optimizer.get_lr()

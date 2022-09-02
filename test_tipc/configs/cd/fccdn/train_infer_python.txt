@@ -1,19 +1,19 @@
 ===========================train_params===========================
 model_name:cd:fccdn
 python:python
-gpu_list:0
+gpu_list:0|0,1
 use_gpu:null|null
 --precision:null
---num_epochs:lite_train_lite_infer=15|lite_train_whole_infer=15|whole_train_whole_infer=15
+--num_epochs:lite_train_lite_infer=5|lite_train_whole_infer=5|whole_train_whole_infer=10
 --save_dir:adaptive
---train_batch_size:lite_train_lite_infer=4|lite_train_whole_infer=4|whole_train_whole_infer=4
+--train_batch_size:lite_train_lite_infer=4|lite_train_whole_infer=4|whole_train_whole_infer=8
 --model_path:null
+--config:lite_train_lite_infer=./test_tipc/configs/cd/fccdn/fccdn_airchange.yaml|lite_train_whole_infer=./test_tipc/configs/cd/fccdn/fccdn_airchange.yaml|whole_train_whole_infer=./test_tipc/configs/cd/fccdn/fccdn_levircd.yaml
 train_model_name:best_model
-train_infer_file_list:./test_tipc/data/airchange/:./test_tipc/data/airchange/eval.txt
 null:null
 ##
 trainer:norm
-norm_train:test_tipc/run_task.py train cd --config ./test_tipc/configs/cd/fccdn/fccdn.yaml
+norm_train:test_tipc/run_task.py train cd
 pact_train:null
 fpgm_train:null
 distill_train:null
@@ -27,7 +27,7 @@ null:null
 ===========================export_params===========================
 --save_dir:adaptive
 --model_dir:adaptive
---fixed_input_shape:[1,3,256,256]
+--fixed_input_shape:[-1,3,256,256]
 norm_export:deploy/export/export_model.py
 quant_export:null
 fpgm_export:null
@@ -46,7 +46,7 @@ inference:test_tipc/infer.py
 --use_trt:False
 --precision:fp32
 --model_dir:null
---file_list:null:null
+--config:null
 --save_log_path:null
 --benchmark:True
 --model_name:fccdn

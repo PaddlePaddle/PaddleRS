@@ -651,7 +651,7 @@ class DRN(BaseRestorer):
     def __init__(self,
                  losses=None,
                  sr_factor=4,
-                 scale=(2, 4),
+                 scales=(2, 4),
                  n_blocks=30,
                  n_feats=16,
                  n_colors=3,
@@ -660,10 +660,10 @@ class DRN(BaseRestorer):
                  lq_loss_weight=0.1,
                  dual_loss_weight=0.1,
                  **params):
-        if sr_factor != max(scale):
-            raise ValueError(f"`sr_factor` must be equal to `max(scale)`.")
+        if sr_factor != max(scales):
+            raise ValueError(f"`sr_factor` must be equal to `max(scales)`.")
         params.update({
-            'scale': scale,
+            'scale': scales,
             'n_blocks': n_blocks,
             'n_feats': n_feats,
             'n_colors': n_colors,
@@ -672,6 +672,7 @@ class DRN(BaseRestorer):
         })
         self.lq_loss_weight = lq_loss_weight
         self.dual_loss_weight = dual_loss_weight
+        self.scales = scales
         super(DRN, self).__init__(
             model_name='DRN', losses=losses, sr_factor=sr_factor, **params)
 
@@ -703,7 +704,7 @@ class DRN(BaseRestorer):
             lr.extend([
                 F.interpolate(
                     inputs[0], scale_factor=s, mode='bicubic')
-                for s in net.generator.scale[:-1]
+                for s in self.scales[:-1]
             ])
             loss = self.losses(sr[-1], inputs[1])
             for i in range(1, len(sr)):
@@ -716,7 +717,7 @@ class DRN(BaseRestorer):
         elif gan_mode == 'forward_dual':
             sr, lr = inputs[0], inputs[1]
             sr2lr = []
-            n_scales = len(net.generator.scale)
+            n_scales = len(self.scales)
             for i in range(n_scales):
                 sr2lr_i = net.generators[1 + i](sr[i - n_scales])
                 sr2lr.append(sr2lr_i)
@@ -741,6 +742,7 @@ class DRN(BaseRestorer):
         (outputs['loss_prim'] + outputs['loss_dual']).backward()
         self.optimizer.step()
         return {
+            'loss': outputs['loss_prim'] + outputs['loss_dual'],
             'loss_prim': outputs['loss_prim'],
             'loss_dual': outputs['loss_dual']
         }
