@@ -134,7 +134,9 @@ def slider_predict(self,
                    save_dir,
                    block_size,
                    overlap=36,
-                   transforms=None):
+                   transforms=None,
+                   invalid_value=255,
+                   merge_strategy='keep_last'):
 ```
 
 输入参数列表：
@@ -143,9 +145,11 @@ def slider_predict(self,
 |-------|----|--------|-----|
 |`img_file`|`str`|输入影像路径。||
 |`save_dir`|`str`|预测结果输出路径。||
-|`block_size`|`list[int]` \| `tuple[int]` \| `int`|滑窗的窗口大小（以列表或元组指定长、宽或以一个整数指定相同的长宽）。||
-|`overlap`|`list[int]` \| `tuple[int]` \| `int`|滑窗的滑动步长（以列表或元组指定长、宽或以一个整数指定相同的长宽）。|`36`|
+|`block_size`|`list[int]` \| `tuple[int]` \| `int`|滑窗的窗口大小（以列表或元组指定宽度、高度或以一个整数指定相同的宽高）。||
+|`overlap`|`list[int]` \| `tuple[int]` \| `int`|滑窗的滑动步长（以列表或元组指定宽度、高度或以一个整数指定相同的宽高）。|`36`|
 |`transforms`|`paddlers.transforms.Compose` \| `None`|对输入数据应用的数据变换算子。若为`None`，则使用训练器在验证阶段使用的数据变换算子。|`None`|
+|`invalid_value`|`int`|输出影像中用于标记无效像素的数值。|`255`|
+|`merge_strategy`|`str`|合并滑窗重叠区域使用的策略。`'keep_first'`表示保留遍历顺序（从左至右，从上往下，列优先）最靠前的窗口的预测值；`'keep_last'`表示保留遍历顺序最靠后的窗口的预测值；`'vote'`表示使用投票策略，即对于每个像素，最终预测值为所有覆盖该像素的滑窗给出的预测值中出现频率最高者。需要注意的是，在对大尺寸影像进行`overlap`较大的密集推理时，使用`'vote'`策略可能导致较长的推理时间，但给出的预测结果在窗口的接缝处相比其它两种策略将更加平滑。|`'keep_last'`|
 
 变化检测任务的滑窗推理API与图像分割任务类似，但需要注意的是输出结果中存储的地理变换、投影等信息以从第一时相影像中读取的信息为准。
 
