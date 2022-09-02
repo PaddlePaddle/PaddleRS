@@ -6,5 +6,5 @@ save_dir: ./test_tipc/output/clas/hrnet/
 
 model: !Node
     type: HRNet_W18_C
-        args:
-            num_classes: 21
+    args:
+        num_classes: 21

@@ -255,32 +255,18 @@ class BaseDetector(BaseModel):
         """
 
         args = self._pre_train(locals())
+        args.pop('self')
         return self._real_train(**args)
 
     def _pre_train(self, in_args):
         return in_args
 
-    def _real_train(self,
-                    num_epochs,
-                    train_dataset,
-                    train_batch_size=64,
-                    eval_dataset=None,
-                    optimizer=None,
-                    save_interval_epochs=1,
-                    log_interval_steps=10,
-                    save_dir='output',
-                    pretrain_weights='IMAGENET',
-                    learning_rate=.001,
-                    warmup_steps=0,
-                    warmup_start_lr=0.0,
-                    lr_decay_epochs=(216, 243),
-                    lr_decay_gamma=0.1,
-                    metric=None,
-                    use_ema=False,
-                    early_stop=False,
-                    early_stop_patience=5,
-                    use_vdl=True,
-                    resume_checkpoint=None):
+    def _real_train(
+            self, num_epochs, train_dataset, train_batch_size, eval_dataset,
+            optimizer, save_interval_epochs, log_interval_steps, save_dir,
+            pretrain_weights, learning_rate, warmup_steps, warmup_start_lr,
+            lr_decay_epochs, lr_decay_gamma, metric, use_ema, early_stop,
+            early_stop_patience, use_vdl, resume_checkpoint):
 
         if self.status == 'Infer':
             logging.error(

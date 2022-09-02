@@ -10,19 +10,20 @@ PaddleRS目前已支持的全部模型如下（标注\*的为遥感专用模型�
 |--------|---------|------|
 | 变化检测 | \*BIT | 是 |
 | 变化检测 | \*CDNet | 是 |
+| 变化检测 | \*ChangeFormer | 是 |
+| 变化检测 | \*ChangeStar | 否 |
 | 变化检测 | \*DSAMNet | 是 |
 | 变化检测 | \*DSIFN | 否 |
-| 变化检测 | \*SNUNet | 是 |
-| 变化检测 | \*STANet | 是 |
 | 变化检测 | \*FC-EF | 是 |
 | 变化检测 | \*FC-Siam-conc | 是 |
 | 变化检测 | \*FC-Siam-diff | 是 |
-| 变化检测 | \*ChangeStar | 否 |
-| 变化检测 | \*ChangeFormer | 是 |
+| 变化检测 | \*FCCDN | 是 |
+| 变化检测 | \*SNUNet | 是 |
+| 变化检测 | \*STANet | 是 |
+| 场景分类 | CondenseNetV2 | 是 |
 | 场景分类 | HRNet | 是 |
 | 场景分类 | MobileNetV3 | 是 |
 | 场景分类 | ResNet50-vd | 是 |
-| 场景分类 | CondenseNetV2 | 是 |
 | 图像复原 | DRN | 否 |
 | 图像复原 | ESRGAN | 否 |
 | 图像复原 | LESRCNN | 否 |
@@ -32,5 +33,5 @@ PaddleRS目前已支持的全部模型如下（标注\*的为遥感专用模型�
 | 目标检测 | PP-YOLOv2 | 是 |
 | 目标检测 | YOLOv3 | 是 |
 | 图像分割 | DeepLab V3+ | 是 |
-| 图像分割 | UNet | 是 |
 | 图像分割 | \*FarSeg | 否 |
+| 图像分割 | UNet | 是 |

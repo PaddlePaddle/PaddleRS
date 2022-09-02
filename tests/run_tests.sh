@@ -15,6 +15,3 @@ done
 
 # Test tutorials
 bash run_tutorials.sh
-
-# Test examples
-bash run_examples.sh

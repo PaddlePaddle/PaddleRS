@@ -86,12 +86,14 @@ function download_and_unzip_dataset() {
         rm -rf "${ds_path}"
     fi
 
-    wget -nc -P "${ds_dir}" "${url}" --no-check-certificate
+    wget -O "${ds_dir}/${zip_name}" "${url}" --no-check-certificate
     
     # The extracted file/directory must have the same name as the zip file.
-    cd "${ds_dir}" && unzip "${zip_name}" \
-        && mv "${zip_name%.*}" ${ds_name} && cd - \
-        && echo "Successfully downloaded ${zip_name} from ${url}. File saved in ${ds_path}. "
+    cd "${ds_dir}" && unzip "${zip_name}"
+    if [ "${zip_name%.*}" != "${ds_name}" ]; then
+        mv "${zip_name%.*}" "${ds_name}"
+    fi
+    cd -
 }
 
 function parse_extra_args() {
