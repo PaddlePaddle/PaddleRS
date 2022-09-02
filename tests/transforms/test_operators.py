@@ -54,30 +54,30 @@ def _add_op_tests(cls):
                 filter_ = OP2FILTER.get(op_name, None)
                 setattr(
                     cls, attr_name, make_test_func(
-                        op_class, filter_=filter_))
+                        op_class, _filter=filter_))
     return cls
 
 
 def make_test_func(op_class,
                    *args,
-                   in_hook=None,
-                   out_hook=None,
-                   filter_=None,
+                   _in_hook=None,
+                   _out_hook=None,
+                   _filter=None,
                    **kwargs):
     def _test_func(self):
         op = op_class(*args, **kwargs)
         decoder = T.DecodeImg()
         inputs = map(decoder, copy.deepcopy(self.inputs))
         for i, input_ in enumerate(inputs):
-            if filter_ is not None:
-                input_ = filter_(input_)
+            if _filter is not None:
+                input_ = _filter(input_)
             with self.subTest(i=i):
                 for sample in input_:
-                    if in_hook:
-                        sample = in_hook(sample)
+                    if _in_hook:
+                        sample = _in_hook(sample)
                     sample = op(sample)
-                    if out_hook:
-                        sample = out_hook(sample)
+                    if _out_hook:
+                        sample = _out_hook(sample)
 
     return _test_func
 
@@ -308,15 +308,15 @@ class TestTransform(CpuCommonTest):
 
         test_func_not_keep_ratio = make_test_func(
             T.Resize,
-            in_hook=_in_hook,
-            out_hook=_out_hook_not_keep_ratio,
+            _in_hook=_in_hook,
+            _out_hook=_out_hook_not_keep_ratio,
             target_size=TARGET_SIZE,
             keep_ratio=False)
         test_func_not_keep_ratio(self)
         test_func_keep_ratio = make_test_func(
             T.Resize,
-            in_hook=_in_hook,
-            out_hook=_out_hook_keep_ratio,
+            _in_hook=_in_hook,
+            _out_hook=_out_hook_keep_ratio,
             target_size=TARGET_SIZE,
             keep_ratio=True)
         test_func_keep_ratio(self)
@@ -345,10 +345,16 @@ class TestTransform(CpuCommonTest):
 
         test_func = make_test_func(
             T.RandomFlipOrRotate,
-            in_hook=_in_hook,
-            out_hook=_out_hook,
-            filter_=_filter_no_det)
+            _in_hook=_in_hook,
+            _out_hook=_out_hook,
+            _filter=_filter_no_det)
         test_func(self)
+
+    def test_MatchRadiance(self):
+        test_hist = make_test_func(T.MatchRadiance, 'hist')
+        test_hist(self)
+        test_lsr = make_test_func(T.MatchRadiance, 'lsr')
+        test_lsr(self)
 
 
 class TestCompose(CpuCommonTest):

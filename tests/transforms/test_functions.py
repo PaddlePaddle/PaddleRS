@@ -21,6 +21,10 @@ from data import build_input_from_file
 __all__ = ['TestMatchHistograms', 'TestMatchByRegression']
 
 
+def calc_err(a, b):
+    return (a - b).abs().mean()
+
+
 class TestMatchHistograms(CpuCommonTest):
     def setUp(self):
         self.inputs = [
@@ -36,9 +40,11 @@ class TestMatchHistograms(CpuCommonTest):
                 im_out = T.functions.match_histograms(sample['image'],
                                                       sample['image2'])
                 self.check_output_equal(im_out.shape, sample['image2'].shape)
+                self.assertEqual(im_out.dtype, sample['image2'].dtype)
                 im_out = T.functions.match_histograms(sample['image2'],
                                                       sample['image'])
                 self.check_output_equal(im_out.shape, sample['image'].shape)
+                self.assertEqual(im_out.dtype, sample['image'].dtype)
 
 
 class TestMatchByRegression(CpuCommonTest):
@@ -56,6 +62,14 @@ class TestMatchByRegression(CpuCommonTest):
                 im_out = T.functions.match_by_regression(sample['image'],
                                                          sample['image2'])
                 self.check_output_equal(im_out.shape, sample['image2'].shape)
+                self.assertEqual(im_out.dtype, sample['image2'].dtype)
+                err1 = calc_err(sample['image'], sample['image2'])
+                err2 = calc_err(sample['image'], im_out)
+                self.assertLessEqual(err2, err1)
                 im_out = T.functions.match_by_regression(sample['image2'],
                                                          sample['image'])
                 self.check_output_equal(im_out.shape, sample['image'].shape)
+                self.assertEqual(im_out.dtype, sample['image'].dtype)
+                err1 = calc_err(sample['image'], sample['image2'])
+                err2 = calc_err(im_out, sample['image2'])
+                self.assertLessEqual(err2, err1)
