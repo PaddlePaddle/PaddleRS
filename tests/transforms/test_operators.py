@@ -145,7 +145,8 @@ OP2FILTER = {
     'SelectBand': _filter_no_sar,
     'Dehaze': _filter_only_optical,
     'Normalize': _filter_only_optical,
-    'RandomDistort': _filter_only_optical
+    'RandomDistort': _filter_only_optical,
+    'MatchRadiance': _filter_only_mt 
 }
 
 
