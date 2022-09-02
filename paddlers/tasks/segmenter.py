@@ -34,6 +34,7 @@ from paddlers.utils.checkpoint import seg_pretrain_weights_dict
 from .base import BaseModel
 from .utils import seg_metrics as metrics
 from .utils.infer_nets import InferSegNet
+from .utils.slider_predict import SlowCache as Cache
 
 __all__ = ["UNet", "DeepLabV3P", "FastSCNN", "HRNet", "BiSeNetV2", "FarSeg"]
 
@@ -550,20 +551,31 @@ class BaseSegmenter(BaseModel):
                        save_dir,
                        block_size,
                        overlap=36,
-                       transforms=None):
+                       transforms=None,
+                       invalid_value=255,
+                       merge_strategy='keep_last'):
         """
-        Do inference.
+        Do inference using sliding windows.
 
         Args:
             img_file (str): Image path.
             save_dir (str): Directory that contains saved geotiff file.
             block_size (list[int] | tuple[int] | int):
-                Size of block.
+                Size of block. If `block_size` is list or tuple, it should be in 
+                (W, H) format.
             overlap (list[int] | tuple[int] | int, optional):
-                Overlap between two blocks. Defaults to 36.
+                Overlap between two blocks. If `overlap` is list or tuple, it should
+                be in (W, H) format. Defaults to 36.
             transforms (paddlers.transforms.Compose|None, optional): Transforms for 
                 inputs. If None, the transforms for evaluation process will be used. 
                 Defaults to None.
+            invalid_value (int, optional): Value that marks invalid pixels in output 
+                image. Defaults to 255.
+            merge_strategy (str, optional): Strategy to merge overlapping blocks. Choices
+                are {'keep_first', 'keep_last', 'vote'}. 'keep_first' and 'keep_last' 
+                means keeping the values of the first and the last block in traversal 
+                order, respectively. 'vote' means applying a simple voting strategy when 
+                there are conflicts in the overlapping pixels. Defaults to 'keep_last'.
         """
 
         try:
@@ -586,24 +598,50 @@ class BaseSegmenter(BaseModel):
             raise ValueError(
                 "`overlap` must be a tuple/list of length 2 or an integer.")
 
+        if merge_strategy not in ('keep_first', 'keep_last', 'vote'):
+            raise ValueError(
+                "{} is not a supported stragegy for block merging.".format(
+                    merge_strategy))
+        if overlap == (0, 0):
+            # When there is no overlap, use 'keep_last' strategy as it introduces least overheads
+            merge_strategy = 'keep_last'
+        if merge_strategy == 'vote':
+            logging.warning(
+                "Currently, a naive Python-implemented cache is used for aggregating voting results. "
+                "For higher performance in inferring large images, please set `merge_strategy` to 'keep_first' or "
+                "'keep_last'.")
+            cache = Cache()
+
         src_data = gdal.Open(img_file)
         width = src_data.RasterXSize
         height = src_data.RasterYSize
         bands = src_data.RasterCount
 
         driver = gdal.GetDriverByName("GTiff")
-        file_name = osp.splitext(osp.normpath(img_file).split(os.sep)[-1])[
-            0] + ".tif"
+        file_name = osp.basename(osp.normpath(img_file))
+        # Replace extension name with '.tif'
+        file_name = osp.splitext(file_name)[0] + ".tif"
         if not osp.exists(save_dir):
             os.makedirs(save_dir)
         save_file = osp.join(save_dir, file_name)
         dst_data = driver.Create(save_file, width, height, 1, gdal.GDT_Byte)
+
+        # Set meta-information
         dst_data.SetGeoTransform(src_data.GetGeoTransform())
         dst_data.SetProjection(src_data.GetProjection())
-        band = dst_data.GetRasterBand(1)
-        band.WriteArray(255 * np.ones((height, width), dtype="uint8"))
 
-        step = np.array(block_size) - np.array(overlap)
+        band = dst_data.GetRasterBand(1)
+        band.WriteArray(
+            np.full(
+                (height, width), fill_value=invalid_value, dtype="uint8"))
+
+        prev_yoff, prev_xoff = None, None
+        prev_h, prev_w = None, None
+        step = np.array(
+            block_size, dtype=np.int32) - np.array(
+                overlap, dtype=np.int32)
+        if step[0] == 0 or step[1] == 0:
+            raise ValueError("`block_size` and `overlap` should not be equal.")
         for yoff in range(0, height, step[1]):
             for xoff in range(0, width, step[0]):
                 xsize, ysize = block_size
@@ -611,25 +649,58 @@ class BaseSegmenter(BaseModel):
                     xsize = int(width - xoff)
                 if yoff + ysize > height:
                     ysize = int(height - yoff)
-                im = src_data.ReadAsArray(int(xoff), int(yoff), xsize,
-                                          ysize).transpose((1, 2, 0))
+
+                xoff = int(xoff)
+                yoff = int(yoff)
+                im = src_data.ReadAsArray(xoff, yoff, xsize, ysize).transpose(
+                    (1, 2, 0))
                 # Fill
                 h, w = im.shape[:2]
                 im_fill = np.zeros(
                     (block_size[1], block_size[0], bands), dtype=im.dtype)
                 im_fill[:h, :w, :] = im
+
                 # Predict
-                pred = self.predict(im_fill,
-                                    transforms)["label_map"].astype("uint8")
-                # Overlap
-                rd_block = band.ReadAsArray(int(xoff), int(yoff), xsize, ysize)
-                mask = (rd_block == pred[:h, :w]) | (rd_block == 255)
-                temp = pred[:h, :w].copy()
-                temp[mask == False] = 0
-                band.WriteArray(temp, int(xoff), int(yoff))
+                pred = self.predict(im_fill, transforms)
+                pred = pred["label_map"].astype('uint8')
+                pred = pred[:h, :w]
+
+                # Deal with overlapping pixels
+                if merge_strategy == 'vote':
+                    cache.push_block(yoff, xoff, h, w, pred)
+                    pred = cache.get_block(yoff, xoff, h, w)
+                    pred = pred.astype('uint8')
+                    if prev_yoff is not None:
+                        pop_h = yoff - prev_yoff
+                    else:
+                        pop_h = 0
+                    if prev_xoff is not None:
+                        if xoff < prev_xoff:
+                            pop_w = prev_w
+                        else:
+                            pop_w = xoff - prev_xoff
+                    else:
+                        pop_w = 0
+                    cache.pop_block(prev_yoff, prev_xoff, pop_h, pop_w)
+                elif merge_strategy == 'keep_first':
+                    rd_block = band.ReadAsArray(xoff, yoff, xsize, ysize)
+                    mask = rd_block != invalid_value
+                    pred = np.where(mask, rd_block, pred)
+                elif merge_strategy == 'keep_last':
+                    pass
+
+                # Write to file
+                band.WriteArray(pred, xoff, yoff)
                 dst_data.FlushCache()
+
+                prev_xoff = xoff
+                prev_w = w
+
+            prev_yoff = yoff
+            prev_h = h
+
         dst_data = None
-        print("GeoTiff saved in {}.".format(save_file))
+        logging.info("GeoTiff file saved in {}.".format(save_file))
 
     def preprocess(self, images, transforms, to_tensor=True):
         self._check_transforms(transforms, 'test')

@@ -197,7 +197,7 @@ class DecodeImg(Transform):
         self.to_uint8 = to_uint8
         self.decode_bgr = decode_bgr
         self.decode_sar = decode_sar
-        self.read_geo_info = False
+        self.read_geo_info = read_geo_info
 
     def read_img(self, img_path):
         img_format = imghdr.what(img_path)
@@ -227,7 +227,7 @@ class DecodeImg(Transform):
                     im_data = im_data.transpose((1, 2, 0))
             if self.read_geo_info:
                 geo_trans = dataset.GetGeoTransform()
-                geo_proj = dataset.GetGeoProjection()
+                geo_proj = dataset.GetProjection()
         elif img_format in ['jpeg', 'bmp', 'png', 'jpg']:
             if self.decode_bgr:
                 im_data = cv2.imread(img_path, cv2.IMREAD_ANYDEPTH |
