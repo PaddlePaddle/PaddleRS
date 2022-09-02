@@ -145,8 +145,7 @@ OP2FILTER = {
     'SelectBand': _filter_no_sar,
     'Dehaze': _filter_only_optical,
     'Normalize': _filter_only_optical,
-    'RandomDistort': _filter_only_optical,
-    'MatchRadiance': _filter_only_mt 
+    'RandomDistort': _filter_only_optical
 }
 
 
@@ -352,9 +351,11 @@ class TestTransform(CpuCommonTest):
         test_func(self)
 
     def test_MatchRadiance(self):
-        test_hist = make_test_func(T.MatchRadiance, 'hist')
+        test_hist = make_test_func(
+            T.MatchRadiance, 'hist', _filter=_filter_only_mt)
         test_hist(self)
-        test_lsr = make_test_func(T.MatchRadiance, 'lsr')
+        test_lsr = make_test_func(
+            T.MatchRadiance, 'lsr', _filter=_filter_only_mt)
         test_lsr(self)
 
 
