@@ -11,11 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-This code is based on https://github.com/Z-Zheng/FarSeg
-Ths copyright of Z-Zheng/FarSeg is as follows:
-Apache License [see LICENSE for details]
-"""
+
+# This code is based on https://github.com/Z-Zheng/FarSeg
+# The copyright of Z-Zheng/FarSeg is as follows:
+# Apache License (see https://github.com/Z-Zheng/FarSeg/blob/master/LICENSE for details).
 
 import math
 
@@ -286,5 +285,4 @@ class FarSeg(nn.Layer):
         final_feat = self.decoder(refined_fpn_feat_list)
         cls_pred = self.cls_pred_conv(final_feat)
         cls_pred = self.upsample4x_op(cls_pred)
-        cls_pred = F.softmax(cls_pred, axis=1)
         return [cls_pred]
