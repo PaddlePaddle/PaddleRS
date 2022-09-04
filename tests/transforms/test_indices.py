@@ -97,9 +97,9 @@ def constr_dummy_image(c):
 class TestIndex(CpuCommonTest):
     def check_output(self, result, expected_result):
         mask = np.isfinite(expected_result)
-        self.check_output_equal(
-            np.abs(result[mask] - expected_result[mask]).mean(), 0.0, 1.e-2,
-            0.1)
+        diff = np.abs(result[mask] - expected_result[mask])
+        cnt = (diff > (1.e-2 * diff + 0.1)).sum()
+        self.assertLess(cnt / diff.size, 0.005)
 
     def test_ARVI(self):
         dummy = constr_dummy_image(3)

@@ -100,9 +100,9 @@ class TestPredictor(CommonTest):
             for key in dict_.keys():
                 if key in ignore_keys:
                     continue
-                # Use higher tolerance
-                self.check_output_equal(
-                    dict_[key], expected_dict[key], rtol=1.e-4, atol=1.e-6)
+                diff = np.abs(dict_[key] - expected_dict[key]).ravel()
+                cnt = (diff > (1.e-4 * diff + 1.e-6)).sum()
+                self.assertLess(cnt / diff.size, 0.01)
 
 
 @TestPredictor.add_tests
@@ -111,9 +111,6 @@ class TestCDPredictor(TestPredictor):
     TRAINER_NAME_TO_EXPORT_OPTS = {
         '_default': "--fixed_input_shape [-1,3,256,256]"
     }
-    # HACK: Skip CDNet.
-    # These models are heavily affected by numeric errors.
-    WHITE_LIST = ['CDNet']
 
     def check_predictor(self, predictor, trainer):
         t1_path = "data/ssmt/optical_t1.bmp"
