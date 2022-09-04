@@ -17,6 +17,7 @@ import tempfile
 import unittest.mock as mock
 
 import paddle
+import numpy as np
 
 import paddlers as pdrs
 from paddlers.transforms import decode_image

@@ -32,7 +32,7 @@ python setup.py bdist_wheel
 pip install ./dist/auto_log*.whl
 cd ..
 
-pip install spyndex protobuf==3.19.0
+pip install spyndex protobuf==3.19.0 colorama
 
 unset http_proxy https_proxy
 
