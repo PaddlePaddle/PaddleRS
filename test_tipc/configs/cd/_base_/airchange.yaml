@@ -60,7 +60,7 @@ download_path: ./test_tipc/data/
 
 num_epochs: 5
 train_batch_size: 4
-save_interval_epochs: 3
+save_interval_epochs: 5
 log_interval_steps: 50
 save_dir: ./test_tipc/output/cd/
 learning_rate: 0.01

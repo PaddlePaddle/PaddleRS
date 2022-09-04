@@ -243,20 +243,17 @@ class Timer(Times):
 def to_data_parallel(layers, *args, **kwargs):
     from paddlers.tasks.utils.res_adapters import GANAdapter
     if isinstance(layers, GANAdapter):
-        # Inplace modification for efficiency
-        layers.generators = [
-            paddle.DataParallel(g, *args, **kwargs) for g in layers.generators
-        ]
-        layers.discriminators = [
-            paddle.DataParallel(d, *args, **kwargs)
-            for d in layers.discriminators
-        ]
+        layers = GANAdapter(
+            [to_data_parallel(g, *args, **kwargs) for g in layers.generators], [
+                to_data_parallel(d, *args, **kwargs)
+                for d in layers.discriminators
+            ])
     else:
         layers = paddle.DataParallel(layers, *args, **kwargs)
     return layers
 
 
-def scheduler_step(optimizer):
+def scheduler_step(optimizer, loss=None):
     from paddlers.tasks.utils.res_adapters import OptimizerAdapter
     if not isinstance(optimizer, OptimizerAdapter):
         optimizer = [optimizer]
