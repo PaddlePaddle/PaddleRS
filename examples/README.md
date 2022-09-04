@@ -12,10 +12,13 @@ PaddleRS提供从科学研究到产业应用的丰富示例，希望帮助遥感
 
 #### 小桨神瞳
 
-
+<p>
+<img src="https://user-images.githubusercontent.com/21275753/188320924-99c2915e-7371-4dc6-a50e-92fe11fc05a6.gif", width="400", hspace="50"> <img src="https://user-images.githubusercontent.com/21275753/188320957-f82348ee-c4cf-4799-b006-8389cb5e9380.gif", width="400">
+</p>
 
 - 作者：白菜
 - 代码仓库：https://github.com/CrazyBoyM/webRS
+- 演示视频：https://www.bilibili.com/video/BV1W14y1s7fs?vd_source=0de109a09b98176090b8aa3295a45bb6
 
 #### 遥感图像智能解译平台
 
