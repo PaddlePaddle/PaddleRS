@@ -315,6 +315,11 @@ class TestResPredictor(TestPredictor):
         '_default': "--fixed_input_shape [-1,3,256,256]"
     }
 
+    def __init__(self, methodName='runTest'):
+        super(TestResPredictor, self).__init__(methodName=methodName)
+        # Do not test with CPUs as it will take long long time.
+        self.places.pop(self.places.index('cpu'))
+
     def check_predictor(self, predictor, trainer):
         # For restoration tasks, do NOT ensure the consistence of numeric values, 
         # because the output is of uint8 type.
