@@ -26,7 +26,7 @@ __all__ = ['TestTransform', 'TestCompose', 'TestArrange']
 WHITE_LIST = ['ReloadMask']
 
 
-def _add_op_tests(cls):
+def add_op_tests(cls):
     """
     Automatically patch testing functions for transform operators.
     """
@@ -149,7 +149,7 @@ OP2FILTER = {
 }
 
 
-@_add_op_tests
+@add_op_tests
 class TestTransform(CpuCommonTest):
     def setUp(self):
         self.inputs = [
@@ -349,6 +349,39 @@ class TestTransform(CpuCommonTest):
             out_hook=_out_hook,
             filter_=_filter_no_det)
         test_func(self)
+
+    def test_AppendIndex(self):
+        def _out_hook_ndvi(sample):
+            self.check_output_equal(sample['image'].shape[2], 11)
+            self.assertLessEqual(sample['image'][..., -1].max() - 1e-8, 1)
+            self.assertGreaterEqual(sample['image'][..., -1].min() + 1e-8, -1)
+
+            if 'image2' in sample:
+                self.check_output_equal(sample['image2'].shape[2], 11)
+                self.assertLessEqual(sample['image2'][..., -1].max() - 1e-8, 1)
+                self.assertGreaterEqual(sample['image2'][..., -1].min() + 1e-8,
+                                        -1)
+
+            return sample
+
+        test_ndvi = make_test_func(
+            T.AppendIndex,
+            'NDVI', {'r': 1,
+                     'n': 2},
+            out_hook=_out_hook_ndvi,
+            filter_=_filter_only_multispectral)
+        test_ndvi(self)
+        test_evi = make_test_func(
+            T.AppendIndex,
+            'EVI', {'b': 1,
+                    'r': 2,
+                    'n': 3},
+            c0=1.0,
+            c1=0.5,
+            c2=1.0,
+            c3=1.5,
+            filter_=_filter_only_multispectral)
+        test_evi(self)
 
 
 class TestCompose(CpuCommonTest):
