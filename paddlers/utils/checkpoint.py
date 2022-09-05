@@ -21,18 +21,12 @@ import paddle
 from . import logging
 from .download import download_and_decompress
 
+cd_pretrain_weights_dict = {}
+
 cls_pretrain_weights_dict = {
     'ResNet50_vd': ['IMAGENET'],
     'MobileNetV3_small_x1_0': ['IMAGENET'],
     'HRNet_W18_C': ['IMAGENET'],
-}
-
-seg_pretrain_weights_dict = {
-    'UNet': ['CITYSCAPES'],
-    'DeepLabV3P': ['CITYSCAPES', 'PascalVOC', 'IMAGENET'],
-    'FastSCNN': ['CITYSCAPES'],
-    'HRNet': ['CITYSCAPES', 'PascalVOC'],
-    'BiSeNetV2': ['CITYSCAPES']
 }
 
 det_pretrain_weights_dict = {
@@ -72,6 +66,16 @@ det_pretrain_weights_dict = {
     'MaskRCNN_ResNet50_vd_ssld_fpn': ['COCO', 'IMAGENET'],
     'MaskRCNN_ResNet101_fpn': ['COCO', 'IMAGENET'],
     'MaskRCNN_ResNet101_vd_fpn': ['COCO', 'IMAGENET']
+}
+
+res_pretrain_weights_dict = {}
+
+seg_pretrain_weights_dict = {
+    'UNet': ['CITYSCAPES'],
+    'DeepLabV3P': ['CITYSCAPES', 'PascalVOC', 'IMAGENET'],
+    'FastSCNN': ['CITYSCAPES'],
+    'HRNet': ['CITYSCAPES', 'PascalVOC'],
+    'BiSeNetV2': ['CITYSCAPES']
 }
 
 cityscapes_weights = {

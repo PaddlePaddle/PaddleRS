@@ -274,7 +274,7 @@ class BaseDetector(BaseModel):
                 exit=True)
         if pretrain_weights is not None and resume_checkpoint is not None:
             logging.error(
-                "pretrain_weights and resume_checkpoint cannot be set simultaneously.",
+                "`pretrain_weights` and `resume_checkpoint` cannot be set simultaneously.",
                 exit=True)
         if train_dataset.__class__.__name__ == 'VOCDetDataset':
             train_dataset.data_fields = {
@@ -323,23 +323,29 @@ class BaseDetector(BaseModel):
             self.optimizer = optimizer
 
         # Initiate weights
-        if pretrain_weights is not None and not osp.exists(pretrain_weights):
-            if pretrain_weights not in det_pretrain_weights_dict['_'.join(
-                [self.model_name, self.backbone_name])]:
-                logging.warning(
-                    "Path of pretrain_weights('{}') does not exist!".format(
-                        pretrain_weights))
-                pretrain_weights = det_pretrain_weights_dict['_'.join(
-                    [self.model_name, self.backbone_name])][0]
-                logging.warning("Pretrain_weights is forcibly set to '{}'. "
-                                "If you don't want to use pretrain weights, "
-                                "set pretrain_weights to be None.".format(
-                                    pretrain_weights))
-        elif pretrain_weights is not None and osp.exists(pretrain_weights):
-            if osp.splitext(pretrain_weights)[-1] != '.pdparams':
-                logging.error(
-                    "Invalid pretrain weights. Please specify a '.pdparams' file.",
-                    exit=True)
+        if pretrain_weights is not None:
+            if not osp.exists(pretrain_weights):
+                key = '_'.join([self.model_name, self.backbone_name])
+                if key not in det_pretrain_weights_dict:
+                    logging.warning(
+                        "Path of pretrained weights ('{}') does not exist!".
+                        format(pretrain_weights))
+                    pretrain_weights = None
+                elif pretrain_weights not in det_pretrain_weights_dict[key]:
+                    logging.warning(
+                        "Path of pretrained weights ('{}') does not exist!".
+                        format(pretrain_weights))
+                    pretrain_weights = det_pretrain_weights_dict[key][0]
+                    logging.warning(
+                        "`pretrain_weights` is forcibly set to '{}'. "
+                        "If you don't want to use pretrained weights, "
+                        "please set `pretrain_weights` to None.".format(
+                            pretrain_weights))
+            else:
+                if osp.splitext(pretrain_weights)[-1] != '.pdparams':
+                    logging.error(
+                        "Invalid pretrained weights. Please specify a .pdparams file.",
+                        exit=True)
         pretrained_dir = osp.join(save_dir, 'pretrain')
         self.net_initialize(
             pretrain_weights=pretrain_weights,

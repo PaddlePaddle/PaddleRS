@@ -50,7 +50,8 @@ class TestFarSegModel(TestSegModel):
 
     def set_specs(self):
         self.specs = [
-            dict(), dict(num_classes=20), dict(encoder_pretrained=False)
+            dict(), dict(num_classes=20), dict(pretrained_encoder=False),
+            dict(in_channels=10)
         ]
 
     def set_targets(self):
