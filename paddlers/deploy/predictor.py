@@ -14,6 +14,7 @@
 
 import os.path as osp
 from operator import itemgetter
+from functools import partial
 
 import numpy as np
 import paddle
@@ -23,6 +24,7 @@ from paddle.inference import PrecisionType
 
 from paddlers.tasks import load_model
 from paddlers.utils import logging, Timer
+from paddlers.tasks.utils.slider_predict import slider_predict
 
 
 class Predictor(object):
@@ -271,22 +273,24 @@ class Predictor(object):
                 topk=1,
                 transforms=None,
                 warmup_iters=0,
-                repeats=1):
+                repeats=1,
+                quiet=False):
         """
-        Do prediction.
+        Do inference.
 
         Args:
             img_file(list[str|tuple|np.ndarray] | str | tuple | np.ndarray): For scene classification, image restoration, 
                 object detection and semantic segmentation tasks, `img_file` should be either the path of the image to predict,
                 a decoded image (a np.ndarray, which should be consistent with what you get from passing image path to
                 paddlers.transforms.decode_image()), or a list of image paths or decoded images. For change detection tasks,
-                img_file should be a tuple of image paths, a tuple of decoded images, or a list of tuples.
+                `img_file` should be a tuple of image paths, a tuple of decoded images, or a list of tuples.
             topk(int, optional): Top-k values to reserve in a classification result. Defaults to 1.
             transforms (paddlers.transforms.Compose|None, optional): Pipeline of data preprocessing. If None, load transforms
                 from `model.yml`. Defaults to None.
             warmup_iters (int, optional): Warm-up iterations before measuring the execution time. Defaults to 0.
             repeats (int, optional): Number of repetitions to evaluate model inference and data processing speed. If greater than
                 1, the reported time consumption is the average of all repeats. Defaults to 1.
+            quiet (bool, optional): If True, do not display the timing information. Defaults to False.
         """
 
         if repeats < 1:
@@ -313,12 +317,55 @@ class Predictor(object):
 
         self.timer.repeats = repeats
         self.timer.img_num = len(images)
-        self.timer.info(average=True)
+        if not quiet:
+            self.timer.info(average=True)
 
         if isinstance(img_file, (str, np.ndarray, tuple)):
             results = results[0]
 
         return results
+
+    def slider_predict(self,
+                       img_file,
+                       save_dir,
+                       block_size,
+                       overlap=36,
+                       transforms=None,
+                       invalid_value=255,
+                       merge_strategy='keep_last'):
+        """
+        Do inference using sliding windows. Only semantic segmentation and change detection models are supported in the 
+            sliding-predicting mode.
+
+        Args:
+            img_file(list[str|tuple|np.ndarray] | str | tuple | np.ndarray): For semantic segmentation tasks, `img_file` 
+                should be either the path of the image to predict, a decoded image (a np.ndarray, which should be 
+                consistent with what you get from passing image path to paddlers.transforms.decode_image()), or a list of 
+                image paths or decoded images. For change detection tasks, `img_file` should be a tuple of image paths, a 
+                tuple of decoded images, or a list of tuples.
+            save_dir (str): Directory that contains saved geotiff file.
+            block_size (list[int] | tuple[int] | int): Size of block. If `block_size` is a list or tuple, it should be in 
+                (W, H) format.
+            overlap (list[int] | tuple[int] | int, optional): Overlap between two blocks. If `overlap` is a list or tuple, 
+                it should be in (W, H) format. Defaults to 36.
+            transforms (paddlers.transforms.Compose|None, optional): Pipeline of data preprocessing. If None, load transforms
+                from `model.yml`. Defaults to None.
+            invalid_value (int, optional): Value that marks invalid pixels in output image. Defaults to 255.
+            merge_strategy (str, optional): Strategy to merge overlapping blocks. Choices are 
+                {'keep_first', 'keep_last', 'accum'}. 'keep_first' and 'keep_last' means keeping the values of the first and 
+                the last block in traversal order, respectively. 'accum' means determining the class of an overlapping pixel 
+                according to accumulated probabilities. Defaults to 'keep_last'.
+        """
+        slider_predict(
+            partial(
+                self.predict, quiet=True),
+            img_file,
+            save_dir,
+            block_size,
+            overlap,
+            transforms,
+            invalid_value,
+            merge_strategy)
 
     def batch_predict(self, image_list, **params):
         return self.predict(img_file=image_list, **params)

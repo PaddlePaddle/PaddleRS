@@ -115,21 +115,6 @@ class TestSegSliderPredict(CommonTest):
                 decode_sar=False)
             self.check_output_equal(pred_keeplast.shape, pred_whole.shape)
 
-            # 'vote'
-            save_dir = osp.join(td, 'vote')
-            self.model.slider_predict(
-                self.image_path,
-                save_dir,
-                128,
-                64,
-                self.transforms,
-                merge_strategy='vote')
-            pred_vote = T.decode_image(
-                osp.join(save_dir, self.basename),
-                to_uint8=False,
-                decode_sar=False)
-            self.check_output_equal(pred_vote.shape, pred_whole.shape)
-
             # 'accum'
             save_dir = osp.join(td, 'accum')
             self.model.slider_predict(
@@ -138,7 +123,7 @@ class TestSegSliderPredict(CommonTest):
                 128,
                 64,
                 self.transforms,
-                merge_strategy='vote')
+                merge_strategy='accum')
             pred_accum = T.decode_image(
                 osp.join(save_dir, self.basename),
                 to_uint8=False,
@@ -253,21 +238,6 @@ class TestCDSliderPredict(CommonTest):
                 decode_sar=False)
             self.check_output_equal(pred_keeplast.shape, pred_whole.shape)
 
-            # 'vote'
-            save_dir = osp.join(td, 'vote')
-            self.model.slider_predict(
-                self.image_paths,
-                save_dir,
-                128,
-                64,
-                self.transforms,
-                merge_strategy='vote')
-            pred_vote = T.decode_image(
-                osp.join(save_dir, self.basename),
-                to_uint8=False,
-                decode_sar=False)
-            self.check_output_equal(pred_vote.shape, pred_whole.shape)
-
             # 'accum'
             save_dir = osp.join(td, 'accum')
             self.model.slider_predict(
@@ -276,7 +246,7 @@ class TestCDSliderPredict(CommonTest):
                 128,
                 64,
                 self.transforms,
-                merge_strategy='vote')
+                merge_strategy='accum')
             pred_accum = T.decode_image(
                 osp.join(save_dir, self.basename),
                 to_uint8=False,
