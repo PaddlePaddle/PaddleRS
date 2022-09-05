@@ -308,7 +308,7 @@ class BaseSegmenter(BaseModel):
                         exit=True)
         pretrained_dir = osp.join(save_dir, 'pretrain')
         is_backbone_weights = pretrain_weights == 'IMAGENET'
-        self.net_initialize(
+        self.initialize_net(
             pretrain_weights=pretrain_weights,
             save_dir=pretrained_dir,
             resume_checkpoint=resume_checkpoint,
@@ -579,15 +579,13 @@ class BaseSegmenter(BaseModel):
             invalid_value (int, optional): Value that marks invalid pixels in output 
                 image. Defaults to 255.
             merge_strategy (str, optional): Strategy to merge overlapping blocks. Choices
-                are {'keep_first', 'keep_last', 'vote', 'accum'}. 'keep_first' and 
-                'keep_last' means keeping the values of the first and the last block in 
-                traversal order, respectively. 'vote' means applying a simple voting 
-                strategy when there are conflicts in the overlapping pixels. 'accum' 
-                means determining the class of an overlapping pixel according to 
-                accumulated probabilities. Defaults to 'keep_last'.
+                are {'keep_first', 'keep_last', 'accum'}. 'keep_first' and 'keep_last' 
+                means keeping the values of the first and the last block in traversal 
+                order, respectively. 'accum' means determining the class of an overlapping 
+                pixel according to accumulated probabilities. Defaults to 'keep_last'.
         """
 
-        slider_predict(self, img_file, save_dir, block_size, overlap,
+        slider_predict(self.predict, img_file, save_dir, block_size, overlap,
                        transforms, invalid_value, merge_strategy)
 
     def preprocess(self, images, transforms, to_tensor=True):

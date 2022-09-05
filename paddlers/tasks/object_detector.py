@@ -347,7 +347,7 @@ class BaseDetector(BaseModel):
                         "Invalid pretrained weights. Please specify a .pdparams file.",
                         exit=True)
         pretrained_dir = osp.join(save_dir, 'pretrain')
-        self.net_initialize(
+        self.initialize_net(
             pretrain_weights=pretrain_weights,
             save_dir=pretrained_dir,
             resume_checkpoint=resume_checkpoint,

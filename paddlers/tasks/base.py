@@ -86,7 +86,7 @@ class BaseModel(metaclass=ModelMeta):
         self.quant_config = None
         self.fixed_input_shape = None
 
-    def net_initialize(self,
+    def initialize_net(self,
                        pretrain_weights=None,
                        save_dir='.',
                        resume_checkpoint=None,
