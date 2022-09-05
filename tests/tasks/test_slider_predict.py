@@ -75,13 +75,9 @@ class TestSegSliderPredict(CommonTest):
 
             # `block_size` larger than image size
             save_dir = osp.join(td, 'pred5')
-            self.model.slider_predict(self.image_path, save_dir, 512, 0,
-                                      self.transforms)
-            pred5 = T.decode_image(
-                osp.join(save_dir, self.basename),
-                to_uint8=False,
-                decode_sar=False)
-            self.check_output_equal(pred5.shape, pred_whole.shape)
+            with self.assertRaises(ValueError):
+                self.model.slider_predict(self.image_path, save_dir, 512, 0,
+                                          self.transforms)
 
     def test_merge_strategy(self):
         with tempfile.TemporaryDirectory() as td:
@@ -133,6 +129,21 @@ class TestSegSliderPredict(CommonTest):
                 to_uint8=False,
                 decode_sar=False)
             self.check_output_equal(pred_vote.shape, pred_whole.shape)
+
+            # 'accum'
+            save_dir = osp.join(td, 'accum')
+            self.model.slider_predict(
+                self.image_path,
+                save_dir,
+                128,
+                64,
+                self.transforms,
+                merge_strategy='vote')
+            pred_accum = T.decode_image(
+                osp.join(save_dir, self.basename),
+                to_uint8=False,
+                decode_sar=False)
+            self.check_output_equal(pred_accum.shape, pred_whole.shape)
 
     def test_geo_info(self):
         with tempfile.TemporaryDirectory() as td:
@@ -202,13 +213,9 @@ class TestCDSliderPredict(CommonTest):
 
             # `block_size` larger than image size
             save_dir = osp.join(td, 'pred5')
-            self.model.slider_predict(self.image_paths, save_dir, 512, 0,
-                                      self.transforms)
-            pred5 = T.decode_image(
-                osp.join(save_dir, self.basename),
-                to_uint8=False,
-                decode_sar=False)
-            self.check_output_equal(pred5.shape, pred_whole.shape)
+            with self.assertRaises(ValueError):
+                self.model.slider_predict(self.image_paths, save_dir, 512, 0,
+                                          self.transforms)
 
     def test_merge_strategy(self):
         with tempfile.TemporaryDirectory() as td:
@@ -260,6 +267,21 @@ class TestCDSliderPredict(CommonTest):
                 to_uint8=False,
                 decode_sar=False)
             self.check_output_equal(pred_vote.shape, pred_whole.shape)
+
+            # 'accum'
+            save_dir = osp.join(td, 'accum')
+            self.model.slider_predict(
+                self.image_paths,
+                save_dir,
+                128,
+                64,
+                self.transforms,
+                merge_strategy='vote')
+            pred_accum = T.decode_image(
+                osp.join(save_dir, self.basename),
+                to_uint8=False,
+                decode_sar=False)
+            self.check_output_equal(pred_accum.shape, pred_whole.shape)
 
     def test_geo_info(self):
         with tempfile.TemporaryDirectory() as td:
