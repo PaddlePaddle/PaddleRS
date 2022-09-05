@@ -78,11 +78,11 @@ model = pdrs.tasks.cd.FCCDN()
 
 # 执行模型训练
 model.train(
-    num_epochs=5,
+    num_epochs=10,
     train_dataset=train_dataset,
     train_batch_size=4,
     eval_dataset=eval_dataset,
-    save_interval_epochs=2,
+    save_interval_epochs=4,
     # 每多少次迭代记录一次日志
     log_interval_steps=50,
     save_dir=EXP_DIR,
