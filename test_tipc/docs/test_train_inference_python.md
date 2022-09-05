@@ -31,6 +31,7 @@ Linux GPU/CPU 基础训练推理测试的主程序为`test_train_inference_pytho
 |  目标检测  | PP-YOLOv2 | 正常训练 | 正常训练 | mAP=59.37% |
 |  目标检测  | YOLOv3 | 正常训练 | 正常训练 | mAP=47.33% |
 |  图像分割  | DeepLab V3+ | 正常训练 | 正常训练 | mIoU=56.05% |
+|  图像分割  | FarSeg | 正常训练 | 正常训练 | mIoU=49.58% |
 |  图像分割  | UNet | 正常训练 | 正常训练 | mIoU=55.50% |
 
 *注：参考预测精度为whole_train_whole_infer模式下单卡训练汇报的精度数据。*
@@ -61,6 +62,7 @@ Linux GPU/CPU 基础训练推理测试的主程序为`test_train_inference_pytho
 |  目标检测  | PP-YOLOv2 | 支持 | 支持 | 1 |
 |  目标检测  | YOLOv3 | 支持 | 支持 | 1 |
 |  图像分割  | DeepLab V3+ | 支持 | 支持 | 1 |
+|  图像分割  | FarSeg | 支持 | 支持 | 1 |
 |  图像分割  | UNet | 支持 | 支持 | 1 |
 
 ## 2 测试流程

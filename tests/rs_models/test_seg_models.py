@@ -25,8 +25,11 @@ class TestSegModel(TestModel):
         self.assertIsInstance(output, list)
         self.check_output_equal(len(output), len(target))
         for o, t in zip(output, target):
-            o = o.numpy()
-            self.check_output_equal(o.shape, t.shape)
+            if isinstance(o, list):
+                self.check_output(o, t)
+            else:
+                o = o.numpy()
+                self.check_output_equal(o.shape, t.shape)
 
     def set_inputs(self):
         def _gen_data(specs):
@@ -50,7 +53,8 @@ class TestFarSegModel(TestSegModel):
 
     def set_specs(self):
         self.specs = [
-            dict(), dict(num_classes=20), dict(encoder_pretrained=False)
+            dict(), dict(num_classes=20), dict(pretrained_encoder=False),
+            dict(in_channels=10)
         ]
 
     def set_targets(self):

@@ -56,7 +56,7 @@ class BIT(nn.Layer):
             Default: 2.
         enc_with_pos (bool, optional): Whether to add leanred positional embedding to the input feature sequence of the 
             encoder. Default: True.
-        enc_depth (int, optional): Number of attention blocks used in the encoder. Default: 1
+        enc_depth (int, optional): Number of attention blocks used in the encoder. Default: 1.
         enc_head_dim (int, optional): Embedding dimension of each encoder head. Default: 64.
         dec_depth (int, optional): Number of attention blocks used in the decoder. Default: 8.
         dec_head_dim (int, optional): Embedding dimension of each decoder head. Default: 8.
