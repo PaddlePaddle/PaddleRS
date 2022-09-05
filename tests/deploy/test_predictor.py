@@ -105,7 +105,7 @@ class TestPredictor(CommonTest):
                     dict_[key], expected_dict[key], rtol=1.e-4, atol=1.e-6)
 
 
-# @TestPredictor.add_tests
+@TestPredictor.add_tests
 class TestCDPredictor(TestPredictor):
     MODULE = pdrs.tasks.change_detector
     TRAINER_NAME_TO_EXPORT_OPTS = {
@@ -177,7 +177,7 @@ class TestCDPredictor(TestPredictor):
         self.assertEqual(len(out_multi_array_t), num_inputs)
 
 
-# @TestPredictor.add_tests
+@TestPredictor.add_tests
 class TestClasPredictor(TestPredictor):
     MODULE = pdrs.tasks.classifier
     TRAINER_NAME_TO_EXPORT_OPTS = {
@@ -242,7 +242,7 @@ class TestClasPredictor(TestPredictor):
         self.check_dict_equal(out_multi_array_p, out_multi_array_t)
 
 
-# @TestPredictor.add_tests
+@TestPredictor.add_tests
 class TestDetPredictor(TestPredictor):
     MODULE = pdrs.tasks.object_detector
     TRAINER_NAME_TO_EXPORT_OPTS = {
@@ -355,7 +355,7 @@ class TestResPredictor(TestPredictor):
         self.assertEqual(len(out_multi_array_t), num_inputs)
 
 
-# @TestPredictor.add_tests
+@TestPredictor.add_tests
 class TestSegPredictor(TestPredictor):
     MODULE = pdrs.tasks.segmenter
     TRAINER_NAME_TO_EXPORT_OPTS = {

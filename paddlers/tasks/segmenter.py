@@ -405,12 +405,12 @@ class BaseSegmenter(BaseModel):
 
         Returns:
             collections.OrderedDict with key-value pairs:
-                {"miou": `mean intersection over union`,
-                 "category_iou": `category-wise mean intersection over union`,
-                 "oacc": `overall accuracy`,
-                 "category_acc": `category-wise accuracy`,
-                 "kappa": ` kappa coefficient`,
-                 "category_F1-score": `F1 score`}.
+                {"miou": mean intersection over union,
+                 "category_iou": category-wise mean intersection over union,
+                 "oacc": overall accuracy,
+                 "category_acc": category-wise accuracy,
+                 "kappa": kappa coefficient,
+                 "category_F1-score": F1 score}.
 
         """
 
