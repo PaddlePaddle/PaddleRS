@@ -11,11 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-This code is based on https://github.com/Z-Zheng/FarSeg
-Ths copyright of Z-Zheng/FarSeg is as follows:
-Apache License [see LICENSE for details]
-"""
+
+# This code is based on https://github.com/Z-Zheng/FarSeg
+# The copyright of Z-Zheng/FarSeg is as follows:
+# Apache License (see https://github.com/Z-Zheng/FarSeg/blob/master/LICENSE for details).
 
 import math
 
@@ -164,7 +163,7 @@ class SceneRelation(nn.Layer):
         return refined_feats
 
 
-class AssymetricDecoder(nn.Layer):
+class AsymmetricDecoder(nn.Layer):
     def __init__(self,
                  in_channels,
                  out_channels,
@@ -172,7 +171,7 @@ class AssymetricDecoder(nn.Layer):
                  out_feat_output_stride=4,
                  norm_fn=nn.BatchNorm2D,
                  num_groups_gn=None):
-        super(AssymetricDecoder, self).__init__()
+        super(AsymmetricDecoder, self).__init__()
         if norm_fn == nn.BatchNorm2D:
             norm_fn_args = dict(num_features=out_channels)
         elif norm_fn == nn.GroupNorm:
@@ -215,9 +214,12 @@ class AssymetricDecoder(nn.Layer):
 
 
 class ResNet50Encoder(nn.Layer):
-    def __init__(self, pretrained=True):
+    def __init__(self, in_ch=3, pretrained=True):
         super(ResNet50Encoder, self).__init__()
         self.resnet = resnet50(pretrained=pretrained)
+        if in_ch != 3:
+            self.resnet.conv1 = nn.Conv2D(
+                in_ch, 64, kernel_size=7, stride=2, padding=3, bias_attr=False)
 
     def forward(self, inputs):
         x = inputs
@@ -234,25 +236,35 @@ class ResNet50Encoder(nn.Layer):
 
 class FarSeg(nn.Layer):
     """
-        The FarSeg implementation based on PaddlePaddle.
+    The FarSeg implementation based on PaddlePaddle.
 
-        The original article refers to
-        Zheng, Zhuo, et al. "Foreground-Aware Relation Network for Geospatial Object 
-            Segmentation in High Spatial Resolution Remote Sensing Imagery"
-        (https://openaccess.thecvf.com/content_CVPR_2020/papers/Zheng_Foreground-Aware_Relation_Network_for_Geospatial_Object_Segmentation_in_High_Spatial_CVPR_2020_paper.pdf)
+    The original article refers to
+    Zheng, Zhuo, et al. "Foreground-Aware Relation Network for Geospatial Object Segmentation in High Spatial Resolution 
+        Remote Sensing Imagery"
+    (https://openaccess.thecvf.com/content_CVPR_2020/papers/Zheng_Foreground-Aware_Relation_Network_for_Geospatial_Object_Segmentation_in_High_Spatial_CVPR_2020_paper.pdf)
+
+    Args:
+        in_channels (int, optional): Number of bands of the input images. Default: 3.
+        num_classes (int, optional): Number of target classes. Default: 16.
+        fpn_ch_list (list[int]|tuple[int], optional): Channel list of the FPN. Default: (256, 512, 1024, 2048).
+        mid_ch (int, optional): Output channels of the FPN. Default: 256.
+        out_ch (int, optional): Output channels of the decoder. Default: 128.
+        sr_ch_list (list[int]|tuple[int], optional): Channel list of the foreground-scene relation module. Default: (256, 256, 256, 256).
+        pretrained_encoder (bool, optional): Whether to use a pretrained encoder. Default: True.
     """
 
     def __init__(self,
+                 in_channels=3,
                  num_classes=16,
                  fpn_ch_list=(256, 512, 1024, 2048),
                  mid_ch=256,
                  out_ch=128,
                  sr_ch_list=(256, 256, 256, 256),
-                 encoder_pretrained=True):
+                 pretrained_encoder=True):
         super(FarSeg, self).__init__()
-        self.en = ResNet50Encoder(encoder_pretrained)
+        self.en = ResNet50Encoder(in_channels, pretrained_encoder)
         self.fpn = FPN(in_channels_list=fpn_ch_list, out_channels=mid_ch)
-        self.decoder = AssymetricDecoder(
+        self.decoder = AsymmetricDecoder(
             in_channels=mid_ch, out_channels=out_ch)
         self.cls_pred_conv = nn.Conv2D(out_ch, num_classes, 1)
         self.upsample4x_op = nn.UpsamplingBilinear2D(scale_factor=4)
@@ -273,5 +285,4 @@ class FarSeg(nn.Layer):
         final_feat = self.decoder(refined_fpn_feat_list)
         cls_pred = self.cls_pred_conv(final_feat)
         cls_pred = self.upsample4x_op(cls_pred)
-        cls_pred = F.softmax(cls_pred, axis=1)
         return [cls_pred]

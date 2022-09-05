@@ -267,7 +267,7 @@ class BaseSegmenter(BaseModel):
                 exit=True)
         if pretrain_weights is not None and resume_checkpoint is not None:
             logging.error(
-                "pretrain_weights and resume_checkpoint cannot be set simultaneously.",
+                "`pretrain_weights` and `resume_checkpoint` cannot be set simultaneously.",
                 exit=True)
         self.labels = train_dataset.labels
         if self.losses is None:
@@ -281,23 +281,30 @@ class BaseSegmenter(BaseModel):
         else:
             self.optimizer = optimizer
 
-        if pretrain_weights is not None and not osp.exists(pretrain_weights):
-            if pretrain_weights not in seg_pretrain_weights_dict[
-                    self.model_name]:
-                logging.warning(
-                    "Path of pretrain_weights('{}') does not exist!".format(
-                        pretrain_weights))
-                logging.warning("Pretrain_weights is forcibly set to '{}'. "
-                                "If don't want to use pretrain weights, "
-                                "set pretrain_weights to be None.".format(
-                                    seg_pretrain_weights_dict[self.model_name][
-                                        0]))
-                pretrain_weights = seg_pretrain_weights_dict[self.model_name][0]
-        elif pretrain_weights is not None and osp.exists(pretrain_weights):
-            if osp.splitext(pretrain_weights)[-1] != '.pdparams':
-                logging.error(
-                    "Invalid pretrain weights. Please specify a '.pdparams' file.",
-                    exit=True)
+        if pretrain_weights is not None:
+            if not osp.exists(pretrain_weights):
+                if self.model_name not in seg_pretrain_weights_dict:
+                    logging.warning(
+                        "Path of pretrained weights ('{}') does not exist!".
+                        format(pretrain_weights))
+                    pretrain_weights = None
+                elif pretrain_weights not in seg_pretrain_weights_dict[
+                        self.model_name]:
+                    logging.warning(
+                        "Path of pretrained weights ('{}') does not exist!".
+                        format(pretrain_weights))
+                    pretrain_weights = seg_pretrain_weights_dict[
+                        self.model_name][0]
+                    logging.warning(
+                        "`pretrain_weights` is forcibly set to '{}'. "
+                        "If you don't want to use pretrained weights, "
+                        "please set `pretrain_weights` to None.".format(
+                            pretrain_weights))
+            else:
+                if osp.splitext(pretrain_weights)[-1] != '.pdparams':
+                    logging.error(
+                        "Invalid pretrained weights. Please specify a .pdparams file.",
+                        exit=True)
         pretrained_dir = osp.join(save_dir, 'pretrain')
         is_backbone_weights = pretrain_weights == 'IMAGENET'
         self.net_initialize(
@@ -398,12 +405,12 @@ class BaseSegmenter(BaseModel):
 
         Returns:
             collections.OrderedDict with key-value pairs:
-                {"miou": `mean intersection over union`,
-                 "category_iou": `category-wise mean intersection over union`,
-                 "oacc": `overall accuracy`,
-                 "category_acc": `category-wise accuracy`,
-                 "kappa": ` kappa coefficient`,
-                 "category_F1-score": `F1 score`}.
+                {"miou": mean intersection over union,
+                 "category_iou": category-wise mean intersection over union,
+                 "oacc": overall accuracy,
+                 "category_acc": category-wise accuracy,
+                 "kappa": kappa coefficient,
+                 "category_F1-score": F1 score}.
 
         """
 
@@ -909,6 +916,7 @@ class BiSeNetV2(BaseSegmenter):
 
 class FarSeg(BaseSegmenter):
     def __init__(self,
+                 in_channels=3,
                  num_classes=2,
                  use_mixed_loss=False,
                  losses=None,
@@ -918,4 +926,5 @@ class FarSeg(BaseSegmenter):
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
             losses=losses,
+            in_channels=in_channels,
             **params)

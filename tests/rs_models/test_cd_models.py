@@ -21,7 +21,7 @@ __all__ = [
     'TestBITModel', 'TestCDNetModel', 'TestChangeStarModel', 'TestDSAMNetModel',
     'TestDSIFNModel', 'TestFCEarlyFusionModel', 'TestFCSiamConcModel',
     'TestFCSiamDiffModel', 'TestSNUNetModel', 'TestSTANetModel',
-    'TestChangeFormerModel'
+    'TestChangeFormerModel', 'TestFCCDNModel'
 ]
 
 
@@ -32,8 +32,11 @@ class TestCDModel(TestModel):
         self.assertIsInstance(output, list)
         self.check_output_equal(len(output), len(target))
         for o, t in zip(output, target):
-            o = o.numpy()
-            self.check_output_equal(o.shape, t.shape)
+            if isinstance(o, list):
+                self.check_output(o, t)
+            else:
+                o = o.numpy()
+                self.check_output_equal(o.shape, t.shape)
 
     def set_inputs(self):
         if self.EF_MODE == 'Concat':
@@ -225,3 +228,27 @@ class TestChangeFormerModel(TestCDModel):
             dict(**base_spec, decoder_softmax=True),
             dict(**base_spec, embed_dim=56)
         ]   # yapf: disable
+
+
+class TestFCCDNModel(TestCDModel):
+    MODEL_CLASS = paddlers.rs_models.cd.FCCDN
+
+    def set_specs(self):
+        self.specs = [
+            dict(in_channels=3, num_classes=2),
+            dict(in_channels=8, num_classes=2),
+            dict(in_channels=3, num_classes=8),
+            dict(in_channels=3, num_classes=2, _phase='eval', _stop_grad=True)
+        ]   # yapf: disable
+
+    def set_targets(self):
+        b = self.DEFAULT_BATCH_SIZE
+        h = self.DEFAULT_HW[0] // 2
+        w = self.DEFAULT_HW[1] // 2
+        tar_c2 = [
+            self.get_zeros_array(2), [self.get_zeros_array(1, b, h, w)] * 2
+        ]
+        self.targets = [
+            tar_c2, tar_c2, [self.get_zeros_array(8), tar_c2[1]],
+            [self.get_zeros_array(2)]
+        ]
