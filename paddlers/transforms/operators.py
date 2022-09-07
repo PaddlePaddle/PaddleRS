@@ -35,7 +35,8 @@ from .functions import (
     horizontal_flip_poly, horizontal_flip_rle, vertical_flip_poly,
     vertical_flip_rle, crop_poly, crop_rle, expand_poly, expand_rle,
     resize_poly, resize_rle, dehaze, select_bands, to_intensity, to_uint8,
-    img_flip, img_simple_rotate, decode_seg_mask, calc_hr_shape)
+    img_flip, img_simple_rotate, decode_seg_mask, calc_hr_shape,
+    match_by_regression, match_histograms)
 
 __all__ = [
     "Compose", "DecodeImg", "Resize", "RandomResize", "ResizeByShort",
@@ -43,8 +44,9 @@ __all__ = [
     "RandomVerticalFlip", "Normalize", "CenterCrop", "RandomCrop",
     "RandomScaleAspect", "RandomExpand", "Pad", "MixupImage", "RandomDistort",
     "RandomBlur", "RandomSwap", "Dehaze", "ReduceDim", "SelectBand",
-    "ArrangeSegmenter", "ArrangeChangeDetector", "ArrangeClassifier",
-    "ArrangeDetector", "ArrangeRestorer", "RandomFlipOrRotate", "ReloadMask"
+    "RandomFlipOrRotate", "ReloadMask", "MatchRadiance", "ArrangeSegmenter",
+    "ArrangeChangeDetector", "ArrangeClassifier", "ArrangeDetector",
+    "ArrangeRestorer"
 ]
 
 interp_dict = {
@@ -1925,6 +1927,39 @@ class ReloadMask(Transform):
         if 'aux_masks' in sample:
             sample['aux_masks'] = list(
                 map(decode_seg_mask, sample['aux_masks_ori']))
+        return sample
+
+
+class MatchRadiance(Transform):
+    """
+    Perform relative radiometric correction between bi-temporal images.
+
+    Args:
+        method (str, optional): Method used to match the radiance of the
+            bi-temporal images. Choices are {'hist', 'lsr'}. 'hist' stands
+            for histogram matching and 'lsr' stands for least-squares 
+            regression. Default: 'hist'.
+    """
+
+    def __init__(self, method='hist'):
+        super(MatchRadiance, self).__init__()
+
+        if method == 'hist':
+            self._match_func = match_histograms
+        elif method == 'lsr':
+            self._match_func = match_by_regression
+        else:
+            raise ValueError(
+                "{} is not a supported radiometric correction method.".format(
+                    method))
+
+        self.method = method
+
+    def apply(self, sample):
+        if 'image2' not in sample:
+            raise ValueError("'image2' is not found in the sample.")
+
+        sample['image2'] = self._match_func(sample['image2'], sample['image'])
         return sample
 
 
