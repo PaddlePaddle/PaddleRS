@@ -61,6 +61,7 @@ __all__ = [
     "SelectBand",
     "RandomFlipOrRotate",
     "ReloadMask",
+    "AppendIndex",
     "MatchRadiance",
     "ArrangeRestorer",
     "ArrangeSegmenter",
