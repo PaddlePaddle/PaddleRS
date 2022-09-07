@@ -1978,6 +1978,7 @@ class AppendIndex(Transform):
         sample['image'] = self.apply_im(sample['image'])
         if 'image2' in sample:
             sample['image2'] = self.apply_im(sample['image2'])
+        return sample
 
 
 class MatchRadiance(Transform):
