@@ -17,6 +17,7 @@ import tempfile
 import unittest.mock as mock
 
 import paddle
+import numpy as np
 
 import paddlers as pdrs
 from paddlers.transforms import decode_image
@@ -66,7 +67,9 @@ class TestPredictor(CommonTest):
                     predictor = pdrs.deploy.Predictor(
                         static_model_dir,
                         use_gpu=paddle.device.get_device().startswith('gpu'))
-                    self.check_predictor(predictor, trainer)
+                    trainer.net.eval()
+                    with paddle.no_grad():
+                        self.check_predictor(predictor, trainer)
 
             return _test_predictor_impl
 
@@ -80,11 +83,12 @@ class TestPredictor(CommonTest):
     def check_predictor(self, predictor, trainer):
         raise NotImplementedError
 
-    def check_dict_equal(
-            self,
-            dict_,
-            expected_dict,
-            ignore_keys=('label_map', 'mask', 'category', 'category_id')):
+    def check_dict_equal(self,
+                         dict_,
+                         expected_dict,
+                         ignore_keys=('label_map', 'mask', 'class_ids_map',
+                                      'label_names_map', 'category',
+                                      'category_id')):
         # By default do not compare label_maps, masks, or categories,
         # because numeric errors could result in large difference in labels.
         if isinstance(dict_, list):
@@ -100,9 +104,11 @@ class TestPredictor(CommonTest):
             for key in dict_.keys():
                 if key in ignore_keys:
                     continue
-                # Use higher tolerance
-                self.check_output_equal(
-                    dict_[key], expected_dict[key], rtol=1.e-4, atol=1.e-6)
+                diff = np.abs(
+                    np.asarray(dict_[key]) - np.asarray(expected_dict[
+                        key])).ravel()
+                cnt = (diff > (1.e-4 * diff + 1.e-4)).sum()
+                self.assertLess(cnt / diff.size, 0.03)
 
 
 @TestPredictor.add_tests
@@ -111,9 +117,9 @@ class TestCDPredictor(TestPredictor):
     TRAINER_NAME_TO_EXPORT_OPTS = {
         '_default': "--fixed_input_shape [-1,3,256,256]"
     }
-    # HACK: Skip CDNet.
+    # HACK: Skip DSIFN.
     # These models are heavily affected by numeric errors.
-    WHITE_LIST = ['CDNet']
+    WHITE_LIST = ['DSIFN']
 
     def check_predictor(self, predictor, trainer):
         t1_path = "data/ssmt/optical_t1.bmp"
@@ -305,6 +311,14 @@ class TestDetPredictor(TestPredictor):
 @TestPredictor.add_tests
 class TestResPredictor(TestPredictor):
     MODULE = pdrs.tasks.restorer
+    TRAINER_NAME_TO_EXPORT_OPTS = {
+        '_default': "--fixed_input_shape [-1,3,256,256]"
+    }
+
+    def __init__(self, methodName='runTest'):
+        super(TestResPredictor, self).__init__(methodName=methodName)
+        # Do not test with CPUs as it will take long long time.
+        self.places.pop(self.places.index('cpu'))
 
     def check_predictor(self, predictor, trainer):
         # For restoration tasks, do NOT ensure the consistence of numeric values, 

@@ -14,3 +14,4 @@
 
 from .test_functions import *
 from .test_operators import *
+from .test_indices import *

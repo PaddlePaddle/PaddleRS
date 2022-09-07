@@ -18,10 +18,7 @@ import random
 from numbers import Number
 from functools import partial
 from operator import methodcaller
-try:
-    from collections.abc import Sequence
-except Exception:
-    from collections import Sequence
+from collections.abc import Sequence
 
 import numpy as np
 import cv2
@@ -30,6 +27,7 @@ from PIL import Image
 from joblib import load
 
 import paddlers
+import paddlers.transforms.indices as indices
 from .functions import (
     normalize, horizontal_flip, permute, vertical_flip, center_crop, is_poly,
     horizontal_flip_poly, horizontal_flip_rle, vertical_flip_poly,
@@ -39,14 +37,37 @@ from .functions import (
     match_by_regression, match_histograms)
 
 __all__ = [
-    "Compose", "DecodeImg", "Resize", "RandomResize", "ResizeByShort",
-    "RandomResizeByShort", "ResizeByLong", "RandomHorizontalFlip",
-    "RandomVerticalFlip", "Normalize", "CenterCrop", "RandomCrop",
-    "RandomScaleAspect", "RandomExpand", "Pad", "MixupImage", "RandomDistort",
-    "RandomBlur", "RandomSwap", "Dehaze", "ReduceDim", "SelectBand",
-    "RandomFlipOrRotate", "ReloadMask", "MatchRadiance", "ArrangeSegmenter",
-    "ArrangeChangeDetector", "ArrangeClassifier", "ArrangeDetector",
-    "ArrangeRestorer"
+    "Compose",
+    "DecodeImg",
+    "Resize",
+    "RandomResize",
+    "ResizeByShort",
+    "RandomResizeByShort",
+    "ResizeByLong",
+    "RandomHorizontalFlip",
+    "RandomVerticalFlip",
+    "Normalize",
+    "CenterCrop",
+    "RandomCrop",
+    "RandomScaleAspect",
+    "RandomExpand",
+    "Pad",
+    "MixupImage",
+    "RandomDistort",
+    "RandomBlur",
+    "RandomSwap",
+    "Dehaze",
+    "ReduceDim",
+    "SelectBand",
+    "RandomFlipOrRotate",
+    "ReloadMask",
+    "AppendIndex",
+    "MatchRadiance",
+    "ArrangeRestorer",
+    "ArrangeSegmenter",
+    "ArrangeChangeDetector",
+    "ArrangeClassifier",
+    "ArrangeDetector",
 ]
 
 interp_dict = {
@@ -132,16 +153,16 @@ class Transform(object):
         pass
 
     def apply_im(self, image):
-        pass
+        return image
 
     def apply_mask(self, mask):
-        pass
+        return mask
 
     def apply_bbox(self, bbox):
-        pass
+        return bbox
 
     def apply_segm(self, segms):
-        pass
+        return segms
 
     def apply(self, sample):
         if 'image' in sample:
@@ -1927,6 +1948,36 @@ class ReloadMask(Transform):
         if 'aux_masks' in sample:
             sample['aux_masks'] = list(
                 map(decode_seg_mask, sample['aux_masks_ori']))
+        return sample
+
+
+class AppendIndex(Transform):
+    """
+    Append remote sensing index to input image(s).
+
+    Args:
+        index_type (str): Type of remote sensinng index. See supported 
+            index types in 
+            https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/indices.py .
+        band_indices (dict): Mapping of band names to band indices 
+            (starting from 1). See band names in 
+            https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/indices.py . 
+    """
+
+    def __init__(self, index_type, band_indices, **kwargs):
+        super(AppendIndex, self).__init__()
+        cls = getattr(indices, index_type)
+        self._compute_index = cls(band_indices, **kwargs)
+
+    def apply_im(self, image):
+        index = self._compute_index(image)
+        index = index[..., None].astype('float32')
+        return np.concatenate([image, index], axis=-1)
+
+    def apply(self, sample):
+        sample['image'] = self.apply_im(sample['image'])
+        if 'image2' in sample:
+            sample['image2'] = self.apply_im(sample['image2'])
         return sample
 
 

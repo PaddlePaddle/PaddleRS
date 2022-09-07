@@ -7,7 +7,6 @@ ln -s /usr/local/bin/pip3.7 /usr/local/python2.7.15/bin/pip
 export PYTHONPATH=`pwd`
 
 python -m pip install --upgrade pip --ignore-installed
-# python -m pip install --upgrade numpy --ignore-installed
 python -m pip uninstall paddlepaddle-gpu -y
 if [[ ${branch} == 'develop' ]];then
 echo "checkout develop !"
@@ -32,6 +31,8 @@ pip install -r requirements.txt
 python setup.py bdist_wheel
 pip install ./dist/auto_log*.whl
 cd ..
+
+pip install spyndex protobuf==3.19.0 colorama
 
 unset http_proxy https_proxy
 
