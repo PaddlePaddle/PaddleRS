@@ -145,8 +145,8 @@ class TestCDPredictor(TestPredictor):
 
         # Single input (ndarrays)
         input_ = (decode_image(
-            t1_path, to_rgb=False), decode_image(
-                t2_path, to_rgb=False))  # Reuse the name `input_`
+            t1_path, read_raw=True), decode_image(
+                t2_path, read_raw=True))  # Reuse the name `input_`
         out_single_array_p = predictor.predict(input_, transforms=transforms)
         self.check_dict_equal(out_single_array_p, out_single_file_p)
         out_single_array_t = trainer.predict(input_, transforms=transforms)
@@ -169,8 +169,9 @@ class TestCDPredictor(TestPredictor):
 
         # Multiple inputs (ndarrays)
         input_ = [(decode_image(
-            t1_path, to_rgb=False), decode_image(
-                t2_path, to_rgb=False))] * num_inputs  # Reuse the name `input_`
+            t1_path, read_raw=True), decode_image(
+                t2_path,
+                read_raw=True))] * num_inputs  # Reuse the name `input_`
         out_multi_array_p = predictor.predict(input_, transforms=transforms)
         self.assertEqual(len(out_multi_array_p), num_inputs)
         out_multi_array_t = trainer.predict(input_, transforms=transforms)
@@ -211,7 +212,7 @@ class TestClasPredictor(TestPredictor):
 
         # Single input (ndarray)
         input_ = decode_image(
-            single_input, to_rgb=False)  # Reuse the name `input_`
+            single_input, read_raw=True)  # Reuse the name `input_`
         out_single_array_p = predictor.predict(input_, transforms=transforms)
         self.check_dict_equal(out_single_array_p, out_single_file_p)
         out_single_array_t = trainer.predict(input_, transforms=transforms)
@@ -235,7 +236,8 @@ class TestClasPredictor(TestPredictor):
 
         # Multiple inputs (ndarrays)
         input_ = [decode_image(
-            single_input, to_rgb=False)] * num_inputs  # Reuse the name `input_`
+            single_input,
+            read_raw=True)] * num_inputs  # Reuse the name `input_`
         out_multi_array_p = predictor.predict(input_, transforms=transforms)
         self.assertEqual(len(out_multi_array_p), num_inputs)
         out_multi_array_t = trainer.predict(input_, transforms=transforms)
@@ -276,7 +278,7 @@ class TestDetPredictor(TestPredictor):
 
         # Single input (ndarray)
         input_ = decode_image(
-            single_input, to_rgb=False)  # Reuse the name `input_`
+            single_input, read_raw=True)  # Reuse the name `input_`
         predictor.predict(input_, transforms=transforms)
         trainer.predict(input_, transforms=transforms)
         out_single_array_list_p = predictor.predict(
@@ -295,7 +297,8 @@ class TestDetPredictor(TestPredictor):
 
         # Multiple inputs (ndarrays)
         input_ = [decode_image(
-            single_input, to_rgb=False)] * num_inputs  # Reuse the name `input_`
+            single_input,
+            read_raw=True)] * num_inputs  # Reuse the name `input_`
         out_multi_array_p = predictor.predict(input_, transforms=transforms)
         self.assertEqual(len(out_multi_array_p), num_inputs)
         out_multi_array_t = trainer.predict(input_, transforms=transforms)
@@ -329,7 +332,7 @@ class TestResPredictor(TestPredictor):
 
         # Single input (ndarray)
         input_ = decode_image(
-            single_input, to_rgb=False)  # Reuse the name `input_`
+            single_input, read_raw=True)  # Reuse the name `input_`
         predictor.predict(input_, transforms=transforms)
         trainer.predict(input_, transforms=transforms)
         out_single_array_list_p = predictor.predict(
@@ -348,7 +351,8 @@ class TestResPredictor(TestPredictor):
 
         # Multiple inputs (ndarrays)
         input_ = [decode_image(
-            single_input, to_rgb=False)] * num_inputs  # Reuse the name `input_`
+            single_input,
+            read_raw=True)] * num_inputs  # Reuse the name `input_`
         out_multi_array_p = predictor.predict(input_, transforms=transforms)
         self.assertEqual(len(out_multi_array_p), num_inputs)
         out_multi_array_t = trainer.predict(input_, transforms=transforms)
@@ -386,7 +390,7 @@ class TestSegPredictor(TestPredictor):
 
         # Single input (ndarray)
         input_ = decode_image(
-            single_input, to_rgb=False)  # Reuse the name `input_`
+            single_input, read_raw=True)  # Reuse the name `input_`
         out_single_array_p = predictor.predict(input_, transforms=transforms)
         self.check_dict_equal(out_single_array_p, out_single_file_p)
         out_single_array_t = trainer.predict(input_, transforms=transforms)
@@ -409,7 +413,8 @@ class TestSegPredictor(TestPredictor):
 
         # Multiple inputs (ndarrays)
         input_ = [decode_image(
-            single_input, to_rgb=False)] * num_inputs  # Reuse the name `input_`
+            single_input,
+            read_raw=True)] * num_inputs  # Reuse the name `input_`
         out_multi_array_p = predictor.predict(input_, transforms=transforms)
         self.assertEqual(len(out_multi_array_p), num_inputs)
         out_multi_array_t = trainer.predict(input_, transforms=transforms)

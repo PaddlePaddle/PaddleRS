@@ -481,7 +481,7 @@ class BaseRestorer(BaseModel):
         batch_tar_shape = list()
         for im in images:
             if isinstance(im, str):
-                im = decode_image(im, to_rgb=False)
+                im = decode_image(im, read_raw=True)
             ori_shape = im.shape[:2]
             sample = {'image': im}
             im = transforms(sample)[0]

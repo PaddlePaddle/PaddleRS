@@ -382,13 +382,13 @@ def resize_rle(rle, im_h, im_w, im_scale_x, im_scale_y, interp):
     return rle
 
 
-def to_uint8(im, is_linear=False):
+def to_uint8(im, stretch=False):
     """
     Convert raster data to uint8 type.
     
     Args:
         im (np.ndarray): Input raster image.
-        is_linear (bool, optional): Use 2% linear stretch or not. Default is False.
+        stretch (bool, optional): Use 2% linear stretch or not. Default is False.
 
     Returns:
         np.ndarray: Image data with unit8 type.
@@ -430,7 +430,7 @@ def to_uint8(im, is_linear=False):
     dtype = im.dtype.name
     if dtype != "uint8":
         im = _sample_norm(im)
-    if is_linear:
+    if stretch:
         im = _two_percent_linear(im)
     return im
 

@@ -617,7 +617,7 @@ class BaseDetector(BaseModel):
         batch_samples = list()
         for im in images:
             if isinstance(im, str):
-                im = decode_image(im, to_rgb=False)
+                im = decode_image(im, read_raw=True)
             sample = {'image': im}
             sample = transforms(sample)
             batch_samples.append(sample)

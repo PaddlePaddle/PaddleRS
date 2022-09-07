@@ -282,8 +282,8 @@ class Predictor(object):
             img_file(list[str|tuple|np.ndarray] | str | tuple | np.ndarray): For scene classification, image restoration, 
                 object detection and semantic segmentation tasks, `img_file` should be either the path of the image to predict,
                 a decoded image (a np.ndarray, which should be consistent with what you get from passing image path to
-                paddlers.transforms.decode_image()), or a list of image paths or decoded images. For change detection tasks,
-                `img_file` should be a tuple of image paths, a tuple of decoded images, or a list of tuples.
+                paddlers.transforms.decode_image(..., read_raw=True)), or a list of image paths or decoded images. For change 
+                detection tasks, `img_file` should be a tuple of image paths, a tuple of decoded images, or a list of tuples.
             topk(int, optional): Top-k values to reserve in a classification result. Defaults to 1.
             transforms (paddlers.transforms.Compose|None, optional): Pipeline of data preprocessing. If None, load transforms
                 from `model.yml`. Defaults to None.
@@ -332,7 +332,8 @@ class Predictor(object):
                        overlap=36,
                        transforms=None,
                        invalid_value=255,
-                       merge_strategy='keep_last'):
+                       merge_strategy='keep_last',
+                       batch_size=1):
         """
         Do inference using sliding windows. Only semantic segmentation and change detection models are supported in the 
             sliding-predicting mode.
@@ -340,9 +341,9 @@ class Predictor(object):
         Args:
             img_file(list[str|tuple|np.ndarray] | str | tuple | np.ndarray): For semantic segmentation tasks, `img_file` 
                 should be either the path of the image to predict, a decoded image (a np.ndarray, which should be 
-                consistent with what you get from passing image path to paddlers.transforms.decode_image()), or a list of 
-                image paths or decoded images. For change detection tasks, `img_file` should be a tuple of image paths, a 
-                tuple of decoded images, or a list of tuples.
+                consistent with what you get from passing image path to paddlers.transforms.decode_image(..., read_raw=True)), 
+                or a list of image paths or decoded images. For change detection tasks, `img_file` should be a tuple of 
+                image paths, a tuple of decoded images, or a list of tuples.
             save_dir (str): Directory that contains saved geotiff file.
             block_size (list[int] | tuple[int] | int): Size of block. If `block_size` is a list or tuple, it should be in 
                 (W, H) format.
@@ -355,6 +356,7 @@ class Predictor(object):
                 {'keep_first', 'keep_last', 'accum'}. 'keep_first' and 'keep_last' means keeping the values of the first and 
                 the last block in traversal order, respectively. 'accum' means determining the class of an overlapping pixel 
                 according to accumulated probabilities. Defaults to 'keep_last'.
+            batch_size (int, optional): Batch size used in inference. Defaults to 1.
         """
         slider_predict(
             partial(
@@ -365,7 +367,8 @@ class Predictor(object):
             overlap,
             transforms,
             invalid_value,
-            merge_strategy)
+            merge_strategy,
+            batch_size)
 
     def batch_predict(self, image_list, **params):
         return self.predict(img_file=image_list, **params)

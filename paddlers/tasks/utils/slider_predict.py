@@ -14,6 +14,7 @@
 
 import os
 import os.path as osp
+import math
 from abc import ABCMeta, abstractmethod
 from collections import Counter, defaultdict
 
@@ -117,10 +118,10 @@ class ProbCache(Cache):
 
     def roll_cache(self):
         if self.order == 'c':
-            self.cache = np.roll(self.cache, -self.sh, axis=0)
+            self.cache[:-self.sh] = self.cache[self.sh:]
             self.cache[-self.sh:, :] = 0
         elif self.order == 'f':
-            self.cache = np.roll(self.cache, -self.sw, axis=1)
+            self.cache[:, :-self.sw] = self.cache[:, self.sw:]
             self.cache[:, -self.sw:] = 0
 
     def get_block(self, i_st, j_st, h, w):
@@ -128,7 +129,7 @@ class ProbCache(Cache):
 
 
 def slider_predict(predict_func, img_file, save_dir, block_size, overlap,
-                   transforms, invalid_value, merge_strategy):
+                   transforms, invalid_value, merge_strategy, batch_size):
     """
     Do inference using sliding windows.
 
@@ -151,6 +152,7 @@ def slider_predict(predict_func, img_file, save_dir, block_size, overlap,
             means keeping the values of the first and the last block in 
             traversal order, respectively. 'accum' means determining the class 
             of an overlapping pixel according to accumulated probabilities.
+        batch_size (int): Batch size used in inference.
     """
 
     try:
@@ -200,6 +202,13 @@ def slider_predict(predict_func, img_file, save_dir, block_size, overlap,
     height = src_data.RasterYSize
     bands = src_data.RasterCount
 
+    # XXX: GDAL read behavior conforms to paddlers.transforms.decode_image(read_raw=True)
+    # except for SAR images.
+    if bands == 1:
+        logging.warning(
+            f"Detected `bands=1`. Please note that currently `slider_predict()` does not properly handle SAR images."
+        )
+
     if block_size[0] > width or block_size[1] > height:
         raise ValueError("`block_size` should not be larger than image size.")
 
@@ -228,6 +237,8 @@ def slider_predict(predict_func, img_file, save_dir, block_size, overlap,
     if merge_strategy == 'accum':
         cache = ProbCache(height, width, *block_size[::-1], *step[::-1])
 
+    batch_data = []
+    batch_offsets = []
     for yoff in range(0, height, step[1]):
         for xoff in range(0, width, step[0]):
             xsize, ysize = block_size
@@ -236,6 +247,9 @@ def slider_predict(predict_func, img_file, save_dir, block_size, overlap,
             if yoff + ysize > height:
                 yoff = height - ysize
 
+            is_end_of_col = yoff + ysize >= height
+            is_end_of_row = xoff + xsize >= width
+
             # Read and fill
             im = src_data.ReadAsArray(xoff, yoff, xsize, ysize).transpose(
                 (1, 2, 0))
@@ -243,33 +257,49 @@ def slider_predict(predict_func, img_file, save_dir, block_size, overlap,
             if isinstance(img_file, tuple):
                 im2 = src2_data.ReadAsArray(xoff, yoff, xsize, ysize).transpose(
                     (1, 2, 0))
-                # Predict
-                out = predict_func((im, im2), transforms=transforms)
+                batch_data.append((im, im2))
             else:
+                batch_data.append(im)
+
+            batch_offsets.append((xoff, yoff))
+
+            len_batch = len(batch_data)
+
+            if is_end_of_row and is_end_of_col and len_batch < batch_size:
+                # Pad `batch_data` by repeating the last element
+                batch_data = batch_data + [batch_data[-1]] * (batch_size -
+                                                              len_batch)
+                # While keeping `len(batch_offsets)` the number of valid elements in the batch 
+
+            if len(batch_data) == batch_size:
                 # Predict
-                out = predict_func(im, transforms=transforms)
+                batch_out = predict_func(batch_data, transforms=transforms)
 
-            pred = out['label_map'].astype('uint8')
-            pred = pred[:ysize, :xsize]
+                for out, (xoff_, yoff_) in zip(batch_out, batch_offsets):
+                    pred = out['label_map'].astype('uint8')
+                    pred = pred[:ysize, :xsize]
 
-            # Deal with overlapping pixels
-            if merge_strategy == 'keep_first':
-                rd_block = band.ReadAsArray(xoff, yoff, xsize, ysize)
-                mask = rd_block != invalid_value
-                pred = np.where(mask, rd_block, pred)
-            elif merge_strategy == 'keep_last':
-                pass
-            elif merge_strategy == 'accum':
-                prob = out['score_map']
-                prob = prob[:ysize, :xsize]
-                cache.update_block(0, xoff, ysize, xsize, prob)
-                pred = cache.get_block(0, xoff, ysize, xsize)
-                if xoff + xsize >= width:
-                    cache.roll_cache()
+                    # Deal with overlapping pixels
+                    if merge_strategy == 'keep_first':
+                        rd_block = band.ReadAsArray(xoff_, yoff_, xsize, ysize)
+                        mask = rd_block != invalid_value
+                        pred = np.where(mask, rd_block, pred)
+                    elif merge_strategy == 'keep_last':
+                        pass
+                    elif merge_strategy == 'accum':
+                        prob = out['score_map']
+                        prob = prob[:ysize, :xsize]
+                        cache.update_block(0, xoff_, ysize, xsize, prob)
+                        pred = cache.get_block(0, xoff_, ysize, xsize)
+                        if xoff_ + xsize >= width:
+                            cache.roll_cache()
 
-            # Write to file
-            band.WriteArray(pred, xoff, yoff)
-            dst_data.FlushCache()
+                    # Write to file
+                    band.WriteArray(pred, xoff_, yoff_)
+
+                dst_data.FlushCache()
+                batch_data.clear()
+                batch_offsets.clear()
 
     dst_data = None
     logging.info("GeoTiff file saved in {}.".format(save_file))
