@@ -16,6 +16,7 @@ import os
 import os.path as osp
 import argparse
 
+import paddlers
 import numpy as np
 from PIL import Image
 try:
@@ -89,17 +90,16 @@ def mask2shape(srcimg_path, mask_path, save_path, ignore_index=255):
                            vec_ext)
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--mask_path", type=str, required=True, \
-                    help="Path of mask data.")
-parser.add_argument("--save_path", type=str, required=True, \
-                    help="Path to save the shape file (the extension is .json/geojson or .shp).")
-parser.add_argument("--srcimg_path", type=str, default="", \
-                    help="Path of original data with geoinfo. Default to empty.")
-parser.add_argument("--ignore_index", type=int, default=255, \
-                    help="The ignored index will not be converted to a value in the shape file. Default value is 255.")
-
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--mask_path", type=str, required=True, \
+                        help="Path of mask data.")
+    parser.add_argument("--save_path", type=str, required=True, \
+                        help="Path to save the shape file (the extension is .json/geojson or .shp).")
+    parser.add_argument("--srcimg_path", type=str, default="", \
+                        help="Path of original data with geoinfo. Default to empty.")
+    parser.add_argument("--ignore_index", type=int, default=255, \
+                        help="The ignored index will not be converted to a value in the shape file. Default value is 255.")
     args = parser.parse_args()
     mask2shape(args.srcimg_path, args.mask_path, args.save_path,
                args.ignore_index)

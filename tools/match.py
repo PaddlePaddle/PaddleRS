@@ -14,6 +14,7 @@
 
 import argparse
 
+import paddlers
 import numpy as np
 import cv2
 
@@ -78,19 +79,18 @@ def match(im1_path,
                  im1_ras.datatype)
 
 
-parser = argparse.ArgumentParser(description="input parameters")
-parser.add_argument('--im1_path', type=str, required=True, \
-                    help="Path of time1 image (with geoinfo).")
-parser.add_argument('--im2_path', type=str, required=True, \
-                    help="Path of time2 image.")
-parser.add_argument('--save_path', type=str, required=True, \
-                    help="Path to save matching result.")
-parser.add_argument('--im1_bands', type=int, nargs="+", default=[1, 2, 3], \
-                    help="Bands of im1 to be used for matching, RGB or monochrome. The default value is [1, 2, 3].")
-parser.add_argument('--im2_bands', type=int, nargs="+", default=[1, 2, 3], \
-                    help="Bands of im2 to be used for matching, RGB or monochrome. The default value is [1, 2, 3].")
-
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="input parameters")
+    parser.add_argument('--im1_path', type=str, required=True, \
+                        help="Path of time1 image (with geoinfo).")
+    parser.add_argument('--im2_path', type=str, required=True, \
+                        help="Path of time2 image.")
+    parser.add_argument('--save_path', type=str, required=True, \
+                        help="Path to save matching result.")
+    parser.add_argument('--im1_bands', type=int, nargs="+", default=[1, 2, 3], \
+                        help="Bands of im1 to be used for matching, RGB or monochrome. The default value is [1, 2, 3].")
+    parser.add_argument('--im2_bands', type=int, nargs="+", default=[1, 2, 3], \
+                        help="Bands of im2 to be used for matching, RGB or monochrome. The default value is [1, 2, 3].")
     args = parser.parse_args()
     match(args.im1_path, args.im2_path, args.save_path, args.im1_bands,
           args.im2_bands)

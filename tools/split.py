@@ -16,6 +16,8 @@ import os
 import os.path as osp
 import argparse
 from math import ceil
+
+import paddlers
 from tqdm import tqdm
 
 from utils import Raster, save_geotiff, time_it
@@ -67,16 +69,15 @@ def split_data(image_path, mask_path, block_size, save_dir):
                 pbar.update(1)
 
 
-parser = argparse.ArgumentParser(description="input parameters")
-parser.add_argument("--image_path", type=str, required=True, \
-                    help="Path of input image.")
-parser.add_argument("--mask_path", type=str, default=None, \
-                    help="Path of input labels.")
-parser.add_argument("--block_size", type=int, default=512, \
-                    help="Size of image block. Default value is 512.")
-parser.add_argument("--save_dir", type=str, default="dataset", \
-                    help="Directory to save the results. Default value is 'dataset'.")
-
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="input parameters")
+    parser.add_argument("--image_path", type=str, required=True, \
+                        help="Path of input image.")
+    parser.add_argument("--mask_path", type=str, default=None, \
+                        help="Path of input labels.")
+    parser.add_argument("--block_size", type=int, default=512, \
+                        help="Size of image block. Default value is 512.")
+    parser.add_argument("--save_dir", type=str, default="dataset", \
+                        help="Directory to save the results. Default value is 'dataset'.")
     args = parser.parse_args()
     split_data(args.image_path, args.mask_path, args.block_size, args.save_dir)

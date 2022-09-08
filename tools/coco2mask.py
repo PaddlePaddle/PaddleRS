@@ -19,8 +19,9 @@ import json
 import argparse
 from collections import defaultdict
 
-import cv2
+import paddlers
 import numpy as np
+import cv2
 import glob
 from tqdm import tqdm
 from PIL import Image
@@ -101,12 +102,11 @@ def convert_data(raw_dir, end_dir):
                           lab_save_path)
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--raw_dir", type=str, required=True, \
-                    help="Directory that contains original data, where `images` stores the original image and `annotation.json` stores the corresponding annotation information.")
-parser.add_argument("--save_dir", type=str, required=True, \
-                    help="Directory to save the results, where `img` stores the image and `gt` stores the label.")
-
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--raw_dir", type=str, required=True, \
+                        help="Directory that contains original data, where `images` stores the original image and `annotation.json` stores the corresponding annotation information.")
+    parser.add_argument("--save_dir", type=str, required=True, \
+                        help="Directory to save the results, where `img` stores the image and `gt` stores the label.")
     args = parser.parse_args()
     convert_data(args.raw_dir, args.save_dir)
