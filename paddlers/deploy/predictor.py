@@ -333,7 +333,8 @@ class Predictor(object):
                        transforms=None,
                        invalid_value=255,
                        merge_strategy='keep_last',
-                       batch_size=1):
+                       batch_size=1,
+                       quiet=False):
         """
         Do inference using sliding windows. Only semantic segmentation and change detection models are supported in the 
             sliding-predicting mode.
@@ -357,6 +358,7 @@ class Predictor(object):
                 the last block in traversal order, respectively. 'accum' means determining the class of an overlapping pixel 
                 according to accumulated probabilities. Defaults to 'keep_last'.
             batch_size (int, optional): Batch size used in inference. Defaults to 1.
+            quiet (bool, optional): If True, disable the progress bar. Defaults to False.
         """
         slider_predict(
             partial(
@@ -368,7 +370,8 @@ class Predictor(object):
             transforms,
             invalid_value,
             merge_strategy,
-            batch_size)
+            batch_size,
+            not quiet)
 
     def batch_predict(self, image_list, **params):
         return self.predict(img_file=image_list, **params)
