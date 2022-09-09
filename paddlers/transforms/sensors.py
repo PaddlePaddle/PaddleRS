@@ -13,15 +13,13 @@
 # limitations under the License.
 
 __all__ = [
-    "Sentinel_2", "Landsat_457", "Landsat_89", "MODIS", "SPOT_15", 
-    "SPOT_67", "Quickbird", "WorldView_23", "WorldView_4", "IKONOS", 
-    "GF_1_WFV", "GF_6_WFV", "GF_16_PMS", "GF_24", "ZY_3", "CBERS_4", 
-    "SJ_9A"
+    "Sentinel_2", "Landsat_457", "Landsat_89", "MODIS", "SPOT_15", "SPOT_67",
+    "Quickbird", "WorldView_23", "WorldView_4", "IKONOS", "GF_1_WFV",
+    "GF_6_WFV", "GF_16_PMS", "GF_24", "ZY_3", "CBERS_4", "SJ_9A"
 ]
 
 # The rules for names
 # eg. GF_1_WFV: [satellite name]_[model]_[sensor name]
-
 
 Sentinel_2 = {
     "b": 2,
@@ -35,7 +33,6 @@ Sentinel_2 = {
     "s2": 13,  # 12 + 1 (due to 8A)
 }
 
-
 Landsat_457 = {
     "b": 1,
     "g": 2,
@@ -45,7 +42,6 @@ Landsat_457 = {
     "s2": 7,
     "t1": 6,
 }
-
 
 Landsat_89 = {
     "b": 2,
@@ -58,7 +54,6 @@ Landsat_89 = {
     "t2": 11,
 }
 
-
 MODIS = {
     "b": 3,
     "g": 4,
@@ -68,13 +63,11 @@ MODIS = {
     "s2": 7,
 }
 
-
 SPOT_15 = {
     "g": 1,
     "r": 2,
     "n": 3,
 }
-
 
 SPOT_67 = {
     "b": 1,
@@ -83,14 +76,12 @@ SPOT_67 = {
     "n": 4,
 }
 
-
 Quickbird = {
     "b": 2,
     "g": 3,
     "r": 4,
     "n": 5,
 }
-
 
 WorldView_23 = {
     "b": 2,
@@ -100,14 +91,12 @@ WorldView_23 = {
     "re1": 7,
 }
 
-
 WorldView_4 = {
     "b": 2,
     "g": 3,
     "r": 4,
     "n": 5,
 }
-
 
 IKONOS = {
     "b": 1,
@@ -116,14 +105,12 @@ IKONOS = {
     "n": 4,
 }
 
-
 GF_1_WFV = {
     "b": 1,
     "g": 2,
     "r": 3,
     "n": 4,
 }
-
 
 GF_6_WFV = {
     "b": 1,
@@ -134,14 +121,12 @@ GF_6_WFV = {
     "re2": 6,
 }
 
-
 GF_16_PMS = {
     "b": 2,
     "g": 3,
     "r": 4,
     "n": 5,
 }
-
 
 GF_24 = {
     "b": 2,
@@ -150,7 +135,6 @@ GF_24 = {
     "n": 5,
 }
 
-
 ZY_3 = {
     "b": 1,
     "g": 2,
@@ -158,14 +142,12 @@ ZY_3 = {
     "n": 4,
 }
 
-
 CBERS_4 = {
     "b": 1,
     "g": 2,
     "r": 3,
     "n": 4,
 }
-
 
 SJ_9A = {
     "b": 2,

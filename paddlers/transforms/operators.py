@@ -1978,7 +1978,8 @@ class AppendIndex(Transform):
             self._compute_index = cls(sensor_bands, **kwargs)
         else:
             if band_indices is None:
-                raise ValueError("At least one of `band_indices` and `sensor` is not None.")
+                raise ValueError(
+                    "At least one of `band_indices` and `sensor` is not None.")
             else:
                 self._compute_index = cls(band_indices, **kwargs)
 

@@ -179,8 +179,7 @@ class TestIndex(CpuCommonTest):
         arvi_transfromer = T.AppendIndex("ARVI", sensor=sensor, c0=c0)
         in_band_list = arvi_transfromer._compute_index.band_indices
         self.assertEqual(
-            {k: v for k, v in in_band_list.items() if k in bands.keys()},
-            bands
-        )
+            {k: v
+             for k, v in in_band_list.items() if k in bands.keys()}, bands)
         result = arvi_transfromer({"image": dummy})
         self.assertEqual(result["image"].shape[-1], 14)

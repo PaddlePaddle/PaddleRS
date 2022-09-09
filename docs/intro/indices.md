@@ -71,4 +71,3 @@
 |    `'s2'`     | SWIR 2      | *2.100 - 2.300* | *Landsat8* |
 |    `'t1'`     | Thermal 1   | *10.60 - 11.19* | *Landsat8* |
 |    `'t2'`     | Thermal 2   | *11.50 - 12.51* | *Landsat8* |
-
