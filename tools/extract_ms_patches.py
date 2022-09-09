@@ -284,7 +284,7 @@ if __name__ == '__main__':
                         help="Path of images. Different images must have unique file names.")
     parser.add_argument("--mask_path", type=str, required=True, \
                         help="Path of mask.")
-    parser.add_argument("--save_dir", type=str, required=True, \
+    parser.add_argument("--save_dir", type=str, default='output', \
                         help="Path to save the extracted patches.")
     parser.add_argument("--min_patch_size", type=int, default=256, \
                         help="Minimum patch size (height and width).")
