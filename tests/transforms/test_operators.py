@@ -390,6 +390,9 @@ class TestTransform(CpuCommonTest):
         test_lsr = make_test_func(
             T.MatchRadiance, 'lsr', _filter=_filter_only_mt)
         test_lsr(self)
+        test_fft = make_test_func(
+            T.MatchRadiance, 'fft', _filter=_filter_only_mt)
+        test_fft(self)
 
 
 class TestCompose(CpuCommonTest):
