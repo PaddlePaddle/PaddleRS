@@ -28,6 +28,7 @@ from joblib import load
 
 import paddlers
 import paddlers.transforms.indices as indices
+import paddlers.transforms.sensors as sensors
 from .functions import (
     normalize, horizontal_flip, permute, vertical_flip, center_crop, is_poly,
     horizontal_flip_poly, horizontal_flip_rle, vertical_flip_poly,
@@ -1959,15 +1960,27 @@ class AppendIndex(Transform):
         index_type (str): Type of remote sensinng index. See supported 
             index types in 
             https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/indices.py .
-        band_indices (dict): Mapping of band names to band indices 
+        band_indices (dict, optional): Mapping of band names to band indices 
             (starting from 1). See band names in 
-            https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/indices.py . 
+            https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/indices.py .
+            Default: None.
+        sensor (str, optional): Type of sensor, used to determine the description of each band.
+            See supported sensors in 
+            https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/sensors.py .
+            Default: None.
     """
 
-    def __init__(self, index_type, band_indices, **kwargs):
+    def __init__(self, index_type, band_indices=None, sensor=None, **kwargs):
         super(AppendIndex, self).__init__()
         cls = getattr(indices, index_type)
-        self._compute_index = cls(band_indices, **kwargs)
+        if sensor is not None:
+            sensor_bands = getattr(sensors, sensor)
+            self._compute_index = cls(sensor_bands, **kwargs)
+        else:
+            if band_indices is None:
+                raise ValueError("At least one of `band_indices` and `sensor` is not None.")
+            else:
+                self._compute_index = cls(band_indices, **kwargs)
 
     def apply_im(self, image):
         index = self._compute_index(image)

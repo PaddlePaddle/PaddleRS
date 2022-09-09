@@ -53,17 +53,19 @@ class RSIndex(metaclass=abc.ABCMeta):
         pass
 
     def __call__(self, image):
+        self.used_band_name = self._compute.__code__.co_varnames[1:]
         bands = self.select_bands(image)
         return self._compute(**bands)
 
     def select_bands(self, image, to_float32=True):
         bands = {}
         for name, idx in self.band_indices.items():
-            if idx == 0:
-                raise ValueError("Band index starts from 1.")
-            bands[name] = image[..., idx - 1]
-            if to_float32:
-                bands[name] = bands[name].astype('float32')
+            if name in self.used_band_name:
+                if idx == 0:
+                    raise ValueError("Band index starts from 1.")
+                bands[name] = image[..., idx - 1]
+                if to_float32:
+                    bands[name] = bands[name].astype('float32')
         return bands
 
 
