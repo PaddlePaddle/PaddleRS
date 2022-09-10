@@ -29,19 +29,19 @@ __all__ = [
 EPS = 1e-32
 BAND_NAMES = ["b", "g", "r", "re1", "re2", "re3", "n", "s1", "s2", "t1", "t2"]
 
-# | Band name | Description | Reference wavelength |  *Sensor  |
-# |-----------|-------------|----------------------|-----------|
-# |     b     | Blue        |     0.450-0.515      | Landsat8  |
-# |     g     | Green       |     0.525-0.600      | Landsat8  |
-# |     r     | Red         |     0.630-0.680      | Landsat8  |
-# |    re1    | Red Edge 1  |     0.698-0.713      | Sentinel2 |
-# |    re2    | Red Edge 2  |     0.733-0.748      | Sentinel2 |
-# |    re3    | Red Edge 3  |     0.773-0.793      | Sentinel2 |
-# |     n     | NIR         |     0.845-0.885      | Landsat8  |
-# |    s1     | SWIR 1      |     1.560-1.660      | Landsat8  |
-# |    s2     | SWIR 2      |     2.100-2.300      | Landsat8  |
-# |    t1     | Thermal 1   |     10.60-11.19      | Landsat8  |
-# |    t2     | Thermal 2   |     11.50-12.51      | Landsat8  |
+# | Band name | Description | Wavelength (μm) | Satellite |
+# |-----------|-------------|-----------------|-----------|
+# |     b     | Blue        |   0.450-0.515   | Landsat8  |
+# |     g     | Green       |   0.525-0.600   | Landsat8  |
+# |     r     | Red         |   0.630-0.680   | Landsat8  |
+# |    re1    | Red Edge 1  |   0.698-0.713   | Sentinel2 |
+# |    re2    | Red Edge 2  |   0.733-0.748   | Sentinel2 |
+# |    re3    | Red Edge 3  |   0.773-0.793   | Sentinel2 |
+# |     n     | NIR         |   0.845-0.885   | Landsat8  |
+# |    s1     | SWIR 1      |   1.560-1.660   | Landsat8  |
+# |    s2     | SWIR 2      |   2.100-2.300   | Landsat8  |
+# |    t1     | Thermal 1   |   10.60-11.19   | Landsat8  |
+# |    t2     | Thermal 2   |   11.50-12.51   | Landsat8  |
 
 
 class RSIndex(metaclass=abc.ABCMeta):

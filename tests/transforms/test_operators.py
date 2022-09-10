@@ -382,6 +382,16 @@ class TestTransform(CpuCommonTest):
             c3=1.5,
             _filter=_filter_only_multispectral)
         test_evi(self)
+        test_evi_from_satellite = make_test_func(
+            T.AppendIndex,
+            'EVI',
+            satellite='Landsat_89',
+            c0=1.0,
+            c1=0.5,
+            c2=1.0,
+            c3=1.5,
+            _filter=_filter_only_multispectral)
+        test_evi_from_satellite(self)
 
     def test_MatchRadiance(self):
         test_hist = make_test_func(
