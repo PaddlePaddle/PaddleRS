@@ -16,6 +16,7 @@ import inspect
 import numpy as np
 
 import paddlers.transforms as T
+from paddlers.transforms.indices import LackBandError
 from testing_utils import CpuCommonTest
 
 __all__ = ['TestIndex']
@@ -171,15 +172,21 @@ class TestIndex(CpuCommonTest):
             'SAVI', constr_spyndex_params(dummy, bands, {'L': L}))
         self.check_output(index1, index2)
 
-    def test_get_band_indices_from_sensor(self):
+    def test_get_band_indices_from_satellite(self):
         dummy = constr_dummy_image(13)
         bands = {'b': 2, 'r': 4, 'n': 8}
         c0 = 0.1
-        sensor = "Sentinel_2"
-        arvi_transfromer = T.AppendIndex("ARVI", sensor=sensor, c0=c0)
+        satellite = "Sentinel_2"
+        arvi_transfromer = T.AppendIndex("ARVI", satellite=satellite, c0=c0)
         in_band_list = arvi_transfromer._compute_index.band_indices
         self.assertEqual(
             {k: v
              for k, v in in_band_list.items() if k in bands.keys()}, bands)
         result = arvi_transfromer({"image": dummy})
         self.assertEqual(result["image"].shape[-1], 14)
+
+    def test_get_band_indices_from_satellite_but_lacked(self):
+        dummy = constr_dummy_image(3)
+        satellite = "SPOT_15"
+        bndvi_transfromer = T.AppendIndex("BNDVI", satellite=satellite)
+        self.assertRaises(LackBandError, bndvi_transfromer, {"image": dummy})

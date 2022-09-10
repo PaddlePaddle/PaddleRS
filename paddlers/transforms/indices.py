@@ -27,6 +27,7 @@ __all__ = [
 ]
 
 EPS = 1e-32
+BAND_NAMES = ["b", "g", "r", "re1", "re2", "re3", "n", "s1", "s2", "t1", "t2"]
 
 # | Band name | Description | Reference wavelength |  *Sensor  |
 # |-----------|-------------|----------------------|-----------|
@@ -47,26 +48,49 @@ class RSIndex(metaclass=abc.ABCMeta):
     def __init__(self, band_indices):
         super(RSIndex, self).__init__()
         self.band_indices = band_indices
+        self.required_band_names = iintersection(
+            self._compute.__code__.co_varnames[1:],  # strip self 
+            BAND_NAMES  # only save band names
+        )
 
     @abc.abstractmethod
     def _compute(self, *args, **kwargs):
         pass
 
     def __call__(self, image):
-        self.used_band_name = self._compute.__code__.co_varnames[1:]
         bands = self.select_bands(image)
+        if not iequal(
+            (now_band_names := tuple(bands.keys())), self.required_band_names):
+            raise LackBandError("Lack of bands: {}.".format(
+                isubtraction(self.required_band_names, now_band_names)))
         return self._compute(**bands)
 
     def select_bands(self, image, to_float32=True):
         bands = {}
         for name, idx in self.band_indices.items():
-            if name in self.used_band_name:
+            if name in self.required_band_names:
                 if idx == 0:
                     raise ValueError("Band index starts from 1.")
                 bands[name] = image[..., idx - 1]
                 if to_float32:
                     bands[name] = bands[name].astype('float32')
         return bands
+
+
+class LackBandError(Exception):
+    pass
+
+
+def iintersection(iter1, iter2):
+    return tuple(set(iter1) & set(iter2))
+
+
+def isubtraction(iter1, iter2):
+    return tuple(set(iter1) - set(iter2))
+
+
+def iequal(iter1, iter2):
+    return set(iter1) == set(iter2)
 
 
 def compute_normalized_difference_index(band1, band2):
