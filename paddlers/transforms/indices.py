@@ -59,8 +59,8 @@ class RSIndex(metaclass=abc.ABCMeta):
 
     def __call__(self, image):
         bands = self.select_bands(image)
-        if not iequal(
-            (now_band_names := tuple(bands.keys())), self.required_band_names):
+        now_band_names = tuple(bands.keys())
+        if not iequal(now_band_names, self.required_band_names):
             raise LackBandError("Lack of bands: {}.".format(
                 isubtraction(self.required_band_names, now_band_names)))
         return self._compute(**bands)
