@@ -1,0 +1,11 @@
+# Configurations of Fast-SCNN with RSSeg dataset
+
+_base_: ../_base_/rsseg.yaml
+
+save_dir: ./test_tipc/output/seg/fast_scnn/
+
+model: !Node
+    type: Fast-SCNN
+    args:
+        in_channels: 10
+        num_classes: 5

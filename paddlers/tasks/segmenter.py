@@ -806,7 +806,7 @@ class UNet(BaseSegmenter):
         })
         super(UNet, self).__init__(
             model_name='UNet',
-            input_channel=in_channels,
+            in_channels=in_channels,
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
             losses=losses,
@@ -834,7 +834,7 @@ class DeepLabV3P(BaseSegmenter):
         if params.get('with_net', True):
             with DisablePrint():
                 backbone = getattr(ppseg.models, backbone)(
-                    input_channel=in_channels, output_stride=output_stride)
+                    in_channels=in_channels, output_stride=output_stride)
         else:
             backbone = None
         params.update({
@@ -854,6 +854,7 @@ class DeepLabV3P(BaseSegmenter):
 
 class FastSCNN(BaseSegmenter):
     def __init__(self,
+                 in_channels=3,
                  num_classes=2,
                  use_mixed_loss=False,
                  losses=None,
@@ -862,6 +863,7 @@ class FastSCNN(BaseSegmenter):
         params.update({'align_corners': align_corners})
         super(FastSCNN, self).__init__(
             model_name='FastSCNN',
+            in_channels=in_channels,
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
             losses=losses,
@@ -870,6 +872,7 @@ class FastSCNN(BaseSegmenter):
 
 class HRNet(BaseSegmenter):
     def __init__(self,
+                 in_channels=3,
                  num_classes=2,
                  width=48,
                  use_mixed_loss=False,
@@ -884,7 +887,7 @@ class HRNet(BaseSegmenter):
         if params.get('with_net', True):
             with DisablePrint():
                 backbone = getattr(ppseg.models, self.backbone_name)(
-                    align_corners=align_corners)
+                    in_channels=in_channels, align_corners=align_corners)
         else:
             backbone = None
 
@@ -900,6 +903,7 @@ class HRNet(BaseSegmenter):
 
 class BiSeNetV2(BaseSegmenter):
     def __init__(self,
+                 in_channels=3,
                  num_classes=2,
                  use_mixed_loss=False,
                  losses=None,
@@ -908,6 +912,7 @@ class BiSeNetV2(BaseSegmenter):
         params.update({'align_corners': align_corners})
         super(BiSeNetV2, self).__init__(
             model_name='BiSeNetV2',
+            in_channels=in_channels,
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
             losses=losses,
