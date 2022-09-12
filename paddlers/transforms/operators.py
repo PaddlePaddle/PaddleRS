@@ -29,6 +29,7 @@ from joblib import load
 import paddlers
 import paddlers.transforms.functions as F
 import paddlers.transforms.indices as indices
+import paddlers.transforms.satellites as satellites
 
 __all__ = [
     "Compose",
@@ -1953,15 +1954,29 @@ class AppendIndex(Transform):
         index_type (str): Type of remote sensinng index. See supported 
             index types in 
             https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/indices.py .
-        band_indices (dict): Mapping of band names to band indices 
+        band_indices (dict, optional): Mapping of band names to band indices 
             (starting from 1). See band names in 
-            https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/indices.py . 
+            https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/indices.py .
+            Default: None.
+        satellite (str, optional): Type of satellite. If set, 
+            band indices will be automatically determined accordingly. See supported satellites in 
+            https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/satellites.py .
+            Default: None.
     """
 
-    def __init__(self, index_type, band_indices, **kwargs):
+    def __init__(self, index_type, band_indices=None, satellite=None, **kwargs):
         super(AppendIndex, self).__init__()
         cls = getattr(indices, index_type)
-        self._compute_index = cls(band_indices, **kwargs)
+        if satellite is not None:
+            satellite_bands = getattr(satellites, satellite)
+            self._compute_index = cls(satellite_bands, **kwargs)
+        else:
+            if band_indices is None:
+                raise ValueError(
+                    "At least one of `band_indices` and `satellite` must not be None."
+                )
+            else:
+                self._compute_index = cls(band_indices, **kwargs)
 
     def apply_im(self, image):
         index = self._compute_index(image)
