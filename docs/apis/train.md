@@ -34,7 +34,7 @@
 
 ### 初始化`BaseSegmenter`子类对象
 
-- 一般支持设置`in_channels`、`num_classes`以及`use_mixed_loss`参数，分别表示输入通道数、输出类别数以及是否使用预置的混合损失。部分模型如`FarSeg`暂不支持对`in_channels`参数的设置。
+- 一般支持设置`in_channels`、`num_classes`以及`use_mixed_loss`参数，分别表示输入通道数、输出类别数以及是否使用预置的混合损失。
 - `use_mixed_loss`参将在未来被弃用，因此不建议使用。
 - 可通过`losses`参数指定模型训练时使用的损失函数。`losses`需为一个字典，其中`'types'`键和`'coef'`键对应的值为两个等长的列表，分别表示损失函数对象（一个可调用对象）和损失函数的权重。例如：`losses={'types': [LossType1(), LossType2()], 'coef': [1.0, 0.5]}`在训练过程中将等价于计算如下损失函数：`1.0*LossType1()(logits, labels)+0.5*LossType2()(logits, labels)`，其中`logits`和`labels`分别是模型输出和真值标签。
 - 不同的子类支持与模型相关的输入参数，详情请参考[模型定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/rs_models/seg)和[训练器定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/segmentor.py)。
