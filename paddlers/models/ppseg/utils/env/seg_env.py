@@ -1,4 +1,4 @@
-# Copyright (c) 2022  PaddlePaddle Authors. All Rights Reserved.
+# Copyright (c) 2020  PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ PRETRAINED_MODEL_HOME : The directory to store the automatically downloaded pret
 
 import os
 
-from paddlers.models.ppseg.utils import logger
+from paddleseg.utils import logger
 
 
 def _get_user_home():

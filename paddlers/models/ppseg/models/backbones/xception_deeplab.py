@@ -1,4 +1,4 @@
-# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from paddlers.models.ppseg.cvlibs import manager
-from paddlers.models.ppseg.utils import utils
-from paddlers.models.ppseg.models import layers
+from paddleseg.cvlibs import manager
+from paddleseg.utils import utils
+from paddleseg.models import layers
 
 __all__ = ["Xception41_deeplab", "Xception65_deeplab", "Xception71_deeplab"]
 
@@ -255,12 +255,17 @@ class XceptionDeeplab(nn.Layer):
 
      Args:
          backbone (str): Which type of Xception_DeepLab to select. It should be one of ('xception_41', 'xception_65', 'xception_71').
+         in_channels (int, optional): The channels of input image. Default: 3.
          pretrained (str, optional): The path of pretrained model.
          output_stride (int, optional): The stride of output features compared to input images. It is 8 or 16. Default: 16.
 
     """
 
-    def __init__(self, backbone, pretrained=None, output_stride=16):
+    def __init__(self,
+                 backbone,
+                 in_channels=3,
+                 pretrained=None,
+                 output_stride=16):
 
         super(XceptionDeeplab, self).__init__()
 
@@ -269,7 +274,7 @@ class XceptionDeeplab(nn.Layer):
         self.feat_channels = [128, 2048]
 
         self._conv1 = ConvBNLayer(
-            3,
+            in_channels,
             32,
             3,
             stride=2,

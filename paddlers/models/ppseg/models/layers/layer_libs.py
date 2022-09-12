@@ -17,7 +17,7 @@ import os
 import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddlers.models.ppseg.models import layers
+from paddleseg.models import layers
 
 
 def SyncBatchNorm(*args, **kwargs):
@@ -53,6 +53,37 @@ class ConvBNReLU(nn.Layer):
         x = self._conv(x)
         x = self._batch_norm(x)
         x = self._relu(x)
+        return x
+
+
+class ConvBNAct(nn.Layer):
+    def __init__(self,
+                 in_channels,
+                 out_channels,
+                 kernel_size,
+                 padding='same',
+                 act_type=None,
+                 **kwargs):
+        super().__init__()
+
+        self._conv = nn.Conv2D(
+            in_channels, out_channels, kernel_size, padding=padding, **kwargs)
+
+        if 'data_format' in kwargs:
+            data_format = kwargs['data_format']
+        else:
+            data_format = 'NCHW'
+        self._batch_norm = SyncBatchNorm(out_channels, data_format=data_format)
+
+        self._act_type = act_type
+        if act_type is not None:
+            self._act = layers.Activation(act_type)
+
+    def forward(self, x):
+        x = self._conv(x)
+        x = self._batch_norm(x)
+        if self._act_type is not None:
+            x = self._act(x)
         return x
 
 
@@ -292,4 +323,30 @@ class ConvBNPReLU(nn.Layer):
         x = self._conv(x)
         x = self._batch_norm(x)
         x = self._prelu(x)
+        return x
+
+
+class ConvBNLeakyReLU(nn.Layer):
+    def __init__(self,
+                 in_channels,
+                 out_channels,
+                 kernel_size,
+                 padding='same',
+                 **kwargs):
+        super().__init__()
+
+        self._conv = nn.Conv2D(
+            in_channels, out_channels, kernel_size, padding=padding, **kwargs)
+
+        if 'data_format' in kwargs:
+            data_format = kwargs['data_format']
+        else:
+            data_format = 'NCHW'
+        self._batch_norm = SyncBatchNorm(out_channels, data_format=data_format)
+        self._relu = layers.Activation("leakyrelu")
+
+    def forward(self, x):
+        x = self._conv(x)
+        x = self._batch_norm(x)
+        x = self._relu(x)
         return x

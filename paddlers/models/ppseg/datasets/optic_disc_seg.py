@@ -15,10 +15,10 @@
 import os
 
 from .dataset import Dataset
-from paddlers.models.ppseg.utils.download import download_file_and_uncompress
-from paddlers.models.ppseg.utils import seg_env
-from paddlers.models.ppseg.cvlibs import manager
-from paddlers.models.ppseg.transforms import Compose
+from paddleseg.utils.download import download_file_and_uncompress
+from paddleseg.utils import seg_env
+from paddleseg.cvlibs import manager
+from paddleseg.transforms import Compose
 
 URL = "https://paddleseg.bj.bcebos.com/dataset/optic_disc_seg.zip"
 

@@ -1,4 +1,4 @@
-# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@ import paddle.nn as nn
 import paddle.nn.functional as F
 import numpy as np
 
-from paddlers.models.ppseg.cvlibs import manager
-from paddlers.models.ppseg.utils import utils, logger
-from paddlers.models.ppseg.models.backbones.transformer_utils import to_2tuple, DropPath, Identity
+from paddleseg.cvlibs import manager
+from paddleseg.utils import utils, logger
+from paddleseg.models.backbones.transformer_utils import to_2tuple, DropPath, Identity
 
 
 class Mlp(nn.Layer):
@@ -154,7 +154,7 @@ class VisionTransformer(nn.Layer):
     def __init__(self,
                  img_size=224,
                  patch_size=16,
-                 in_chans=3,
+                 in_channels=3,
                  embed_dim=768,
                  depth=12,
                  num_heads=12,
@@ -176,7 +176,7 @@ class VisionTransformer(nn.Layer):
         self.patch_embed = PatchEmbed(
             img_size=img_size,
             patch_size=patch_size,
-            in_chans=in_chans,
+            in_chans=in_channels,
             embed_dim=embed_dim)
         self.pos_w = self.patch_embed.num_patches_in_w
         self.pos_h = self.patch_embed.num_patches_in_h

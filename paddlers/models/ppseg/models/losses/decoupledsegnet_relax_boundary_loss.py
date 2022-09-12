@@ -16,9 +16,9 @@ import numpy as np
 import paddle
 from paddle import nn
 import paddle.nn.functional as F
-from scipy.ndimage.interpolation import shift
+from scipy.ndimage import shift
 
-from paddlers.models.ppseg.cvlibs import manager
+from paddleseg.cvlibs import manager
 
 
 @manager.LOSSES.add_component

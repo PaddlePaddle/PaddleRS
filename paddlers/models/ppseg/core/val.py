@@ -19,8 +19,8 @@ import time
 import paddle
 import paddle.nn.functional as F
 
-from paddlers.models.ppseg.utils import metrics, TimeAverager, calculate_eta, logger, progbar
-from paddlers.models.ppseg.core import infer
+from paddleseg.utils import metrics, TimeAverager, calculate_eta, logger, progbar
+from paddleseg.core import infer
 
 np.set_printoptions(suppress=True)
 
@@ -34,6 +34,8 @@ def evaluate(model,
              is_slide=False,
              stride=None,
              crop_size=None,
+             precision='fp32',
+             amp_level='O1',
              num_workers=0,
              print_detail=True,
              auc_roc=False):
@@ -41,7 +43,7 @@ def evaluate(model,
     Launch evalution.
 
     Args:
-        model（nn.Layer): A sementic segmentation model.
+        model（nn.Layer): A semantic segmentation model.
         eval_dataset (paddle.io.Dataset): Used to read and process validation datasets.
         aug_eval (bool, optional): Whether to use mulit-scales and flip augment for evaluation. Default: False.
         scales (list|float, optional): Scales for augment. It is valid when `aug_eval` is True. Default: 1.0.
@@ -52,6 +54,8 @@ def evaluate(model,
             It should be provided when `is_slide` is True.
         crop_size (tuple|list, optional):  The crop size of sliding window, the first is width and the second is height.
             It should be provided when `is_slide` is True.
+        precision (str, optional): Use AMP if precision='fp16'. If precision='fp32', the evaluation is normal.
+        amp_level (str, optional): Auto mixed precision level. Accepted values are “O1” and “O2”: O1 represent mixed precision, the input data type of each operator will be casted by white_list and black_list; O2 represent Pure fp16, all operators parameters and input data will be casted to fp16, except operators in black_list, don’t support fp16 kernel and batchnorm. Default is O1(amp)
         num_workers (int, optional): Num workers for data loader. Default: 0.
         print_detail (bool, optional): Whether to print detailed information about the evaluation process. Default: True.
         auc_roc(bool, optional): whether add auc_roc metric
@@ -93,32 +97,66 @@ def evaluate(model,
     batch_cost_averager = TimeAverager()
     batch_start = time.time()
     with paddle.no_grad():
-        for iter, (im, label) in enumerate(loader):
+        for iter, data in enumerate(loader):
             reader_cost_averager.record(time.time() - batch_start)
-            label = label.astype('int64')
+            label = data['label'].astype('int64')
 
-            ori_shape = label.shape[-2:]
             if aug_eval:
-                pred, logits = infer.aug_inference(
-                    model,
-                    im,
-                    ori_shape=ori_shape,
-                    transforms=eval_dataset.transforms.transforms,
-                    scales=scales,
-                    flip_horizontal=flip_horizontal,
-                    flip_vertical=flip_vertical,
-                    is_slide=is_slide,
-                    stride=stride,
-                    crop_size=crop_size)
+                if precision == 'fp16':
+                    with paddle.amp.auto_cast(
+                            level=amp_level,
+                            enable=True,
+                            custom_white_list={
+                                "elementwise_add", "batch_norm",
+                                "sync_batch_norm"
+                            },
+                            custom_black_list={'bilinear_interp_v2'}):
+                        pred, logits = infer.aug_inference(
+                            model,
+                            data['img'],
+                            trans_info=data['trans_info'],
+                            scales=scales,
+                            flip_horizontal=flip_horizontal,
+                            flip_vertical=flip_vertical,
+                            is_slide=is_slide,
+                            stride=stride,
+                            crop_size=crop_size)
+                else:
+                    pred, logits = infer.aug_inference(
+                        model,
+                        data['img'],
+                        trans_info=data['trans_info'],
+                        scales=scales,
+                        flip_horizontal=flip_horizontal,
+                        flip_vertical=flip_vertical,
+                        is_slide=is_slide,
+                        stride=stride,
+                        crop_size=crop_size)
             else:
-                pred, logits = infer.inference(
-                    model,
-                    im,
-                    ori_shape=ori_shape,
-                    transforms=eval_dataset.transforms.transforms,
-                    is_slide=is_slide,
-                    stride=stride,
-                    crop_size=crop_size)
+                if precision == 'fp16':
+                    with paddle.amp.auto_cast(
+                            level=amp_level,
+                            enable=True,
+                            custom_white_list={
+                                "elementwise_add", "batch_norm",
+                                "sync_batch_norm"
+                            },
+                            custom_black_list={'bilinear_interp_v2'}):
+                        pred, logits = infer.inference(
+                            model,
+                            data['img'],
+                            trans_info=data['trans_info'],
+                            is_slide=is_slide,
+                            stride=stride,
+                            crop_size=crop_size)
+                else:
+                    pred, logits = infer.inference(
+                        model,
+                        data['img'],
+                        trans_info=data['trans_info'],
+                        is_slide=is_slide,
+                        stride=stride,
+                        crop_size=crop_size)
 
             intersect_area, pred_area, label_area = metrics.calculate_area(
                 pred,
@@ -175,12 +213,12 @@ def evaluate(model,
             batch_cost_averager.reset()
             batch_start = time.time()
 
-    class_iou, miou = metrics.mean_iou(intersect_area_all, pred_area_all,
-                                       label_area_all)
-    class_acc, acc = metrics.accuracy(intersect_area_all, pred_area_all)
-    kappa = metrics.kappa(intersect_area_all, pred_area_all, label_area_all)
-    class_dice, mdice = metrics.dice(intersect_area_all, pred_area_all,
-                                     label_area_all)
+    metrics_input = (intersect_area_all, pred_area_all, label_area_all)
+    class_iou, miou = metrics.mean_iou(*metrics_input)
+    acc, class_precision, class_recall = metrics.class_measurement(
+        *metrics_input)
+    kappa = metrics.kappa(*metrics_input)
+    class_dice, mdice = metrics.dice(*metrics_input)
 
     if auc_roc:
         auc_roc = metrics.auc_roc(
@@ -193,5 +231,7 @@ def evaluate(model,
         infor = infor + auc_infor if auc_roc else infor
         logger.info(infor)
         logger.info("[EVAL] Class IoU: \n" + str(np.round(class_iou, 4)))
-        logger.info("[EVAL] Class Acc: \n" + str(np.round(class_acc, 4)))
-    return miou, acc, class_iou, class_acc, kappa
+        logger.info("[EVAL] Class Precision: \n" + str(
+            np.round(class_precision, 4)))
+        logger.info("[EVAL] Class Recall: \n" + str(np.round(class_recall, 4)))
+    return miou, acc, class_iou, class_precision, kappa

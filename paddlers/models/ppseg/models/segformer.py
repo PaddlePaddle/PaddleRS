@@ -7,9 +7,9 @@ import paddle.nn as nn
 import paddle.nn.functional as F
 import numpy as np
 
-from paddlers.models.ppseg.cvlibs import manager
-from paddlers.models.ppseg.models import layers
-from paddlers.models.ppseg.utils import utils
+from paddleseg.cvlibs import manager
+from paddleseg.models import layers
+from paddleseg.utils import utils
 
 
 class MLP(nn.Layer):
@@ -127,51 +127,3 @@ class SegFormer(nn.Layer):
                 mode='bilinear',
                 align_corners=self.align_corners)
         ]
-
-
-@manager.MODELS.add_component
-def SegFormer_B0(**kwargs):
-    return SegFormer(
-        backbone=manager.BACKBONES['MixVisionTransformer_B0'](),
-        embedding_dim=256,
-        **kwargs)
-
-
-@manager.MODELS.add_component
-def SegFormer_B1(**kwargs):
-    return SegFormer(
-        backbone=manager.BACKBONES['MixVisionTransformer_B1'](),
-        embedding_dim=256,
-        **kwargs)
-
-
-@manager.MODELS.add_component
-def SegFormer_B2(**kwargs):
-    return SegFormer(
-        backbone=manager.BACKBONES['MixVisionTransformer_B2'](),
-        embedding_dim=768,
-        **kwargs)
-
-
-@manager.MODELS.add_component
-def SegFormer_B3(**kwargs):
-    return SegFormer(
-        backbone=manager.BACKBONES['MixVisionTransformer_B3'](),
-        embedding_dim=768,
-        **kwargs)
-
-
-@manager.MODELS.add_component
-def SegFormer_B4(**kwargs):
-    return SegFormer(
-        backbone=manager.BACKBONES['MixVisionTransformer_B4'](),
-        embedding_dim=768,
-        **kwargs)
-
-
-@manager.MODELS.add_component
-def SegFormer_B5(**kwargs):
-    return SegFormer(
-        backbone=manager.BACKBONES['MixVisionTransformer_B5'](),
-        embedding_dim=768,
-        **kwargs)

@@ -17,7 +17,7 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from paddlers.models.ppseg.cvlibs import manager
+from paddleseg.cvlibs import manager
 
 _euler_num = 2.718281828
 _pi = 3.14159265

@@ -1,4 +1,4 @@
-# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from paddlers.models.ppseg import utils
-from paddlers.models.ppseg.models import layers
-from paddlers.models.ppseg.cvlibs import manager
-from paddlers.models.ppseg.utils import utils
+from paddleseg import utils
+from paddleseg.models import layers
+from paddleseg.cvlibs import manager
+from paddleseg.utils import utils
 
 
 @manager.MODELS.add_component

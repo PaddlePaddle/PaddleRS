@@ -16,24 +16,28 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from paddlers.models.ppseg.cvlibs import manager, param_init
-from paddlers.models.ppseg.models import layers
-from paddlers.models.ppseg.utils import utils
+from paddleseg.cvlibs import manager, param_init
+from paddleseg.models import layers
+from paddleseg.utils import utils
 
 __all__ = ['PPHumanSegLite']
 
 
 @manager.MODELS.add_component
 class PPHumanSegLite(nn.Layer):
-    "A self-developed ultra lightweight model from paddlers.models.ppseg, is suitable for real-time scene segmentation on web or mobile terminals."
+    "A self-developed ultra lightweight model from PaddleSeg, is suitable for real-time scene segmentation on web or mobile terminals."
 
-    def __init__(self, num_classes, pretrained=None, align_corners=False):
+    def __init__(self,
+                 num_classes,
+                 in_channels=3,
+                 pretrained=None,
+                 align_corners=False):
         super().__init__()
         self.pretrained = pretrained
         self.num_classes = num_classes
         self.align_corners = align_corners
 
-        self.conv_bn0 = _ConvBNReLU(3, 36, 3, 2, 1)
+        self.conv_bn0 = _ConvBNReLU(in_channels, 36, 3, 2, 1)
         self.conv_bn1 = _ConvBNReLU(36, 18, 1, 1, 0)
 
         self.block1 = nn.Sequential(

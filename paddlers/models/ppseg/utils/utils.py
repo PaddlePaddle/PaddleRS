@@ -22,8 +22,8 @@ from urllib.parse import urlparse, unquote
 
 import paddle
 
-from paddlers.models.ppseg.utils import logger, seg_env
-from paddlers.models.ppseg.utils.download import download_file_and_uncompress
+from paddleseg.utils import logger, seg_env
+from paddleseg.utils.download import download_file_and_uncompress
 
 
 @contextlib.contextmanager
@@ -159,6 +159,8 @@ def get_image_list(image_path):
         for root, dirs, files in os.walk(image_path):
             for f in files:
                 if '.ipynb_checkpoints' in root:
+                    continue
+                if f.startswith('.'):
                     continue
                 if os.path.splitext(f)[-1] in valid_suffix:
                     image_list.append(os.path.join(root, f))

@@ -16,7 +16,7 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from paddlers.models.ppseg.cvlibs import manager
+from paddleseg.cvlibs import manager
 
 
 @manager.LOSSES.add_component
@@ -99,7 +99,7 @@ class BCELoss(nn.Layer):
                     raise ValueError(
                         "if type of `weight` is str, it should equal to 'dynamic', but it is {}"
                         .format(self.weight))
-            elif isinstance(self.weight, paddle.VarBase):
+            elif not isinstance(self.weight, paddle.Tensor):
                 raise TypeError(
                     'The type of `weight` is wrong, it should be Tensor or str, but it is {}'
                     .format(type(self.weight)))

@@ -15,10 +15,10 @@
 import paddle
 import paddle.nn as nn
 
-from paddlers.models.ppseg.cvlibs import manager
-from paddlers.models.ppseg.utils import load_entire_model
-from paddlers.models.ppseg.cvlibs.param_init import kaiming_normal_init
-from paddlers.models.ppseg.models.layers.layer_libs import SyncBatchNorm
+from paddleseg.cvlibs import manager
+from paddleseg.utils import load_entire_model
+from paddleseg.cvlibs.param_init import kaiming_normal_init
+from paddleseg.models.layers.layer_libs import SyncBatchNorm
 
 
 @manager.MODELS.add_component
@@ -31,8 +31,8 @@ class UNetPlusPlus(nn.Layer):
     (https://arxiv.org/abs/1807.10165).
 
     Args:
-        in_channels (int): The channel number of input image.
         num_classes (int): The unique number of target classes.
+        in_channels (int, optional): The channel number of input image. Default: 3.
         use_deconv (bool, optional): A bool value indicates whether using deconvolution in upsampling.
             If False, use resize_bilinear. Default: False.
         align_corners (bool): An argument of F.interpolate. It should be set to False when the output size of feature
@@ -42,8 +42,8 @@ class UNetPlusPlus(nn.Layer):
         """
 
     def __init__(self,
-                 in_channels,
                  num_classes,
+                 in_channels=3,
                  use_deconv=False,
                  align_corners=False,
                  pretrained=None,

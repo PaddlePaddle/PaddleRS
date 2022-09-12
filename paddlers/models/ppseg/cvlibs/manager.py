@@ -31,7 +31,7 @@ class ComponentManager:
 
     Examples 1:
 
-        from paddlers.models.ppseg.cvlibs.manager import ComponentManager
+        from paddleseg.cvlibs.manager import ComponentManager
 
         model_manager = ComponentManager()
 
@@ -49,7 +49,7 @@ class ComponentManager:
     Examples 2:
 
         # Or an easier way, using it as a Python decorator, while just add it above the class declaration.
-        from paddlers.models.ppseg.cvlibs.manager import ComponentManager
+        from paddleseg.cvlibs.manager import ComponentManager
 
         model_manager = ComponentManager()
 

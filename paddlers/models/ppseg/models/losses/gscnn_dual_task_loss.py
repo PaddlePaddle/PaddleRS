@@ -13,7 +13,7 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from paddlers.models.ppseg.cvlibs import manager
+from paddleseg.cvlibs import manager
 
 
 @manager.LOSSES.add_component

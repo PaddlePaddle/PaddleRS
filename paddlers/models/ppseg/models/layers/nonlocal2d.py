@@ -16,7 +16,7 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from paddlers.models.ppseg.models import layers
+from paddleseg.models import layers
 
 
 class NonLocal2D(nn.Layer):

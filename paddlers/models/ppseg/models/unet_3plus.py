@@ -16,9 +16,9 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from paddlers.models.ppseg.cvlibs import manager
-from paddlers.models.ppseg.models.layers.layer_libs import SyncBatchNorm
-from paddlers.models.ppseg.cvlibs.param_init import kaiming_normal_init
+from paddleseg.cvlibs import manager
+from paddleseg.models.layers.layer_libs import SyncBatchNorm
+from paddleseg.cvlibs.param_init import kaiming_normal_init
 
 
 @manager.MODELS.add_component

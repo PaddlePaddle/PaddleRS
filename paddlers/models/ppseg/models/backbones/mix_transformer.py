@@ -1,4 +1,4 @@
-# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@ import paddle.nn as nn
 import paddle.nn.functional as F
 import paddle.nn.initializer as paddle_init
 
-from paddlers.models.ppseg.cvlibs import manager
-from paddlers.models.ppseg.utils import utils
-from paddlers.models.ppseg.models.backbones.transformer_utils import *
+from paddleseg.cvlibs import manager
+from paddleseg.utils import utils
+from paddleseg.models.backbones.transformer_utils import *
 
 
 class Mlp(nn.Layer):
@@ -260,7 +260,7 @@ class MixVisionTransformer(nn.Layer):
     def __init__(self,
                  img_size=224,
                  patch_size=16,
-                 in_chans=3,
+                 in_channels=3,
                  num_classes=1000,
                  embed_dims=[64, 128, 256, 512],
                  num_heads=[1, 2, 4, 8],
@@ -284,7 +284,7 @@ class MixVisionTransformer(nn.Layer):
             img_size=img_size,
             patch_size=7,
             stride=4,
-            in_chans=in_chans,
+            in_chans=in_channels,
             embed_dim=embed_dims[0])
         self.patch_embed2 = OverlapPatchEmbed(
             img_size=img_size // 4,

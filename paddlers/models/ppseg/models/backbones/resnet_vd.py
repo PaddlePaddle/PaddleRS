@@ -1,4 +1,4 @@
-# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from paddlers.models.ppseg.cvlibs import manager
-from paddlers.models.ppseg.models import layers
-from paddlers.models.ppseg.utils import utils
+from paddleseg.cvlibs import manager
+from paddleseg.models import layers
+from paddleseg.utils import utils
 
 __all__ = [
     "ResNet18_vd", "ResNet34_vd", "ResNet50_vd", "ResNet101_vd", "ResNet152_vd"
@@ -206,15 +206,16 @@ class ResNet_vd(nn.Layer):
         layers (int, optional): The layers of ResNet_vd. The supported layers are (18, 34, 50, 101, 152, 200). Default: 50.
         output_stride (int, optional): The stride of output features compared to input images. It is 8 or 16. Default: 8.
         multi_grid (tuple|list, optional): The grid of stage4. Defult: (1, 1, 1).
+        in_channels (int, optional): The channels of input image. Default: 3.
         pretrained (str, optional): The path of pretrained model.
 
     """
 
     def __init__(self,
-                 input_channel=3,
                  layers=50,
                  output_stride=8,
                  multi_grid=(1, 1, 1),
+                 in_channels=3,
                  pretrained=None,
                  data_format='NCHW'):
         super(ResNet_vd, self).__init__()
@@ -252,7 +253,7 @@ class ResNet_vd(nn.Layer):
             dilation_dict = {3: 2}
 
         self.conv1_1 = ConvBNLayer(
-            in_channels=input_channel,
+            in_channels=in_channels,
             out_channels=32,
             kernel_size=3,
             stride=2,

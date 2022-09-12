@@ -16,7 +16,7 @@ import paddle
 from paddle import nn
 import paddle.nn.functional as F
 
-from paddlers.models.ppseg.cvlibs import manager
+from paddleseg.cvlibs import manager
 
 
 @manager.LOSSES.add_component
@@ -55,7 +55,7 @@ class OhemCrossEntropyLoss(nn.Layer):
 
         # get the label after ohem
         n, c, h, w = logit.shape
-        label = label.reshape((-1, ))
+        label = label.reshape((-1, )).astype('int64')
         valid_mask = (label != self.ignore_index).astype('int64')
         num_valid = valid_mask.sum()
         label = label * valid_mask
