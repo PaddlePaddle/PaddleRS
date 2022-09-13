@@ -86,7 +86,7 @@ class BaseModel(metaclass=ModelMeta):
         self.quant_config = None
         self.fixed_input_shape = None
 
-    def net_initialize(self,
+    def initialize_net(self,
                        pretrain_weights=None,
                        save_dir='.',
                        resume_checkpoint=None,
@@ -677,3 +677,18 @@ class BaseModel(metaclass=ModelMeta):
             raise ValueError(
                 f"Incorrect arrange mode! Expected {mode} but got {arrange_obj.mode}."
             )
+
+    def run(self, net, inputs, mode):
+        raise NotImplementedError
+
+    def train(self, *args, **kwargs):
+        raise NotImplementedError
+
+    def evaluate(self, *args, **kwargs):
+        raise NotImplementedError
+
+    def preprocess(self, images, transforms, to_tensor):
+        raise NotImplementedError
+
+    def postprocess(self, *args, **kwargs):
+        raise NotImplementedError

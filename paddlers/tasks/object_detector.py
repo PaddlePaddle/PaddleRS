@@ -347,7 +347,7 @@ class BaseDetector(BaseModel):
                         "Invalid pretrained weights. Please specify a .pdparams file.",
                         exit=True)
         pretrained_dir = osp.join(save_dir, 'pretrain')
-        self.net_initialize(
+        self.initialize_net(
             pretrain_weights=pretrain_weights,
             save_dir=pretrained_dir,
             resume_checkpoint=resume_checkpoint,
@@ -617,7 +617,7 @@ class BaseDetector(BaseModel):
         batch_samples = list()
         for im in images:
             if isinstance(im, str):
-                im = decode_image(im, to_rgb=False)
+                im = decode_image(im, read_raw=True)
             sample = {'image': im}
             sample = transforms(sample)
             batch_samples.append(sample)
