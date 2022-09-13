@@ -19,9 +19,9 @@ import cv2
 import numpy as np
 import paddle
 
-from paddleseg import utils
-from paddleseg.core import infer
-from paddleseg.utils import logger, progbar, visualize
+from paddlers.models.ppseg import utils
+from paddlers.models.ppseg.core import infer
+from paddlers.models.ppseg.utils import logger, progbar, visualize
 
 
 def mkdir(path):

@@ -18,9 +18,9 @@ import paddle
 import numpy as np
 from PIL import Image
 
-from paddleseg.cvlibs import manager
-from paddleseg.transforms import Compose
-import paddleseg.transforms.functional as F
+from paddlers.models.ppseg.cvlibs import manager
+from paddlers.models.ppseg.transforms import Compose
+import paddlers.models.ppseg.transforms.functional as F
 
 
 @manager.DATASETS.add_component
@@ -46,8 +46,8 @@ class Dataset(paddle.io.Dataset):
 
         Examples:
 
-            import paddleseg.transforms as T
-            from paddleseg.datasets import Dataset
+            import paddlers.models.ppseg as ppseg.transforms as T
+            from paddlers.models.ppseg.datasets import Dataset
 
             transforms = [T.RandomPaddingCrop(crop_size=(512,512)), T.Normalize()]
             dataset_root = 'dataset_root_path'

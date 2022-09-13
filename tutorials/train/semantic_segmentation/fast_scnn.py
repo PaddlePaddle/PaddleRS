@@ -15,7 +15,7 @@ EVAL_FILE_LIST_PATH = './data/rsseg/val.txt'
 # 数据集类别信息文件路径
 LABEL_LIST_PATH = './data/rsseg/labels.txt'
 # 实验目录，保存输出的模型权重和结果
-EXP_DIR = './output/unet/'
+EXP_DIR = './output/fast_scnn/'
 
 # 影像波段数量
 NUM_BANDS = 10

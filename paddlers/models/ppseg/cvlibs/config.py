@@ -22,8 +22,8 @@ import paddle
 import yaml
 import six
 
-from paddleseg.cvlibs import manager
-from paddleseg.utils import logger
+from paddlers.models.ppseg.cvlibs import manager
+from paddlers.models.ppseg.utils import logger
 
 
 class Config(object):
@@ -54,7 +54,7 @@ class Config(object):
 
     Examples:
 
-        from paddleseg.cvlibs.config import Config
+        from paddlers.models.ppseg.cvlibs.config import Config
 
         # Create a cfg object with yaml file path.
         cfg = Config(yaml_cfg_path)

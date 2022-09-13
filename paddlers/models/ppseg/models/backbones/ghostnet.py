@@ -23,8 +23,8 @@ from paddle.nn import Conv2D, BatchNorm, AdaptiveAvgPool2D, Linear
 from paddle.regularizer import L2Decay
 from paddle.nn.initializer import Uniform, KaimingNormal
 
-from paddleseg.cvlibs import manager
-from paddleseg.utils import utils, logger
+from paddlers.models.ppseg.cvlibs import manager
+from paddlers.models.ppseg.utils import utils, logger
 
 __all__ = ["GhostNet_x0_5", "GhostNet_x1_0", "GhostNet_x1_3"]
 

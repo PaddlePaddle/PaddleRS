@@ -17,12 +17,12 @@ import os
 import numpy as np
 from PIL import Image
 
-from paddleseg.datasets import Dataset
-from paddleseg.utils.download import download_file_and_uncompress
-from paddleseg.utils import seg_env
-from paddleseg.cvlibs import manager
-from paddleseg.transforms import Compose
-import paddleseg.transforms.functional as F
+from paddlers.models.ppseg.datasets import Dataset
+from paddlers.models.ppseg.utils.download import download_file_and_uncompress
+from paddlers.models.ppseg.utils import seg_env
+from paddlers.models.ppseg.cvlibs import manager
+from paddlers.models.ppseg.transforms import Compose
+import paddlers.models.ppseg.transforms.functional as F
 
 URL = "http://data.csail.mit.edu/places/ADEchallenge/ADEChallengeData2016.zip"
 

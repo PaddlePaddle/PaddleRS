@@ -18,7 +18,7 @@ from paddle import nn
 import paddle.nn.functional as F
 from scipy.ndimage import shift
 
-from paddleseg.cvlibs import manager
+from paddlers.models.ppseg.cvlibs import manager
 
 
 @manager.LOSSES.add_component

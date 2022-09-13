@@ -16,9 +16,9 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from paddleseg import utils
-from paddleseg.models import layers
-from paddleseg.cvlibs import manager, param_init
+from paddlers.models.ppseg import utils
+from paddlers.models.ppseg.models import layers
+from paddlers.models.ppseg.cvlibs import manager, param_init
 
 __all__ = ['ENet']
 

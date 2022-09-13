@@ -17,8 +17,8 @@ import paddle.nn as nn
 import paddle.nn.functional as F
 from paddle import ParamAttr
 from paddle.nn.initializer import Constant
-from paddleseg.models import layers
-from paddleseg.models.layers import tensor_fusion_helper as helper
+from paddlers.models.ppseg.models import layers
+from paddlers.models.ppseg.models.layers import tensor_fusion_helper as helper
 
 
 class UAFM(nn.Layer):

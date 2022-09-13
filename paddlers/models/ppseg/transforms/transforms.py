@@ -19,9 +19,9 @@ import cv2
 import numpy as np
 from PIL import Image
 
-from paddleseg.cvlibs import manager
-from paddleseg.transforms import functional
-from paddleseg.utils import logger
+from paddlers.models.ppseg.cvlibs import manager
+from paddlers.models.ppseg.transforms import functional
+from paddlers.models.ppseg.utils import logger
 
 
 @manager.TRANSFORMS.add_component

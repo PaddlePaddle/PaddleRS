@@ -16,7 +16,7 @@ import paddle
 import paddle.nn.functional as F
 from paddle import nn
 
-from paddleseg.models import layers
+from paddlers.models.ppseg.models import layers
 
 
 class ASPPModule(nn.Layer):

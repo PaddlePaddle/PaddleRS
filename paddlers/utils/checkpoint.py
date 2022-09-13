@@ -493,11 +493,12 @@ def load_pretrain_weights(model, pretrain_weights=None, model_name=None):
             num_params_loaded = 0
             for k in model_state_dict:
                 if k not in param_state_dict:
-                    logging.warning("{} is not in pretrained model".format(k))
+                    logging.warning("{} is not in the pretrained model.".format(
+                        k))
                 elif list(param_state_dict[k].shape) != list(model_state_dict[k]
                                                              .shape):
                     logging.warning(
-                        "[SKIP] Shape of pretrained params {} doesn't match.(Pretrained: {}, Actual: {})"
+                        "[SKIP] Shape of parameters {} do not match. (pretrained: {} vs actual: {})"
                         .format(k, param_state_dict[k].shape, model_state_dict[
                             k].shape))
                 else:
@@ -507,11 +508,11 @@ def load_pretrain_weights(model, pretrain_weights=None, model_name=None):
             logging.info("There are {}/{} variables loaded into {}.".format(
                 num_params_loaded, len(model_state_dict), model_name))
         else:
-            raise ValueError('The pretrained model directory is not Found: {}'.
+            raise ValueError('The pretrained model directory is not found: {}'.
                              format(pretrain_weights))
     else:
         logging.info(
-            'No pretrained model to load, {} will be trained from scratch.'.
+            'No pretrained model to load. {} will be trained from scratch.'.
             format(model_name))
 
 

@@ -631,7 +631,7 @@ class CondenseNetV2(BaseClassifier):
                  num_classes=2,
                  use_mixed_loss=False,
                  losses=None,
-                 in_chnanels=3,
+                 in_channels=3,
                  arch='A',
                  **params):
         if arch not in ('A', 'B', 'C'):

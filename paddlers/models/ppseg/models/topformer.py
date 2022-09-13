@@ -18,10 +18,10 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from paddleseg.cvlibs import manager
-from paddleseg.models import layers
-from paddleseg.utils import utils
-from paddleseg.models.backbones.top_transformer import ConvBNAct
+from paddlers.models.ppseg.cvlibs import manager
+from paddlers.models.ppseg.models import layers
+from paddlers.models.ppseg.utils import utils
+from paddlers.models.ppseg.models.backbones.top_transformer import ConvBNAct
 
 
 @manager.MODELS.add_component

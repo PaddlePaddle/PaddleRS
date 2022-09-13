@@ -18,8 +18,8 @@ from paddle.nn import Layer, Conv2D, MaxPool2D, AdaptiveAvgPool2D, BatchNorm, Li
 from paddle.nn.initializer import KaimingNormal
 from paddle.nn.functional import swish
 
-from paddleseg.cvlibs import manager
-from paddleseg.utils import utils, logger
+from paddlers.models.ppseg.cvlibs import manager
+from paddlers.models.ppseg.utils import utils, logger
 
 __all__ = [
     'ShuffleNetV2_x0_25', 'ShuffleNetV2_x0_33', 'ShuffleNetV2_x0_5',

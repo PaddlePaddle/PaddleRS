@@ -14,9 +14,9 @@
 
 import paddle
 import paddle.nn as nn
-from paddleseg.cvlibs import manager
-from paddleseg.models import layers
-from paddleseg import utils
+from paddlers.models.ppseg.cvlibs import manager
+from paddlers.models.ppseg.models import layers
+from paddlers.models.ppseg import utils
 import numpy as np
 
 

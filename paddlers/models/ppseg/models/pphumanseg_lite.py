@@ -16,16 +16,16 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from paddleseg.cvlibs import manager, param_init
-from paddleseg.models import layers
-from paddleseg.utils import utils
+from paddlers.models.ppseg.cvlibs import manager, param_init
+from paddlers.models.ppseg.models import layers
+from paddlers.models.ppseg.utils import utils
 
 __all__ = ['PPHumanSegLite']
 
 
 @manager.MODELS.add_component
 class PPHumanSegLite(nn.Layer):
-    "A self-developed ultra lightweight model from PaddleSeg, is suitable for real-time scene segmentation on web or mobile terminals."
+    "A self-developed ultra lightweight model from paddlers.models.ppseg, is suitable for real-time scene segmentation on web or mobile terminals."
 
     def __init__(self,
                  num_classes,

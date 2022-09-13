@@ -15,7 +15,7 @@ EVAL_FILE_LIST_PATH = './data/ucmerced/val.txt'
 # 数据集类别信息文件路径
 LABEL_LIST_PATH = './data/ucmerced/labels.txt'
 # 实验目录，保存输出的模型权重和结果
-EXP_DIR = './output/hrnet/'
+EXP_DIR = './output/condensenetv2/'
 
 # 下载和解压UC Merced数据集
 pdrs.utils.download_and_decompress(

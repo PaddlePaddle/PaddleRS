@@ -22,7 +22,7 @@ PRETRAINED_MODEL_HOME : The directory to store the automatically downloaded pret
 
 import os
 
-from paddleseg.utils import logger
+from paddlers.models.ppseg.utils import logger
 
 
 def _get_user_home():

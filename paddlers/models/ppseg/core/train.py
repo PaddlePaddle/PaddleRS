@@ -20,9 +20,10 @@ import shutil
 import paddle
 import paddle.nn.functional as F
 
-from paddleseg.utils import (TimeAverager, calculate_eta, resume, logger,
-                             worker_init_fn, train_profiler, op_flops_funs)
-from paddleseg.core.val import evaluate
+from paddlers.models.ppseg.utils import (TimeAverager, calculate_eta, resume,
+                                         logger, worker_init_fn, train_profiler,
+                                         op_flops_funs)
+from paddlers.models.ppseg.core.val import evaluate
 
 
 def check_logits_losses(logits_list, losses):

@@ -17,7 +17,7 @@ import os
 import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddleseg.models import layers
+from paddlers.models.ppseg.models import layers
 
 
 def SyncBatchNorm(*args, **kwargs):
