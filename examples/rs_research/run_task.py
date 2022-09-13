@@ -15,7 +15,9 @@
 # limitations under the License.
 
 import os
+import random
 
+import numpy as np
 # Import cv2 and sklearn before paddlers to solve the
 # "ImportError: dlopen: cannot load any more object with static TLS" issue.
 import cv2
@@ -61,6 +63,11 @@ if __name__ == '__main__':
 
     cfg = parse_args()
     print(format_cfg(cfg))
+
+    if cfg['seed'] is not None:
+        random.seed(cfg['seed'])
+        np.random.seed(cfg['seed'])
+        paddle.seed(cfg['seed'])
 
     # Automatically download data
     if cfg['download_on']:

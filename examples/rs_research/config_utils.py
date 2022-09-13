@@ -133,6 +133,7 @@ def parse_args(*args, **kwargs):
     # Global settings
     parser.add_argument('cmd', choices=['train', 'eval'])
     parser.add_argument('task', choices=['cd', 'clas', 'det', 'res', 'seg'])
+    parser.add_argument('--seed', type=int, default=None)
 
     # Data
     parser.add_argument('--datasets', type=dict, default={})
