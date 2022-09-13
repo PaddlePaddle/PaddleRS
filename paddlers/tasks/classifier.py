@@ -286,7 +286,7 @@ class BaseClassifier(BaseModel):
                         exit=True)
         pretrained_dir = osp.join(save_dir, 'pretrain')
         is_backbone_weights = False
-        self.net_initialize(
+        self.initialize_net(
             pretrain_weights=pretrain_weights,
             save_dir=pretrained_dir,
             resume_checkpoint=resume_checkpoint,
@@ -495,7 +495,7 @@ class BaseClassifier(BaseModel):
         batch_ori_shape = list()
         for im in images:
             if isinstance(im, str):
-                im = decode_image(im, to_rgb=False)
+                im = decode_image(im, read_raw=True)
             ori_shape = im.shape[:2]
             sample = {'image': im}
             im = transforms(sample)

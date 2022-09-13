@@ -34,6 +34,7 @@ from paddlers.utils.checkpoint import seg_pretrain_weights_dict
 from .base import BaseModel
 from .utils import seg_metrics as metrics
 from .utils.infer_nets import InferSegNet
+from .utils.slider_predict import slider_predict
 
 __all__ = ["UNet", "DeepLabV3P", "FastSCNN", "HRNet", "BiSeNetV2", "FarSeg"]
 
@@ -300,7 +301,7 @@ class BaseSegmenter(BaseModel):
                         exit=True)
         pretrained_dir = osp.join(save_dir, 'pretrain')
         is_backbone_weights = pretrain_weights == 'IMAGENET'
-        self.net_initialize(
+        self.initialize_net(
             pretrain_weights=pretrain_weights,
             save_dir=pretrained_dir,
             resume_checkpoint=resume_checkpoint,
@@ -550,86 +551,40 @@ class BaseSegmenter(BaseModel):
                        save_dir,
                        block_size,
                        overlap=36,
-                       transforms=None):
+                       transforms=None,
+                       invalid_value=255,
+                       merge_strategy='keep_last',
+                       batch_size=1,
+                       quiet=False):
         """
-        Do inference.
+        Do inference using sliding windows.
 
         Args:
             img_file (str): Image path.
             save_dir (str): Directory that contains saved geotiff file.
             block_size (list[int] | tuple[int] | int):
-                Size of block.
+                Size of block. If `block_size` is list or tuple, it should be in 
+                (W, H) format.
             overlap (list[int] | tuple[int] | int, optional):
-                Overlap between two blocks. Defaults to 36.
+                Overlap between two blocks. If `overlap` is list or tuple, it should
+                be in (W, H) format. Defaults to 36.
             transforms (paddlers.transforms.Compose|None, optional): Transforms for 
                 inputs. If None, the transforms for evaluation process will be used. 
                 Defaults to None.
+            invalid_value (int, optional): Value that marks invalid pixels in output 
+                image. Defaults to 255.
+            merge_strategy (str, optional): Strategy to merge overlapping blocks. Choices
+                are {'keep_first', 'keep_last', 'accum'}. 'keep_first' and 'keep_last' 
+                means keeping the values of the first and the last block in traversal 
+                order, respectively. 'accum' means determining the class of an overlapping 
+                pixel according to accumulated probabilities. Defaults to 'keep_last'.
+            batch_size (int, optional): Batch size used in inference. Defaults to 1.
+            quiet (bool, optional): If True, disable the progress bar. Defaults to False.
         """
 
-        try:
-            from osgeo import gdal
-        except:
-            import gdal
-
-        if isinstance(block_size, int):
-            block_size = (block_size, block_size)
-        elif isinstance(block_size, (tuple, list)) and len(block_size) == 2:
-            block_size = tuple(block_size)
-        else:
-            raise ValueError(
-                "`block_size` must be a tuple/list of length 2 or an integer.")
-        if isinstance(overlap, int):
-            overlap = (overlap, overlap)
-        elif isinstance(overlap, (tuple, list)) and len(overlap) == 2:
-            overlap = tuple(overlap)
-        else:
-            raise ValueError(
-                "`overlap` must be a tuple/list of length 2 or an integer.")
-
-        src_data = gdal.Open(img_file)
-        width = src_data.RasterXSize
-        height = src_data.RasterYSize
-        bands = src_data.RasterCount
-
-        driver = gdal.GetDriverByName("GTiff")
-        file_name = osp.splitext(osp.normpath(img_file).split(os.sep)[-1])[
-            0] + ".tif"
-        if not osp.exists(save_dir):
-            os.makedirs(save_dir)
-        save_file = osp.join(save_dir, file_name)
-        dst_data = driver.Create(save_file, width, height, 1, gdal.GDT_Byte)
-        dst_data.SetGeoTransform(src_data.GetGeoTransform())
-        dst_data.SetProjection(src_data.GetProjection())
-        band = dst_data.GetRasterBand(1)
-        band.WriteArray(255 * np.ones((height, width), dtype="uint8"))
-
-        step = np.array(block_size) - np.array(overlap)
-        for yoff in range(0, height, step[1]):
-            for xoff in range(0, width, step[0]):
-                xsize, ysize = block_size
-                if xoff + xsize > width:
-                    xsize = int(width - xoff)
-                if yoff + ysize > height:
-                    ysize = int(height - yoff)
-                im = src_data.ReadAsArray(int(xoff), int(yoff), xsize,
-                                          ysize).transpose((1, 2, 0))
-                # Fill
-                h, w = im.shape[:2]
-                im_fill = np.zeros(
-                    (block_size[1], block_size[0], bands), dtype=im.dtype)
-                im_fill[:h, :w, :] = im
-                # Predict
-                pred = self.predict(im_fill,
-                                    transforms)["label_map"].astype("uint8")
-                # Overlap
-                rd_block = band.ReadAsArray(int(xoff), int(yoff), xsize, ysize)
-                mask = (rd_block == pred[:h, :w]) | (rd_block == 255)
-                temp = pred[:h, :w].copy()
-                temp[mask == False] = 0
-                band.WriteArray(temp, int(xoff), int(yoff))
-                dst_data.FlushCache()
-        dst_data = None
-        print("GeoTiff saved in {}.".format(save_file))
+        slider_predict(self.predict, img_file, save_dir, block_size, overlap,
+                       transforms, invalid_value, merge_strategy, batch_size,
+                       not quiet)
 
     def preprocess(self, images, transforms, to_tensor=True):
         self._check_transforms(transforms, 'test')
@@ -637,7 +592,7 @@ class BaseSegmenter(BaseModel):
         batch_ori_shape = list()
         for im in images:
             if isinstance(im, str):
-                im = decode_image(im, to_rgb=False)
+                im = decode_image(im, read_raw=True)
             ori_shape = im.shape[:2]
             sample = {'image': im}
             im = transforms(sample)[0]
