@@ -1911,11 +1911,11 @@ class _Permute(Transform):
         super(_Permute, self).__init__()
 
     def apply(self, sample):
-        sample['image'] = permute(sample['image'], False)
+        sample['image'] = F.permute(sample['image'], False)
         if 'image2' in sample:
-            sample['image2'] = permute(sample['image2'], False)
+            sample['image2'] = F.permute(sample['image2'], False)
         if 'target' in sample:
-            sample['target'] = permute(sample['target'], False)
+            sample['target'] = F.permute(sample['target'], False)
         return sample
 
 
@@ -2046,7 +2046,7 @@ class ArrangeSegmenter(Arrange):
             mask = sample['mask']
             mask = mask.astype('int64')
 
-        image = permute(sample['image'], False)
+        image = F.permute(sample['image'], False)
         if self.mode == 'train':
             return image, mask
         if self.mode == 'eval':
@@ -2061,8 +2061,8 @@ class ArrangeChangeDetector(Arrange):
             mask = sample['mask']
             mask = mask.astype('int64')
 
-        image_t1 = permute(sample['image'], False)
-        image_t2 = permute(sample['image2'], False)
+        image_t1 = F.permute(sample['image'], False)
+        image_t2 = F.permute(sample['image2'], False)
         if self.mode == 'train':
             masks = [mask]
             if 'aux_masks' in sample:
@@ -2079,7 +2079,7 @@ class ArrangeChangeDetector(Arrange):
 
 class ArrangeClassifier(Arrange):
     def apply(self, sample):
-        image = permute(sample['image'], False)
+        image = F.permute(sample['image'], False)
         if self.mode in ['train', 'eval']:
             return image, sample['label']
         else:
@@ -2096,8 +2096,8 @@ class ArrangeDetector(Arrange):
 class ArrangeRestorer(Arrange):
     def apply(self, sample):
         if 'target' in sample:
-            target = permute(sample['target'], False)
-        image = permute(sample['image'], False)
+            target = F.permute(sample['target'], False)
+        image = F.permute(sample['image'], False)
         if self.mode == 'train':
             return image, target
         if self.mode == 'eval':
