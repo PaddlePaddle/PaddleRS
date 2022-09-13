@@ -28,6 +28,7 @@ from joblib import load
 
 import paddlers
 import paddlers.transforms.indices as indices
+import paddlers.transforms.satellites as satellites
 from .functions import (
     normalize, horizontal_flip, permute, vertical_flip, center_crop, is_poly,
     horizontal_flip_poly, horizontal_flip_rle, vertical_flip_poly,
@@ -202,11 +203,13 @@ class DecodeImg(Transform):
             uint8 type. Defaults to True.
         decode_bgr (bool, optional): If True, automatically interpret a non-geo image 
             (e.g., jpeg images) as a BGR image. Defaults to True.
-        decode_sar (bool, optional): If True, automatically interpret a two-channel 
+        decode_sar (bool, optional): If True, automatically interpret a single-channel 
             geo image (e.g. geotiff images) as a SAR image, set this argument to 
             True. Defaults to True.
         read_geo_info (bool, optional): If True, read geographical information from 
             the image. Deafults to False.
+        use_stretch (bool, optional): Whether to apply 2% linear stretch. Valid only if 
+            `to_uint8` is True. Defaults to False.
     """
 
     def __init__(self,
@@ -214,13 +217,15 @@ class DecodeImg(Transform):
                  to_uint8=True,
                  decode_bgr=True,
                  decode_sar=True,
-                 read_geo_info=False):
+                 read_geo_info=False,
+                 use_stretch=False):
         super(DecodeImg, self).__init__()
         self.to_rgb = to_rgb
         self.to_uint8 = to_uint8
         self.decode_bgr = decode_bgr
         self.decode_sar = decode_sar
-        self.read_geo_info = False
+        self.read_geo_info = read_geo_info
+        self.use_stretch = use_stretch
 
     def read_img(self, img_path):
         img_format = imghdr.what(img_path)
@@ -250,7 +255,7 @@ class DecodeImg(Transform):
                     im_data = im_data.transpose((1, 2, 0))
             if self.read_geo_info:
                 geo_trans = dataset.GetGeoTransform()
-                geo_proj = dataset.GetGeoProjection()
+                geo_proj = dataset.GetProjection()
         elif img_format in ['jpeg', 'bmp', 'png', 'jpg']:
             if self.decode_bgr:
                 im_data = cv2.imread(img_path, cv2.IMREAD_ANYDEPTH |
@@ -287,7 +292,7 @@ class DecodeImg(Transform):
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
         if self.to_uint8:
-            image = to_uint8(image)
+            image = to_uint8(image, stretch=self.use_stretch)
 
         if self.read_geo_info:
             return image, geo_info_dict
@@ -1959,15 +1964,29 @@ class AppendIndex(Transform):
         index_type (str): Type of remote sensinng index. See supported 
             index types in 
             https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/indices.py .
-        band_indices (dict): Mapping of band names to band indices 
+        band_indices (dict, optional): Mapping of band names to band indices 
             (starting from 1). See band names in 
-            https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/indices.py . 
+            https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/indices.py .
+            Default: None.
+        satellite (str, optional): Type of satellite. If set, 
+            band indices will be automatically determined accordingly. See supported satellites in 
+            https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/satellites.py .
+            Default: None.
     """
 
-    def __init__(self, index_type, band_indices, **kwargs):
+    def __init__(self, index_type, band_indices=None, satellite=None, **kwargs):
         super(AppendIndex, self).__init__()
         cls = getattr(indices, index_type)
-        self._compute_index = cls(band_indices, **kwargs)
+        if satellite is not None:
+            satellite_bands = getattr(satellites, satellite)
+            self._compute_index = cls(satellite_bands, **kwargs)
+        else:
+            if band_indices is None:
+                raise ValueError(
+                    "At least one of `band_indices` and `satellite` must not be None."
+                )
+            else:
+                self._compute_index = cls(band_indices, **kwargs)
 
     def apply_im(self, image):
         index = self._compute_index(image)
