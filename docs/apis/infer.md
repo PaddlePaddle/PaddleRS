@@ -155,7 +155,11 @@ def slider_predict(self,
                    save_dir,
                    block_size,
                    overlap=36,
-                   transforms=None):
+                   transforms=None,
+                   invalid_value=255,
+                   merge_strategy='keep_last',
+                   batch_size=1,
+                   quiet=False):
 ```
 
 输入参数列表：
@@ -164,11 +168,15 @@ def slider_predict(self,
 |-------|----|--------|-----|
 |`img_file`|`str`|输入影像路径。||
 |`save_dir`|`str`|预测结果输出路径。||
-|`block_size`|`list[int]` \| `tuple[int]` \| `int`|滑窗的窗口大小（以列表或元组指定长、宽或以一个整数指定相同的长宽）。||
-|`overlap`|`list[int]` \| `tuple[int]` \| `int`|滑窗的滑动步长（以列表或元组指定长、宽或以一个整数指定相同的长宽）。|`36`|
+|`block_size`|`list[int]` \| `tuple[int]` \| `int`|滑窗的窗口大小（以列表或元组指定宽度、高度或以一个整数指定相同的宽高）。||
+|`overlap`|`list[int]` \| `tuple[int]` \| `int`|滑窗的滑动步长（以列表或元组指定宽度、高度或以一个整数指定相同的宽高）。|`36`|
 |`transforms`|`paddlers.transforms.Compose` \| `None`|对输入数据应用的数据变换算子。若为`None`，则使用训练器在验证阶段使用的数据变换算子。|`None`|
+|`invalid_value`|`int`|输出影像中用于标记无效像素的数值。|`255`|
+|`merge_strategy`|`str`|合并滑窗重叠区域使用的策略。`'keep_first'`表示保留遍历顺序（从左至右，从上往下，列优先）最靠前的窗口的预测类别；`'keep_last'`表示保留遍历顺序最靠后的窗口的预测类别；`'accum'`表示通过将各窗口在重叠区域给出的预测概率累加，计算最终预测类别。需要注意的是，在对大尺寸影像进行`overlap`较大的密集推理时，使用`'accum'`策略可能导致较长的推理时间，但一般能够在窗口交界部分取得更好的表现。|`'keep_last'`|
+|`batch_size`|`int`|预测时使用的mini-batch大小。|`1`|
+|`quiet`|`bool`|若为`True`，不显示预测进度。|`False`|
 
-变化检测任务的滑窗推理API与图像分割任务类似，但需要注意的是输出结果中存储的地理变换、投影等信息以从第一时相影像中读取的信息为准。
+变化检测任务的滑窗推理API与图像分割任务类似，但需要注意的是输出结果中存储的地理变换、投影等信息以从第一时相影像中读取的信息为准，存储滑窗推理结果的文件名也与第一时相影像文件相同。
 
 ## 静态图推理API
 
@@ -216,5 +224,10 @@ def predict(self,
 |`transforms`|`paddlers.transforms.Compose`\|`None`|对输入数据应用的数据变换算子。若为`None`，则使用从`model.yml`中读取的算子。|`None`|
 |`warmup_iters`|`int`|预热轮数，用于评估模型推理以及前后处理速度。若大于1，将预先重复执行`warmup_iters`次推理，而后才开始正式的预测及其速度评估。|`0`|
 |`repeats`|`int`|重复次数，用于评估模型推理以及前后处理速度。若大于1，将执行`repeats`次预测并取时间平均值。|`1`|
+|`quiet`|`bool`|若为`True`，不打印计时信息。|`False`|
 
 `Predictor.predict()`的返回格式与相应的动态图推理API的返回格式完全相同，详情请参考[动态图推理API](#动态图推理api)。
+
+### `Predictor.slider_predict()`
+
+实现滑窗推理功能。用法与`BaseSegmenter`和`BaseChangeDetector`的`slider_predict()`方法相同。
