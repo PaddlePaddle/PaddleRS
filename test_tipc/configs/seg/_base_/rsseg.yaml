@@ -1,5 +1,7 @@
 # Basic configurations of RSSeg dataset
 
+seed: 1024
+
 datasets:
     train: !Node
         type: SegDataset
@@ -32,8 +34,8 @@ transforms:
         - !Node
           type: Normalize
           args:
-            mean: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
-            std: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+            mean: [0.5, 0.5, 0.5]
+            std: [0.5, 0.5, 0.5]
         - !Node
           type: ArrangeSegmenter
           args: ['train']
@@ -47,8 +49,8 @@ transforms:
         - !Node
           type: Normalize
           args:
-            mean: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
-            std: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+            mean: [0.5, 0.5, 0.5]
+            std: [0.5, 0.5, 0.5]
         - !Node
           type: ArrangeSegmenter
           args: ['eval']
