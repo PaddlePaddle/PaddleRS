@@ -78,7 +78,7 @@ model = pdrs.tasks.cd.FCCDN()
 
 # 执行模型训练
 model.train(
-    num_epochs=10,
+    num_epochs=15,
     train_dataset=train_dataset,
     train_batch_size=4,
     eval_dataset=eval_dataset,
