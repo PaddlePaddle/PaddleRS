@@ -53,3 +53,4 @@ PaddleRS提供从科学研究到产业应用的丰富示例，希望帮助遥感
 |[【官方】第十一届 “中国软件杯”百度遥感赛项：目标检测功能](https://aistudio.baidu.com/aistudio/projectdetail/3792609)|古代飞|竞赛打榜|目标检测，比赛基线|
 |[【十一届软件杯】遥感解译赛道：变化检测任务——预赛第四名方案分享](https://aistudio.baidu.com/aistudio/projectdetail/4116895)|lzzzzzm|竞赛打榜|变化检测，高分方案|
 |[【方案分享】第十一届 “中国软件杯”大学生软件设计大赛遥感解译赛道 比赛方案分享](https://aistudio.baidu.com/aistudio/projectdetail/4146154)|trainer|竞赛打榜|变化检测，高分方案|
+|[遥感变化检测助力信贷场景下工程进度管控](https://aistudio.baidu.com/aistudio/projectdetail/4543160)|古代飞|产业范例|变化检测，金融风控|
