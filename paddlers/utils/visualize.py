@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import warnings
+
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
 import os.path as osp
 from typing import List, Tuple, Union, Optional
 import webbrowser
@@ -27,26 +31,31 @@ except:
     import osr
 
 
-def map_show(
-        raster_path: str,
+def map_display(
+        mask_path: str,
+        img_path: Optional[str]=None,
         band_list: Union[List[int], Tuple[int, ...], None]=None,
         save_path: Optional[str]=None, ) -> folium.Map:
-    """Show raster in folium online map.
+    """Show mask (and raster) on online map.
 
     Args:
-        raster_path (str): The path of raster.
+        mask_path (str): The path of predictio or GT.
+        img_path (str, optional): The path of raster.
         band_list (Union[List[int], Tuple[int, ...], None], optional): 
-            Select a set of bands (the band index starts from 1). 
+            Select a set of bands about raster (the band index starts from 1). 
             If None, read all bands. Defaults to None.
         save_path (str, optional): The path of save html. 
-            If None, it is only display on Jupyter Notebook.
+            If None, it is only display on Notebook, not no terminal or IDE. 
             Defaults to None.
 
     Returns:
         folium.Map: An example of folium map.
     """
     fmap = Map(max_zoom=24, prefer_canvas=True)
-    layer, center = Raster(raster_path, band_list).get_layer()
+    if img_path is not None:
+        layer, _ = Raster(img_path, band_list).get_layer()
+        layer.add_to(fmap)
+    layer, center = Raster(mask_path).get_layer()
     layer.add_to(fmap)
     if center is not None:
         fmap.location = center
@@ -58,6 +67,10 @@ def map_show(
     return fmap
 
 
+class OpenAsEPSG4326Error(Exception):
+    pass
+
+
 class Raster:
     def __init__(
             self,
@@ -65,7 +78,8 @@ class Raster:
             band_list: Union[List[int], Tuple[int, ...], None]=None) -> None:
         self.src_data = Converter.open_as_WGS84(path)
         if self.src_data is None:
-            raise ValueError("Faild to open {}.".format(path))
+            raise OpenAsEPSG4326Error("Faild to open {} in EPSG:4326.".format(
+                path))
         self.name = path.replace("\\", "/").split("/")[-1].split(".")[0]
         self.set_bands(band_list)
         self._get_info()
@@ -99,13 +113,13 @@ class Raster:
         self.wgs_range = self._get_WGS84_range()
         self.wgs_center = self._get_WGS84_center()
 
-    def _get_WGS84_range(self) -> List:
+    def _get_WGS84_range(self) -> List[List[float]]:
         converter = Converter(self.proj, self.geotf)
         lat1, lon1 = converter.xy2latlon(self.height - 1, 0)
         lat2, lon2 = converter.xy2latlon(0, self.width - 1)
         return [[lon1, lat1], [lon2, lat2]]
 
-    def _get_WGS84_center(self) -> List:
+    def _get_WGS84_center(self) -> List[float]:
         clat = (self.wgs_range[0][0] + self.wgs_range[1][0]) / 2
         clon = (self.wgs_range[0][1] + self.wgs_range[1][1]) / 2
         return [clat, clon]
@@ -144,7 +158,7 @@ class Converter:
         result = gdal.Warp("", path, dstSRS="EPSG:4326", format="VRT")
         return result
 
-    def xy2latlon(self, row: int, col: int) -> List:
+    def xy2latlon(self, row: int, col: int) -> List[float]:
         px = self.geotf[0] + col * self.geotf[1] + row * self.geotf[2]
         py = self.geotf[3] + col * self.geotf[4] + row * self.geotf[5]
         ct = osr.CoordinateTransformation(self.source, self.target)
