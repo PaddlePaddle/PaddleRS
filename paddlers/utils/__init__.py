@@ -22,4 +22,8 @@ from .env import get_environ_info, get_num_workers, init_parallel_env
 from .download import download_and_decompress, decompress
 from .stats import SmoothedValue, TrainingStats
 from .shm import _get_shared_memory_size_in_M
-from .visualize import map_display
+
+try:
+    from .visualize import map_display
+except:
+    print("Can not import `map_display` due to lack gdal or osr.")
