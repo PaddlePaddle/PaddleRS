@@ -188,7 +188,7 @@ PaddleRS目录树中关键部分如下：
 * 如果您发现任何PaddleRS存在的问题或是对PaddleRS有建议, 欢迎通过[GitHub Issues](https://github.com/PaddlePaddle/PaddleRS/issues)向我们提出。
 * 欢迎加入PaddleRS微信群
 <div align="center">
-<img src="https://user-images.githubusercontent.com/21275753/187380802-cf1b551f-8127-4c78-993f-e3f65eca0398.png"  width = "150" />  
+<img src="https://user-images.githubusercontent.com/21275753/190135989-078ecdc9-5760-4c1b-b317-f07b77cc4312.png"  width = "150" />  
 </div>
 
 ## 使用教程 <img src="./docs/images/teach.png" width="30"/>
