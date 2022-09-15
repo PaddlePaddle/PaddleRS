@@ -25,7 +25,7 @@ PaddleRS目前已支持的全部模型如下（标注\*的为遥感专用模型�
 | 场景分类 | MobileNetV3 | 否 |
 | 场景分类 | ResNet50-vd | 否 |
 | 图像复原 | DRN | 否 |
-| 图像复原 | ESRGAN | 否 |
+| 图像复原 | ESRGAN | 是 |
 | 图像复原 | LESRCNN | 否 |
 | 目标检测 | Faster R-CNN | 否 |
 | 目标检测 | PP-YOLO | 否 |

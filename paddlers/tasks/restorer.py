@@ -773,7 +773,7 @@ class LESRCNN(BaseRestorer):
                  group=1,
                  **params):
         params.update({
-            'scale': sr_factor,
+            'scale': sr_factor if sr_factor is not None else 1,
             'multi_scale': multi_scale,
             'group': group
         })
