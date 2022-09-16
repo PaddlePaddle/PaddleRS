@@ -25,5 +25,7 @@ from .shm import _get_shared_memory_size_in_M
 
 try:
     from .visualize import map_display
-except:
-    print("Can not import `map_display` due to lack gdal or osr.")
+except ImportError:
+    print(
+        "Can not import `map_display`. This is probably because GDAL is not properly installed."
+    )

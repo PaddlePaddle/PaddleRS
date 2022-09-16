@@ -17,6 +17,7 @@ import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 import os.path as osp
+from pathlib import Path
 from typing import List, Tuple, Union, Optional
 import webbrowser
 import numpy as np
@@ -36,17 +37,19 @@ def map_display(
         img_path: Optional[str]=None,
         band_list: Union[List[int], Tuple[int, ...], None]=None,
         save_path: Optional[str]=None, ) -> folium.Map:
-    """Show mask (and raster) on online map.
+    """
+    Show mask (and original image) on an online map.
 
     Args:
-        mask_path (str): The path of predictio or GT.
-        img_path (str, optional): The path of raster.
-        band_list (Union[List[int], Tuple[int, ...], None], optional): 
-            Select a set of bands about raster (the band index starts from 1). 
-            If None, read all bands. Defaults to None.
-        save_path (str, optional): The path of save html. 
-            If None, it is only display on Notebook, not no terminal or IDE. 
-            Defaults to None.
+    mask_path (str): Path of predicted or ground-truth masks.
+    img_path (str|None, optional): Path of the original image. Defaults to None.
+    band_list (list[int]|tuple[int]|None, optional): 
+        Bands to select from the original image for display (the band index starts from 1). 
+        If None, use all bands. Defaults to None.
+    save_path (str, optional): Path of the .html file to save the visualization results. 
+        In Jupyter Notebook environments, 
+        leave `save_path` as None to display the result immediately in the notebook. 
+        Defaults to None.
 
     Returns:
         folium.Map: An example of folium map.
@@ -80,7 +83,7 @@ class Raster:
         if self.src_data is None:
             raise OpenAsEPSG4326Error("Faild to open {} in EPSG:4326.".format(
                 path))
-        self.name = path.replace("\\", "/").split("/")[-1].split(".")[0]
+        self.name = Path(path).stem
         self.set_bands(band_list)
         self._get_info()
 
