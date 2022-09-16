@@ -6,3 +6,5 @@ save_dir: ./test_tipc/output/cd/fccdn/
 
 model: !Node
     type: FCCDN
+
+learning_rate: 0.001
