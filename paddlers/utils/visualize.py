@@ -22,7 +22,7 @@ from typing import List, Tuple, Union, Optional
 import webbrowser
 import numpy as np
 from folium import folium, Map, LayerControl
-from folium.raster_layers import ImageOverlay
+from folium.raster_layers import TileLayer, ImageOverlay
 from paddlers.transforms.functions import to_uint8
 
 try:
@@ -54,7 +54,8 @@ def map_display(
     Returns:
         folium.Map: An example of folium map.
     """
-    fmap = Map(max_zoom=24, prefer_canvas=True)
+
+    fmap = _init_map()
     if img_path is not None:
         layer, _ = Raster(img_path, band_list).get_layer()
         layer.add_to(fmap)
@@ -67,6 +68,31 @@ def map_display(
     if save_path:
         fmap.save(save_path)
         webbrowser.open(save_path)
+    return fmap
+
+
+def _init_map() -> folium.Map:
+    key = "8e879a4cad078fd3ce7456f2737fc4cc"
+    fmap = Map(
+        tiles=None,
+        min_zoom=1,
+        max_zoom=24, )
+    tdt_vec = TileLayer(
+        tiles="https://t2.tianditu.gov.cn/DataServer?T=vec_w&X={x}&Y={y}&L={z}&tk="
+        + key,
+        min_zoom=1,
+        max_zoom=24,
+        attr="天地图 矢量",
+        control=False, )
+    fmap.add_child(tdt_vec, name=tdt_vec.tile_name)
+    tdt_cva = TileLayer(
+        tiles="https://t2.tianditu.gov.cn/DataServer?T=cva_w&X={x}&Y={y}&L={z}&tk="
+        + key,
+        min_zoom=1,
+        max_zoom=24,
+        attr="天地图 注记",
+        control=False, )
+    fmap.add_child(tdt_cva, name=tdt_cva.tile_name)
     return fmap
 
 
