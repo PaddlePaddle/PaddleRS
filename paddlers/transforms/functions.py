@@ -604,6 +604,55 @@ def match_by_regression(im, ref, pif_loc=None):
     return matched
 
 
+def match_lf_components(im, ref, lf_ratio=0.01):
+    """
+    Match the low-frequency components of two images.
+
+    Args:
+        im (np.ndarray): Input image.
+        ref (np.ndarray): Reference image to match. `ref` must have the same shape 
+            as `im`.
+        lf_ratio (float, optional): Proportion of frequence components that should
+            be recognized as low-frequency components in the frequency domain. 
+            Default: 0.01.
+
+    Returns:
+        np.ndarray: Transformed input image.
+
+    Raises:
+        ValueError: When the shape of `ref` differs from that of `im`.
+    """
+
+    def _replace_lf(im, ref, lf_ratio):
+        h, w = im.shape
+        h_lf, w_lf = int(h // 2 * lf_ratio), int(w // 2 * lf_ratio)
+        freq_im = np.fft.fft2(im)
+        freq_ref = np.fft.fft2(ref)
+        if h_lf > 0:
+            freq_im[:h_lf] = freq_ref[:h_lf]
+            freq_im[-h_lf:] = freq_ref[-h_lf:]
+        if w_lf > 0:
+            freq_im[:, :w_lf] = freq_ref[:, :w_lf]
+            freq_im[:, -w_lf:] = freq_ref[:, -w_lf:]
+        recon_im = np.fft.ifft2(freq_im)
+        recon_im = np.abs(recon_im)
+        return recon_im
+
+    if im.shape != ref.shape:
+        raise ValueError("Image and Reference must have the same shape!")
+
+    if im.ndim > 2:
+        # Multiple channels
+        matched = np.empty(im.shape, dtype=im.dtype)
+        for ch in range(im.shape[-1]):
+            matched[..., ch] = _replace_lf(im[..., ch], ref[..., ch], lf_ratio)
+    else:
+        # Single channel
+        matched = _replace_lf(im, ref, lf_ratio).astype(im.dtype)
+
+    return matched
+
+
 def inv_pca(im, joblib_path):
     """
     Perform inverse PCA transformation.
