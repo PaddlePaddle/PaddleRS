@@ -1,23 +1,25 @@
-paddleslim >= 2.2.1,<2.3.3
-visualdl >= 2.1.1
-opencv-contrib-python == 4.3.0.38
-numba == 0.53.1
-scikit-learn == 0.23.2
-scikit-image >= 0.14.0
-pandas
-scipy
+chardet
+colorama
 cython
-pycocotools
-shapely
+easydict
+filelock
+foliume
+# GDAL >= 3.1.3
+geojson
 lap
 motmetrics
-chardet
-openpyxl
-easydict
 munch
 natsort
-geojson
-colorama
-filelock
-# # Self installation
-# GDAL >= 3.1.3
+numba == 0.53.1
+opencv-contrib-python == 4.3.0.38
+openpyxl
+# paddlepaddle >= 2.2.0
+# paddlepaddle-gpu >= 2.2.0
+paddleslim >= 2.2.1,<2.3.3
+pandas
+pycocotools
+scikit-learn == 0.23.2
+scikit-image >= 0.14.0
+scipy
+shapely
+visualdl >= 2.1.1
