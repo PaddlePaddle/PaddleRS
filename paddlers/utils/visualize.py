@@ -31,12 +31,19 @@ except:
     import gdal
     import osr
 
+CHINATILES = (
+    "GeoQ China Community",
+    "GeoQ China Street",
+    "AMAP China",
+    "TencentMap China",
+    "BaiduMaps China", )
 
-def map_display(
-        mask_path: str,
-        img_path: Optional[str]=None,
-        band_list: Union[List[int], Tuple[int, ...], None]=None,
-        save_path: Optional[str]=None, ) -> folium.Map:
+
+def map_display(mask_path: str,
+                img_path: Optional[str]=None,
+                band_list: Union[List[int], Tuple[int, ...], None]=None,
+                save_path: Optional[str]=None,
+                tiles: str="GeoQ China Community") -> folium.Map:
     """
     Show mask (and original image) on an online map.
 
@@ -50,13 +57,34 @@ def map_display(
         In Jupyter Notebook environments, 
         leave `save_path` as None to display the result immediately in the notebook. 
         Defaults to None.
+    tiles (str): Map tileset to use. Due to boundary question,
+        the map tileset provided by folium cannot be selected. 
+        * Only can choose from this list:
+            - "GeoQ China Community", "GeoQ China Street"  (from http://www.geoq.cn/)
+            - "AMAP China"  (from https://www.amap.com/)
+            - "TencentMap China"  (from https://map.qq.com/)
+            - "BaiduMaps China"   (from https://map.baidu.com/) {
+                It is worked in some cases, but it is not recommended.
+            }
+
+        Defaults to "GeoQ China Community".
+
+        These tileset have been corrected through the public algorithm on the Internet.
+        * Please read the relevant terms of use carefully:
+            - GeoQ [GISUNI] (http://geoq.cn/useragreement.html)
+            - AMap [AutoNavi]  (https://wap.amap.com/doc/serviceitem.html)
+            - Tencent Map  (https://ugc.map.qq.com/AppBox/Landlord/serveagreement.html)
+            - Baidu Map  (https://map.baidu.com/zt/client/service/index.html)
 
     Returns:
         folium.Map: An example of folium map.
     """
 
+    if tiles not in CHINATILES:
+        raise ValueError("The `tiles` must in {}, not {}.".format(CHINATILES,
+                                                                  tiles))
     fmap = Map(
-        tiles="GeoQ China Community",
+        tiles=tiles,
         min_zoom=1,
         max_zoom=24, )
     if img_path is not None:
