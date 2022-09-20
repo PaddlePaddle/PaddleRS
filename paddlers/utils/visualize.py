@@ -63,7 +63,7 @@ def map_display(mask_path: str,
             - "GeoQ China Community", "GeoQ China Street"  (from http://www.geoq.cn/)
             - "AMAP China"  (from https://www.amap.com/)
             - "TencentMap China"  (from https://map.qq.com/)
-            - "BaiduMaps China"   (from https://map.baidu.com/) {
+            - "BaiduMaps China"  (from https://map.baidu.com/) {
                 It is worked in some cases, but it is not recommended.
             }
 
@@ -71,7 +71,7 @@ def map_display(mask_path: str,
 
         These tileset have been corrected through the public algorithm on the Internet.
         * Please read the relevant terms of use carefully:
-            - GeoQ [GISUNI] (http://geoq.cn/useragreement.html)
+            - GeoQ [GISUNI]  (http://geoq.cn/useragreement.html)
             - AMap [AutoNavi]  (https://wap.amap.com/doc/serviceitem.html)
             - Tencent Map  (https://ugc.map.qq.com/AppBox/Landlord/serveagreement.html)
             - Baidu Map  (https://map.baidu.com/zt/client/service/index.html)
