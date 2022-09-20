@@ -17,6 +17,7 @@ import os.path as osp
 import numpy as np
 import argparse
 
+import paddlers
 from sklearn.decomposition import PCA
 from joblib import dump
 
@@ -43,14 +44,13 @@ def pca_train(img_path, save_dir="output", dim=3):
         save_dir))
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--im_path", type=str, required=True, \
-                    help="Path of HSIs image.")
-parser.add_argument("--save_dir", type=str, default="output", \
-                    help="Directory to save PCA params(*.joblib). Default: output.")
-parser.add_argument("--dim", type=int, default=3, \
-                    help="Dimension to reduce to. Default: 3.")
-
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--im_path", type=str, required=True, \
+                        help="Path of HSIs image.")
+    parser.add_argument("--save_dir", type=str, default="output", \
+                        help="Directory to save PCA params(*.joblib). Default: output.")
+    parser.add_argument("--dim", type=int, default=3, \
+                        help="Dimension to reduce to. Default: 3.")
     args = parser.parse_args()
     pca_train(args.im_path, args.save_dir, args.dim)

@@ -14,10 +14,11 @@
 
 import itertools
 import argparse
-from easydict import EasyDict as edict
 
+import paddlers
 import numpy as np
 import pandas as pd
+from easydict import EasyDict as edict
 
 from utils import Raster, time_it
 
@@ -55,12 +56,11 @@ def oif(img_path, topk=5):
         print("Bands: {0}, OIF value: {1}.".format(k, v))
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--im_path", type=str, required=True, \
-                    help="Path of HSIs image.")
-parser.add_argument("--topk", type=int, default=5, \
-                    help="Number of top results. The default value is 5.")
-
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--im_path", type=str, required=True, \
+                        help="Path of HSIs image.")
+    parser.add_argument("--topk", type=int, default=5, \
+                        help="Number of top results. The default value is 5.")
     args = parser.parse_args()
     oif(args.im_path, args.topk)

@@ -14,11 +14,14 @@
 
 import os
 import codecs
-import cv2
-import numpy as np
 import argparse
+
+import paddlers
+import numpy as np
+import cv2
 import geojson
 from tqdm import tqdm
+
 from utils import Raster, save_geotiff, translate_vector, time_it
 
 
@@ -60,12 +63,11 @@ def convert_data(image_path, geojson_path):
     os.remove(temp_geojson_path)
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--mask_path", type=str, required=True, \
-                    help="Path of mask data.")
-parser.add_argument("--save_path", type=str, required=True, \
-                    help="Path to store the GeoJSON file (the coordinate system is WGS84).")
-
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--mask_path", type=str, required=True, \
+                        help="Path of mask data.")
+    parser.add_argument("--save_path", type=str, required=True, \
+                        help="Path to store the GeoJSON file (the coordinate system is WGS84).")
     args = parser.parse_args()
     convert_data(args.raster_path, args.geojson_path)

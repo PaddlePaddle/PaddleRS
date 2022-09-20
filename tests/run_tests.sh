@@ -9,8 +9,8 @@ bash download_test_data.sh
 python -m unittest discover -v
 
 # Test tools
-for script in $(ls run*.py); do
-    python ${script}
+for script in $(ls tools/run*.py); do
+    PYTHONPATH="$(pwd)" python ${script}
 done
 
 # Test tutorials
