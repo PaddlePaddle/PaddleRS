@@ -14,6 +14,7 @@
 
 from . import logging
 from . import utils
+from . import postprocs
 from .utils import (seconds_to_hms, get_encoding, get_single_card_bs, dict2str,
                     EarlyStop, norm_path, is_pic, MyEncoder, DisablePrint,
                     Timer, to_data_parallel, scheduler_step)
