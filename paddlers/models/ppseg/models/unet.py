@@ -36,18 +36,19 @@ class UNet(nn.Layer):
             is even, e.g. 1024x512, otherwise it is True, e.g. 769x769.  Default: False.
         use_deconv (bool, optional): A bool value indicates whether using deconvolution in upsampling.
             If False, use resize_bilinear. Default: False.
+        in_channels (int, optional): The channels of input image. Default: 3.
         pretrained (str, optional): The path or url of pretrained model for fine tuning. Default: None.
     """
 
     def __init__(self,
                  num_classes,
-                 input_channel=3,
                  align_corners=False,
                  use_deconv=False,
+                 in_channels=3,
                  pretrained=None):
         super().__init__()
 
-        self.encode = Encoder(input_channel)
+        self.encode = Encoder(in_channels)
         self.decode = Decoder(align_corners, use_deconv=use_deconv)
         self.cls = self.conv = nn.Conv2D(
             in_channels=64,
@@ -73,12 +74,11 @@ class UNet(nn.Layer):
 
 
 class Encoder(nn.Layer):
-    def __init__(self, input_channel=3):
+    def __init__(self, in_channels=3):
         super().__init__()
 
         self.double_conv = nn.Sequential(
-            layers.ConvBNReLU(input_channel, 64, 3),
-            layers.ConvBNReLU(64, 64, 3))
+            layers.ConvBNReLU(in_channels, 64, 3), layers.ConvBNReLU(64, 64, 3))
         down_channels = [[64, 128], [128, 256], [256, 512], [512, 512]]
         self.down_sample_list = nn.LayerList([
             self.down_sampling(channel[0], channel[1])

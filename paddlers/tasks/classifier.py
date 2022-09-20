@@ -34,9 +34,7 @@ from paddlers.utils.checkpoint import cls_pretrain_weights_dict
 from paddlers.transforms import Resize, decode_image
 from .base import BaseModel
 
-__all__ = [
-    "ResNet50_vd", "MobileNetV3_small_x1_0", "HRNet_W18_C", "CondenseNetV2_b"
-]
+__all__ = ["ResNet50_vd", "MobileNetV3", "HRNet", "CondenseNetV2"]
 
 
 class BaseClassifier(BaseModel):
@@ -600,13 +598,13 @@ class ResNet50_vd(BaseClassifier):
             **params)
 
 
-class MobileNetV3_small_x1_0(BaseClassifier):
+class MobileNetV3(BaseClassifier):
     def __init__(self,
                  num_classes=2,
                  use_mixed_loss=False,
                  losses=None,
                  **params):
-        super(MobileNetV3_small_x1_0, self).__init__(
+        super(MobileNetV3, self).__init__(
             model_name='MobileNetV3_small_x1_0',
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
@@ -614,13 +612,13 @@ class MobileNetV3_small_x1_0(BaseClassifier):
             **params)
 
 
-class HRNet_W18_C(BaseClassifier):
+class HRNet(BaseClassifier):
     def __init__(self,
                  num_classes=2,
                  use_mixed_loss=False,
                  losses=None,
                  **params):
-        super(HRNet_W18_C, self).__init__(
+        super(HRNet, self).__init__(
             model_name='HRNet_W18_C',
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
@@ -628,15 +626,21 @@ class HRNet_W18_C(BaseClassifier):
             **params)
 
 
-class CondenseNetV2_b(BaseClassifier):
+class CondenseNetV2(BaseClassifier):
     def __init__(self,
                  num_classes=2,
                  use_mixed_loss=False,
                  losses=None,
+                 in_channels=3,
+                 arch='A',
                  **params):
-        super(CondenseNetV2_b, self).__init__(
-            model_name='CondenseNetV2_b',
+        if arch not in ('A', 'B', 'C'):
+            raise ValueError("{} is not a supported architecture.".format(arch))
+        model_name = 'CondenseNetV2_' + arch
+        super(CondenseNetV2, self).__init__(
+            model_name=model_name,
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
             losses=losses,
+            in_channels=in_channels,
             **params)

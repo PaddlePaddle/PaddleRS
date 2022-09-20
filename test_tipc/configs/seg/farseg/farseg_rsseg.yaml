@@ -7,5 +7,5 @@ save_dir: ./test_tipc/output/seg/farseg/
 model: !Node
     type: FarSeg
     args:
-        in_channels: 10
+        in_channels: 3
         num_classes: 5

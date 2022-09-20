@@ -38,7 +38,7 @@ if [[ ${MODE} == 'lite_train_lite_infer' \
     elif [[ ${task_name} == 'res' ]]; then
         download_and_unzip_dataset "${DATA_DIR}" rssr https://paddlers.bj.bcebos.com/datasets/rssr_mini.zip
     elif [[ ${task_name} == 'seg' ]]; then
-        download_and_unzip_dataset "${DATA_DIR}" rsseg https://paddlers.bj.bcebos.com/datasets/rsseg_mini.zip
+        download_and_unzip_dataset "${DATA_DIR}" rsseg https://paddlers.bj.bcebos.com/datasets/rsseg_rgb.zip
     fi
 
 elif [[ ${MODE} == 'whole_train_whole_infer' ]]; then
@@ -63,7 +63,7 @@ elif [[ ${MODE} == 'whole_train_whole_infer' ]]; then
     elif [[ ${task_name} == 'res' ]]; then
         download_and_unzip_dataset "${DATA_DIR}" rssr https://paddlers.bj.bcebos.com/datasets/rssr.zip
     elif [[ ${task_name} == 'seg' ]]; then
-        download_and_unzip_dataset "${DATA_DIR}" rsseg https://paddlers.bj.bcebos.com/datasets/rsseg.zip
+        download_and_unzip_dataset "${DATA_DIR}" rsseg https://paddlers.bj.bcebos.com/datasets/rsseg_rgb.zip
     fi
 
 fi

@@ -1,5 +1,7 @@
 # Basic configurations of SARShip dataset
 
+seed: 1024
+
 datasets:
     train: !Node
         type: VOCDetDataset

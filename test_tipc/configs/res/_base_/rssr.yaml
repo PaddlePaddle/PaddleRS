@@ -1,5 +1,7 @@
 # Basic configurations of RSSR dataset
 
+seed: 1024
+
 datasets:
     train: !Node
         type: ResDataset

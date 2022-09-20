@@ -20,18 +20,21 @@ PaddleRS目前已支持的全部模型如下（标注\*的为遥感专用模型�
 | 变化检测 | \*FCCDN | 是 |
 | 变化检测 | \*SNUNet | 是 |
 | 变化检测 | \*STANet | 是 |
-| 场景分类 | CondenseNetV2 | 是 |
-| 场景分类 | HRNet | 是 |
-| 场景分类 | MobileNetV3 | 是 |
-| 场景分类 | ResNet50-vd | 是 |
+| 场景分类 | CondenseNet V2 | 是 |
+| 场景分类 | HRNet | 否 |
+| 场景分类 | MobileNetV3 | 否 |
+| 场景分类 | ResNet50-vd | 否 |
 | 图像复原 | DRN | 否 |
-| 图像复原 | ESRGAN | 否 |
+| 图像复原 | ESRGAN | 是 |
 | 图像复原 | LESRCNN | 否 |
-| 目标检测 | Faster R-CNN | 是 |
-| 目标检测 | PP-YOLO | 是 |
-| 目标检测 | PP-YOLO Tiny | 是 |
-| 目标检测 | PP-YOLOv2 | 是 |
-| 目标检测 | YOLOv3 | 是 |
+| 目标检测 | Faster R-CNN | 否 |
+| 目标检测 | PP-YOLO | 否 |
+| 目标检测 | PP-YOLO Tiny | 否 |
+| 目标检测 | PP-YOLOv2 | 否 |
+| 目标检测 | YOLOv3 | 否 |
+| 图像分割 | BiSeNet V2 | 是 |
 | 图像分割 | DeepLab V3+ | 是 |
-| 图像分割 | \*FarSeg | 否 |
+| 图像分割 | \*FarSeg | 是 |
+| 图像分割 | Fast-SCNN | 是 |
+| 图像分割 | HRNet | 是 |
 | 图像分割 | UNet | 是 |

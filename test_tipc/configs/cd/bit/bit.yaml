@@ -1,8 +1,0 @@
-# Basic configurations of BIT
-
-_base_: ../_base_/airchange.yaml
-
-save_dir: ./test_tipc/output/cd/bit/
-
-model: !Node
-    type: BIT

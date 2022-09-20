@@ -1,8 +1,0 @@
-# Basic configurations of ChangeFormer
-
-_base_: ../_base_/airchange.yaml
-
-save_dir: ./test_tipc/output/cd/changeformer/
-
-model: !Node
-    type: ChangeFormer

@@ -1,4 +1,4 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
+# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import sys
 
 import cv2
 import paddle
+import paddlers.models.ppseg as ppseg
 
 IS_WINDOWS = sys.platform == 'win32'
 
@@ -57,8 +58,12 @@ def _get_nvcc_info(cuda_home):
     if cuda_home is not None and os.path.isdir(cuda_home):
         try:
             nvcc = os.path.join(cuda_home, 'bin/nvcc')
-            nvcc = subprocess.check_output(
-                "{} -V".format(nvcc), shell=True).decode()
+            if not IS_WINDOWS:
+                nvcc = subprocess.check_output(
+                    "{} -V".format(nvcc), shell=True).decode()
+            else:
+                nvcc = subprocess.check_output(
+                    "\"{}\" -V".format(nvcc), shell=True).decode()
             nvcc = nvcc.strip().split('\n')[-1]
         except subprocess.SubprocessError:
             nvcc = "Not Available"
@@ -116,6 +121,7 @@ def get_sys_env():
     except:
         pass
 
+    env_info['PaddleSeg'] = ppseg.__version__
     env_info['PaddlePaddle'] = paddle.__version__
     env_info['OpenCV'] = cv2.__version__
 

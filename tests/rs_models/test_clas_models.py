@@ -18,7 +18,7 @@ from rs_models.test_model import TestModel
 __all__ = []
 
 
-class TestCDModel(TestModel):
+class TestClasModel(TestModel):
     DEFAULT_HW = (224, 224)
 
     def check_output(self, output, target):
@@ -36,3 +36,36 @@ class TestCDModel(TestModel):
     def set_targets(self):
         self.targets = [[self.DEFAULT_BATCH_SIZE, spec.get('num_classes', 2)]
                         for spec in self.specs]
+
+
+class TestCondenseNetV2AModel(TestClasModel):
+    MODEL_CLASS = paddlers.rs_models.clas.CondenseNetV2_A
+
+    def set_specs(self):
+        self.specs = [
+            dict(in_channels=3, num_classes=2),
+            dict(in_channels=10, num_classes=2),
+            dict(in_channels=3, num_classes=100)
+        ]   # yapf: disable
+
+
+class TestCondenseNetV2BModel(TestClasModel):
+    MODEL_CLASS = paddlers.rs_models.clas.CondenseNetV2_B
+
+    def set_specs(self):
+        self.specs = [
+            dict(in_channels=3, num_classes=2),
+            dict(in_channels=10, num_classes=2),
+            dict(in_channels=3, num_classes=100)
+        ]   # yapf: disable
+
+
+class TestCondenseNetV2CModel(TestClasModel):
+    MODEL_CLASS = paddlers.rs_models.clas.CondenseNetV2_C
+
+    def set_specs(self):
+        self.specs = [
+            dict(in_channels=3, num_classes=2),
+            dict(in_channels=10, num_classes=2),
+            dict(in_channels=3, num_classes=100)
+        ]   # yapf: disable

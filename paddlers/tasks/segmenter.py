@@ -185,14 +185,7 @@ class BaseSegmenter(BaseModel):
                 )
             losses = [getattr(seg_losses, loss)() for loss in losses]
             loss_type = [seg_losses.MixedLoss(losses=losses, coef=list(coef))]
-        if self.model_name == 'FastSCNN':
-            loss_type *= 2
-            loss_coef = [1.0, 0.4]
-        elif self.model_name == 'BiSeNetV2':
-            loss_type *= 5
-            loss_coef = [1.0] * 5
-        else:
-            loss_coef = [1.0]
+        loss_coef = [1.0]
         losses = {'types': loss_type, 'coef': loss_coef}
         return losses
 
@@ -761,7 +754,7 @@ class UNet(BaseSegmenter):
         })
         super(UNet, self).__init__(
             model_name='UNet',
-            input_channel=in_channels,
+            in_channels=in_channels,
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
             losses=losses,
@@ -789,7 +782,7 @@ class DeepLabV3P(BaseSegmenter):
         if params.get('with_net', True):
             with DisablePrint():
                 backbone = getattr(ppseg.models, backbone)(
-                    input_channel=in_channels, output_stride=output_stride)
+                    in_channels=in_channels, output_stride=output_stride)
         else:
             backbone = None
         params.update({
@@ -809,6 +802,7 @@ class DeepLabV3P(BaseSegmenter):
 
 class FastSCNN(BaseSegmenter):
     def __init__(self,
+                 in_channels=3,
                  num_classes=2,
                  use_mixed_loss=False,
                  losses=None,
@@ -817,14 +811,22 @@ class FastSCNN(BaseSegmenter):
         params.update({'align_corners': align_corners})
         super(FastSCNN, self).__init__(
             model_name='FastSCNN',
+            in_channels=in_channels,
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
             losses=losses,
             **params)
 
+    def default_loss(self):
+        losses = super(FastSCNN, self).default_loss()
+        losses['types'] *= 2
+        losses['coef'] = [1.0, 0.4]
+        return losses
+
 
 class HRNet(BaseSegmenter):
     def __init__(self,
+                 in_channels=3,
                  num_classes=2,
                  width=48,
                  use_mixed_loss=False,
@@ -839,7 +841,7 @@ class HRNet(BaseSegmenter):
         if params.get('with_net', True):
             with DisablePrint():
                 backbone = getattr(ppseg.models, self.backbone_name)(
-                    align_corners=align_corners)
+                    in_channels=in_channels, align_corners=align_corners)
         else:
             backbone = None
 
@@ -855,6 +857,7 @@ class HRNet(BaseSegmenter):
 
 class BiSeNetV2(BaseSegmenter):
     def __init__(self,
+                 in_channels=3,
                  num_classes=2,
                  use_mixed_loss=False,
                  losses=None,
@@ -863,10 +866,17 @@ class BiSeNetV2(BaseSegmenter):
         params.update({'align_corners': align_corners})
         super(BiSeNetV2, self).__init__(
             model_name='BiSeNetV2',
+            in_channels=in_channels,
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
             losses=losses,
             **params)
+
+    def default_loss(self):
+        losses = super(BiSeNetV2, self).default_loss()
+        losses['types'] *= 5
+        losses['coef'] = [1.0] * 5
+        return losses
 
 
 class FarSeg(BaseSegmenter):

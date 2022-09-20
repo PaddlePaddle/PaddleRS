@@ -68,8 +68,7 @@ eval_dataset = pdrs.datasets.ClasDataset(
 # 构建MobileNetV3模型
 # 目前已支持的模型请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/intro/model_zoo.md
 # 模型输入参数请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/classifier.py
-model = pdrs.tasks.clas.MobileNetV3_small_x1_0(
-    num_classes=len(train_dataset.labels))
+model = pdrs.tasks.clas.MobileNetV3(num_classes=len(train_dataset.labels))
 
 # 执行模型训练
 model.train(
