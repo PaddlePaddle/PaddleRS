@@ -31,7 +31,7 @@ except:
     import gdal
     import osr
 
-CHINATILES = (
+CHINA_TILES = (
     "GeoQ China Community",
     "GeoQ China Street",
     "AMAP China",
@@ -57,19 +57,15 @@ def map_display(mask_path: str,
         In Jupyter Notebook environments, 
         leave `save_path` as None to display the result immediately in the notebook. 
         Defaults to None.
-    tiles (str): Map tileset to use. Due to boundary question,
-        the map tileset provided by folium cannot be selected. 
-        * Only can choose from this list:
-            - "GeoQ China Community", "GeoQ China Street"  (from http://www.geoq.cn/)
-            - "AMAP China"  (from https://www.amap.com/)
-            - "TencentMap China"  (from https://map.qq.com/)
-            - "BaiduMaps China"   (from https://map.baidu.com/) {
-                It is worked in some cases, but it is not recommended.
-            }
+    tiles (str): Map tileset to use. Chosen from the following list:
+            - "GeoQ China Community", "GeoQ China Street" (from http://www.geoq.cn/)
+            - "AMAP China" (from https://www.amap.com/)
+            - "TencentMap China" (from https://map.qq.com/)
+            - "BaiduMaps China" (from https://map.baidu.com/)
 
         Defaults to "GeoQ China Community".
 
-        These tileset have been corrected through the public algorithm on the Internet.
+        * All tilesets have been corrected through public algorithms from the Internet.
         * Please read the relevant terms of use carefully:
             - GeoQ [GISUNI] (http://geoq.cn/useragreement.html)
             - AMap [AutoNavi]  (https://wap.amap.com/doc/serviceitem.html)
@@ -80,8 +76,8 @@ def map_display(mask_path: str,
         folium.Map: An example of folium map.
     """
 
-    if tiles not in CHINATILES:
-        raise ValueError("The `tiles` must in {}, not {}.".format(CHINATILES,
+    if tiles not in CHINA_TILES:
+        raise ValueError("The `tiles` must in {}, not {}.".format(CHINA_TILES,
                                                                   tiles))
     fmap = Map(
         tiles=tiles,
