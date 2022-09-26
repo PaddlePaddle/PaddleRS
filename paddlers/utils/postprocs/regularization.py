@@ -38,18 +38,18 @@ def building_regularization(mask: np.ndarray, W: int=32) -> np.ndarray:
     (https://ieeexplore.ieee.org/document/8933116).
 
     This algorithm has no public code.
-    The implementation refers to original article and this repo: 
+    The implementation procedure refers to original article and this repo: 
     https://github.com/niecongchong/RS-building-regularization
 
-    The implementation procedure is not fully consistent with the article.
+    The implementation is not fully consistent with the article.
 
     Args:
-        mask (np.ndarray): The mask of building.
+        mask (np.ndarray): Mask of building.
         W (int, optional): Minimum threshold in main direction. Default is 32.
             The larger W, the more regular the image, but the worse the image detail.
 
     Returns:
-        np.ndarray: The mask of building after regularized.
+        np.ndarray: Mask of building after regularized.
     """
     # check and pro processing
     mask_shape = mask.shape
