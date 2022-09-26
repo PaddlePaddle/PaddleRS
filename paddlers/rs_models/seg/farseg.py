@@ -246,23 +246,23 @@ class AsymmetricDecoder(nn.Layer):
 
 class FarSeg(nn.Layer):
     """
-        The FarSeg implementation based on PaddlePaddle.
+    The FarSeg implementation based on PaddlePaddle.
 
-        The original article refers to
-        Zheng Z, Zhong Y, Wang J, et al. Foreground-aware relation network for geospatial object segmentation in
-        high spatial resolution remote sensing imagery[C]//Proceedings of the IEEE/CVF conference on computer vision
-        and pattern recognition. 2020: 4096-4105.
+    The original article refers to
+    Zheng Z, Zhong Y, Wang J, et al. Foreground-aware relation network for geospatial object segmentation in
+    high spatial resolution remote sensing imagery[C]//Proceedings of the IEEE/CVF conference on computer vision
+    and pattern recognition. 2020: 4096-4105.
 
-        Args:
-            in_channels (int): The number of image channels for the input model. Default: 3.
-            num_classes (int): The unique number of target classes. Default: 16.
-            backbone (str): A backbone network, models available in `paddle.vision.models.resnet`. Default: resnet50.
-            backbone_pretrained (bool): Whether the backbone network uses IMAGENET pretrained weights. Default: True.
-            fpn_out_channels (int): The number of channels output by the feature pyramid network. Default: 256.
-            fsr_out_channels (int): The number of channels output by the F-S relation module. Default: 256.
-            scale_aware_proj (bool): Whether to use scale awareness in F-S relation module. Default: True.
-            decoder_out_channels (int): The number of channels output by the decoder. Default: 128.
-        """
+    Args:
+        in_channels (int): The number of image channels for the input model. Default: 3.
+        num_classes (int): The unique number of target classes. Default: 16.
+        backbone (str): A backbone network, models available in `paddle.vision.models.resnet`. Default: resnet50.
+        backbone_pretrained (bool): Whether the backbone network uses IMAGENET pretrained weights. Default: True.
+        fpn_out_channels (int): The number of channels output by the feature pyramid network. Default: 256.
+        fsr_out_channels (int): The number of channels output by the F-S relation module. Default: 256.
+        scale_aware_proj (bool): Whether to use scale awareness in F-S relation module. Default: True.
+        decoder_out_channels (int): The number of channels output by the decoder. Default: 128.
+    """
 
     def __init__(self,
                  in_channels=3,
