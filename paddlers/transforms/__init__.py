@@ -33,8 +33,8 @@ def decode_image(im_path,
     
     Args:
         im_path (str): Path of the image to decode.
-        to_rgb (bool, optional): If True, convert input image(s) from BGR format to 
-            RGB format. Defaults to True.
+        to_rgb (bool, optional): (Deprecated) If True, convert input image(s) from 
+            BGR format to RGB format. Defaults to True.
         to_uint8 (bool, optional): If True, quantize and convert decoded image(s) to 
             uint8 type. Defaults to True.
         decode_bgr (bool, optional): If True, automatically interpret a non-geo 
@@ -46,9 +46,9 @@ def decode_image(im_path,
             the image. Deafults to False.
         use_stretch (bool, optional): Whether to apply 2% linear stretch. Valid only if 
             `to_uint8` is True. Defaults to False.
-        read_raw (bool, optional): If True, equivalent to setting `to_rgb` and `to_uint8`
-            to False. Setting `read_raw` takes precedence over setting `to_rgb` and 
-            `to_uint8`. Defaults to False.
+        read_raw (bool, optional): If True, equivalent to setting `to_rgb` to `True` and
+            `to_uint8` to False. Setting `read_raw` takes precedence over setting `to_rgb` 
+            and `to_uint8`. Defaults to False.
     
     Returns:
         np.ndarray|tuple: If `read_geo_info` is False, return the decoded image. 
@@ -61,7 +61,7 @@ def decode_image(im_path,
     if not osp.exists(im_path):
         raise ValueError(f"{im_path} does not exist!")
     if read_raw:
-        to_rgb = False
+        to_rgb = True
         to_uint8 = False
     decoder = T.DecodeImg(
         to_rgb=to_rgb,

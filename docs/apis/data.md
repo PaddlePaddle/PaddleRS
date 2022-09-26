@@ -133,13 +133,13 @@
 |参数名称|类型|参数说明|默认值|
 |-------|----|--------|-----|
 |`im_path`|`str`|输入图像路径。||
-|`to_rgb`|`bool`|若为`True`，则执行BGR到RGB格式的转换。|`True`|
+|`to_rgb`|`bool`|若为`True`，则执行BGR到RGB格式的转换。该参数已废弃，在将来可能被移除，请尽可能避免使用。|`True`|
 |`to_uint8`|`bool`|若为`True`，则将读取的影像数据量化并转换为uint8类型。|`True`|
 |`decode_bgr`|`bool`|若为`True`，则自动将非地学格式影像（如jpeg影像）解析为BGR格式。|`True`|
 |`decode_sar`|`bool`|若为`True`，则自动将单通道的地学格式影像（如GeoTiff影像）作为SAR影像解析。|`True`|
 |`read_geo_info`|`bool`|若为`True`，则从影像中读取地理信息。|`False`|
 |`use_stretch`|`bool`|是否对影像亮度进行2%线性拉伸。仅当`to_uint8`为`True`时有效。|`False`|
-|`read_raw`|`bool`|若为`True`，等价于指定`to_rgb`和`to_uint8`为`False`，且该参数的优先级高于上述参数。|`False`|
+|`read_raw`|`bool`|若为`True`，等价于指定`to_rgb`为`True`而`to_uint8`为`False`，且该参数的优先级高于上述参数。|`False`|
 
 返回格式如下：
 
