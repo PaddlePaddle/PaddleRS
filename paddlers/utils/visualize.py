@@ -67,7 +67,7 @@ def map_display(mask_path: str,
 
         * All tilesets have been corrected through public algorithms from the Internet.
         * Please read the relevant terms of use carefully:
-            - GeoQ [GISUNI] (http://geoq.cn/useragreement.html)
+            - GeoQ [GISUNI]  (http://geoq.cn/useragreement.html)
             - AMap [AutoNavi]  (https://wap.amap.com/doc/serviceitem.html)
             - Tencent Map  (https://ugc.map.qq.com/AppBox/Landlord/serveagreement.html)
             - Baidu Map  (https://map.baidu.com/zt/client/service/index.html)
