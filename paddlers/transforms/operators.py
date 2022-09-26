@@ -257,6 +257,8 @@ class DecodeImg(Transform):
             else:
                 im_data = cv2.imread(img_path, cv2.IMREAD_ANYDEPTH |
                                      cv2.IMREAD_ANYCOLOR)
+            if self.to_rgb and im_data.shape[-1] == 3:
+                im_data = cv2.cvtColor(im_data, cv2.COLOR_BGR2RGB)
         elif ext == '.npy':
             im_data = np.load(img_path)
         else:
@@ -281,9 +283,6 @@ class DecodeImg(Transform):
                 image = data
         else:
             image = im_path
-
-        if self.to_rgb and image.shape[-1] == 3:
-            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
         if self.to_uint8:
             image = F.to_uint8(image, stretch=self.use_stretch)
