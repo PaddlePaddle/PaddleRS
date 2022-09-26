@@ -18,10 +18,11 @@
 
 import math
 
-import numpy as np
 import paddle.nn as nn
 import paddle.nn.functional as F
 from paddle.vision.models import resnet
+
+from paddlers.models.ppdet.modeling import initializer as init
 
 
 class FPNConvBlock(nn.Conv2D):
@@ -37,10 +38,9 @@ class FPNConvBlock(nn.Conv2D):
             kernel_size=kernel_size,
             stride=stride,
             padding=dilation * (kernel_size - 1) // 2,
-            dilation=dilation,
-            weight_attr=nn.initializer.KaimingUniform(
-                negative_slope=1.0, nonlinearity='leaky_relu'),
-            bias_attr=nn.initializer.Constant(0.0))
+            dilation=dilation)
+        init.kaiming_uniform_(self.weight, a=1)
+        init.constant_(self.bias, value=0)
 
 
 class DefaultConvBlock(nn.Conv2D):
@@ -57,30 +57,12 @@ class DefaultConvBlock(nn.Conv2D):
             kernel_size,
             stride=stride,
             padding=padding,
-            weight_attr=nn.initializer.KaimingUniform(
-                negative_slope=math.sqrt(5.), nonlinearity='leaky_relu'),
             bias_attr=bias_attr)
+        init.kaiming_uniform_(self.weight, a=math.sqrt(5))
         if self.bias is not None:
-            fan_in, _ = self._compute_fans(self.weight)
+            fan_in, _ = init._calculate_fan_in_and_fan_out(self.weight)
             bound = 1 / math.sqrt(fan_in)
-            uniformer = nn.initializer.Uniform(-bound, bound)
-            uniformer(self.bias)
-
-    @staticmethod
-    def _compute_fans(var):
-        shape = var.shape
-        if not shape or len(shape) == 0:
-            fan_in = fan_out = 1
-        elif len(shape) == 1:
-            fan_in = fan_out = shape[0]
-        elif len(shape) == 2:
-            fan_in = shape[0]
-            fan_out = shape[1]
-        else:
-            receptive_field_size = np.prod(shape[2:])
-            fan_in = shape[1] * receptive_field_size
-            fan_out = shape[0] * receptive_field_size
-        return fan_in, fan_out
+            init.uniform_(self.bias, -bound, bound)
 
 
 class ResNetEncoder(nn.Layer):
