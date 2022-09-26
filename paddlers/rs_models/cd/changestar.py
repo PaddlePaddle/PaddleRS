@@ -14,7 +14,6 @@
 
 import paddle
 import paddle.nn as nn
-import paddle.nn.functional as F
 
 from paddlers.datasets.cd_dataset import MaskType
 from paddlers.rs_models.seg import FarSeg
@@ -22,7 +21,6 @@ from .layers import Conv3x3, Identity
 
 
 class _ChangeStarBase(nn.Layer):
-
     USE_MULTITASK_DECODER = True
     OUT_TYPES = (MaskType.CD, MaskType.CD, MaskType.SEG_T1, MaskType.SEG_T2)
 
@@ -118,22 +116,12 @@ class ChangeStar_FarSeg(_ChangeStarBase):
             def __init__(self, seg_model):
                 super(_FarSegWrapper, self).__init__()
                 self._seg_model = seg_model
-                self._seg_model.cls_pred_conv = Identity()
+                self._seg_model.cls_head = Identity()
 
             def forward(self, x):
-                feat_list = self._seg_model.en(x)
-                fpn_feat_list = self._seg_model.fpn(feat_list)
-                if self._seg_model.scene_relation:
-                    c5 = feat_list[-1]
-                    c6 = self._seg_model.gap(c5)
-                    refined_fpn_feat_list = self._seg_model.sr(c6,
-                                                               fpn_feat_list)
-                else:
-                    refined_fpn_feat_list = fpn_feat_list
-                final_feat = self._seg_model.decoder(refined_fpn_feat_list)
-                return [final_feat]
+                return self._seg_model(x)
 
-        seg_model = FarSeg(out_ch=mid_channels)
+        seg_model = FarSeg(decoder_out_channels=mid_channels)
 
         super(ChangeStar_FarSeg, self).__init__(
             seg_model=_FarSegWrapper(seg_model),
