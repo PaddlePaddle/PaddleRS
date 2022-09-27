@@ -90,7 +90,8 @@ class BaseModel(metaclass=ModelMeta):
                        pretrain_weights=None,
                        save_dir='.',
                        resume_checkpoint=None,
-                       is_backbone_weights=False):
+                       is_backbone_weights=False,
+                       load_optim_state=True):
         if pretrain_weights is not None and \
                 not osp.exists(pretrain_weights):
             if not osp.isdir(save_dir):
@@ -148,7 +149,8 @@ class BaseModel(metaclass=ModelMeta):
                 self.net,
                 self.optimizer,
                 model_name=self.model_name,
-                checkpoint=resume_checkpoint)
+                checkpoint=resume_checkpoint,
+                load_optim_state=load_optim_state)
 
     def get_model_info(self, get_raw_params=False, inplace=True):
         if inplace:

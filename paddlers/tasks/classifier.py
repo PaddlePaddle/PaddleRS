@@ -432,6 +432,7 @@ class BaseClassifier(BaseModel):
 
             return eval_metrics
 
+    @paddle.no_grad()
     def predict(self, img_file, transforms=None):
         """
         Do inference.
