@@ -655,17 +655,13 @@ class BaseRestorer(BaseModel):
         if squeeze:
             tensor = tensor.squeeze()
         images = tensor.numpy().astype('float32')
-        images = self._normalize(
-            images, copy=True, clip=True, quantize=quantize)
+        images = self._normalize(images, copy=True, quantize=quantize)
         return images
 
-    def _normalize(self, im, copy=False, clip=True, quantize=True):
+    def _normalize(self, im, copy=False, quantize=True):
         if copy:
             im = im.copy()
-        if clip:
-            im = np.clip(im, self.min_max[0], self.min_max[1])
-        im -= self.min_max[0]
-        im /= self.min_max[1] - self.min_max[0]
+        im = np.clip(im, self.min_max[0], self.min_max[1])
         if quantize:
             im *= 255
             im = im.astype('uint8')
