@@ -13,3 +13,4 @@
 # limitations under the License.
 
 from .regularization import building_regularization
+from .connection import cut_road_connection
