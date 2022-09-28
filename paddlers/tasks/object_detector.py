@@ -567,6 +567,7 @@ class BaseDetector(BaseModel):
                 return scores, self.eval_details
             return scores
 
+    @paddle.no_grad()
     def predict(self, img_file, transforms=None):
         """
         Do inference.

@@ -28,9 +28,9 @@ Linux GPU/CPU 基础训练推理测试的主程序为`test_train_inference_pytho
 |  目标检测  | PP-YOLO Tiny | 正常训练 | 正常训练 | 暂无稳定精度 |
 |  目标检测  | PP-YOLOv2 | 正常训练 | 正常训练 | 暂无稳定精度 |
 |  目标检测  | YOLOv3 | 正常训练 | 正常训练 | 暂无稳定精度 |
-|  图像复原  | DRN | 正常训练 | 正常训练 | PSNR=24.14 |
-|  图像复原  | ESRGAN | 正常训练 | 正常训练 | PSNR=21.25 |
-|  图像复原  | LESRCNN | 正常训练 | 正常训练 | PSNR=22.96 |
+|  图像复原  | DRN | 正常训练 | 正常训练 | PSNR=24.92 |
+|  图像复原  | ESRGAN | 正常训练 | 正常训练 | PSNR=21.39 |
+|  图像复原  | LESRCNN | 正常训练 | 正常训练 | PSNR=23.67 |
 |  图像分割  | BiSeNet V2 | 正常训练 | 正常训练 | mIoU=70.52% |
 |  图像分割  | DeepLab V3+ | 正常训练 | 正常训练 | mIoU=64.41% |
 |  图像分割  | FarSeg | 正常训练 | 正常训练 | mIoU=50.60% |

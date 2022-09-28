@@ -30,6 +30,7 @@
 
 - 一般支持设置`sr_factor`参数，表示超分辨率倍数；对于不支持超分辨率重建任务的模型，`sr_factor`设置为`None`。
 - 可通过`losses`参数指定模型训练时使用的损失函数，传入实参需为可调用对象或字典。手动指定的`losses`与子类的`default_loss()`方法返回值必须具有相同的格式。
+- 可通过`min_max`参数指定模型输入、输出的数值范围；若为`None`，则使用类默认的数值范围。
 - 不同的子类支持与模型相关的输入参数，详情请参考[模型定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/rs_models/res)和[训练器定义](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/restorer.py)。
 
 ### 初始化`BaseSegmenter`子类对象

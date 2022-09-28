@@ -527,11 +527,16 @@ def load_optimizer(optimizer, state_dict_path):
     optimizer.set_state_dict(optim_state_dict)
 
 
-def load_checkpoint(model, optimizer, model_name, checkpoint):
+def load_checkpoint(model,
+                    optimizer,
+                    model_name,
+                    checkpoint,
+                    load_optim_state=True):
     logging.info("Loading checkpoint from {}".format(checkpoint))
     load_pretrain_weights(
         model,
         pretrain_weights=osp.join(checkpoint, 'model.pdparams'),
         model_name=model_name)
-    load_optimizer(
-        optimizer, state_dict_path=osp.join(checkpoint, "model.pdopt"))
+    if load_optim_state:
+        load_optimizer(
+            optimizer, state_dict_path=osp.join(checkpoint, "model.pdopt"))

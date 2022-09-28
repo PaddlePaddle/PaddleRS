@@ -528,6 +528,7 @@ class BaseChangeDetector(BaseModel):
             return eval_metrics, eval_details
         return eval_metrics
 
+    @paddle.no_grad()
     def predict(self, img_file, transforms=None):
         """
         Do inference.
