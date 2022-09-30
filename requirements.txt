@@ -10,7 +10,7 @@ lap
 motmetrics
 munch
 natsort
-numba == 0.53.1
+numba == 0.56.2
 opencv-contrib-python == 4.3.0.38
 openpyxl
 # paddlepaddle >= 2.2.0
