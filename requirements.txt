@@ -11,7 +11,7 @@ motmetrics
 munch
 natsort
 numba == 0.56.2
-opencv-contrib-python == 4.3.0.38
+opencv-contrib-python == 4.6.0.66
 openpyxl
 # paddlepaddle >= 2.2.0
 # paddlepaddle-gpu >= 2.2.0
