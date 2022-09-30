@@ -146,4 +146,6 @@ python extract_ms_patches.py --image_paths {一个或多个输入影像路径} -
 - `--nonzero_ratio`：指定一个阈值，对于任意一幅源影像，若影像块中非零像素占比小于此阈值，则该影像块将被舍弃。若为`None`，则表示不进行过滤。默认为`None`。
 - `--visualize`：若指定此选项，则程序执行完毕后将生成图像`./vis_quadtree.png`，其中保存有四叉树中节点情况的可视化结果，一个例子如下图所示：
 
-![vis_quadtree_example](https://user-images.githubusercontent.com/21275753/189264850-f94b3d7b-c631-47b1-9833-0800de2ccf54.png)
+<div align="center">
+<img src="https://user-images.githubusercontent.com/21275753/189264850-f94b3d7b-c631-47b1-9833-0800de2ccf54.png"  width = "400" />  
+</div>
