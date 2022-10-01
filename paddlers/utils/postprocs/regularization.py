@@ -15,9 +15,7 @@
 import math
 import cv2
 import numpy as np
-from .utils import (calc_distance, calc_angle, calc_azimuth, rotation, line,
-                    intersection, calc_distance_between_lines,
-                    calc_project_in_line)
+from .utils import prepro_mask, calc_distance
 
 S = 20
 TD = 3
@@ -52,15 +50,7 @@ def building_regularization(mask: np.ndarray, W: int=32) -> np.ndarray:
         np.ndarray: Mask of building after regularized.
     """
     # check and pro processing
-    mask_shape = mask.shape
-    if len(mask_shape) != 2:
-        mask = mask[..., 0]
-    mask = cv2.medianBlur(mask, 5)
-    class_num = len(np.unique(mask))
-    if class_num != 2:
-        _, mask = cv2.threshold(mask, 0, 255, cv2.THRESH_BINARY |
-                                cv2.THRESH_OTSU)
-    mask = np.clip(mask, 0, 1).astype("uint8")  # 0-255 / 0-1 -> 0-1
+    mask = prepro_mask(mask)
     mask_shape = mask.shape
     # find contours
     contours, hierarchys = cv2.findContours(mask, cv2.RETR_TREE,
@@ -115,7 +105,7 @@ def _coarse(contour, img_shape):
             continue
         # remove over-sharp angles with threshold α.
         # remove over-smooth angles with threshold β.
-        angle = calc_angle(last_point, current_point, next_point)
+        angle = _calc_angle(last_point, current_point, next_point)
         if (ALPHA > angle or angle > BETA) and _inline_check(current_point,
                                                              img_shape):
             contour = np.delete(contour, idx, axis=0)
@@ -143,7 +133,7 @@ def _fine(contour, W):
         next_idx = (idx + 1) % p_number
         next_point = contour[next_idx]
         distance_list.append(calc_distance(current_point, next_point))
-        azimuth_list.append(calc_azimuth(current_point, next_point))
+        azimuth_list.append(_calc_azimuth(current_point, next_point))
         indexs_list.append((idx, next_idx))
     # add the direction of the longest edge to the list of main direction.
     longest_distance_idx = np.argmax(distance_list)
@@ -177,11 +167,11 @@ def _fine(contour, W):
             abs_rotate_ang = abs(rotate_ang)
             # adjust long edges according to the list and angles.
             if abs_rotate_ang < DELTA or abs_rotate_ang > (180 - DELTA):
-                rp1 = rotation(p1, pm, rotate_ang)
-                rp2 = rotation(p2, pm, rotate_ang)
+                rp1 = _rotation(p1, pm, rotate_ang)
+                rp2 = _rotation(p2, pm, rotate_ang)
             elif (90 - DELTA) < abs_rotate_ang < (90 + DELTA):
-                rp1 = rotation(p1, pm, rotate_ang - 90)
-                rp2 = rotation(p2, pm, rotate_ang - 90)
+                rp1 = _rotation(p1, pm, rotate_ang - 90)
+                rp2 = _rotation(p2, pm, rotate_ang - 90)
             else:
                 rp1, rp2 = p1, p2
         # adjust short edges (judged by a threshold θ) according to the list and angles.
@@ -189,11 +179,11 @@ def _fine(contour, W):
             rotate_ang = md_used_list[-1] - azimuth
             abs_rotate_ang = abs(rotate_ang)
             if abs_rotate_ang < THETA or abs_rotate_ang > (180 - THETA):
-                rp1 = rotation(p1, pm, rotate_ang)
-                rp2 = rotation(p2, pm, rotate_ang)
+                rp1 = _rotation(p1, pm, rotate_ang)
+                rp2 = _rotation(p2, pm, rotate_ang)
             else:
-                rp1 = rotation(p1, pm, rotate_ang - 90)
-                rp2 = rotation(p2, pm, rotate_ang - 90)
+                rp1 = _rotation(p1, pm, rotate_ang - 90)
+                rp2 = _rotation(p2, pm, rotate_ang - 90)
         # contour_by_lines.extend([rp1, rp2])
         contour_by_lines.append([rp1[0], rp2[0]])
     correct_points = np.array(contour_by_lines)
@@ -208,35 +198,35 @@ def _fine(contour, W):
         cur_edge_p2 = correct_points[idx][1]
         next_edge_p1 = correct_points[next_idx][0]
         next_edge_p2 = correct_points[next_idx][1]
-        L1 = line(cur_edge_p1, cur_edge_p2)
-        L2 = line(next_edge_p1, next_edge_p2)
-        A1 = calc_azimuth([cur_edge_p1], [cur_edge_p2])
-        A2 = calc_azimuth([next_edge_p1], [next_edge_p2])
+        L1 = _line(cur_edge_p1, cur_edge_p2)
+        L2 = _line(next_edge_p1, next_edge_p2)
+        A1 = _calc_azimuth([cur_edge_p1], [cur_edge_p2])
+        A2 = _calc_azimuth([next_edge_p1], [next_edge_p2])
         dif_azi = abs(A1 - A2)
         # find intersection point if not parallel
         if (90 - DELTA) < dif_azi < (90 + DELTA):
-            point_intersection = intersection(L1, L2)
+            point_intersection = _intersection(L1, L2)
             if point_intersection is not None:
                 final_points.append(point_intersection)
         # move or add lines when parallel
         elif dif_azi < 1e-6:
-            marg = calc_distance_between_lines(L1, L2)
+            marg = _calc_distance_between_lines(L1, L2)
             if marg < D:
                 # move
-                point_move = calc_project_in_line(next_edge_p1, cur_edge_p1,
-                                                  cur_edge_p2)
+                point_move = _calc_project_in_line(next_edge_p1, cur_edge_p1,
+                                                   cur_edge_p2)
                 final_points.append(point_move)
                 # update next
                 correct_points[next_idx][0] = point_move
-                correct_points[next_idx][1] = calc_project_in_line(
+                correct_points[next_idx][1] = _calc_project_in_line(
                     next_edge_p2, cur_edge_p1, cur_edge_p2)
             else:
-                # add line
+                # add _line
                 add_mid_point = (cur_edge_p2 + next_edge_p1) / 2
-                rp1 = calc_project_in_line(add_mid_point, cur_edge_p1,
-                                           cur_edge_p2)
-                rp2 = calc_project_in_line(add_mid_point, next_edge_p1,
-                                           next_edge_p2)
+                rp1 = _calc_project_in_line(add_mid_point, cur_edge_p1,
+                                            cur_edge_p2)
+                rp2 = _calc_project_in_line(add_mid_point, next_edge_p1,
+                                            next_edge_p2)
                 final_points.extend([rp1, rp2])
         else:
             final_points.extend(
@@ -262,3 +252,96 @@ def _fill(img, coarse_conts):
         else:
             cv2.fillPoly(result, [contour.astype(np.int32)], (255, 255, 255))
     return result
+
+
+def _calc_angle(p1, vertex, p2):
+    x1, y1 = p1[0]
+    xv, yv = vertex[0]
+    x2, y2 = p2[0]
+    a = ((xv - x2) * (xv - x2) + (yv - y2) * (yv - y2))**0.5
+    b = ((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2))**0.5
+    c = ((x1 - xv) * (x1 - xv) + (y1 - yv) * (y1 - yv))**0.5
+    return math.degrees(math.acos((b**2 - a**2 - c**2) / (-2 * a * c)))
+
+
+def _calc_azimuth(p1, p2):
+    x1, y1 = p1[0]
+    x2, y2 = p2[0]
+    if y1 == y2:
+        return 0.0
+    if x1 == x2:
+        return 90.0
+    elif x1 < x2:
+        if y1 < y2:
+            ang = math.atan((y2 - y1) / (x2 - x1))
+            return math.degrees(ang)
+        else:
+            ang = math.atan((y1 - y2) / (x2 - x1))
+            return 180 - math.degrees(ang)
+    else:  # x1 > x2
+        if y1 < y2:
+            ang = math.atan((y2 - y1) / (x1 - x2))
+            return 180 - math.degrees(ang)
+        else:
+            ang = math.atan((y1 - y2) / (x1 - x2))
+            return math.degrees(ang)
+
+
+def _rotation(point, center, angle):
+    if angle == 0:
+        return point
+    x, y = point[0]
+    cx, cy = center[0]
+    radian = math.radians(abs(angle))
+    if angle > 0:  # clockwise
+        rx = (x - cx) * math.cos(radian) - (y - cy) * math.sin(radian) + cx
+        ry = (x - cx) * math.sin(radian) + (y - cy) * math.cos(radian) + cy
+    else:
+        rx = (x - cx) * math.cos(radian) + (y - cy) * math.sin(radian) + cx
+        ry = (y - cy) * math.cos(radian) - (x - cx) * math.sin(radian) + cy
+    return np.array([[rx, ry]])
+
+
+def _line(p1, p2):
+    A = (p1[1] - p2[1])
+    B = (p2[0] - p1[0])
+    C = (p1[0] * p2[1] - p2[0] * p1[1])
+    return A, B, -C
+
+
+def _intersection(L1, L2):
+    D = L1[0] * L2[1] - L1[1] * L2[0]
+    Dx = L1[2] * L2[1] - L1[1] * L2[2]
+    Dy = L1[0] * L2[2] - L1[2] * L2[0]
+    if D != 0:
+        x = Dx / D
+        y = Dy / D
+        return np.array([[x, y]])
+    else:
+        return None
+
+
+def _calc_distance_between_lines(L1, L2):
+    eps = 1e-16
+    A1, _, C1 = L1
+    A2, B2, C2 = L2
+    new_C1 = C1 / (A1 + eps)
+    new_A2 = 1
+    new_B2 = B2 / (A2 + eps)
+    new_C2 = C2 / (A2 + eps)
+    dist = (np.abs(new_C1 - new_C2)) / (
+        np.sqrt(new_A2 * new_A2 + new_B2 * new_B2) + eps)
+    return dist
+
+
+def _calc_project_in_line(point, line_point1, line_point2):
+    eps = 1e-16
+    m, n = point
+    x1, y1 = line_point1
+    x2, y2 = line_point2
+    F = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)
+    x = (m * (x2 - x1) * (x2 - x1) + n * (y2 - y1) * (x2 - x1) +
+         (x1 * y2 - x2 * y1) * (y2 - y1)) / (F + eps)
+    y = (m * (x2 - x1) * (y2 - y1) + n * (y2 - y1) * (y2 - y1) +
+         (x2 * y1 - x1 * y2) * (x2 - x1)) / (F + eps)
+    return np.array([[x, y]])
