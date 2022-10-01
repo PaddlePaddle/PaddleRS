@@ -119,6 +119,7 @@ PaddleRS具有以下五大特色：
           <li>ReduceDim</li>  
           <li>SelectBand</li>  
           <li>RandomSwap</li>
+          <li>AppendIndex</li>
           <li>...</li>
         </ul>  
       </td>
@@ -136,6 +137,17 @@ PaddleRS具有以下五大特色：
           <li>影像配准</li>
           <li>波段选择</li>
           <li>辐射校正</li>
+          <li>...</li>
+        </ul>
+        <b>数据后处理</b><br>
+        <ul>
+          <li>建筑边界规则化</li>
+          <li>道路断线连接</li>
+          <li>...</li>
+        </ul>
+        <b>数据可视化</b><br>
+        <ul>
+          <li>地图-栅格可视化</li>
           <li>...</li>
         </ul>
       </td>
@@ -177,8 +189,10 @@ PaddleRS目录树中关键部分如下：
 │     ├── datasets       # 数据集接口实现
 │     ├── models         # 视觉模型实现
 │     ├── tasks          # 训练器实现
-│     └── transforms     # 数据预处理/数据增强实现
+│     ├── transforms     # 数据预处理/数据增强实现
+│     └── utils          # 数据下载/可视化/后处理等
 ├── tools                # 遥感影像处理工具集
+├── examples             # 相关实践案例
 └── tutorials
       └── train          # 模型训练教程
 ```
