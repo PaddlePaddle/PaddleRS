@@ -20,6 +20,7 @@ def prepro_mask(mask: np.ndarray):
     mask_shape = mask.shape
     if len(mask_shape) != 2:
         mask = mask[..., 0]
+    mask = mask.astype("uint8")
     mask = cv2.medianBlur(mask, 5)
     class_num = len(np.unique(mask))
     if class_num != 2:

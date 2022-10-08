@@ -13,8 +13,10 @@
 # limitations under the License.
 
 import math
+
 import cv2
 import numpy as np
+
 from .utils import prepro_mask, calc_distance
 
 S = 20

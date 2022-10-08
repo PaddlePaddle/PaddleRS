@@ -12,23 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import itertools
 import warnings
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-import itertools
 import cv2
 import numpy as np
 from skimage import morphology
 from sklearn import metrics
 from sklearn.cluster import KMeans
 from scipy import ndimage, optimize
+
 from .utils import prepro_mask, calc_distance
 
 
 def cut_road_connection(mask: np.ndarray, line_width: int=6) -> np.ndarray:
     """
-    Connection of cut road lines.
+    Connecting cut road lines.
 
     The original article refers to
     Wang B, Chen Z, et al. "Road extraction of high-resolution satellite remote sensing images in U-Net network with consideration of connectivity."
@@ -37,6 +38,8 @@ def cut_road_connection(mask: np.ndarray, line_width: int=6) -> np.ndarray:
     This algorithm has no public code.
     The implementation procedure refers to original article,
     and it is not fully consistent with the article.
+    1. It is an implementation of uncertainty about `n_clusters` of KMeans in the original article.
+    2. Add filter 2 breakpoints if its angle between the road extension line direction is less than 90°.
 
     Args:
         mask (np.ndarray): Mask of road.
@@ -44,7 +47,7 @@ def cut_road_connection(mask: np.ndarray, line_width: int=6) -> np.ndarray:
             . Default is 6.
 
     Returns:
-        np.ndarray: Mask of road after connected to cut road lines.
+        np.ndarray: Mask of road after connecting cut road lines.
     """
     mask = prepro_mask(mask)
     skeleton = morphology.skeletonize(mask).astype("uint8")
@@ -93,8 +96,8 @@ def _get_match_points(break_points, labels):
 
 
 def _draw_curve(mask, skeleton, match_points, line_width):
-    result = mask.copy() * 255
-    for _, v in match_points.items():
+    result = mask * 255
+    for v in match_points.values():
         p_num = len(v)
         if p_num == 2:
             points_list = _curve_backtracking(v, skeleton)
