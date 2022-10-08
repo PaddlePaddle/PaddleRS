@@ -223,7 +223,7 @@ def _fine(contour, W):
                 correct_points[next_idx][1] = _calc_project_in_line(
                     next_edge_p2, cur_edge_p1, cur_edge_p2)
             else:
-                # add _line
+                # add line
                 add_mid_point = (cur_edge_p2 + next_edge_p1) / 2
                 rp1 = _calc_project_in_line(add_mid_point, cur_edge_p1,
                                             cur_edge_p2)

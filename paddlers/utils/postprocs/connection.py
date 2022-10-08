@@ -15,14 +15,15 @@
 import itertools
 import warnings
 
-warnings.filterwarnings("ignore", category=DeprecationWarning)
-
 import cv2
 import numpy as np
 from skimage import morphology
-from sklearn import metrics
-from sklearn.cluster import KMeans
 from scipy import ndimage, optimize
+
+with warnings.catch_warnings():
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
+    from sklearn import metrics
+    from sklearn.cluster import KMeans
 
 from .utils import prepro_mask, calc_distance
 
@@ -37,9 +38,9 @@ def cut_road_connection(mask: np.ndarray, line_width: int=6) -> np.ndarray:
 
     This algorithm has no public code.
     The implementation procedure refers to original article,
-    and it is not fully consistent with the article.
-    1. It is an implementation of uncertainty about `n_clusters` of KMeans in the original article.
-    2. Add filter 2 breakpoints if its angle between the road extension line direction is less than 90°.
+    and it is not fully consistent with the article:
+    1. The way to determine the optimal number of clusters k used in k-means clustering is not described in the original article. In this implementation, we use the k that reports the highest silhouette score.
+    2. We unmark the breakpoints if the angle between the two road extensions is less than 90°.
 
     Args:
         mask (np.ndarray): Mask of road.
