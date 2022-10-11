@@ -36,7 +36,7 @@ from .utils import seg_metrics as metrics
 from .utils.infer_nets import InferSegNet
 from .utils.slider_predict import slider_predict
 
-__all__ = ["UNet", "DeepLabV3P", "FastSCNN", "HRNet", "BiSeNetV2", "FarSeg"]
+__all__ = ["UNet", "DeepLabV3P", "FastSCNN", "HRNet", "BiSeNetV2", "FarSeg", "FactSeg"]
 
 
 class BaseSegmenter(BaseModel):
@@ -889,6 +889,22 @@ class FarSeg(BaseSegmenter):
                  **params):
         super(FarSeg, self).__init__(
             model_name='FarSeg',
+            num_classes=num_classes,
+            use_mixed_loss=use_mixed_loss,
+            losses=losses,
+            in_channels=in_channels,
+            **params)
+
+
+class FactSeg(BaseSegmenter):
+    def __init__(self,
+                 in_channels=3,
+                 num_classes=16,
+                 use_mixed_loss=False,
+                 losses=None,
+                 **params):
+        super(FactSeg, self).__init__(
+            model_name='FactSeg',
             num_classes=num_classes,
             use_mixed_loss=use_mixed_loss,
             losses=losses,

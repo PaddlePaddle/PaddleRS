@@ -15,7 +15,7 @@
 import paddlers
 from rs_models.test_model import TestModel
 
-__all__ = ['TestFarSegModel']
+__all__ = ['TestFarSegModel', 'TestFactSegModel']
 
 
 class TestSegModel(TestModel):
@@ -59,6 +59,22 @@ class TestFarSegModel(TestSegModel):
                         fpn_out_channels=128,
                         fsr_out_channels=64,
                         decoder_out_channels=32), dict(scale_aware_proj=False)
+        ]
+
+    def set_targets(self):
+        self.targets = [[self.get_zeros_array(16)], [self.get_zeros_array(10)],
+                        [self.get_zeros_array(16)], [self.get_zeros_array(16)],
+                        [self.get_zeros_array(16)]]
+
+
+class TestFactSegModel(TestSegModel):
+    MODEL_CLASS = paddlers.rs_models.seg.FactSeg
+
+    def set_specs(self):
+        self.specs = [
+            dict(), dict(
+                in_channels=6, num_classes=10), dict(
+                    backbone='resnet18', backbone_pretrained=False)
         ]
 
     def set_targets(self):
