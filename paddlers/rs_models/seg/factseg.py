@@ -205,7 +205,7 @@ class ResNetEncoder(nn.Layer):
         return _function
 
     def forward(self, inputs):
-        global c2, c3, c4
+        c2, c3, c4 = None, None, None
         x = inputs
         x = self.resnet.conv1(x)
         x = self.resnet.bn1(x)
@@ -400,6 +400,6 @@ class FactSeg(nn.Layer):
             cls_prob = F.softmax(fg_pred, axis=1)
             cls_prob[:, 0, :, :] = cls_prob[:, 0, :, :] * (1 - binary_prob).squeeze(axis=1)
             cls_prob[:, 1:, :, :] = cls_prob[:, 1:, :, :] * binary_prob
-            Z = paddle.sum(cls_prob, axis=1)
-            cls_prob = paddle.divide(cls_prob, Z)
+            z = paddle.sum(cls_prob, axis=1)
+            cls_prob = paddle.divide(cls_prob, z)
             return [cls_prob]
