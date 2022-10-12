@@ -413,5 +413,6 @@ class FactSeg(nn.Layer):
                             1 - binary_prob).squeeze(axis=1)
             cls_prob[:, 1:, :, :] = cls_prob[:, 1:, :, :] * binary_prob
             z = paddle.sum(cls_prob, axis=1)
+            z = z.unsqueeze(axis=1)
             cls_prob = paddle.divide(cls_prob, z)
             return [cls_prob]
