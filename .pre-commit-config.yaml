@@ -1,17 +1,28 @@
-# See https://pre-commit.com for more information
-# See https://pre-commit.com/hooks.html for more hooks
 repos:
+-   repo: https://github.com/PaddlePaddle/mirrors-yapf.git
+    rev: 0d79c0c469bab64f7229c9aca2b1186ef47f0e37
+    hooks:
+    -   id: yapf
+        files: \.py$
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.4.0
+    rev: a11d9314b22d8f8c7556443875b731ef05965464
     hooks:
-    -   id: check-xml
-    -   id: check-added-large-files
-    -   id: check-byte-order-marker
--   repo: https://gitlab.com/pycqa/flake8
-    rev: '3.7.9'
+    -   id: check-merge-conflict
+    -   id: check-symlinks
+    -   id: detect-private-key
+        files: (?!.*paddle)^.*$
+    -   id: end-of-file-fixer
+        files: \.md$
+    -   id: trailing-whitespace
+        files: \.md$
+-   repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.0.1
     hooks:
-    -   id: flake8
--   repo: https://github.com/codespell-project/codespell
-    rev: v1.16.0
-    hooks:
-    -   id: codespell
+    -   id: forbid-crlf
+        files: \.md$
+    -   id: remove-crlf
+        files: \.md$
+    -   id: forbid-tabs
+        files: \.md$
+    -   id: remove-tabs
+        files: \.md$
