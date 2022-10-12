@@ -85,9 +85,15 @@ class FPN(nn.Layer):
         last_inner = getattr(self, self.inner_blocks[-1])(x[-1])
         results = [getattr(self, self.layer_blocks[-1])(last_inner)]
         for i, feature in enumerate(x[-2::-1]):
-            inner_block = getattr(self, self.inner_blocks[len(self.inner_blocks) - 2 - i])
-            layer_block = getattr(self, self.layer_blocks[len(self.layer_blocks) - 2 - i])
-            inner_top_down = F.interpolate(last_inner, scale_factor=2, mode='nearest')
+            inner_block = getattr(self,
+                                  self.inner_blocks[
+                                      len(self.inner_blocks) - 2 - i]
+                                  )
+            layer_block = getattr(self,
+                                  self.layer_blocks[
+                                      len(self.layer_blocks) - 2 - i])
+            inner_top_down = F.interpolate(last_inner,
+                                           scale_factor=2, mode='nearest')
             inner_laternal = inner_block(feature)
             last_inner = inner_laternal + inner_top_down
             results.insert(0, layer_block(last_inner))
@@ -270,22 +276,30 @@ class AssymetricDecoder(nn.Layer):
             norm_fn_args = dict(num_features=out_channels)
         elif norm_fn == nn.GroupNorm:
             if num_groups_gn is None:
-                raise ValueError('When norm_fn is nn.GroupNorm, num_groups_gn is needed.')
-            norm_fn_args = dict(num_groups=num_groups_gn, num_channels=out_channels)
+                raise ValueError(
+                    'When norm_fn is nn.GroupNorm, num_groups_gn is needed.')
+            norm_fn_args = dict(num_groups=num_groups_gn,
+                                num_channels=out_channels)
         else:
-            raise ValueError('Type of {} is not support.'.format(type(norm_fn)))
+            raise ValueError(
+                'Type of {} is not support.'.format(type(norm_fn)))
         self.blocks = nn.LayerList()
         for in_feat_os in in_feat_output_strides:
-            num_upsample = int(math.log2(int(in_feat_os))) - int(math.log2(int(out_feat_output_stride)))
+            num_upsample = int(math.log2(int(in_feat_os))) - \
+                           int(math.log2(int(out_feat_output_stride)))
 
             num_layers = num_upsample if num_upsample != 0 else 1
 
             self.blocks.append(nn.Sequential(*[
                 nn.Sequential(
-                    nn.Conv2D(in_channels if idx == 0 else out_channels, out_channels, 3, 1, 1, bias_attr=False),
-                    norm_fn(**norm_fn_args) if norm_fn is not None else nn.Identity(),
+                    nn.Conv2D(in_channels if idx == 0
+                              else out_channels, out_channels, 3, 1, 1,
+                              bias_attr=False),
+                    norm_fn(**norm_fn_args) if norm_fn is not None
+                    else nn.Identity(),
                     nn.ReLU(),
-                    nn.UpsamplingBilinear2D(scale_factor=2) if num_upsample != 0 else nn.Identity(),
+                    nn.UpsamplingBilinear2D(scale_factor=2)
+                    if num_upsample != 0 else nn.Identity(),
                 )
                 for idx in range(num_layers)]))
 
@@ -299,31 +313,25 @@ class AssymetricDecoder(nn.Layer):
         return out_feat
 
 
-def som(loss, ratio):
-    num_inst = loss.numel()
-    num_hns = int(ratio * num_inst)
-
-    top_loss, _ = loss.reshape(-1).topk(num_hns, -1)
-    loss_mask = (top_loss != 0)
-
-    return paddle.sum(top_loss[loss_mask]) / (loss_mask.sum())
-
-
 class FactSeg(nn.Layer):
     """
      The FactSeg implementation based on PaddlePaddle.
 
      The original article refers to
-     A. Ma, J. Wang, Y. Zhong and Z. Zheng, "FactSeg: Foreground Activation-Driven Small Object Semantic Segmentation
-     in Large-Scale Remote Sensing Imagery," in IEEE Transactions on Geoscience and Remote Sensing, vol. 60,
-     pp. 1-16, 2022, Art no. 5606216.
+     A. Ma, J. Wang, Y. Zhong and Z. Zheng, "FactSeg: Foreground Activation
+     -Driven Small Object Semantic Segmentation in Large-Scale Remote Sensing
+      Imagery,"in IEEE Transactions on Geoscience and Remote Sensing, vol. 60,
+       pp. 1-16, 2022, Art no. 5606216.
 
 
      Args:
-         in_channels (int): The number of image channels for the input model. Default: 3.
+         in_channels (int): The number of image channels for the input model.
+         Default: 3.
          num_classes (int): The unique number of target classes. Default: 16.
-         backbone (str): A backbone network, models available in `paddle.vision.models.resnet`. Default: resnet50.
-         backbone_pretrained (bool): Whether the backbone network uses IMAGENET pretrained weights. Default: True.
+         backbone (str): A backbone network, models available in
+         `paddle.vision.models.resnet`. Default: resnet50.
+         backbone_pretrained (bool): Whether the backbone network uses IMAGENET
+         pretrained weights. Default: True.
      """
 
     def __init__(self,
@@ -352,12 +360,14 @@ class FactSeg(nn.Layer):
 
         self.fg_decoder = AssymetricDecoder(in_channels=256,
                                             out_channels=128,
-                                            in_feat_output_strides=(4, 8, 16, 32),
+                                            in_feat_output_strides=(
+                                                4, 8, 16, 32),
                                             out_feat_output_stride=4)
 
         self.bi_decoder = AssymetricDecoder(in_channels=256,
                                             out_channels=128,
-                                            in_feat_output_strides=(4, 8, 16, 32),
+                                            in_feat_output_strides=(
+                                                4, 8, 16, 32),
                                             out_feat_output_stride=4)
 
         self.fg_cls = nn.Conv2D(128, num_classes, kernel_size=1)
@@ -380,7 +390,8 @@ class FactSeg(nn.Layer):
 
             if self.fbattention_atttention:
                 for i in range(len(binaryfeat_list)):
-                    forefeat_list[i] = self.fbatt_block_list[i](binaryfeat_list[i], forefeat_list[i])
+                    forefeat_list[i] = self.fbatt_block_list[i](
+                        binaryfeat_list[i], forefeat_list[i])
 
             fg_out = self.fg_decoder(forefeat_list)
             bi_out = self.bi_decoder(binaryfeat_list)
@@ -398,7 +409,8 @@ class FactSeg(nn.Layer):
         else:
             binary_prob = F.sigmoid(bi_pred)
             cls_prob = F.softmax(fg_pred, axis=1)
-            cls_prob[:, 0, :, :] = cls_prob[:, 0, :, :] * (1 - binary_prob).squeeze(axis=1)
+            cls_prob[:, 0, :, :] = cls_prob[:, 0, :, :] * (
+                            1 - binary_prob).squeeze(axis=1)
             cls_prob[:, 1:, :, :] = cls_prob[:, 1:, :, :] * binary_prob
             z = paddle.sum(cls_prob, axis=1)
             cls_prob = paddle.divide(cls_prob, z)

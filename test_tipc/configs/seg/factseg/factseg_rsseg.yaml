@@ -7,5 +7,5 @@ save_dir: ./test_tipc/output/seg/factseg/
 model: !Node
     type: FactSeg
     args:
-        in_channels: 10
+        in_channels: 3
         num_classes: 5

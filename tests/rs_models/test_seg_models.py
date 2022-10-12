@@ -74,7 +74,7 @@ class TestFactSegModel(TestSegModel):
         self.specs = [
             dict(), dict(
                 in_channels=6, num_classes=10), dict(
-                    backbone='resnet18', backbone_pretrained=False)
+                    backbone='resnet50', backbone_pretrained=False)
         ]
 
     def set_targets(self):
