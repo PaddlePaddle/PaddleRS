@@ -24,9 +24,7 @@ from paddlers.models.ppdet.modeling import initializer as init
 
 
 def conv_with_kaiming_uniform(use_gn=False, use_relu=False):
-    def make_conv(
-            in_channels, out_channels, kernel_size, stride=1, dilation=1
-    ):
+    def make_conv(in_channels, out_channels, kernel_size, stride=1, dilation=1):
         conv = nn.Conv2D(
             in_channels,
             out_channels,
@@ -34,8 +32,7 @@ def conv_with_kaiming_uniform(use_gn=False, use_relu=False):
             stride=stride,
             padding=dilation * (kernel_size - 1) // 2,
             dilation=dilation,
-            bias_attr=False if use_gn else True
-        )
+            bias_attr=False if use_gn else True)
 
         init.kaiming_uniform_(conv.weight, a=1)
         if not use_gn:
@@ -56,13 +53,11 @@ default_conv_block = conv_with_kaiming_uniform(use_gn=False, use_relu=False)
 
 
 class FPN(nn.Layer):
-
     def __init__(self,
                  in_channels_list,
                  out_channels,
                  conv_block=default_conv_block,
-                 top_blocks=None
-                 ):
+                 top_blocks=None):
 
         super(FPN, self).__init__()
         self.inner_blocks = []
@@ -85,15 +80,12 @@ class FPN(nn.Layer):
         last_inner = getattr(self, self.inner_blocks[-1])(x[-1])
         results = [getattr(self, self.layer_blocks[-1])(last_inner)]
         for i, feature in enumerate(x[-2::-1]):
-            inner_block = getattr(self,
-                                  self.inner_blocks[
-                                      len(self.inner_blocks) - 2 - i]
-                                  )
-            layer_block = getattr(self,
-                                  self.layer_blocks[
-                                      len(self.layer_blocks) - 2 - i])
-            inner_top_down = F.interpolate(last_inner,
-                                           scale_factor=2, mode='nearest')
+            inner_block = getattr(
+                self, self.inner_blocks[len(self.inner_blocks) - 2 - i])
+            layer_block = getattr(
+                self, self.layer_blocks[len(self.layer_blocks) - 2 - i])
+            inner_top_down = F.interpolate(
+                last_inner, scale_factor=2, mode='nearest')
             inner_laternal = inner_block(feature)
             last_inner = inner_laternal + inner_top_down
             results.insert(0, layer_block(last_inner))
@@ -114,7 +106,6 @@ class LastLevelMaxPool(nn.Layer):
 
 
 class LastLevelP6P7(nn.Layer):
-
     def __init__(self, in_channels, out_channels):
         super(LastLevelP6P7, self).__init__()
         self.p6 = nn.Conv2D(in_channels, out_channels, 3, 2, 1)
@@ -132,21 +123,18 @@ class LastLevelP6P7(nn.Layer):
 
 
 class ResNetEncoder(nn.Layer):
-
-    def __init__(self,
-                 backbone,
-                 include_conv5,
-                 batch_norm_trainable,
-                 freeze_at,
-                 output_stride,
-                 in_channels=3,
-                 pretrained=True,
-                 with_cp=(False, False, False, False),
-                 ):
+    def __init__(
+            self,
+            backbone,
+            include_conv5,
+            batch_norm_trainable,
+            freeze_at,
+            output_stride,
+            in_channels=3,
+            pretrained=True,
+            with_cp=(False, False, False, False), ):
         super(ResNetEncoder, self).__init__()
-        if all([output_stride != 16,
-                output_stride != 32,
-                output_stride != 8]):
+        if all([output_stride != 16, output_stride != 32, output_stride != 8]):
             raise ValueError('output_stride must be 8, 16 or 32.')
         self.with_cp = with_cp
         self.freeze_at = freeze_at
@@ -263,7 +251,6 @@ class ResNetEncoder(nn.Layer):
 
 
 class AssymetricDecoder(nn.Layer):
-
     def __init__(self,
                  in_channels,
                  out_channels,
@@ -278,11 +265,10 @@ class AssymetricDecoder(nn.Layer):
             if num_groups_gn is None:
                 raise ValueError(
                     'When norm_fn is nn.GroupNorm, num_groups_gn is needed.')
-            norm_fn_args = dict(num_groups=num_groups_gn,
-                                num_channels=out_channels)
+            norm_fn_args = dict(
+                num_groups=num_groups_gn, num_channels=out_channels)
         else:
-            raise ValueError(
-                'Type of {} is not support.'.format(type(norm_fn)))
+            raise ValueError('Type of {} is not support.'.format(type(norm_fn)))
         self.blocks = nn.LayerList()
         for in_feat_os in in_feat_output_strides:
             num_upsample = int(math.log2(int(in_feat_os))) - \
@@ -290,18 +276,22 @@ class AssymetricDecoder(nn.Layer):
 
             num_layers = num_upsample if num_upsample != 0 else 1
 
-            self.blocks.append(nn.Sequential(*[
-                nn.Sequential(
-                    nn.Conv2D(in_channels if idx == 0
-                              else out_channels, out_channels, 3, 1, 1,
-                              bias_attr=False),
-                    norm_fn(**norm_fn_args) if norm_fn is not None
-                    else nn.Identity(),
-                    nn.ReLU(),
-                    nn.UpsamplingBilinear2D(scale_factor=2)
-                    if num_upsample != 0 else nn.Identity(),
-                )
-                for idx in range(num_layers)]))
+            self.blocks.append(
+                nn.Sequential(*[
+                    nn.Sequential(
+                        nn.Conv2D(
+                            in_channels if idx == 0 else out_channels,
+                            out_channels,
+                            3,
+                            1,
+                            1,
+                            bias_attr=False),
+                        norm_fn(**norm_fn_args)
+                        if norm_fn is not None else nn.Identity(),
+                        nn.ReLU(),
+                        nn.UpsamplingBilinear2D(scale_factor=2) if num_upsample
+                        != 0 else nn.Identity(), ) for idx in range(num_layers)
+                ]))
 
     def forward(self, feat_list: list):
         inner_feat_list = []
@@ -334,12 +324,12 @@ class FactSeg(nn.Layer):
          pretrained weights. Default: True.
      """
 
-    def __init__(self,
-                 in_channels=3,
-                 num_classes=16,
-                 backbone='resnet50',
-                 backbone_pretrained=True,
-                 ):
+    def __init__(
+            self,
+            in_channels=3,
+            num_classes=16,
+            backbone='resnet50',
+            backbone_pretrained=True, ):
         super(FactSeg, self).__init__()
 
         self.resencoder = ResNetEncoder(
@@ -355,20 +345,21 @@ class FactSeg(nn.Layer):
         print('use fpn!')
         self.fgfpn = FPN(in_channels_list=[256, 512, 1024, 2048],
                          out_channels=256)
-        self.bifpn = FPN(in_channels_list=[256, 512, 1024, 2048],
-                         out_channels=256, )
+        self.bifpn = FPN(
+            in_channels_list=[256, 512, 1024, 2048],
+            out_channels=256, )
 
-        self.fg_decoder = AssymetricDecoder(in_channels=256,
-                                            out_channels=128,
-                                            in_feat_output_strides=(
-                                                4, 8, 16, 32),
-                                            out_feat_output_stride=4)
+        self.fg_decoder = AssymetricDecoder(
+            in_channels=256,
+            out_channels=128,
+            in_feat_output_strides=(4, 8, 16, 32),
+            out_feat_output_stride=4)
 
-        self.bi_decoder = AssymetricDecoder(in_channels=256,
-                                            out_channels=128,
-                                            in_feat_output_strides=(
-                                                4, 8, 16, 32),
-                                            out_feat_output_stride=4)
+        self.bi_decoder = AssymetricDecoder(
+            in_channels=256,
+            out_channels=128,
+            in_feat_output_strides=(4, 8, 16, 32),
+            out_feat_output_stride=4)
 
         self.fg_cls = nn.Conv2D(128, num_classes, kernel_size=1)
         self.bi_cls = nn.Conv2D(128, 1, kernel_size=1)
@@ -398,10 +389,10 @@ class FactSeg(nn.Layer):
 
         fg_pred = self.fg_cls(fg_out)
         bi_pred = self.bi_cls(bi_out)
-        fg_pred = F.interpolate(fg_pred, scale_factor=4.0, mode='bilinear',
-                                align_corners=True)
-        bi_pred = F.interpolate(bi_pred, scale_factor=4.0, mode='bilinear',
-                                align_corners=True)
+        fg_pred = F.interpolate(
+            fg_pred, scale_factor=4.0, mode='bilinear', align_corners=True)
+        bi_pred = F.interpolate(
+            bi_pred, scale_factor=4.0, mode='bilinear', align_corners=True)
 
         if self.training:
             return [fg_pred]
@@ -410,7 +401,7 @@ class FactSeg(nn.Layer):
             binary_prob = F.sigmoid(bi_pred)
             cls_prob = F.softmax(fg_pred, axis=1)
             cls_prob[:, 0, :, :] = cls_prob[:, 0, :, :] * (
-                            1 - binary_prob).squeeze(axis=1)
+                1 - binary_prob).squeeze(axis=1)
             cls_prob[:, 1:, :, :] = cls_prob[:, 1:, :, :] * binary_prob
             z = paddle.sum(cls_prob, axis=1)
             z = z.unsqueeze(axis=1)
