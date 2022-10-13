@@ -47,7 +47,7 @@ class AnimeDiscriminator(nn.Layer):
 
         self.body = nn.Sequential(*f)
 
-        self.head = nn.Sequential(* [
+        self.head = nn.Sequential(*[
             spectral_norm(
                 nn.Conv2D(
                     last_channel,
