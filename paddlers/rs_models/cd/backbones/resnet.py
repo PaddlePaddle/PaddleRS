@@ -168,10 +168,12 @@ class ResNet(nn.Layer):
     
     Args:
         Block (BasicBlock|BottleneckBlock): block module of model.
-        depth (int): layers of resnet, default: 50.
-        num_classes (int): output dim of last fc layer. If num_classes <=0, last fc 
+        depth (int): layers of resnet.
+        num_classes (int, optional): output dim of last fc layer. If num_classes <=0, last fc 
             layer will not be defined. Default: 1000.
-        with_pool (bool): use pool before the last fc layer or not. Default: True.
+        with_pool (bool, optional): use pool before the last fc layer or not. Default: True.
+        strides (tuple[int], optional): Strides to use in each stage. Default: (1, 1, 2, 2, 2).
+        norm_layer (nn.Layer|None): Type of normalization layer. Default: None.
     
     Examples:
         .. code-block:: python

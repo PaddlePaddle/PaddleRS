@@ -178,15 +178,15 @@ class ChangeFormer(nn.Layer):
         (https://arxiv.org/pdf/2201.01293.pdf).
 
     Args:
-        in_channels (int): Number of bands of the input images. Default: 3.
-        num_classes (int): Number of target classes. Default: 2.
+        in_channels (int): Number of bands of the input images.
+        num_classes (int): Number of target classes.
         decoder_softmax (bool, optional): Use softmax after decode or not. Default: False.
         embed_dim (int, optional): Embedding dimension of each decoder head. Default: 256.
     """
 
     def __init__(self,
-                 in_channels=3,
-                 num_classes=2,
+                 in_channels,
+                 num_classes,
                  decoder_softmax=False,
                  embed_dim=256):
         super(ChangeFormer, self).__init__()

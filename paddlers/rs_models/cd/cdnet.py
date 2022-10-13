@@ -32,7 +32,7 @@ class CDNet(nn.Layer):
         num_classes (int): Number of target classes.
     """
 
-    def __init__(self, in_channels=6, num_classes=2):
+    def __init__(self, in_channels, num_classes):
         super(CDNet, self).__init__()
         self.conv1 = Conv7x7(in_channels, 64, norm=True, act=True)
         self.pool1 = nn.MaxPool2D(2, 2, return_mask=True)
