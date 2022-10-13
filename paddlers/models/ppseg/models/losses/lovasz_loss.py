@@ -77,8 +77,8 @@ class LovaszHingeLoss(nn.Layer):
         """
         if logits.shape[1] == 2:
             logits = binary_channel_to_unary(logits)
-        loss = lovasz_hinge_flat(
-            *flatten_binary_scores(logits, labels, self.ignore_index))
+        loss = lovasz_hinge_flat(*flatten_binary_scores(logits, labels,
+                                                        self.ignore_index))
         return loss
 
 

@@ -201,7 +201,7 @@ class AsymmetricDecoder(nn.Layer):
                 math.log2(int(out_feature_output_stride)))
             num_layers = num_upsample if num_upsample != 0 else 1
             self.blocks.append(
-                nn.Sequential(*[
+                nn.Sequential(* [
                     nn.Sequential(
                         conv_block(
                             in_channels if idx == 0 else out_channels,
