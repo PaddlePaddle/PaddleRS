@@ -127,12 +127,12 @@ class FirstOrderGenerator(nn.Layer):
             # jacobian loss part
             if self.loss_weights['equivariance_jacobian'] != 0:
                 jacobian_transformed = paddle.matmul(*broadcast(
-                    transform.jacobian(transformed_kp['value']), transformed_kp[
-                        'jacobian']))
+                    transform.jacobian(transformed_kp['value']),
+                    transformed_kp['jacobian']))
                 normed_driving = paddle.inverse(kp_driving['jacobian'])
                 normed_transformed = jacobian_transformed
-                value = paddle.matmul(*broadcast(normed_driving,
-                                                 normed_transformed))
+                value = paddle.matmul(
+                    *broadcast(normed_driving, normed_transformed))
                 eye = paddle.tensor.eye(2, dtype='float32').reshape(
                     (1, 1, 2, 2))
                 eye = paddle.tile(eye, [1, value.shape[1], 1, 1])

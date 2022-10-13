@@ -35,9 +35,7 @@ from .utils import seg_metrics as metrics
 from .utils.infer_nets import InferSegNet
 from .utils.slider_predict import slider_predict
 
-__all__ = [
-    "UNet", "DeepLabV3P", "FastSCNN", "HRNet", "BiSeNetV2", "FarSeg", "FactSeg"
-]
+__all__ = ["UNet", "DeepLabV3P", "FastSCNN", "HRNet", "BiSeNetV2", "FarSeg", "FactSeg"]
 
 
 class BaseSegmenter(BaseModel):

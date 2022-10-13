@@ -36,7 +36,7 @@ class SPADE(nn.Layer):
         nhidden = 128
 
         pw = ks // 2
-        self.mlp_shared = nn.Sequential(* [
+        self.mlp_shared = nn.Sequential(*[
             nn.Conv2D(label_nc, nhidden, ks, 1, pw),
             nn.GELU(),
         ])
@@ -75,20 +75,20 @@ class SPADEResnetBlock(nn.Layer):
             self.spade_s = SPADE(spade_config_str, fin, opt.semantic_nc)
 
         # define act_conv layers
-        self.act_conv_0 = nn.Sequential(* [
+        self.act_conv_0 = nn.Sequential(*[
             nn.GELU(),
             spectral_norm(
                 nn.Conv2D(
                     fin, fmiddle, 3, 1, 1, weight_attr=None, bias_attr=None)),
         ])
-        self.act_conv_1 = nn.Sequential(* [
+        self.act_conv_1 = nn.Sequential(*[
             nn.GELU(),
             spectral_norm(
                 nn.Conv2D(
                     fmiddle, fout, 3, 1, 1, weight_attr=None, bias_attr=None)),
         ])
         if self.learned_shortcut:
-            self.act_conv_s = nn.Sequential(* [
+            self.act_conv_s = nn.Sequential(*[
                 spectral_norm(
                     nn.Conv2D(
                         fin, fout, 1, 1, 0, bias_attr=False, weight_attr=None)),

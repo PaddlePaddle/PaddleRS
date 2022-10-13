@@ -1412,7 +1412,7 @@ class ConvMixer(nn.Layer):
         Seq, ActBn = nn.Sequential, lambda x: Seq(x, nn.GELU(), nn.BatchNorm2D(dim))
         Residual = type('Residual', (Seq, ),
                         {'forward': lambda self, x: self[0](x) + x})
-        return Seq(* [
+        return Seq(*[
             Seq(Residual(
                 ActBn(
                     nn.Conv2D(
