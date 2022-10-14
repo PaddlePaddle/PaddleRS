@@ -127,8 +127,8 @@ PaddleRS具有以下五大特色：
         <b>数据格式转换</b><br>
         <ul>
           <li>coco to mask</li>
+          <li>geojson to mask</li>
           <li>mask to shpfile</li>
-          <li>mask to geojson</li>
           <li>...</li>
         </ul>
         <b>数据预处理</b><br>

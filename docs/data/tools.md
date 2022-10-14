@@ -3,8 +3,8 @@
 PaddleRS在`tools`目录中提供了丰富的遥感影像处理工具，包括：
 
 - `coco2mask.py`：用于将COCO格式的标注文件转换为.png格式。
-- `mask2shape.py`：用于将模型推理输出的.png格式栅格标签转换为矢量格式。
-- `mask2geojson.py`：用于将模型推理输出的.png格式栅格标签转换为GeoJSON格式。
+- `mask2shape.py`：用于将模型推理输出的.png格式栅格标签转换为.shp矢量格式。
+- `geojson2mask.py`：用于将GeoJSON格式标签转换为.tif栅格格式。
 - `match.py`：用于实现两幅影像的配准。
 - `split.py`：用于对大幅面影像数据进行切片。
 - `coco_tools/`：COCO工具合集，用于统计处理COCO格式标注文件。
@@ -47,18 +47,19 @@ python mask2shape.py --srcimg_path {带有地理信息的原始影像路径} --m
 - `save_path`：保存shapefile的路径，默认为`output`。
 - `ignore_index`：需要在shapefile中忽略的索引值（例如分割任务中的背景类），默认为`255`。
 
-### mask2geojson
+### geojson2mask
 
-`mask2geojson.py`的主要功能是将.png格式的分割结果转换为GeoJSON格式。使用方式如下：
+`geojson2mask.py`的主要功能是将GeoJSON格式的标签转换为.tif的栅格格式。使用方式如下：
 
 ```shell
-python mask2geojson.py --mask_path {输入分割标签路径} --save_path {输出路径}
+python geojson2mask.py --srcimg_path {带有地理信息的原始影像路径} --geojson_path {输入分割标签路径} --save_path {输出路径}
 ```
 
 其中：
 
-- `mask_path`：模型推理得到的.png格式的分割结果。
-- `save_path`：保存GeoJSON文件的路径。
+- `srcimg_path`：原始影像路径，需要带有地理元信息。
+- `geojson_path`：GeoJSON格式标签路径。
+- `save_path`：保存转换后的栅格文件的路径。
 
 ### match
 

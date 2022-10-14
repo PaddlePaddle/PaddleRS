@@ -236,19 +236,19 @@ class FarSeg(nn.Layer):
     and pattern recognition. 2020: 4096-4105.
 
     Args:
-        in_channels (int): The number of image channels for the input model. Default: 3.
-        num_classes (int): The unique number of target classes. Default: 16.
-        backbone (str): A backbone network, models available in `paddle.vision.models.resnet`. Default: resnet50.
-        backbone_pretrained (bool): Whether the backbone network uses IMAGENET pretrained weights. Default: True.
-        fpn_out_channels (int): The number of channels output by the feature pyramid network. Default: 256.
-        fsr_out_channels (int): The number of channels output by the F-S relation module. Default: 256.
-        scale_aware_proj (bool): Whether to use scale awareness in F-S relation module. Default: True.
-        decoder_out_channels (int): The number of channels output by the decoder. Default: 128.
+        in_channels (int): Number of input channels.
+        num_classes (int): Unique number of target classes.
+        backbone (str, optional): Backbone network, one of models available in `paddle.vision.models.resnet`. Default: resnet50.
+        backbone_pretrained (bool, optional): Whether the backbone network uses IMAGENET pretrained weights. Default: True.
+        fpn_out_channels (int, optional): Number of channels output by the feature pyramid network. Default: 256.
+        fsr_out_channels (int, optional): Number of channels output by the F-S relation module. Default: 256.
+        scale_aware_proj (bool, optional): Whether to use scale awareness in F-S relation module. Default: True.
+        decoder_out_channels (int, optional): Number of channels output by the decoder. Default: 128.
     """
 
     def __init__(self,
-                 in_channels=3,
-                 num_classes=16,
+                 in_channels,
+                 num_classes,
                  backbone='resnet50',
                  backbone_pretrained=True,
                  fpn_out_channels=256,
