@@ -71,6 +71,7 @@ class TestFarSegModel(TestSegModel):
                         [self.get_zeros_array(2)], [self.get_zeros_array(2)],
                         [self.get_zeros_array(2)]]
 
+
 class TestFactSegModel(TestSegModel):
     MODEL_CLASS = paddlers.rs_models.seg.FactSeg
 
