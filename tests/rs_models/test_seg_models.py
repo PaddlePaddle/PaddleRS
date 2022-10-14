@@ -15,7 +15,7 @@
 import paddlers
 from rs_models.test_model import TestModel
 
-__all__ = ['TestFarSegModel']
+__all__ = ['TestFarSegModel', 'TestFactSegModel']
 
 
 class TestSegModel(TestModel):
@@ -69,4 +69,22 @@ class TestFarSegModel(TestSegModel):
     def set_targets(self):
         self.targets = [[self.get_zeros_array(2)], [self.get_zeros_array(10)],
                         [self.get_zeros_array(2)], [self.get_zeros_array(2)],
+                        [self.get_zeros_array(2)]]
+
+
+class TestFactSegModel(TestSegModel):
+    MODEL_CLASS = paddlers.rs_models.seg.FactSeg
+
+    def set_specs(self):
+        base_spec = dict(in_channels=3, num_classes=2)
+        self.specs = [
+            base_spec,
+            dict(in_channels=6, num_classes=10),
+            dict(**base_spec,
+                 backbone='resnet50',
+                 backbone_pretrained=False)
+        ]  # yapf: disable
+
+    def set_targets(self):
+        self.targets = [[self.get_zeros_array(2)], [self.get_zeros_array(10)],
                         [self.get_zeros_array(2)]]

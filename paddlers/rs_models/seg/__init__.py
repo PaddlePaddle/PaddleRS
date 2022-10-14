@@ -13,3 +13,4 @@
 # limitations under the License.
 
 from .farseg import FarSeg
+from .factseg import FactSeg
