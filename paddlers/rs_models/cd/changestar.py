@@ -121,7 +121,10 @@ class ChangeStar_FarSeg(_ChangeStarBase):
             def forward(self, x):
                 return self._seg_model(x)
 
-        seg_model = FarSeg(decoder_out_channels=mid_channels)
+        seg_model = FarSeg(
+            in_channels=3,
+            num_classes=num_classes,
+            decoder_out_channels=mid_channels)
 
         super(ChangeStar_FarSeg, self).__init__(
             seg_model=_FarSegWrapper(seg_model),
