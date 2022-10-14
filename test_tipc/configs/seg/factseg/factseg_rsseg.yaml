@@ -1,4 +1,4 @@
-# Configurations of FarSeg with RSSeg dataset
+# Configurations of FactSeg with RSSeg dataset
 
 _base_: ../_base_/rsseg.yaml
 

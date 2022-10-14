@@ -56,8 +56,7 @@ class TestFarSegModel(TestSegModel):
             dict(), dict(
                 in_channels=6, num_classes=10), dict(
                     backbone='resnet18', backbone_pretrained=False), dict(
-                        fpn_out_channels=128,
-                        fsr_out_channels=64,
+                        fpn_out_channels=128, fsr_out_channels=64,
                         decoder_out_channels=32), dict(scale_aware_proj=False)
         ]
 
@@ -79,5 +78,4 @@ class TestFactSegModel(TestSegModel):
 
     def set_targets(self):
         self.targets = [[self.get_zeros_array(16)], [self.get_zeros_array(10)],
-                        [self.get_zeros_array(16)], [self.get_zeros_array(16)],
                         [self.get_zeros_array(16)]]

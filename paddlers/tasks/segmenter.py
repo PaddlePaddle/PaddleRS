@@ -900,7 +900,7 @@ class FarSeg(BaseSegmenter):
 class FactSeg(BaseSegmenter):
     def __init__(self,
                  in_channels=3,
-                 num_classes=16,
+                 num_classes=2,
                  use_mixed_loss=False,
                  losses=None,
                  **params):
