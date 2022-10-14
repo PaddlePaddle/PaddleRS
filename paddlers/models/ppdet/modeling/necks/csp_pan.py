@@ -197,7 +197,7 @@ class CSPLayer(nn.Layer):
         self.final_conv = ConvBNLayer(
             2 * mid_channels, out_channels, 1, act=act)
 
-        self.blocks = nn.Sequential(*[
+        self.blocks = nn.Sequential(* [
             DarknetBottleneck(
                 mid_channels,
                 mid_channels,

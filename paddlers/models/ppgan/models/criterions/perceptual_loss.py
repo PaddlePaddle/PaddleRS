@@ -51,8 +51,8 @@ class PerceptualVGG(nn.Layer):
         assert len(_vgg.features) >= num_layers
 
         # only borrow layers that will be used from _vgg to avoid unused params
-        self.vgg_layers = nn.Sequential(
-            *list(_vgg.features.children())[:num_layers])
+        self.vgg_layers = nn.Sequential(*list(_vgg.features.children())
+                                        [:num_layers])
 
         if self.use_input_norm:
             # the mean is for image with range [0, 1]

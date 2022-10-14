@@ -280,13 +280,13 @@ class ESPNetEncoder(nn.Layer):
 
         self.level2_0 = DownSampler(in_channels + 16, 64)
         self.level2 = nn.Sequential(
-            *[DilatedResidualBlock(64, 64) for i in range(level2_depth)])
+            * [DilatedResidualBlock(64, 64) for i in range(level2_depth)])
         self.br2 = BNPReLU(in_channels + 128)
         self.proj2 = layers.ConvBNPReLU(in_channels + 128, num_classes, 1)
 
         self.level3_0 = DownSampler(in_channels + 128, 128)
         self.level3 = nn.Sequential(
-            *[DilatedResidualBlock(128, 128) for i in range(level3_depth)])
+            * [DilatedResidualBlock(128, 128) for i in range(level3_depth)])
         self.br3 = BNPReLU(256)
         self.proj3 = layers.ConvBNPReLU(256, num_classes, 1)
 

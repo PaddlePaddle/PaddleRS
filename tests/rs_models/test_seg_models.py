@@ -88,4 +88,3 @@ class TestFactSegModel(TestSegModel):
     def set_targets(self):
         self.targets = [[self.get_zeros_array(2)], [self.get_zeros_array(10)],
                         [self.get_zeros_array(2)]]
-

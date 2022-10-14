@@ -18,7 +18,7 @@ from paddle.io import Dataset, WeightedRandomSampler
 
 def listdir(dname):
     fnames = list(
-        chain(*[
+        chain(* [
             list(Path(dname).rglob('*.' + ext))
             for ext in ['png', 'jpg', 'jpeg', 'JPG']
         ]))
