@@ -1,3 +1,5 @@
+
+
 # Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +17,7 @@
 import paddlers
 from rs_models.test_model import TestModel
 
-__all__ = ['TestFarSegModel', 'TestFactSegModel']
+__all__ = ['TestFarSegModel']
 
 
 class TestSegModel(TestModel):
@@ -52,31 +54,39 @@ class TestFarSegModel(TestSegModel):
     MODEL_CLASS = paddlers.rs_models.seg.FarSeg
 
     def set_specs(self):
+        base_spec = dict(in_channels=3, num_classes=2)
         self.specs = [
-            dict(), dict(
-                in_channels=6, num_classes=10), dict(
-                    backbone='resnet18', backbone_pretrained=False), dict(
-                        fpn_out_channels=128,
-                        fsr_out_channels=64,
-                        decoder_out_channels=32), dict(scale_aware_proj=False)
-        ]
+            base_spec,
+            dict(in_channels=6, num_classes=10),
+            dict(**base_spec,
+                backbone='resnet18',
+                backbone_pretrained=False),
+            dict(**base_spec,
+                fpn_out_channels=128,
+                fsr_out_channels=64,
+                decoder_out_channels=32),
+            dict(**base_spec, scale_aware_proj=False)
+        ]   # yapf: disable
 
     def set_targets(self):
-        self.targets = [[self.get_zeros_array(16)], [self.get_zeros_array(10)],
-                        [self.get_zeros_array(16)], [self.get_zeros_array(16)],
-                        [self.get_zeros_array(16)]]
+        self.targets = [[self.get_zeros_array(2)], [self.get_zeros_array(10)],
+                        [self.get_zeros_array(2)], [self.get_zeros_array(2)],
+                        [self.get_zeros_array(2)]]
 
 
 class TestFactSegModel(TestSegModel):
     MODEL_CLASS = paddlers.rs_models.seg.FactSeg
 
     def set_specs(self):
+        base_spec = dict(in_channels=3, num_classes=2)
         self.specs = [
-            dict(), dict(
-                in_channels=6, num_classes=10), dict(
-                    backbone='resnet50', backbone_pretrained=False)
-        ]
+            base_spec,
+            dict(in_channels=6, num_classes=10),
+            dict(**base_spec,
+                 backbone='resnet50',
+                 backbone_pretrained=False)
+        ]  # yapf: disable
 
     def set_targets(self):
-        self.targets = [[self.get_zeros_array(16)], [self.get_zeros_array(10)],
-                        [self.get_zeros_array(16)]]
+        self.targets = [[self.get_zeros_array(2)], [self.get_zeros_array(10)],
+                        [self.get_zeros_array(2)]]
