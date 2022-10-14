@@ -1,5 +1,5 @@
 ===========================train_params===========================
-model_name:seg:FactSeg
+model_name:seg:factseg
 python:python
 gpu_list:0
 use_gpu:null|null

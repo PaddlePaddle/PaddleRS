@@ -29,6 +29,7 @@
 |object_detection/yolov3.py | 目标检测 | YOLOv3 |
 |semantic_segmentation/bisenetv2.py | 图像分割 | BiSeNet V2 |
 |semantic_segmentation/deeplabv3p.py | 图像分割 | DeepLab V3+ |
+|semantic_segmentation/factseg.py | 图像分割 | FactSeg |
 |semantic_segmentation/farseg.py | 图像分割 | FarSeg |
 |semantic_segmentation/fast_scnn.py | 图像分割 | Fast-SCNN |
 |semantic_segmentation/hrnet.py | 图像分割 | HRNet |

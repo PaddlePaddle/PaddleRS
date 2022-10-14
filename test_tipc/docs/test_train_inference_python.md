@@ -33,6 +33,7 @@ Linux GPU/CPU 基础训练推理测试的主程序为`test_train_inference_pytho
 |  图像复原  | LESRCNN | 正常训练 | 正常训练 | PSNR=23.67 |
 |  图像分割  | BiSeNet V2 | 正常训练 | 正常训练 | mIoU=70.52% |
 |  图像分割  | DeepLab V3+ | 正常训练 | 正常训练 | mIoU=64.41% |
+|  图像分割  | FactSeg | 正常训练 | 正常训练 |  |
 |  图像分割  | FarSeg | 正常训练 | 正常训练 | mIoU=50.60% |
 |  图像分割  | Fast-SCNN | 正常训练 | 正常训练 | mIoU=49.27% |
 |  图像分割  | HRNet | 正常训练 | 正常训练 | mIoU=33.03% |
@@ -68,6 +69,7 @@ Linux GPU/CPU 基础训练推理测试的主程序为`test_train_inference_pytho
 |  目标检测  | YOLOv3 | 支持 | 支持 | 1 |
 |  图像分割  | BiSeNet V2 | 支持 | 支持 | 1 |
 |  图像分割  | DeepLab V3+ | 支持 | 支持 | 1 |
+|  图像分割  | FactSeg | 支持 | 支持 | 1 |
 |  图像分割  | FarSeg | 支持 | 支持 | 1 |
 |  图像分割  | Fast-SCNN | 支持 | 支持 | 1 |
 |  图像分割  | HRNet | 支持 | 支持 | 1 |
