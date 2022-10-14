@@ -298,7 +298,7 @@ class ResNet(TheseusLayer):
             [[input_image_channel, 32, 3, 2], [32, 32, 3, 1], [32, 64, 3, 1]]
         }
 
-        self.stem = nn.Sequential(* [
+        self.stem = nn.Sequential(*[
             ConvBNLayer(
                 num_channels=in_c,
                 num_filters=out_c,
