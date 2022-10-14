@@ -1,5 +1,3 @@
-
-
 # Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +15,7 @@
 import paddlers
 from rs_models.test_model import TestModel
 
-__all__ = ['TestFarSegModel']
+__all__ = ['TestFarSegModel', 'TestFactSegModel']
 
 
 class TestSegModel(TestModel):
