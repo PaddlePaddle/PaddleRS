@@ -22,7 +22,7 @@
 PaddleRS是百度飞桨、遥感科研院所及相关高校共同开发的基于飞桨的遥感影像智能化处理套件，支持图像分割、目标检测、场景分类、变化检测以及图像复原等常见遥感任务。PaddleRS致力于帮助遥感领域科研从业者快速完成算法的研发、验证和调优，以及帮助投身于产业实践的开发者便捷地实现从数据预处理到模型部署的全流程遥感深度学习应用。
 
 <div align="center">
-<img src="docs/images/teasor.png"  width = "2000" />  
+<img src="https://user-images.githubusercontent.com/21275753/197484785-c3c5a9c3-efb0-4d68-b0eb-2d5ce5fa817f.png"  width = "2000" />  
 </div>
 
 ## <img src="./docs/images/feature.png" width="30"/> 特性
@@ -48,7 +48,7 @@ PaddleRS具有以下五大特色：
 * 如果您发现任何PaddleRS存在的问题或是对PaddleRS有建议, 欢迎通过[GitHub Issues](https://github.com/PaddlePaddle/PaddleRS/issues)向我们提出。
 * 欢迎加入PaddleRS微信群：
 <div align="center">
-<img src="https://user-images.githubusercontent.com/21275753/190135989-078ecdc9-5760-4c1b-b317-f07b77cc4312.png"  width = "150" />  
+<img src="https://user-images.githubusercontent.com/21275753/197484745-98109428-88b1-413c-a6d7-4f8f6fa54020.png"  width = "150" />  
 </div>
 
 ## <img src="./docs/images/model.png" width="30"/> 产品矩阵
