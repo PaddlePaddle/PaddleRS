@@ -22,7 +22,7 @@
 PaddleRS是百度飞桨、遥感科研院所及相关高校共同开发的基于飞桨的遥感影像智能化处理套件，支持图像分割、目标检测、场景分类、变化检测以及图像复原等常见遥感任务。PaddleRS致力于帮助遥感领域科研从业者快速完成算法的研发、验证和调优，以及帮助投身于产业实践的开发者便捷地实现从数据预处理到模型部署的全流程遥感深度学习应用。
 
 <div align="center">
-<img src="https://user-images.githubusercontent.com/21275753/197485399-b76e7f78-64de-4065-8b21-1a20d3eb8283.png"  width = "2000" />  
+<img src="https://user-images.githubusercontent.com/21275753/197486676-8534ddf7-fd76-418d-bbe1-5d9c031ce84b.png"  width = "2000" />  
 </div>
 
 ## <img src="./docs/images/feature.png" width="30"/> 特性
@@ -75,8 +75,8 @@ PaddleRS具有以下五大特色：
         <ul>
           <li><a href="./tutorials/train/change_detection/bit.py">BIT</a></li>
           <li><a href="./tutorials/train/change_detection/cdnet.py">CDNet</a></li>
-          <li><a href="./paddlers/rs_models/change_detection/changeformer.py">ChangeFormer</a></li>
-          <li><a href="./tutorials/train/cd/changestar.py">ChangeStar</a></li>
+          <li><a href="./tutorials/train/change_detection/changeformer.py">ChangeFormer</a></li>
+          <li><a href="./paddlers/rs_models/cd/changestar.py">ChangeStar</a></li>
           <li><a href="./tutorials/train/change_detection/dsamnet.py">DSAMNet</a></li>
           <li><a href="./tutorials/train/change_detection/dsifn.py">DSIFN</a></li>
           <li><a href="./tutorials/train/change_detection/fc_ef.py">FC-EF</a></li>
@@ -213,7 +213,7 @@ PaddleRS具有以下五大特色：
         <details><summary><b>数据格式转换</b></summary>
         <ul>
           <li><a href="./tools/coco2mask.py">COCO to mask</a></li>
-          <li><a href="./tools/geojson2mask.py">GeoJson to mask</a></li>
+          <li><a href="./tools/geojson2mask.py">GeoJSON to mask</a></li>
           <li><a href="./tools/mask2shape.py">mask to shapefile</a></li>
         </ul>
         </details>
@@ -221,8 +221,8 @@ PaddleRS具有以下五大特色：
         <ul>
           <li><a href="./tools/extract_ms_patches.py">四叉树索引切片</a></li>
           <li><a href="./tools/match.py">影像配准</a></li>
-          <li><a href="./tools/oif.py">波段选择</a><li>
-          <li><a href="./tools/pca.py">波段融合</a><li>
+          <li><a href="./tools/oif.py">波段选择</a></li>
+          <li><a href="./tools/pca.py">波段融合</a></li>
           <li><a href="./tools/split.py">影像切片</a></li>
         </ul>
         </details>
