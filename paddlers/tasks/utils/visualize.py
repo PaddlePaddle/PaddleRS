@@ -176,10 +176,6 @@ def draw_bbox_mask(image, results, threshold=0.5, color_map=None):
         color_map = get_color_map_list(len(labels) + 2)[2:]
     else:
         color_map = np.asarray(color_map)
-        if color_map.shape[0] != len(labels) or color_map.shape[1] != 3:
-            raise ValueError(
-                "The shape for color_map is required to be {}x3, but recieved shape is {}x{}.".
-                format(len(labels), color_map.shape))
         if np.max(color_map) > 255 or np.min(color_map) < 0:
             raise ValueError(
                 " The values in color_map should be within 0-255 range.")
