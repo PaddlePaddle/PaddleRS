@@ -299,11 +299,12 @@ def slider_predict(predict_func,
         raise ValueError(
             "`overlap` must be a tuple/list of length 2 or an integer.")
 
+    if block_size[0] <= overlap[0] or block_size[1] <= overlap[1]:
+        raise ValueError("`block_size` must be larger than `overlap`.")
+
     step = np.array(
         block_size, dtype=np.int32) - np.array(
             overlap, dtype=np.int32)
-    if step[0] == 0 or step[1] == 0:
-        raise ValueError("`block_size` and `overlap` should not be equal.")
 
     if isinstance(img_file, tuple):
         if len(img_file) != 2:
