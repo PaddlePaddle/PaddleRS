@@ -4,7 +4,7 @@
     <img src="./docs/images/logo.png" align="middle" width = "500" />
   </p>
 
-  **飞桨高性能遥感影像开发套件，端到端完成从数据到部署的全流程遥感应用。**
+  **飞桨高性能、多任务遥感影像开发套件，端到端完成从数据到部署的全流程遥感应用**
 
   [![version](https://img.shields.io/github/release/PaddlePaddle/PaddleRS.svg)](https://github.com/PaddlePaddle/PaddleRS/releases)
   [![license](https://img.shields.io/badge/license-Apache%202-blue.svg)](LICENSE)
@@ -19,7 +19,7 @@
 
 ## <img src="docs/images/intro.png" width="30"/> 简介
 
-PaddleRS是百度飞桨、遥感科研院所及相关高校共同开发的基于飞桨的遥感影像智能化处理套件，支持图像分割、目标检测、场景分类、变化检测以及图像复原等常见遥感任务。PaddleRS致力于帮助遥感领域科研从业者快速完成算法的研发、验证和调优，以及帮助投身于产业实践的开发者便捷地实现从数据预处理到模型部署的全流程遥感深度学习应用。
+PaddleRS是百度飞桨、遥感科研院所及相关高校共同开发的基于飞桨的遥感影像智能化处理套件，支持**图像分割、目标检测、场景分类、变化检测、图像复原**等常见遥感任务。PaddleRS致力于帮助遥感领域科研从业者快速完成算法的研发、验证和调优。同时，PaddleRS也期望助力投身于产业实践的开发者，便捷地实现从数据预处理到模型部署的**全流程遥感深度学习应用**。
 
 <div align="center">
 <img src="https://user-images.githubusercontent.com/21275753/197486676-8534ddf7-fd76-418d-bbe1-5d9c031ce84b.png"  width = "2000" />  
@@ -247,11 +247,17 @@ PaddleRS具有以下五大特色：
         </ul>
       </td>
       <td>
+      <details><summary><b>官方案例</b></summary>
       <ul>
         <li><a href="https://github.com/PaddleCV-SIG/PP-GeoView">遥感影像智能解译工具PP-GeoView</a></li>
         <li><a href="./examples/rs_research/README.md">PaddleRS科研实战：设计深度学习变化检测模型</a></li>
-        <li><a href="./examples/README.md">PaddleRS实践案例库</a></li>
       </ul>
+      </details>
+      <details><summary><b>社区案例</b></summary>
+      <ul>
+      <li><a href="./examples/README.md">PaddleRS实践案例库</a></li>
+      </ul>
+      </details>
       </td>  
     </tr>
   </tbody>
