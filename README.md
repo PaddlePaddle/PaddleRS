@@ -242,7 +242,9 @@ PaddleRS具有以下五大特色：
         <ul>
           <li><a href="./tools/prepare_dataset/prepare_levircd.py">LEVIR-CD</a></li>
           <li><a href="./tools/prepare_dataset/prepare_svcd.py">Season-varying</a></li>
+          <li><a href="./tools/prepare_dataset/prepare_ucmerced.py">UC Merced</a></li>
           <li><a href="./tools/prepare_dataset/prepare_rsod.py">RSOD</a></li>
+          <li><a href="./tools/prepare_dataset/prepare_isaid.py">iSAID</a></li>
           <li><a href="./docs/intro/data_prep.md">...</a></li>
         </ul>
       </td>
