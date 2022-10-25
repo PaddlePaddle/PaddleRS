@@ -4,28 +4,28 @@
     <img src="./docs/images/logo.png" align="middle" width = "500" />
   </p>
 
-  **飞桨高性能遥感影像开发套件，端到端完成从数据到部署的全流程遥感应用。**
+  **飞桨高性能、多任务遥感影像开发套件，端到端完成从数据到部署的全流程遥感应用**
 
-  <!-- [![version](https://img.shields.io/github/release/PaddlePaddle/PaddleRS.svg)](https://github.com/PaddlePaddle/PaddleRS/releases) -->
+  [![version](https://img.shields.io/github/release/PaddlePaddle/PaddleRS.svg)](https://github.com/PaddlePaddle/PaddleRS/releases)
   [![license](https://img.shields.io/badge/license-Apache%202-blue.svg)](LICENSE)
   [![build status](https://github.com/PaddlePaddle/PaddleRS/actions/workflows/build.yaml/badge.svg?branch=develop)](https://github.com/PaddlePaddle/PaddleRS/actions)
   ![python version](https://img.shields.io/badge/python-3.7+-orange.svg)
   ![support os](https://img.shields.io/badge/os-linux%2C%20win%2C%20mac-yellow.svg)
 </div>
 
-## 最新动态 <img src="docs/images/seg_news_icon.png" width="30"/>
+## <img src="docs/images/seg_news_icon.png" width="30"/> 最新动态
 
 *  [2022-05-19] 🔥 PaddleRS发布1.0-beta版本，全面支持遥感领域深度学习任务。详细发版信息请参考[Release Note](https://github.com/PaddlePaddle/PaddleRS/releases)。
 
-## 简介
+## <img src="docs/images/intro.png" width="30"/> 简介
 
-PaddleRS是百度飞桨、遥感科研院所及相关高校共同开发的基于飞桨的遥感影像智能化处理套件，支持图像分割、目标检测、场景分类、变化检测以及图像复原等常见遥感任务。PaddleRS致力于帮助遥感领域科研从业者快速完成算法的研发、验证和调优，以及帮助投身于产业实践的开发者便捷地实现从数据预处理到模型部署的全流程遥感深度学习应用。
+PaddleRS是百度飞桨、遥感科研院所及相关高校共同开发的基于飞桨的遥感影像智能化处理套件，支持**图像分割、目标检测、场景分类、变化检测、图像复原**等常见遥感任务。PaddleRS致力于帮助遥感领域科研从业者快速完成算法的研发、验证和调优。同时，PaddleRS也期望助力投身于产业实践的开发者，便捷地实现从数据预处理到模型部署的**全流程遥感深度学习应用**。
 
 <div align="center">
-<img src="docs/images/whole_picture.png"  width = "2000" />  
+<img src="https://user-images.githubusercontent.com/21275753/197486676-8534ddf7-fd76-418d-bbe1-5d9c031ce84b.png"  width = "2000" />  
 </div>
 
-## 特性 <img src="./docs/images/feature.png" width="30"/>
+## <img src="./docs/images/feature.png" width="30"/> 特性
 
 PaddleRS具有以下五大特色：
 
@@ -39,19 +39,31 @@ PaddleRS具有以下五大特色：
 
 * <img src="./docs/images/f3.png" width="20"/> **工业级训练与部署性能**：支持多进程异步I/O、多卡并行训练等加速策略，结合飞桨核心框架的显存优化功能，可大幅度减少模型的训练开销，帮助开发者以更低成本、更高效地完成遥感的开发和训练。
 
-## 产品矩阵<img src="./docs/images/model.png" width="30"/>
+<div align="center">
+<img src="docs/images/whole_picture.png"  width = "2000" />  
+</div>
+
+## <img src="./docs/images/chat.png" width="30"/> 技术交流
+
+* 如果您发现任何PaddleRS存在的问题或是对PaddleRS有建议, 欢迎通过[GitHub Issues](https://github.com/PaddlePaddle/PaddleRS/issues)向我们提出。
+* 欢迎加入PaddleRS微信群：
+<div align="center">
+<img src="https://user-images.githubusercontent.com/21275753/197484745-98109428-88b1-413c-a6d7-4f8f6fa54020.png"  width = "150" />  
+</div>
+
+## <img src="./docs/images/model.png" width="30"/> 产品矩阵
 
 <table align="center">
   <tbody>
     <tr align="center" valign="bottom">
       <td>
-        <b>模型总览</b>
+        <b>模型库</b>
       </td>
       <td>
-        <b>数据增强</b>
+        <b>数据变换算子</b>
       </td>
       <td>
-        <b>遥感工具</b>
+        <b>遥感特色工具</b>
       </td>
       <td>
         <b>实践案例</b>
@@ -59,158 +71,205 @@ PaddleRS具有以下五大特色：
     </tr>
     <tr valign="top">
       <td>
-        <b>场景分类</b><br>
+        <details><summary><b>变化检测</b></summary>
         <ul>
-          <li>ResNet50-vd</li>
-          <li>MobileNetV3</li>
-          <li>HRNet</li>
-          <li>...</li>
+          <li><a href="./tutorials/train/change_detection/bit.py">BIT</a></li>
+          <li><a href="./tutorials/train/change_detection/cdnet.py">CDNet</a></li>
+          <li><a href="./tutorials/train/change_detection/changeformer.py">ChangeFormer</a></li>
+          <li><a href="./paddlers/rs_models/cd/changestar.py">ChangeStar</a></li>
+          <li><a href="./tutorials/train/change_detection/dsamnet.py">DSAMNet</a></li>
+          <li><a href="./tutorials/train/change_detection/dsifn.py">DSIFN</a></li>
+          <li><a href="./tutorials/train/change_detection/fc_ef.py">FC-EF</a></li>
+          <li><a href="./tutorials/train/change_detection/fc_siam_conc.py">FC-Siam-conc</a></li>
+          <li><a href="./tutorials/train/change_detection/fc_siam_diff.py">FC-Siam-diff</a></li>
+          <li><a href="./tutorials/train/change_detection/fccdn.py">FCCDN</a></li>
+          <li><a href="./tutorials/train/change_detection/snunet.py">SNUNet</a></li>
+          <li><a href="./tutorials/train/change_detection/stanet.py">STANet</a></li>
         </ul>
-        <b>语义分割</b><br>
+        </details>
+        <details><summary><b>场景分类</b></summary>
         <ul>
-          <li>FarSeg</li>
-          <li>UNet</li>
-          <li>DeepLab V3+</li>
-          <li>...</li>
+          <li><a href="./tutorials/train/classification/condensenetv2.py">CondenseNet V2</a></li>
+          <li><a href="./tutorials/train/classification/hrnet.py">HRNet</a></li>
+          <li><a href="./tutorials/train/classification/mobilenetv3.py">MobileNetV3</a></li>
+          <li><a href="./tutorials/train/classification/resnet50_vd.py">ResNet50-vd</a></li>
         </ul>
-        <b>目标检测</b><br>
+        </details>
+        <details><summary><b>图像复原</b></summary>
         <ul>
-          <li>PP-YOLO</li>
-          <li>Faster R-CNN</li>
-          <li>YOLOv3</li>
-          <li>...</li>
+          <li><a href="./tutorials/train/image_restoration/drn.py">DRN</a></li>
+          <li><a href="./tutorials/train/image_restoration/esrgan.py">ESRGAN</a></li>
+          <li><a href="./tutorials/train/image_restoration/lesrcnn.py">LESRCNN</a></li>
         </ul>
-        <b>图像复原</b><br>
+        </details>
+        <details><summary><b>目标检测</b></summary>
         <ul>
-          <li>DRNet</li>
-          <li>LESRCNN</li>
-          <li>ESRGAN</li>
-          <li>...</li>
+          <li><a href="./tutorials/train/object_detection/faster_rcnn.py">Faster R-CNN</a></li>
+          <li><a href="./tutorials/train/object_detection/ppyolo.py">PP-YOLO</a></li>
+          <li><a href="./tutorials/train/object_detection/ppyolo_tiny.py">PP-YOLO Tiny</a></li>
+          <li><a href="./tutorials/train/object_detection/ppyolov2.py">PP-YOLOv2</a></li>
+          <li><a href="./tutorials/train/object_detection/yolov3.py">YOLOv3</a></li>
         </ul>
-        <b>变化检测</b><br>
+        </details>
+        <details><summary><b>图像分割</b></summary>
         <ul>
-          <li>DSIFN</li>
-          <li>STANet</li>
-          <li>ChangeStar</li>
-          <li>...</li>
+          <li><a href="./tutorials/train/semantic_segmentation/bisenetv2.py">BiSeNet V2</a></li>
+          <li><a href="./tutorials/train/semantic_segmentation/deeplabv3p.py">DeepLab V3+</a></li>
+          <li><a href="./tutorials/train/semantic_segmentation/factseg.py">FactSeg</a></li>
+          <li><a href="./tutorials/train/semantic_segmentation/farseg.py">FarSeg</a></li>
+          <li><a href="./tutorials/train/semantic_segmentation/fast_scnn.py">Fast-SCNN</a></li>
+          <li><a href="./tutorials/train/semantic_segmentation/hrnet.py">HRNet</a></li>
+          <li><a href="./tutorials/train/semantic_segmentation/unet.py">UNet</a></li>
         </ul>
+        </details>
       </td>
       <td>
-        <b>数据增强</b><br>
+        <details><summary><b>数据预处理</b></summary>
         <ul>
-          <li>Resize</li>  
-          <li>RandomResize</li>  
-          <li>ResizeByShort</li>
-          <li>RandomResizeByShort</li>
-          <li>ResizeByLong</li>  
-          <li>RandomFlipOrRotate</li>
-          <li>RandomHorizontalFlip</li>  
-          <li>RandomVerticalFlip</li>
-          <li>Normalize</li>
+          <li>AppendIndex（遥感指数计算）</li>
           <li>CenterCrop</li>
-          <li>RandomCrop</li>
-          <li>RandomScaleAspect</li>  
-          <li>RandomExpand</li>
+          <li>Dehaze（影像去雾）</li>
+          <li>MatchRadiance（辐射校正）</li>
+          <li>Normalize</li>
           <li>Pad</li>
-          <li>MixupImage</li>  
-          <li>RandomDistort</li>  
-          <li>RandomBlur</li>  
-          <li>Dehaze</li>  
-          <li>ReduceDim</li>  
-          <li>SelectBand</li>  
-          <li>RandomSwap</li>
-          <li>AppendIndex</li>
-          <li>...</li>
-        </ul>  
+          <li>ReduceDim（高光谱降维）</li>
+          <li>Resize</li>
+          <li>ResizeByLong</li>
+          <li>ResizeByShort</li>
+          <li>SelectBand（波段选择）</li>
+          <li><a href="./docs/intro/transforms.md">...</a></li>
+        </ul>
+        </details>
+        <details><summary><b>数据增强</b></summary>
+        <ul>
+          <li>MixupImage</li>
+          <li>RandomBlur</li>
+          <li>RandomCrop</li>
+          <li>RandomDistort</li>
+          <li>RandomExpand</li>
+          <li>RandomHorizontalFlip</li>
+          <li>RandomResize</li>
+          <li>RandomResizeByShort</li>
+          <li>RandomScaleAspect</li>
+          <li>RandomSwap（随机时序交换）</li>
+          <li>RandomVerticalFlip</li>
+          <li><a href="./docs/intro/transforms.md">...</a></li>
+        </ul>
+        </details>
+        <details><summary><b>遥感指数</b></summary>
+        <ul>
+          <li>ARI</li>
+          <li>ARI2</li>
+          <li>ARVI</li>
+          <li>AWEInsh</li>
+          <li>AWEIsh</li>
+          <li>BAI</li>
+          <li>BI</li>
+          <li>BLFEI</li>
+          <li>BNDVI</li>
+          <li>BWDRVI</li>
+          <li>BaI</li>
+          <li>CIG</li>
+          <li>CSI</li>
+          <li>CSIT</li>
+          <li>DBI</li>
+          <li>DBSI</li>
+          <li>DVI</li>
+          <li>EBBI</li>
+          <li>EVI</li>
+          <li>EVI2</li>
+          <li>FCVI</li>
+          <li>GARI</li>
+          <li>GBNDVI</li>
+          <li>GLI</li>
+          <li>GRVI</li>
+          <li>IPVI</li>
+          <li>LSWI</li>
+          <li>MBI</li>
+          <li>MGRVI</li>
+          <li>MNDVI</li>
+          <li>MNDWI</li>
+          <li>MSI</li>
+          <li>NBLI</li>
+          <li>NDVI</li>
+          <li>NDWI</li>
+          <li>NDYI</li>
+          <li>NIRv</li>
+          <li>PSRI</li>
+          <li>RI</li>
+          <li>SAVI</li>
+          <li>SWI</li>
+          <li>TDVI</li>
+          <li>UI</li>
+          <li>VIG</li>
+          <li>WI1</li>
+          <li>WI2</li>
+          <li>WRI</li>
+          <li><a href="./docs/intro/indices.md">...</a></li>
+        </ul>
+        </details>
       </td>
       <td>
-        <b>数据格式转换</b><br>
+        <details><summary><b>数据格式转换</b></summary>
         <ul>
-          <li>coco to mask</li>
-          <li>geojson to mask</li>
-          <li>mask to shpfile</li>
-          <li>...</li>
+          <li><a href="./tools/coco2mask.py">COCO to mask</a></li>
+          <li><a href="./tools/geojson2mask.py">GeoJSON to mask</a></li>
+          <li><a href="./tools/mask2shape.py">mask to shapefile</a></li>
         </ul>
-        <b>数据预处理</b><br>
+        </details>
+        <details><summary><b>数据集制作</b></summary>
         <ul>
-          <li>影像切片</li>
-          <li>影像配准</li>
-          <li>波段选择</li>
-          <li>辐射校正</li>
-          <li>...</li>
+          <li><a href="./tools/extract_ms_patches.py">四叉树索引切片</a></li>
+          <li><a href="./tools/match.py">影像配准</a></li>
+          <li><a href="./tools/oif.py">波段选择</a></li>
+          <li><a href="./tools/pca.py">波段融合</a></li>
+          <li><a href="./tools/split.py">影像切片</a></li>
         </ul>
-        <b>数据后处理</b><br>
+        </details>
+        </details>
+        <details><summary><b>数据后处理</b></summary>
         <ul>
-          <li>建筑边界规则化</li>
-          <li>道路断线连接</li>
-          <li>...</li>
+          <li><a href="./paddlers/utils/postprocs/connection.py">道路断线连接</a></li>
+          <li><a href="./paddlers/utils/postprocs/regularization.py">建筑边界规则化</a></li>
         </ul>
-        <b>数据可视化</b><br>
+        </details>
+        <details><summary><b>数据可视化</b></summary>
         <ul>
-          <li>地图-栅格可视化</li>
-          <li>...</li>
+          <li><a href="./paddlers/utils/visualize.py">地图-栅格可视化</a></li>
+        </ul>
+        </details>
+        <details><summary><b>开源数据集预处理</b></summary>
+        <ul>
+          <li><a href="./tools/prepare_dataset/prepare_levircd.py">LEVIR-CD</a></li>
+          <li><a href="./tools/prepare_dataset/prepare_svcd.py">Season-varying</a></li>
+          <li><a href="./tools/prepare_dataset/prepare_rsod.py">RSOD</a></li>
+          <li><a href="./docs/intro/data_prep.md">...</a></li>
         </ul>
       </td>
       <td>
-        <b>遥感场景分类</b><br>
-        <ul>
-          <li>待更</li>
-        </ul>
-        <b>遥感图像分割</b><br>
-        <ul>
-          <li>待更</li>
-        </ul>
-        <b>遥感目标检测</b><br>
-        <ul>
-          <li>待更</li>
-        </ul>
-        <b>遥感变化检测</b><br>
-        <ul>
-          <li>待更</li>
-        </ul>
-        <b>遥感图像复原</b><br>
-        <ul>
-          <li>待更</li>
-        </ul>
+      <details><summary><b>官方案例</b></summary>
+      <ul>
+        <li><a href="https://github.com/PaddleCV-SIG/PP-GeoView">遥感影像智能解译工具PP-GeoView</a></li>
+        <li><a href="./examples/rs_research/README.md">PaddleRS科研实战：设计深度学习变化检测模型</a></li>
+      </ul>
+      </details>
+      <details><summary><b>社区案例</b></summary>
+      <ul>
+      <li><a href="./examples/README.md">PaddleRS实践案例库</a></li>
+      </ul>
+      </details>
       </td>  
     </tr>
   </tbody>
 </table>
 
-### 代码结构
+## <img src="./docs/images/teach.png" width="30"/> 教程与文档
 
-PaddleRS目录树中关键部分如下：
-
-```
-├── deploy               # 部署相关文档与脚本
-├── docs                 # 项目文档
-├── paddlers  
-│     ├── rs_models      # 遥感专用模型实现
-│     ├── datasets       # 数据集接口实现
-│     ├── models         # 视觉模型实现
-│     ├── tasks          # 训练器实现
-│     ├── transforms     # 数据预处理/数据增强实现
-│     └── utils          # 数据下载/可视化/后处理等
-├── tools                # 遥感影像处理工具集
-├── examples             # 相关实践案例
-└── tutorials
-      └── train          # 模型训练教程
-```
-
-## 技术交流 <img src="./docs/images/chat.png" width="30"/>
-
-* 如果您发现任何PaddleRS存在的问题或是对PaddleRS有建议, 欢迎通过[GitHub Issues](https://github.com/PaddlePaddle/PaddleRS/issues)向我们提出。
-* 欢迎加入PaddleRS微信群
-<div align="center">
-<img src="https://user-images.githubusercontent.com/21275753/190135989-078ecdc9-5760-4c1b-b317-f07b77cc4312.png"  width = "150" />  
-</div>
-
-## 使用教程 <img src="./docs/images/teach.png" width="30"/>
-
-* [快速上手PaddleRS](./tutorials/train/README.md)
-* 准备数据集
+* 快速上手
+  * [快速上手PaddleRS](./tutorials/train/README.md)
+* 数据准备
   * [快速了解遥感与遥感数据](./docs/data/rs_data.md)
-  * [遥感数据集整理](./docs/data/dataset.md)
+  * [开源遥感数据集汇总表](./docs/data/dataset.md)
   * [智能标注工具EISeg](https://github.com/PaddlePaddle/PaddleSeg/tree/release/2.6/EISeg)
   * [遥感影像处理工具集](./docs/data/tools.md)
 * 组件介绍
@@ -218,30 +277,34 @@ PaddleRS目录树中关键部分如下：
   * [模型库](./docs/intro/model_zoo.md)
   * [遥感指数](./docs/intro/indices.md)
   * [数据变换算子](./docs/intro/transforms.md)
-* 模型训练
-  * [模型训练API说明](./docs/apis/train.md)
+* [模型训练](./tutorials/train/README.md)
 * 模型部署
   * [模型导出](./deploy/export/README.md)
   * [Python部署](./deploy/README.md)
-  * [模型推理API说明](./docs/apis/infer.md)
-* 实践案例
-  * [PaddleRS实践案例库](./examples/README.md)
 * 代码贡献
   * [贡献指南](./docs/CONTRIBUTING.md)
   * [开发指南](./docs/dev/dev_guide.md)
   * [代码注释规范](./docs/dev/docstring.md)
+  * [模型训练API说明](./docs/apis/train.md)
+  * [模型推理API说明](./docs/apis/infer.md)
 
-## 开源贡献 <img src="./docs/images/love.png" width="30"/>
+## <img src="./docs/images/anli.png" width="30"/> 实践案例
 
-* 非常感谢国家对地观测科学数据中心、中国科学院空天信息创新研究院、北京航空航天大学、武汉大学、中国石油大学（华东）、中国地质大学、中国四维、航天宏图、中科星图、超图等单位对PaddleRS项目的贡献。注：排名不分先后。
-* 非常感谢[geoyee](https://github.com/geoyee)(陈奕州), [kongdebug](https://github.com/kongdebug)(孔远杭), [huilin16](https://github.com/huilin16)(赵慧琳)等开发者对PaddleRS项目的贡献。
-* PaddleRS欢迎来自开源社区的贡献。如果您想要为PaddleRS贡献源码/案例，请参考[贡献指南](./docs/CONTRIBUTING.md)。
+* [遥感影像智能解译工具PP-GeoView](https://github.com/PaddleCV-SIG/PP-GeoView)
+* [PaddleRS科研实战：设计深度学习变化检测模型](./examples/rs_research/README.md)
+
+更多案例请参考[PaddleRS实践案例库](./examples/README.md)。
 
 ## 许可证书
 
 本项目的发布受[Apache 2.0 license](./LICENSE)许可认证。
 
-## 学术引用 <img src="./docs/images/yinyong.png" width="30"/>
+## <img src="./docs/images/love.png" width="30"/> 开源贡献
+
+* 非常感谢国家对地观测科学数据中心、中国科学院空天信息创新研究院、北京航空航天大学、武汉大学、中国石油大学（华东）、中国地质大学、中国四维、航天宏图、中科星图、超图等单位对PaddleRS项目的贡献。注：排名不分先后。
+* 非常感谢[geoyee](https://github.com/geoyee)(陈奕州), [kongdebug](https://github.com/kongdebug)(孔远杭), [huilin16](https://github.com/huilin16)(赵慧琳)等开发者对PaddleRS项目的贡献。
+
+## <img src="./docs/images/yinyong.png" width="30"/> 学术引用
 
 如果我们的项目在学术上帮助到您，请考虑以下引用：
 
