@@ -3,11 +3,13 @@ import random
 import copy
 import os
 import os.path as osp
+import shutil
 from glob import glob
 from itertools import count
 from functools import partial
 from concurrent.futures import ThreadPoolExecutor
 
+import numpy as np
 from skimage.io import imread, imsave
 from tqdm import tqdm
 
@@ -57,20 +59,54 @@ def add_crop_options(parser):
     return parser
 
 
-def crop_and_save(path, out_subdir, crop_size, stride):
+def crop_and_save(path,
+                  out_subdir,
+                  crop_size,
+                  stride,
+                  keep_last=False,
+                  pad=True,
+                  pad_val=0):
     name, ext = osp.splitext(osp.basename(path))
     out_subsubdir = osp.join(out_subdir, name)
     if not osp.exists(out_subsubdir):
         os.makedirs(out_subsubdir)
     img = imread(path)
-    w, h = img.shape[:2]
+    h, w = img.shape[:2]
+    if h < crop_size or w < crop_size:
+        if not pad:
+            raise ValueError(
+                f"`crop_size` must be smaller than image size. `crop_size` is {crop_size}, but got image size {h}x{w}."
+            )
+        padded_img = np.full(
+            shape=(max(h, crop_size), max(w, crop_size)) + img.shape[2:],
+            fill_value=pad_val,
+            dtype=img.dtype)
+        padded_img[:h, :w] = img
+        h, w = padded_img.shape[:2]
+        img = padded_img
     counter = count()
-    for i in range(0, h - crop_size + 1, stride):
-        for j in range(0, w - crop_size + 1, stride):
+    for i in range(0, h, stride):
+        i_st = i
+        i_ed = i_st + crop_size
+        if i_ed > h:
+            if keep_last:
+                i_st = h - crop_size
+                i_ed = h
+            else:
+                continue
+        for j in range(0, w, stride):
+            j_st = j
+            j_ed = j_st + crop_size
+            if j_ed > w:
+                if keep_last:
+                    j_st = w - crop_size
+                    j_ed = w
+                else:
+                    continue
             imsave(
                 osp.join(out_subsubdir, '{}_{}{}'.format(name,
                                                          next(counter), ext)),
-                img[i:i + crop_size, j:j + crop_size],
+                img[i_st:i_ed, j_st:j_ed],
                 check_contrast=False)
 
 
@@ -81,7 +117,8 @@ def crop_patches(crop_size,
                  subsets=('train', 'val', 'test'),
                  subdirs=('A', 'B', 'label'),
                  glob_pattern='*',
-                 max_workers=0):
+                 max_workers=0,
+                 keep_last=False):
     """
     Crop patches from images in specific directories.
     
@@ -102,6 +139,9 @@ def crop_patches(crop_size,
             Defaults to '*', which matches arbitrary file. 
         max_workers (int, optional): Number of worker threads to perform the cropping 
             operation. Deafults to 0.
+        keep_last (bool, optional): If True, keep the last patch in each row and each 
+            column. The left and upper border of the last patch will be shifted to 
+            ensure that size of the patch be `crop_size`. Defaults to False.
     """
 
     if max_workers < 0:
@@ -109,6 +149,8 @@ def crop_patches(crop_size,
 
     if subsets is None:
         subsets = ('', )
+
+    print("Cropping patches...")
 
     if max_workers == 0:
         for subset in subsets:
@@ -122,7 +164,8 @@ def crop_patches(crop_size,
                         p,
                         out_subdir=out_subdir,
                         crop_size=crop_size,
-                        stride=stride)
+                        stride=stride,
+                        keep_last=keep_last)
     else:
         # Concurrently crop image patches
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
@@ -230,6 +273,25 @@ def link_dataset(src, dst):
     src = osp.realpath(src)
     name = osp.basename(osp.normpath(src))
     os.symlink(src, osp.join(dst, name), target_is_directory=True)
+
+
+def copy_dataset(src, dst):
+    """
+    Make a copy a dataset.
+    
+    Args:
+        src (str): Path of the original dataset.
+        dst (str): Path to copy to.
+    """
+
+    if osp.exists(dst) and not osp.isdir(dst):
+        raise ValueError(f"{dst} exists and is not a directory.")
+    elif not osp.exists(dst):
+        os.makedirs(dst)
+
+    src = osp.realpath(src)
+    name = osp.basename(osp.normpath(src))
+    shutil.copytree(src, osp.join(dst, name))
 
 
 def random_split(samples,
