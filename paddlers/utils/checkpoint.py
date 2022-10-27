@@ -86,7 +86,8 @@ seg_pretrain_weights_dict = {
     'DeepLabV3P': ['CITYSCAPES', 'PascalVOC', 'IMAGENET'],
     'FastSCNN': ['CITYSCAPES'],
     'HRNet': ['CITYSCAPES', 'PascalVOC'],
-    'BiSeNetV2': ['CITYSCAPES']
+    'BiSeNetV2': ['CITYSCAPES'],
+    'FactSeg': ['iSAID']
 }
 
 cityscapes_weights = {
@@ -438,6 +439,11 @@ levircd_weights = {
     'https://paddlers.bj.bcebos.com/pretrained/cd/levircd/weights/stanet_levircd.pdparams'
 }
 
+isaid_weights = {
+    'FactSeg_iSAID':
+    'https://paddlers.bj.bcebos.com/pretrained/seg/isaid/weights/factseg_isaid.pdparams'
+}
+
 
 def get_pretrain_weights(flag, class_name, save_dir, backbone_name=None):
     if flag is None:
@@ -463,6 +469,8 @@ def get_pretrain_weights(flag, class_name, save_dir, backbone_name=None):
         url = coco_weights[weights_key]
     elif flag == 'LEVIRCD':
         url = levircd_weights[weights_key]
+    elif flag == 'iSAID':
+        url = isaid_weights[weights_key]
     else:
         raise ValueError('Given pretrained weights {} is undefined.'.format(
             flag))

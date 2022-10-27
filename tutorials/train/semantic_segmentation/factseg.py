@@ -83,7 +83,8 @@ model.train(
     # 每多少次迭代记录一次日志
     log_interval_steps=4,
     save_dir=EXP_DIR,
-    pretrain_weights=None,
+    # 使用iSAID数据集上的预训练权重
+    pretrain_weights='iSAID',
     # 初始学习率大小
     learning_rate=0.001,
     # 是否使用early stopping策略，当精度不再改善时提前终止训练
