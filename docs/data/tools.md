@@ -131,12 +131,12 @@ python prepare_dataset/prepare_levircd.py --help
 `extract_ms_patches.py`的主要功能是利用四叉树从整幅遥感影像中提取不同尺度的包含感兴趣目标的影像块，提取的影像块可用作模型训练样本。使用方式如下：
 
 ```shell
-python extract_ms_patches.py --image_paths {一个或多个输入影像路径} --mask_path {真值标签路径} [--save_dir {输出目录}] [--min_patch_size {最小的影像块尺寸}] [--bg_class {背景类类别编号}] [--target_class {目标类类别编号}] [--max_level {检索的最大尺度层级}] [--include_bg] [--nonzero_ratio {影像块中非零像素占比阈值}] [--visualize]
+python extract_ms_patches.py --im_paths {一个或多个输入影像路径} --mask_path {真值标签路径} [--save_dir {输出目录}] [--min_patch_size {最小的影像块尺寸}] [--bg_class {背景类类别编号}] [--target_class {目标类类别编号}] [--max_level {检索的最大尺度层级}] [--include_bg] [--nonzero_ratio {影像块中非零像素占比阈值}] [--visualize]
 ```
 
 其中：
 
-- `image_paths`：源影像路径，可以指定多个路径。
+- `im_paths`：源影像路径，可以指定多个路径。
 - `mask_path`：真值标签路径。
 - `save_dir`：保存切分后结果的文件夹路径，默认为`output`。
 - `min_patch_size`：提取的影像块的最小尺寸（以影像块长/宽的像素个数计），即四叉树的叶子结点在图中覆盖的最小范围，默认为`256`。
