@@ -630,8 +630,6 @@ class BaseChangeDetector(BaseModel):
             if isinstance(im1, str) or isinstance(im2, str):
                 im1 = decode_image(im1, read_raw=True)
                 im2 = decode_image(im2, read_raw=True)
-                np.save('im1_whole.npy', im1)
-                np.save('im2_whole.npy', im2)
             ori_shape = im1.shape[:2]
             # XXX: sample do not contain 'image_t1' and 'image_t2'.
             sample = {'image': im1, 'image2': im2}

@@ -23,8 +23,8 @@ import paddle
 import paddlers
 from tqdm import tqdm
 
-import custom_model
-import custom_trainer
+from custom_model import CustomModel
+from custom_trainer import make_trainer
 
 
 def read_file_list(file_list, sep=' '):
@@ -56,6 +56,9 @@ def parse_args():
 
 if __name__ == '__main__':
     args = parse_args()
+
+    # 注册训练器
+    make_trainer(CustomModel)
 
     model = paddlers.tasks.load_model(args.model_dir)
 

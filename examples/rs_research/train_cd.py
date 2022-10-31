@@ -7,7 +7,7 @@ import paddlers as pdrs
 from paddlers import transforms as T
 
 from custom_model import CustomModel
-from custom_trainer import make_trainer
+from custom_trainer import make_trainer_and_build
 
 # 数据集路径
 DATA_DIR = 'data/levircd/'
@@ -75,8 +75,8 @@ test_dataset = pdrs.datasets.CDDataset(
     binarize_labels=True)
 
 # 构建自定义模型CustomModel并为其自动生成训练器
-# make_trainer()的首个参数为模型类型，剩余参数为模型构造所需参数
-model = make_trainer(CustomModel, in_channels=3)
+# make_trainer_and_build()的首个参数为模型类型，剩余参数为模型构造所需参数
+model = make_trainer_and_build(CustomModel, in_channels=3)
 
 # 构建学习率调度器
 # 使用定步长学习率衰减策略
@@ -108,4 +108,5 @@ model.train(
 # 加载验证集上效果最好的模型
 model = pdrs.tasks.load_model(osp.join(EXP_DIR, 'best_model'))
 # 在测试集上计算精度指标
-model.evaluate(test_dataset)
+res = model.evaluate(test_dataset)
+print(res)
