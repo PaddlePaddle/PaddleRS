@@ -28,8 +28,7 @@ from sklearn.decomposition import PCA
 
 _dir = osp.dirname(osp.abspath(__file__))
 sys.path.append(osp.abspath(osp.join(_dir, '../')))
-import custom_model
-import custom_trainer
+import bootstrap
 
 FILENAME_PATTERN = "{key}_{idx}_vis.png"
 

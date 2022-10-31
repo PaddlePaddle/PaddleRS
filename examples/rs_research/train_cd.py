@@ -93,6 +93,7 @@ model.train(
     train_dataset=train_dataset,
     train_batch_size=8,
     eval_dataset=val_dataset,
+    optimizer=optimizer,
     # 每多少个epoch验证并保存一次模型
     save_interval_epochs=5,
     # 每多少次迭代记录一次日志

@@ -30,8 +30,7 @@ from paddle.hapi.static_flops import Table
 
 _dir = osp.dirname(osp.abspath(__file__))
 sys.path.append(osp.abspath(osp.join(_dir, '../')))
-import custom_model
-import custom_trainer
+import bootstrap
 
 
 def parse_args():

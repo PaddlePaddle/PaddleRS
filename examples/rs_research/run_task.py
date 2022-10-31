@@ -21,8 +21,7 @@ import paddle
 import paddlers
 from paddlers import transforms as T
 
-import custom_model
-import custom_trainer
+import bootstrap
 from config_utils import parse_args, build_objects, CfgNode
 
 
