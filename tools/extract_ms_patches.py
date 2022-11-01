@@ -194,7 +194,7 @@ class QuadTree(object):
         for node in nodes:
             i, j, h, w = node.coords
             vis = cv2.rectangle(vis, (j, i), (j + w, i + h), (255, 0, 0), 2)
-        cv2.imwrite(save_path, vis[...,::-1])
+        cv2.imwrite(save_path, vis[..., ::-1])
         return save_path
 
     def print_tree(self, node=None, level=0):
