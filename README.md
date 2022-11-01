@@ -48,7 +48,7 @@ PaddleRS具有以下五大特色：
 * 如果您发现任何PaddleRS存在的问题或是对PaddleRS有建议, 欢迎通过[GitHub Issues](https://github.com/PaddlePaddle/PaddleRS/issues)向我们提出。
 * 欢迎加入PaddleRS微信群：
 <div align="center">
-<img src="https://user-images.githubusercontent.com/21275753/197484745-98109428-88b1-413c-a6d7-4f8f6fa54020.png"  width = "150" />  
+<img src="https://user-images.githubusercontent.com/21275753/199192024-79373ad7-917f-4a7c-9de2-010a4d0c0152.png"  width = "150" />  
 </div>
 
 ## <img src="./docs/images/model.png" width="30"/> 产品矩阵
@@ -126,7 +126,6 @@ PaddleRS具有以下五大特色：
       <td>
         <details><summary><b>数据预处理</b></summary>
         <ul>
-          <li>AppendIndex（遥感指数计算）</li>
           <li>CenterCrop</li>
           <li>Dehaze（影像去雾）</li>
           <li>MatchRadiance（辐射校正）</li>
@@ -142,6 +141,7 @@ PaddleRS具有以下五大特色：
         </details>
         <details><summary><b>数据增强</b></summary>
         <ul>
+          <li>AppendIndex（遥感指数计算）</li>
           <li>MixupImage</li>
           <li>RandomBlur</li>
           <li>RandomCrop</li>
