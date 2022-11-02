@@ -25,8 +25,7 @@ def update_metric(trainer, out, batch, batch_size):
         for key in metric_dict:
             if key not in trainer.output_info:
                 trainer.output_info[key] = AverageMeter(key, '7.5f')
-            trainer.output_info[key].update(metric_dict[key].numpy()[0],
-                                            batch_size)
+            trainer.output_info[key].update(float(metric_dict[key]), batch_size)
 
 
 def update_loss(trainer, loss_dict, batch_size):
@@ -34,7 +33,7 @@ def update_loss(trainer, loss_dict, batch_size):
     for key in loss_dict:
         if key not in trainer.output_info:
             trainer.output_info[key] = AverageMeter(key, '7.5f')
-        trainer.output_info[key].update(loss_dict[key].numpy()[0], batch_size)
+        trainer.output_info[key].update(float(loss_dict[key]), batch_size)
 
 
 def log_info(trainer, batch_size, epoch_id, iter_id):
