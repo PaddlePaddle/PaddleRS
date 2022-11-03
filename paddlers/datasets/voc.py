@@ -289,7 +289,8 @@ class VOCDetDataset(BaseDataset):
                     self.num_max_boxes = max(self.num_max_boxes, len(objs))
 
         if not ct:
-            logging.error("No voc record found in %s ." % (file_list), exit=True)
+            logging.error(
+                "No voc record found in %s ." % (file_list), exit=True)
         self.pos_num = len(self.file_list)
         if self.allow_empty and neg_file_list:
             self.file_list += self._sample_empty(neg_file_list)
