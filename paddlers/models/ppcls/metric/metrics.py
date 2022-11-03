@@ -81,7 +81,7 @@ class mAP(nn.Layer):
         #calc map
         precision_mask = paddle.multiply(equal_flag, precision)
         ap = paddle.sum(precision_mask, axis=1) / paddle.sum(equal_flag, axis=1)
-        metric_dict["mAP"] = paddle.mean(ap).numpy()[0]
+        metric_dict["mAP"] = float(paddle.mean(ap))
         return metric_dict
 
 
@@ -124,7 +124,7 @@ class mINP(nn.Layer):
         hard_index = paddle.argmax(auxilary, axis=1).astype("float32")
         all_INP = paddle.divide(paddle.sum(equal_flag, axis=1), hard_index)
         mINP = paddle.mean(all_INP)
-        metric_dict["mINP"] = mINP.numpy()[0]
+        metric_dict["mINP"] = float(mINP)
         return metric_dict
 
 
