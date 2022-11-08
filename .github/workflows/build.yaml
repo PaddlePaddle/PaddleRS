@@ -26,16 +26,16 @@ jobs:
         include:
           - python-version: "3.7"
             os: windows-latest
-            gdal-whl-url: https://download.lfd.uci.edu/pythonlibs/archived/cp37/GDAL-3.3.3-cp37-cp37m-win_amd64.whl
+            gdal-whl-url: https://paddlers.bj.bcebos.com/dependencies/gdal/GDAL-3.3.3-cp37-cp37m-win_amd64.whl
           - python-version: "3.7"
             os: ubuntu-latest
-            gdal-whl-url: https://versaweb.dl.sourceforge.net/project/gdal-wheels-for-linux/GDAL-3.4.1-cp37-cp37m-manylinux_2_5_x86_64.manylinux1_x86_64.whl
+            gdal-whl-url: https://paddlers.bj.bcebos.com/dependencies/gdal/GDAL-3.4.1-cp37-cp37m-manylinux_2_5_x86_64.manylinux1_x86_64.whl
           - python-version: "3.8"
             os: windows-latest
-            gdal-whl-url: https://download.lfd.uci.edu/pythonlibs/archived/GDAL-3.3.3-cp38-cp38-win_amd64.whl
+            gdal-whl-url: https://paddlers.bj.bcebos.com/dependencies/gdal/GDAL-3.3.3-cp38-cp38-win_amd64.whl
           - python-version: "3.8"
             os: ubuntu-latest
-            gdal-whl-url: https://versaweb.dl.sourceforge.net/project/gdal-wheels-for-linux/GDAL-3.4.1-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.whl
+            gdal-whl-url: https://paddlers.bj.bcebos.com/dependencies/gdal/GDAL-3.4.1-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.whl
       fail-fast: false
     steps:
       - uses: actions/checkout@v3
