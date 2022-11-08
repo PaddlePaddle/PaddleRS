@@ -67,15 +67,14 @@ def get_args():
         default=['images', 'annotations'],
         help='json keys that need to merge')
     parser.add_argument(
-        '-Args_show',
         '--Args_show',
-        type=bool,
-        default=True,
+        type=str,
+        default='True',
         help='Args_show(default: True), if True, show args info')
 
     args = parser.parse_args()
 
-    if args.Args_show:
+    if args.Args_show.lower() == 'true':
         print('Args'.center(100, '-'))
         for k, v in vars(args).items():
             print('%s = %s' % (k, v))
