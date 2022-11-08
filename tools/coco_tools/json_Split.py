@@ -27,7 +27,9 @@ import pandas as pd
 
 
 def get_annno(df_img_split, df_anno):
-    df_merge = pd.merge(df_img_split, df_anno, on="image_id")
+    df_merge = pd.merge(
+        df_img_split, df_anno, on="image_id", suffixes=(None, '_r'))
+    df_merge = df_merge[[c for c in df_merge.columns if not c.endswith('_r')]]
     df_anno_split = df_merge[df_anno.columns.to_list()]
     df_anno_split = df_anno_split.sort_values(by='id')
     return df_anno_split

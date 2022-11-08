@@ -35,7 +35,7 @@ def check_dir(check_path, show=True):
         check_directory = check_path
     else:
         check_directory = os.path.dirname(check_path)
-    if not os.path.exists(check_directory):
+    if len(check_directory) > 0 and not os.path.exists(check_directory):
         os.makedirs(check_directory)
         if show:
             print('make dir:', check_directory)
@@ -51,7 +51,7 @@ def js_img_sta(js_path, csv_path, png_shape_path, png_shapeRate_path,
 
     if png_shape_path is not None:
         check_dir(png_shape_path)
-        sns.jointplot('height', 'width', data=df_img, kind='hex')
+        sns.jointplot(y='height', x='width', data=df_img, kind='hex')
         plt.savefig(png_shape_path)
         plt.close()
         print('png save to', png_shape_path)

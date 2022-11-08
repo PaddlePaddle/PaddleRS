@@ -46,7 +46,7 @@ def check_dir(check_path, show=True):
         check_directory = check_path
     else:
         check_directory = os.path.dirname(check_path)
-    if not os.path.exists(check_directory):
+    if len(check_directory) > 0 and not os.path.exists(check_directory):
         os.makedirs(check_directory)
         if show:
             print('make dir:', check_directory)
@@ -60,7 +60,7 @@ def js_anno_sta(js_path, csv_path, png_shape_path, png_shapeRate_path,
         data = json.load(load_f)
 
     df_img = pd.DataFrame(data[image_keyname])
-    sns.jointplot('height', 'width', data=df_img, kind='hex')
+    sns.jointplot(y='height', x='width', data=df_img, kind='hex')
     plt.close()
     df_img = df_img.rename(columns={
         "id": "image_id",
@@ -78,7 +78,7 @@ def js_anno_sta(js_path, csv_path, png_shape_path, png_shapeRate_path,
 
     if png_shape_path is not None:
         check_dir(png_shape_path)
-        sns.jointplot('height', 'width', data=df_merge, kind='hex')
+        sns.jointplot(y='height', x='width', data=df_merge, kind='hex')
         plt.savefig(png_shape_path)
         plt.close()
         print('png save to', png_shape_path)
@@ -86,7 +86,7 @@ def js_anno_sta(js_path, csv_path, png_shape_path, png_shapeRate_path,
             png_shapeR_path = png_shape_path.replace('.png', '_Relative.png')
             df_merge['heightR'] = df_merge['height'] / df_merge['image_height']
             df_merge['widthR'] = df_merge['width'] / df_merge['image_width']
-            sns.jointplot('heightR', 'widthR', data=df_merge, kind='hex')
+            sns.jointplot(y='heightR', x='widthR', data=df_merge, kind='hex')
             plt.savefig(png_shapeR_path)
             plt.close()
             print('png save to', png_shapeR_path)
@@ -105,7 +105,7 @@ def js_anno_sta(js_path, csv_path, png_shape_path, png_shapeRate_path,
 
     if png_pos_path is not None:
         check_dir(png_pos_path)
-        sns.jointplot('pox_y', 'pox_x', data=df_merge, kind='hex')
+        sns.jointplot(y='pox_y', x='pox_x', data=df_merge, kind='hex')
         plt.savefig(png_pos_path)
         plt.close()
         print('png save to', png_pos_path)
@@ -113,7 +113,7 @@ def js_anno_sta(js_path, csv_path, png_shape_path, png_shapeRate_path,
             png_posR_path = png_pos_path.replace('.png', '_Relative.png')
             df_merge['pox_yR'] = df_merge['pox_y'] / df_merge['image_height']
             df_merge['pox_xR'] = df_merge['pox_x'] / df_merge['image_width']
-            sns.jointplot('pox_yR', 'pox_xR', data=df_merge, kind='hex')
+            sns.jointplot(y='pox_yR', x='pox_xR', data=df_merge, kind='hex')
             plt.savefig(png_posR_path)
             plt.close()
             print('png save to', png_posR_path)
@@ -121,7 +121,7 @@ def js_anno_sta(js_path, csv_path, png_shape_path, png_shapeRate_path,
         check_dir(png_posEnd_path)
         df_merge['pox_y_end'] = df_merge['pox_y'] + df_merge['height']
         df_merge['pox_x_end'] = df_merge['pox_x'] + df_merge['width']
-        sns.jointplot('pox_y_end', 'pox_x_end', data=df_merge, kind='hex')
+        sns.jointplot(y='pox_y_end', x='pox_x_end', data=df_merge, kind='hex')
         plt.savefig(png_posEnd_path)
         plt.close()
         print('png save to', png_posEnd_path)
@@ -131,7 +131,8 @@ def js_anno_sta(js_path, csv_path, png_shape_path, png_shapeRate_path,
                 'image_height']
             df_merge['pox_x_endR'] = df_merge['pox_x_end'] / df_merge[
                 'image_width']
-            sns.jointplot('pox_y_endR', 'pox_x_endR', data=df_merge, kind='hex')
+            sns.jointplot(
+                y='pox_y_endR', x='pox_x_endR', data=df_merge, kind='hex')
             plt.savefig(png_posEndR_path)
             plt.close()
             print('png save to', png_posEndR_path)
