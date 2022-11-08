@@ -167,13 +167,8 @@ class BaseClassifier(BaseModel):
             weight_decay=paddle.regularizer.L2Decay(L2_coeff))
         return optimizer
 
-    def default_postprocess(self, class_id_map_file):
-        default_config = {
-            "name": "Topk",
-            "topk": 1,
-            "class_id_map_file": class_id_map_file
-        }
-        return build_postprocess(default_config)
+    def default_postprocess(self):
+        return self.build_postprocess_from_labels(topk=1)
 
     def build_postprocess_from_labels(self, topk=1):
         label_dict = dict()
@@ -250,7 +245,7 @@ class BaseClassifier(BaseModel):
         if self.losses is None:
             self.losses = self.default_loss()
         self.metrics = self.default_metric()
-        self.postprocess = self.default_postprocess(train_dataset.label_list)
+        self.postprocess = self.default_postprocess()
 
         if optimizer is None:
             num_steps_each_epoch = train_dataset.num_samples // train_batch_size
