@@ -1,4 +1,4 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -188,11 +188,10 @@ class ShuffleNetV2(nn.Layer):
         elif scale == 1.5:
             stage_out_channels = [-1, 24, 176, 352, 704, 1024]
         elif scale == 2.0:
-            stage_out_channels = [-1, 24, 224, 488, 976, 2048]
+            stage_out_channels = [-1, 24, 244, 488, 976, 2048]
         else:
             raise NotImplementedError("This scale size:[" + str(scale) +
                                       "] is not implemented!")
-
         self._out_channels = []
         self._feature_idx = 0
         # 1. conv1

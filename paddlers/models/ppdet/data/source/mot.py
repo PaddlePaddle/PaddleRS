@@ -39,15 +39,16 @@ class MOTDataSet(DetDataset):
         image_lists (str|list): mot data image lists, muiti-source mot dataset.
         data_fields (list): key name of data dictionary, at least have 'image'.
         sample_num (int): number of samples to load, -1 means all.
+        repeat (int): repeat times for dataset, use in benchmark.
 
     Notes:
         MOT datasets root directory following this:
             dataset/mot
             |——————image_lists
-            |        |——————caltech.train
-            |        |——————caltech.val
-            |        |——————mot16.train
-            |        |——————mot17.train
+            |        |——————caltech.train  
+            |        |——————caltech.val   
+            |        |——————mot16.train  
+            |        |——————mot17.train  
             |        ......
             |——————Caltech
             |——————MOT17
@@ -77,11 +78,13 @@ class MOTDataSet(DetDataset):
                  dataset_dir=None,
                  image_lists=[],
                  data_fields=['image'],
-                 sample_num=-1):
+                 sample_num=-1,
+                 repeat=1):
         super(MOTDataSet, self).__init__(
             dataset_dir=dataset_dir,
             data_fields=data_fields,
-            sample_num=sample_num)
+            sample_num=sample_num,
+            repeat=repeat)
         self.dataset_dir = dataset_dir
         self.image_lists = image_lists
         if isinstance(self.image_lists, str):
@@ -243,8 +246,8 @@ class MCMOTDataSet(DetDataset):
         MCMOT datasets root directory following this:
             dataset/mot
             |——————image_lists
-            |        |——————visdrone_mcmot.train
-            |        |——————visdrone_mcmot.val
+            |        |——————visdrone_mcmot.train  
+            |        |——————visdrone_mcmot.val   
             visdrone_mcmot
             |——————images
             |        └——————train
@@ -348,10 +351,10 @@ class MCMOTDataSet(DetDataset):
         self.num_imgs_each_data = [len(x) for x in self.img_files.values()]
         self.total_imgs = sum(self.num_imgs_each_data)
 
-        # cname2cid and cid2cname
+        # cname2cid and cid2cname 
         cname2cid = {}
         if self.label_list is not None:
-            # if use label_list for multi source mix dataset,
+            # if use label_list for multi source mix dataset, 
             # please make sure label_list in the first sub_dataset at least.
             sub_dataset = self.image_lists[0].split('.')[0]
             label_path = os.path.join(self.dataset_dir, sub_dataset,
@@ -461,7 +464,7 @@ class MOTImageFolder(DetDataset):
         video_file (str): path of the video file, default ''.
         frame_rate (int): frame rate of the video, use cv2 VideoCapture if not set.
         dataset_dir (str): root directory for dataset.
-        keep_ori_im (bool): whether to keep original image, default False.
+        keep_ori_im (bool): whether to keep original image, default False. 
             Set True when used during MOT model inference while saving
             images or video, or used in DeepSORT.
     """
@@ -474,6 +477,7 @@ class MOTImageFolder(DetDataset):
                  image_dir=None,
                  sample_num=-1,
                  keep_ori_im=False,
+                 anno_path=None,
                  **kwargs):
         super(MOTImageFolder, self).__init__(
             dataset_dir, image_dir, sample_num=sample_num)
@@ -483,6 +487,7 @@ class MOTImageFolder(DetDataset):
         self._imid2path = {}
         self.roidbs = None
         self.frame_rate = frame_rate
+        self.anno_path = anno_path
 
     def check_or_download_dataset(self):
         return
@@ -572,6 +577,9 @@ class MOTImageFolder(DetDataset):
         assert os.path.isfile(self.video_file) and _is_valid_video(self.video_file), \
                 "wrong or unsupported file format: {}".format(self.video_file)
         self.roidbs = self._load_video_images()
+
+    def get_anno(self):
+        return self.anno_path
 
 
 def _is_valid_video(f, extensions=('.mp4', '.avi', '.mov', '.rmvb', 'flv')):

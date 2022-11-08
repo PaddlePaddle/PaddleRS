@@ -1,15 +1,15 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
+# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved. 
+#   
+# Licensed under the Apache License, Version 2.0 (the "License");   
+# you may not use this file except in compliance with the License.  
+# You may obtain a copy of the License at   
+#   
+#     http://www.apache.org/licenses/LICENSE-2.0    
+#   
+# Unless required by applicable law or agreed to in writing, software   
+# distributed under the License is distributed on an "AS IS" BASIS, 
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  
+# See the License for the specific language governing permissions and   
 # limitations under the License.
 
 from __future__ import absolute_import
@@ -41,22 +41,26 @@ TRT_MIN_SUBGRAPH = {
     'HigherHRNet': 3,
     'HRNet': 3,
     'DeepSORT': 3,
+    'ByteTrack': 10,
     'JDE': 10,
     'FairMOT': 5,
     'GFL': 16,
     'PicoDet': 3,
     'CenterNet': 5,
     'TOOD': 5,
+    'YOLOX': 8,
 }
 
 KEYPOINT_ARCH = ['HigherHRNet', 'TopDownHRNet']
-MOT_ARCH = ['DeepSORT', 'JDE', 'FairMOT']
+MOT_ARCH = ['DeepSORT', 'JDE', 'FairMOT', 'ByteTrack']
 
 
 def _prune_input_spec(input_spec, program, targets):
     # try to prune static program to figure out pruned input spec
     # so we perform following operations in static mode
+    device = paddle.get_device()
     paddle.enable_static()
+    paddle.set_device(device)
     pruned_input_spec = [{}]
     program = program.clone()
     program = program._prune(targets=targets)
@@ -67,7 +71,7 @@ def _prune_input_spec(input_spec, program, targets):
             pruned_input_spec[0][name] = spec
         except Exception:
             pass
-    paddle.disable_static()
+    paddle.disable_static(place=device)
     return pruned_input_spec
 
 
@@ -88,6 +92,7 @@ def _parse_reader(reader_cfg, dataset_cfg, metric, arch, image_shape):
             if key == 'Resize':
                 if int(image_shape[1]) != -1:
                     value['target_size'] = image_shape[1:]
+                value['interp'] = value.get('interp', 1)  # cv2.INTER_LINEAR
             if fuse_normalize and key == 'NormalizeImage':
                 continue
             p.update(value)
@@ -120,12 +125,20 @@ def _dump_infer_config(config, path, image_shape, model):
     setup_orderdict()
     use_dynamic_shape = True if image_shape[2] == -1 else False
     infer_cfg = OrderedDict({
-        'mode': 'fluid',
+        'mode': 'paddle',
         'draw_threshold': 0.5,
         'metric': config['metric'],
         'use_dynamic_shape': use_dynamic_shape
     })
+    export_onnx = config.get('export_onnx', False)
+    export_eb = config.get('export_eb', False)
+
     infer_arch = config['architecture']
+    if 'RCNN' in infer_arch and export_onnx:
+        logger.warning(
+            "Exporting RCNN model to ONNX only support batch_size = 1")
+        infer_cfg['export_onnx'] = True
+        infer_cfg['export_eb'] = export_eb
 
     if infer_arch in MOT_ARCH:
         if infer_arch == 'DeepSORT':
@@ -140,6 +153,12 @@ def _dump_infer_config(config, path, image_shape, model):
             infer_cfg['min_subgraph_size'] = min_subgraph_size
             arch_state = True
             break
+
+    if infer_arch == 'YOLOX':
+        infer_cfg['arch'] = infer_arch
+        infer_cfg['min_subgraph_size'] = TRT_MIN_SUBGRAPH[infer_arch]
+        arch_state = True
+
     if not arch_state:
         logger.error(
             'Architecture: {} is not supported for exporting model now.\n'.
@@ -165,12 +184,17 @@ def _dump_infer_config(config, path, image_shape, model):
         reader_cfg, dataset_cfg, config['metric'], label_arch, image_shape[1:])
 
     if infer_arch == 'PicoDet':
-        infer_cfg['NMS'] = config['PicoHead']['nms']
-        # In order to speed up the prediction, the threshold of nms
+        if hasattr(config, 'export') and config['export'].get(
+                'post_process',
+                False) and not config['export'].get('benchmark', False):
+            infer_cfg['arch'] = 'GFL'
+        head_name = 'PicoHeadV2' if config['PicoHeadV2'] else 'PicoHead'
+        infer_cfg['NMS'] = config[head_name]['nms']
+        # In order to speed up the prediction, the threshold of nms 
         # is adjusted here, which can be changed in infer_cfg.yml
-        config['PicoHead']['nms']["score_threshold"] = 0.3
-        config['PicoHead']['nms']["nms_threshold"] = 0.5
-        infer_cfg['fpn_stride'] = config['PicoHead']['fpn_stride']
+        config[head_name]['nms']["score_threshold"] = 0.3
+        config[head_name]['nms']["nms_threshold"] = 0.5
+        infer_cfg['fpn_stride'] = config[head_name]['fpn_stride']
 
     yaml.dump(infer_cfg, open(path, 'w'))
     logger.info("Export inference config file to {}".format(os.path.join(path)))

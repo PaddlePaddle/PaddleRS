@@ -1,15 +1,15 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
+# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved. 
+#   
+# Licensed under the Apache License, Version 2.0 (the "License");   
+# you may not use this file except in compliance with the License.  
+# You may obtain a copy of the License at   
+#   
+#     http://www.apache.org/licenses/LICENSE-2.0    
+# 
+# Unless required by applicable law or agreed to in writing, software   
+# distributed under the License is distributed on an "AS IS" BASIS, 
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  
+# See the License for the specific language governing permissions and   
 # limitations under the License.
 
 import paddle
@@ -17,10 +17,12 @@ import paddle.nn as nn
 import paddle.nn.functional as F
 from paddlers.models.ppdet.core.workspace import register, serializable
 from paddlers.models.ppdet.modeling.layers import DropBlock
+from paddlers.models.ppdet.modeling.ops import get_act_fn
 from ..backbones.darknet import ConvBNLayer
 from ..shape_spec import ShapeSpec
+from ..backbones.csp_darknet import BaseConv, DWConv, CSPLayer
 
-__all__ = ['YOLOv3FPN', 'PPYOLOFPN', 'PPYOLOTinyFPN', 'PPYOLOPAN']
+__all__ = ['YOLOv3FPN', 'PPYOLOFPN', 'PPYOLOTinyFPN', 'PPYOLOPAN', 'YOLOCSPPAN']
 
 
 def add_coord(x, data_format):
@@ -114,7 +116,7 @@ class SPP(nn.Layer):
                  ch_out,
                  k,
                  pool_size,
-                 norm_type,
+                 norm_type='bn',
                  freeze_norm=False,
                  name='',
                  act='leaky',
@@ -267,7 +269,7 @@ class PPYOLOTinyDetBlock(nn.Layer):
         self.conv_module = nn.Sequential()
 
         cfgs = [
-            # name, in channels, out channels, filter_size,
+            # name, in channels, out channels, filter_size, 
             # stride, padding, groups
             ['.0', ch_in, ch_out, 1, 1, 0, 1],
             ['.1', ch_out, ch_out, 5, 1, 2, ch_out],
@@ -679,7 +681,7 @@ class PPYOLOTinyFPN(nn.Layer):
             detection_block_channels (list): channels in fpn
             norm_type (str): batch norm type, default bn
             data_format (str): data format, NCHW or NHWC
-            kwargs: extra key-value pairs, such as parameter of DropBlock and spp
+            kwargs: extra key-value pairs, such as parameter of DropBlock and spp 
         """
         super(PPYOLOTinyFPN, self).__init__()
         assert len(in_channels) > 0, "in_channels length should > 0"
@@ -978,6 +980,115 @@ class PPYOLOPAN(nn.Layer):
             return {'yolo_feats': pan_feats[::-1], 'emb_feats': emb_feats}
         else:
             return pan_feats[::-1]
+
+    @classmethod
+    def from_config(cls, cfg, input_shape):
+        return {'in_channels': [i.channels for i in input_shape], }
+
+    @property
+    def out_shape(self):
+        return [ShapeSpec(channels=c) for c in self._out_channels]
+
+
+@register
+@serializable
+class YOLOCSPPAN(nn.Layer):
+    """
+    YOLO CSP-PAN, used in YOLOv5 and YOLOX.
+    """
+    __shared__ = ['depth_mult', 'data_format', 'act', 'trt']
+
+    def __init__(self,
+                 depth_mult=1.0,
+                 in_channels=[256, 512, 1024],
+                 depthwise=False,
+                 data_format='NCHW',
+                 act='silu',
+                 trt=False):
+        super(YOLOCSPPAN, self).__init__()
+        self.in_channels = in_channels
+        self._out_channels = in_channels
+        Conv = DWConv if depthwise else BaseConv
+
+        self.data_format = data_format
+        act = get_act_fn(
+            act, trt=trt) if act is None or isinstance(act,
+                                                       (str, dict)) else act
+        self.upsample = nn.Upsample(scale_factor=2, mode="nearest")
+
+        # top-down fpn
+        self.lateral_convs = nn.LayerList()
+        self.fpn_blocks = nn.LayerList()
+        for idx in range(len(in_channels) - 1, 0, -1):
+            self.lateral_convs.append(
+                BaseConv(
+                    int(in_channels[idx]),
+                    int(in_channels[idx - 1]),
+                    1,
+                    1,
+                    act=act))
+            self.fpn_blocks.append(
+                CSPLayer(
+                    int(in_channels[idx - 1] * 2),
+                    int(in_channels[idx - 1]),
+                    round(3 * depth_mult),
+                    shortcut=False,
+                    depthwise=depthwise,
+                    act=act))
+
+        # bottom-up pan
+        self.downsample_convs = nn.LayerList()
+        self.pan_blocks = nn.LayerList()
+        for idx in range(len(in_channels) - 1):
+            self.downsample_convs.append(
+                Conv(
+                    int(in_channels[idx]),
+                    int(in_channels[idx]),
+                    3,
+                    stride=2,
+                    act=act))
+            self.pan_blocks.append(
+                CSPLayer(
+                    int(in_channels[idx] * 2),
+                    int(in_channels[idx + 1]),
+                    round(3 * depth_mult),
+                    shortcut=False,
+                    depthwise=depthwise,
+                    act=act))
+
+    def forward(self, feats, for_mot=False):
+        assert len(feats) == len(self.in_channels)
+
+        # top-down fpn
+        inner_outs = [feats[-1]]
+        for idx in range(len(self.in_channels) - 1, 0, -1):
+            feat_heigh = inner_outs[0]
+            feat_low = feats[idx - 1]
+            feat_heigh = self.lateral_convs[len(self.in_channels) - 1 - idx](
+                feat_heigh)
+            inner_outs[0] = feat_heigh
+
+            upsample_feat = F.interpolate(
+                feat_heigh,
+                scale_factor=2.,
+                mode="nearest",
+                data_format=self.data_format)
+            inner_out = self.fpn_blocks[len(self.in_channels) - 1 - idx](
+                paddle.concat(
+                    [upsample_feat, feat_low], axis=1))
+            inner_outs.insert(0, inner_out)
+
+        # bottom-up pan
+        outs = [inner_outs[0]]
+        for idx in range(len(self.in_channels) - 1):
+            feat_low = outs[-1]
+            feat_height = inner_outs[idx + 1]
+            downsample_feat = self.downsample_convs[idx](feat_low)
+            out = self.pan_blocks[idx](paddle.concat(
+                [downsample_feat, feat_height], axis=1))
+            outs.append(out)
+
+        return outs
 
     @classmethod
     def from_config(cls, cfg, input_shape):

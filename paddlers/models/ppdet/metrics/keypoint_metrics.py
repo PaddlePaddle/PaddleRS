@@ -1,21 +1,22 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
+# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved. 
+#   
+# Licensed under the Apache License, Version 2.0 (the "License");   
+# you may not use this file except in compliance with the License.  
+# You may obtain a copy of the License at   
+#   
+#     http://www.apache.org/licenses/LICENSE-2.0    
+#   
+# Unless required by applicable law or agreed to in writing, software   
+# distributed under the License is distributed on an "AS IS" BASIS, 
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  
+# See the License for the specific language governing permissions and   
 # limitations under the License.
 
 import os
 import json
 from collections import defaultdict, OrderedDict
 import numpy as np
+import paddle
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
 from ..modeling.keypoint_utils import oks_nms
@@ -70,15 +71,23 @@ class KeyPointTopDownCOCOEval(object):
         self.results['all_preds'][self.idx:self.idx + num_images, :, 0:
                                   3] = kpts[:, :, 0:3]
         self.results['all_boxes'][self.idx:self.idx + num_images, 0:2] = inputs[
-            'center'].numpy()[:, 0:2]
+            'center'].numpy()[:, 0:2] if isinstance(
+                inputs['center'], paddle.Tensor) else inputs['center'][:, 0:2]
         self.results['all_boxes'][self.idx:self.idx + num_images, 2:4] = inputs[
-            'scale'].numpy()[:, 0:2]
+            'scale'].numpy()[:, 0:2] if isinstance(
+                inputs['scale'], paddle.Tensor) else inputs['scale'][:, 0:2]
         self.results['all_boxes'][self.idx:self.idx + num_images, 4] = np.prod(
-            inputs['scale'].numpy() * 200, 1)
-        self.results['all_boxes'][self.idx:self.idx + num_images,
-                                  5] = np.squeeze(inputs['score'].numpy())
-        self.results['image_path'].extend(inputs['im_id'].numpy())
-
+            inputs['scale'].numpy() * 200,
+            1) if isinstance(inputs['scale'], paddle.Tensor) else np.prod(
+                inputs['scale'] * 200, 1)
+        self.results['all_boxes'][
+            self.idx:self.idx + num_images,
+            5] = np.squeeze(inputs['score'].numpy()) if isinstance(
+                inputs['score'], paddle.Tensor) else np.squeeze(inputs['score'])
+        if isinstance(inputs['im_id'], paddle.Tensor):
+            self.results['image_path'].extend(inputs['im_id'].numpy())
+        else:
+            self.results['image_path'].extend(inputs['im_id'])
         self.idx += num_images
 
     def _write_coco_keypoint_results(self, keypoints):

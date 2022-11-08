@@ -1,15 +1,15 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
+# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved. 
+#   
+# Licensed under the Apache License, Version 2.0 (the "License");   
+# you may not use this file except in compliance with the License.  
+# You may obtain a copy of the License at   
+#   
+#     http://www.apache.org/licenses/LICENSE-2.0    
+#   
+# Unless required by applicable law or agreed to in writing, software   
+# distributed under the License is distributed on an "AS IS" BASIS, 
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  
+# See the License for the specific language governing permissions and   
 # limitations under the License.
 
 from __future__ import absolute_import
@@ -109,10 +109,13 @@ class YOLOv3(BaseArch):
                 if self.return_idx:
                     _, bbox, bbox_num, _ = self.post_process(
                         yolo_head_outs, self.yolo_head.mask_anchors)
-                else:
+                elif self.post_process is not None:
                     bbox, bbox_num = self.post_process(
                         yolo_head_outs, self.yolo_head.mask_anchors,
                         self.inputs['im_shape'], self.inputs['scale_factor'])
+                else:
+                    bbox, bbox_num = self.yolo_head.post_process(
+                        yolo_head_outs, self.inputs['scale_factor'])
                 output = {'bbox': bbox, 'bbox_num': bbox_num}
 
             return output

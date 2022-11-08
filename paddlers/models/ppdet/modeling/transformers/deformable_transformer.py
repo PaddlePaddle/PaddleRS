@@ -13,7 +13,7 @@
 # limitations under the License.
 #
 # Modified from Deformable-DETR (https://github.com/fundamentalvision/Deformable-DETR)
-# Copyright (c) 2022 SenseTime. All Rights Reserved.
+# Copyright (c) 2020 SenseTime. All Rights Reserved.
 
 from __future__ import absolute_import
 from __future__ import division

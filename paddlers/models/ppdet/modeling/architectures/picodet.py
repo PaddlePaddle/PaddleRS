@@ -1,15 +1,15 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
+# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved. 
+#   
+# Licensed under the Apache License, Version 2.0 (the "License");   
+# you may not use this file except in compliance with the License.  
+# You may obtain a copy of the License at   
+#   
+#     http://www.apache.org/licenses/LICENSE-2.0    
+#   
+# Unless required by applicable law or agreed to in writing, software   
+# distributed under the License is distributed on an "AS IS" BASIS, 
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  
+# See the License for the specific language governing permissions and   
 # limitations under the License.
 
 from __future__ import absolute_import
@@ -41,7 +41,8 @@ class PicoDet(BaseArch):
         self.backbone = backbone
         self.neck = neck
         self.head = head
-        self.deploy = False
+        self.export_post_process = True
+        self.export_nms = True
 
     @classmethod
     def from_config(cls, cfg, *args, **kwargs):
@@ -62,14 +63,13 @@ class PicoDet(BaseArch):
     def _forward(self):
         body_feats = self.backbone(self.inputs)
         fpn_feats = self.neck(body_feats)
-        head_outs = self.head(fpn_feats, self.deploy)
-        if self.training or self.deploy:
+        head_outs = self.head(fpn_feats, self.export_post_process)
+        if self.training or not self.export_post_process:
             return head_outs, None
         else:
-            im_shape = self.inputs['im_shape']
             scale_factor = self.inputs['scale_factor']
-            bboxes, bbox_num = self.head.post_process(head_outs, im_shape,
-                                                      scale_factor)
+            bboxes, bbox_num = self.head.post_process(
+                head_outs, scale_factor, export_nms=self.export_nms)
             return bboxes, bbox_num
 
     def get_loss(self, ):
@@ -83,9 +83,13 @@ class PicoDet(BaseArch):
         return loss
 
     def get_pred(self):
-        if self.deploy:
+        if not self.export_post_process:
             return {'picodet': self._forward()[0]}
-        else:
+        elif self.export_nms:
             bbox_pred, bbox_num = self._forward()
             output = {'bbox': bbox_pred, 'bbox_num': bbox_num}
+            return output
+        else:
+            bboxes, mlvl_scores = self._forward()
+            output = {'bbox': bboxes, 'scores': mlvl_scores}
             return output

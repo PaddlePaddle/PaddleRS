@@ -511,18 +511,18 @@ class RandomFlipHalfBodyTransform(object):
 
 @register_keypointop
 class AugmentationbyInformantionDropping(object):
-    """AID: Augmentation by Informantion Dropping. Please refer
-        to https://arxiv.org/abs/2008.07139
-
+    """AID: Augmentation by Informantion Dropping. Please refer 
+        to https://arxiv.org/abs/2008.07139 
+    
     Args:
         prob_cutout (float): The probability of the Cutout augmentation.
         offset_factor (float): Offset factor of cutout center.
-        num_patch (int): Number of patches to be cutout.
+        num_patch (int): Number of patches to be cutout.                       
         records(dict): the dict contained the image and coords
-
+        
     Returns:
         records (dict): contain the image and coords after tranformed
-
+    
     """
 
     def __init__(self,
@@ -698,8 +698,8 @@ class ToHeatmapsTopDown(object):
         tmp_size = self.sigma * 3
         feat_stride = image_size / self.hmsize
         for joint_id in range(num_joints):
-            mu_x = int(joints[joint_id][0] + 0.5) / feat_stride[0]
-            mu_y = int(joints[joint_id][1] + 0.5) / feat_stride[1]
+            mu_x = int(joints[joint_id][0] / feat_stride[0] + 0.5)
+            mu_y = int(joints[joint_id][1] / feat_stride[1] + 0.5)
             # Check that any part of the gaussian is in-bounds
             ul = [int(mu_x - tmp_size), int(mu_y - tmp_size)]
             br = [int(mu_x + tmp_size + 1), int(mu_y + tmp_size + 1)]
@@ -796,7 +796,7 @@ class ToHeatmapsTopDown_DARK(object):
 class ToHeatmapsTopDown_UDP(object):
     """This code is based on:
         https://github.com/HuangJunJie2017/UDP-Pose/blob/master/deep-high-resolution-net.pytorch/lib/dataset/JointsDataset.py
-
+       
         to generate the gaussian heatmaps of keypoint for heatmap loss.
         ref: Huang et al. The Devil is in the Details: Delving into Unbiased Data Processing
         for Human Pose Estimation (CVPR 2020).

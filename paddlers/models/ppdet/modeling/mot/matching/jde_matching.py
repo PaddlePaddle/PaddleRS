@@ -15,7 +15,14 @@
 This code is based on https://github.com/Zhongdao/Towards-Realtime-MOT/blob/master/tracker/matching.py
 """
 
-import lap
+try:
+    import lap
+except:
+    print(
+        'Warning: Unable to use JDE/FairMOT/ByteTrack, please install lap, for example: `pip install lap`, see https://github.com/gatagat/lap'
+    )
+    pass
+
 import scipy
 import numpy as np
 from scipy.spatial.distance import cdist
@@ -26,7 +33,7 @@ warnings.filterwarnings("ignore")
 __all__ = [
     'merge_matches',
     'linear_assignment',
-    'cython_bbox_ious',
+    'bbox_ious',
     'iou_distance',
     'embedding_distance',
     'fuse_motion',
@@ -53,6 +60,12 @@ def merge_matches(m1, m2, shape):
 
 
 def linear_assignment(cost_matrix, thresh):
+    try:
+        import lap
+    except Exception as e:
+        raise RuntimeError(
+            'Unable to use JDE/FairMOT/ByteTrack, please install lap, for example: `pip install lap`, see https://github.com/gatagat/lap'
+        )
     if cost_matrix.size == 0:
         return np.empty(
             (0, 2), dtype=int), tuple(range(cost_matrix.shape[0])), tuple(
@@ -68,22 +81,28 @@ def linear_assignment(cost_matrix, thresh):
     return matches, unmatched_a, unmatched_b
 
 
-def cython_bbox_ious(atlbrs, btlbrs):
-    ious = np.zeros((len(atlbrs), len(btlbrs)), dtype=np.float)
-    if ious.size == 0:
+def bbox_ious(atlbrs, btlbrs):
+    boxes = np.ascontiguousarray(atlbrs, dtype=np.float)
+    query_boxes = np.ascontiguousarray(btlbrs, dtype=np.float)
+    N = boxes.shape[0]
+    K = query_boxes.shape[0]
+    ious = np.zeros((N, K), dtype=boxes.dtype)
+    if N * K == 0:
         return ious
-    try:
-        import cython_bbox
-    except Exception as e:
-        print('cython_bbox not found, please install cython_bbox.'
-              'for example: `pip install cython_bbox`.')
-        raise e
 
-    ious = cython_bbox.bbox_overlaps(
-        np.ascontiguousarray(
-            atlbrs, dtype=np.float),
-        np.ascontiguousarray(
-            btlbrs, dtype=np.float))
+    for k in range(K):
+        box_area = ((query_boxes[k, 2] - query_boxes[k, 0] + 1) *
+                    (query_boxes[k, 3] - query_boxes[k, 1] + 1))
+        for n in range(N):
+            iw = (min(boxes[n, 2], query_boxes[k, 2]) - max(
+                boxes[n, 0], query_boxes[k, 0]) + 1)
+            if iw > 0:
+                ih = (min(boxes[n, 3], query_boxes[k, 3]) - max(
+                    boxes[n, 1], query_boxes[k, 1]) + 1)
+                if ih > 0:
+                    ua = float((boxes[n, 2] - boxes[n, 0] + 1) * (boxes[
+                        n, 3] - boxes[n, 1] + 1) + box_area - iw * ih)
+                    ious[n, k] = iw * ih / ua
     return ious
 
 
@@ -98,7 +117,7 @@ def iou_distance(atracks, btracks):
     else:
         atlbrs = [track.tlbr for track in atracks]
         btlbrs = [track.tlbr for track in btracks]
-    _ious = cython_bbox_ious(atlbrs, btlbrs)
+    _ious = bbox_ious(atlbrs, btlbrs)
     cost_matrix = 1 - _ious
 
     return cost_matrix

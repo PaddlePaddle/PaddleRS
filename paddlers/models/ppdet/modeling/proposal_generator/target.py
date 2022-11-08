@@ -39,7 +39,7 @@ def rpn_anchor_target(anchors,
         matches, match_labels = label_box(
             anchors, gt_bbox, rpn_positive_overlap, rpn_negative_overlap, True,
             ignore_thresh, is_crowd_i, assign_on_cpu)
-        # Step2: sample anchor
+        # Step2: sample anchor 
         fg_inds, bg_inds = subsample_labels(match_labels, rpn_batch_size_per_im,
                                             rpn_fg_fraction, 0, use_random)
         # Fill with the ignore label (-1), then set positive and negative labels
@@ -48,7 +48,7 @@ def rpn_anchor_target(anchors,
             labels = paddle.scatter(labels, bg_inds, paddle.zeros_like(bg_inds))
         if fg_inds.shape[0] > 0:
             labels = paddle.scatter(labels, fg_inds, paddle.ones_like(fg_inds))
-        # Step3: make output
+        # Step3: make output  
         if gt_bbox.shape[0] == 0:
             matched_gt_boxes = paddle.zeros([matches.shape[0], 4])
             tgt_delta = paddle.zeros([matches.shape[0], 4])
@@ -74,9 +74,11 @@ def label_box(anchors,
               is_crowd=None,
               assign_on_cpu=False):
     if assign_on_cpu:
+        device = paddle.device.get_device()
         paddle.set_device("cpu")
         iou = bbox_overlaps(gt_boxes, anchors)
-        paddle.set_device("gpu")
+        paddle.set_device(device)
+
     else:
         iou = bbox_overlaps(gt_boxes, anchors)
     n_gt = gt_boxes.shape[0]
@@ -89,7 +91,7 @@ def label_box(anchors,
         default_matches = paddle.full((iou.shape[1], ), 0, dtype='int64')
         default_match_labels = paddle.full((iou.shape[1], ), 0, dtype='int32')
         return default_matches, default_match_labels
-    # if ignore_thresh > 0, remove anchor if it is closed to
+    # if ignore_thresh > 0, remove anchor if it is closed to 
     # one of the crowded ground-truth
     if n_gt_crowd > 0:
         N_a = anchors.shape[0]
@@ -184,7 +186,8 @@ def generate_proposal_target(rpn_rois,
                              use_random=True,
                              is_cascade=False,
                              cascade_iou=0.5,
-                             assign_on_cpu=False):
+                             assign_on_cpu=False,
+                             add_gt_as_proposals=True):
 
     rois_with_gt = []
     tgt_labels = []
@@ -202,7 +205,7 @@ def generate_proposal_target(rpn_rois,
         gt_class = paddle.squeeze(gt_classes[i], axis=-1)
 
         # Concat RoIs and gt boxes except cascade rcnn or none gt
-        if not is_cascade and gt_bbox.shape[0] > 0:
+        if add_gt_as_proposals and gt_bbox.shape[0] > 0:
             bbox = paddle.concat([rpn_roi, gt_bbox])
         else:
             bbox = rpn_roi
@@ -211,12 +214,12 @@ def generate_proposal_target(rpn_rois,
         matches, match_labels = label_box(bbox, gt_bbox, fg_thresh, bg_thresh,
                                           False, ignore_thresh, is_crowd_i,
                                           assign_on_cpu)
-        # Step2: sample bbox
+        # Step2: sample bbox 
         sampled_inds, sampled_gt_classes = sample_bbox(
             matches, match_labels, gt_class, batch_size_per_im, fg_fraction,
             num_classes, use_random, is_cascade)
 
-        # Step3: make output
+        # Step3: make output 
         rois_per_image = bbox if is_cascade else paddle.gather(bbox,
                                                                sampled_inds)
         sampled_gt_ind = matches if is_cascade else paddle.gather(matches,
@@ -337,7 +340,7 @@ def generate_mask_target(gt_segms, rois, labels_int32, sampled_gt_inds,
         # generate fake roi if foreground is empty
         if fg_inds.numel() == 0:
             has_fg = False
-            fg_inds = paddle.ones([1], dtype='int32')
+            fg_inds = paddle.ones([1, 1], dtype='int64')
         inds_per_im = sampled_gt_inds[k]
         inds_per_im = paddle.gather(inds_per_im, fg_inds)
 
@@ -356,7 +359,7 @@ def generate_mask_target(gt_segms, rois, labels_int32, sampled_gt_inds,
         fg_inds_new = fg_inds.reshape([-1]).numpy()
         results = []
         if len(gt_segms_per_im) > 0:
-            for j in fg_inds_new:
+            for j in range(fg_inds_new.shape[0]):
                 results.append(
                     rasterize_polygons_within_box(new_segm[j], boxes[j],
                                                   resolution))

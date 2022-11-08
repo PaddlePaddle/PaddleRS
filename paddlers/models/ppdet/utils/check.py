@@ -20,12 +20,14 @@ import sys
 
 import paddle
 import six
-import paddle.version as fluid_version
+import paddle.version as paddle_version
 
 from .logger import setup_logger
 logger = setup_logger(__name__)
 
-__all__ = ['check_gpu', 'check_npu', 'check_version', 'check_config']
+__all__ = [
+    'check_gpu', 'check_npu', 'check_xpu', 'check_version', 'check_config'
+]
 
 
 def check_npu(use_npu):
@@ -41,6 +43,25 @@ def check_npu(use_npu):
 
     try:
         if use_npu and not paddle.is_compiled_with_npu():
+            logger.error(err)
+            sys.exit(1)
+    except Exception as e:
+        pass
+
+
+def check_xpu(use_xpu):
+    """
+    Log error and exit when set use_xpu=true in paddlepaddle
+    cpu/gpu/npu version.
+    """
+    err = "Config use_xpu cannot be set as true while you are " \
+          "using paddlepaddle cpu/gpu/npu version ! \nPlease try: \n" \
+          "\t1. Install paddlepaddle-xpu to run model on XPU \n" \
+          "\t2. Set use_xpu as false in config file to run " \
+          "model on CPU/GPU/NPU"
+
+    try:
+        if use_xpu and not paddle.is_compiled_with_xpu():
             logger.error(err)
             sys.exit(1)
     except Exception as e:
@@ -66,21 +87,23 @@ def check_gpu(use_gpu):
         pass
 
 
-def check_version(version='2.0'):
+def check_version(version='2.2'):
     """
     Log error and exit when the installed version of paddlepaddle is
     not satisfied.
     """
     err = "PaddlePaddle version {} or higher is required, " \
-          "or a suitable develop version is satisfied as well. \n" \
+          "or a suitable release/2.5 version is satisfied as well. \n" \
           "Please make sure the version is good with your code.".format(version)
 
     version_installed = [
-        fluid_version.major, fluid_version.minor, fluid_version.patch,
-        fluid_version.rc
+        paddle_version.major, paddle_version.minor, paddle_version.patch,
+        paddle_version.rc
     ]
+
     if version_installed == ['0', '0', '0', '0']:
         return
+
     version_split = version.split('.')
 
     length = min(len(version_installed), len(version_split))

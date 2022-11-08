@@ -1,15 +1,15 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
+# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved. 
+#   
+# Licensed under the Apache License, Version 2.0 (the "License");   
+# you may not use this file except in compliance with the License.  
+# You may obtain a copy of the License at   
+#   
+#     http://www.apache.org/licenses/LICENSE-2.0    
+#   
+# Unless required by applicable law or agreed to in writing, software   
+# distributed under the License is distributed on an "AS IS" BASIS, 
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  
+# See the License for the specific language governing permissions and   
 # limitations under the License.
 
 import paddle
@@ -22,6 +22,7 @@ from .bbox_head import BBoxHead, TwoFCHead, XConvNormHead
 from .roi_extractor import RoIAlign
 from ..shape_spec import ShapeSpec
 from ..bbox_utils import delta2bbox, clip_bbox, nonempty_bbox
+from ..cls_utils import _get_class_default_kwargs
 
 __all__ = ['CascadeTwoFCHead', 'CascadeXConvNormHead', 'CascadeHead']
 
@@ -82,7 +83,7 @@ class CascadeXConvNormHead(nn.Layer):
         conv_dim (int): The number of channels for the conv layers
         out_channel (int): Output channels
         resolution (int): Resolution of input feature map
-        norm_type (string): Norm type, bn, gn, sync_bn are available,
+        norm_type (string): Norm type, bn, gn, sync_bn are available, 
             default `gn`
         freeze_norm (bool): Whether to freeze the norm
         num_cascade_stage (int): The number of cascade stage, default 3
@@ -142,10 +143,10 @@ class CascadeHead(BBoxHead):
         head (nn.Layer): Extract feature in bbox head
         in_channel (int): Input channel after RoI extractor
         roi_extractor (object): The module of RoI Extractor
-        bbox_assigner (object): The module of Box Assigner, label and sample the
+        bbox_assigner (object): The module of Box Assigner, label and sample the 
             box.
         num_classes (int): The number of classes
-        bbox_weight (List[List[float]]): The weight to get the decode box and the
+        bbox_weight (List[List[float]]): The weight to get the decode box and the 
             length of weight is the number of cascade stage
         num_cascade_stages (int): THe number of stage to refine the box
     """
@@ -153,13 +154,18 @@ class CascadeHead(BBoxHead):
     def __init__(self,
                  head,
                  in_channel,
-                 roi_extractor=RoIAlign().__dict__,
+                 roi_extractor=_get_class_default_kwargs(RoIAlign),
                  bbox_assigner='BboxAssigner',
                  num_classes=80,
                  bbox_weight=[[10., 10., 5., 5.], [20.0, 20.0, 10.0, 10.0],
                               [30.0, 30.0, 15.0, 15.0]],
                  num_cascade_stages=3,
-                 bbox_loss=None):
+                 bbox_loss=None,
+                 reg_class_agnostic=True,
+                 stage_loss_weights=None,
+                 loss_normalize_pos=False,
+                 add_gt_as_proposals=[True, False, False]):
+
         nn.Layer.__init__(self, )
         self.head = head
         self.roi_extractor = roi_extractor
@@ -171,6 +177,18 @@ class CascadeHead(BBoxHead):
         self.bbox_weight = bbox_weight
         self.num_cascade_stages = num_cascade_stages
         self.bbox_loss = bbox_loss
+        self.stage_loss_weights = [
+            1. / num_cascade_stages for _ in range(num_cascade_stages)
+        ] if stage_loss_weights is None else stage_loss_weights
+        self.add_gt_as_proposals = add_gt_as_proposals
+
+        assert len(
+            self.stage_loss_weights
+        ) == num_cascade_stages, f'stage_loss_weights({len(self.stage_loss_weights)}) do not equal to num_cascade_stages({num_cascade_stages})'
+
+        self.reg_class_agnostic = reg_class_agnostic
+        num_bbox_delta = 4 if reg_class_agnostic else 4 * num_classes
+        self.loss_normalize_pos = loss_normalize_pos
 
         self.bbox_score_list = []
         self.bbox_delta_list = []
@@ -189,7 +207,7 @@ class CascadeHead(BBoxHead):
                 delta_name,
                 nn.Linear(
                     in_channel,
-                    4,
+                    num_bbox_delta,
                     weight_attr=paddle.ParamAttr(initializer=Normal(
                         mean=0.0, std=0.001))))
             self.bbox_score_list.append(bbox_score)
@@ -206,7 +224,11 @@ class CascadeHead(BBoxHead):
         """
         targets = []
         if self.training:
-            rois, rois_num, targets = self.bbox_assigner(rois, rois_num, inputs)
+            rois, rois_num, targets = self.bbox_assigner(
+                rois,
+                rois_num,
+                inputs,
+                add_gt_as_proposals=self.add_gt_as_proposals[0])
             targets_list = [targets]
             self.assigned_rois = (rois, rois_num)
             self.assigned_targets = targets
@@ -219,13 +241,32 @@ class CascadeHead(BBoxHead):
                                                            inputs['im_shape'])
                 if self.training:
                     rois, rois_num, targets = self.bbox_assigner(
-                        rois, rois_num, inputs, i, is_cascade=True)
+                        rois,
+                        rois_num,
+                        inputs,
+                        i,
+                        is_cascade=True,
+                        add_gt_as_proposals=self.add_gt_as_proposals[i])
                     targets_list.append(targets)
 
             rois_feat = self.roi_extractor(body_feats, rois, rois_num)
             bbox_feat = self.head(rois_feat, i)
             scores = self.bbox_score_list[i](bbox_feat)
             deltas = self.bbox_delta_list[i](bbox_feat)
+
+            # TODO (lyuwenyu) Is it correct for only one class ?
+            if not self.reg_class_agnostic and i < self.num_cascade_stages - 1:
+                deltas = deltas.reshape([deltas.shape[0], self.num_classes, 4])
+                labels = scores[:, :-1].argmax(axis=-1)
+
+                if self.training:
+                    deltas = deltas[paddle.arange(deltas.shape[0]), labels]
+                else:
+                    deltas = deltas[((deltas + 10000) * F.one_hot(
+                        labels, num_classes=self.num_classes).unsqueeze(-1) != 0
+                                     ).nonzero(as_tuple=True)].reshape(
+                                         [deltas.shape[0], 4])
+
             head_out_list.append([scores, deltas, rois])
             pred_bbox = self._get_pred_bbox(deltas, rois, self.bbox_weight[i])
 
@@ -233,11 +274,16 @@ class CascadeHead(BBoxHead):
             loss = {}
             for stage, value in enumerate(zip(head_out_list, targets_list)):
                 (scores, deltas, rois), targets = value
-                loss_stage = self.get_loss(scores, deltas, targets, rois,
-                                           self.bbox_weight[stage])
+                loss_stage = self.get_loss(
+                    scores,
+                    deltas,
+                    targets,
+                    rois,
+                    self.bbox_weight[stage],
+                    loss_normalize_pos=self.loss_normalize_pos)
                 for k, v in loss_stage.items():
                     loss[k + "_stage{}".format(
-                        stage)] = v / self.num_cascade_stages
+                        stage)] = v * self.stage_loss_weights[stage]
 
             return loss, bbox_feat
         else:
@@ -266,6 +312,14 @@ class CascadeHead(BBoxHead):
         num_prop = []
         for p in proposals:
             num_prop.append(p.shape[0])
+
+        # NOTE(dev): num_prob will be tagged as LoDTensorArray because it
+        # depends on batch_size under @to_static. However the argument
+        # num_or_sections in paddle.split does not support LoDTensorArray,
+        # so we use [-1] to replace it if num_prop is not list. The modification
+        # This ensures the correctness of both dynamic and static graphs.
+        if not isinstance(num_prop, list):
+            num_prop = [-1]
         return pred_bbox.split(num_prop)
 
     def get_prediction(self, head_out_list):

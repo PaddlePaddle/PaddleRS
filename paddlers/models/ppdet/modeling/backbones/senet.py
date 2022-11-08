@@ -1,21 +1,23 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
+# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved. 
+#   
+# Licensed under the Apache License, Version 2.0 (the "License");   
+# you may not use this file except in compliance with the License.  
+# You may obtain a copy of the License at   
+#   
+#     http://www.apache.org/licenses/LICENSE-2.0    
+#   
+# Unless required by applicable law or agreed to in writing, software   
+# distributed under the License is distributed on an "AS IS" BASIS, 
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  
+# See the License for the specific language governing permissions and   
 # limitations under the License.
 
 import paddle.nn as nn
 
 from paddlers.models.ppdet.core.workspace import register, serializable
 from .resnet import ResNet, Blocks, BasicBlock, BottleNeck
+from ..shape_spec import ShapeSpec
+from .name_adapter import NameAdapter
 
 __all__ = ['SENet', 'SERes5Head']
 
@@ -41,12 +43,12 @@ class SENet(ResNet):
                  num_stages=4):
         """
         Squeeze-and-Excitation Networks, see https://arxiv.org/abs/1709.01507
-
+        
         Args:
             depth (int): SENet depth, should be 50, 101, 152
             variant (str): ResNet variant, supports 'a', 'b', 'c', 'd' currently
             lr_mult_list (list): learning rate ratio of different resnet stages(2,3,4,5),
-                                 lower learning rate ratio is need for pretrained model
+                                 lower learning rate ratio is need for pretrained model 
                                  got using distillation(default as [1.0, 1.0, 1.0, 1.0]).
             groups (int): group convolution cardinality
             base_width (int): base width of each group convolution
@@ -103,7 +105,7 @@ class SERes5Head(nn.Layer):
             norm_decay (float): weight decay for normalization layer weights
             dcn_v2_stages (list): index of stages who select deformable conv v2
             std_senet (bool): whether use senet, default True
-
+            
         """
         super(SERes5Head, self).__init__()
         ch_out = 512
