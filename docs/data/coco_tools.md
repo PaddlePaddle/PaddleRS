@@ -4,6 +4,8 @@
 
 coco_tools是PaddleRS提供的用于处理COCO格式标注文件的工具集，位于`tools/coco_tools/`目录。由于[pycocotools库](https://pypi.org/project/pycocotools/)在部分环境下无法安装，PaddleRS提供coco_tools作为替代，进行一些简单的文件处理工作。
 
+*请注意，coco_tools目前为一项实验性功能，若您在使用过程中遇到问题，请及时向我们反馈。*
+
 ## 2 文件说明
 
 目前coco_tools共有6个文件，各文件及其功能如下：
