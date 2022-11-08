@@ -1,15 +1,15 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
+# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved. 
+#   
+# Licensed under the Apache License, Version 2.0 (the "License");   
+# you may not use this file except in compliance with the License.  
+# You may obtain a copy of the License at   
+#   
+#     http://www.apache.org/licenses/LICENSE-2.0    
+#   
+# Unless required by applicable law or agreed to in writing, software   
+# distributed under the License is distributed on an "AS IS" BASIS, 
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  
+# See the License for the specific language governing permissions and   
 # limitations under the License.
 """
 this code is base on https://github.com/open-mmlab/mmpose
@@ -27,7 +27,7 @@ from paddlers.models.ppdet.core.workspace import register, serializable
 
 @serializable
 class KeypointBottomUpBaseDataset(DetDataset):
-    """Base class for bottom-up datasets.
+    """Base class for bottom-up datasets. 
 
     All datasets should subclass it.
     All subclasses should overwrite:
@@ -91,7 +91,7 @@ class KeypointBottomUpBaseDataset(DetDataset):
 @register
 @serializable
 class KeypointBottomUpCocoDataset(KeypointBottomUpBaseDataset):
-    """COCO dataset for bottom-up pose estimation.
+    """COCO dataset for bottom-up pose estimation. 
 
     The dataset loads raw features and apply specified transforms
     to return a dict containing the image tensors and other information.
@@ -262,7 +262,7 @@ class KeypointBottomUpCocoDataset(KeypointBottomUpBaseDataset):
 @register
 @serializable
 class KeypointBottomUpCrowdPoseDataset(KeypointBottomUpCocoDataset):
-    """CrowdPose dataset for bottom-up pose estimation.
+    """CrowdPose dataset for bottom-up pose estimation. 
 
     The dataset loads raw features and apply specified transforms
     to return a dict containing the image tensors and other information.
@@ -386,7 +386,7 @@ class KeypointTopDownBaseDataset(DetDataset):
 @register
 @serializable
 class KeypointTopDownCocoDataset(KeypointTopDownBaseDataset):
-    """COCO dataset for top-down pose estimation.
+    """COCO dataset for top-down pose estimation. 
 
     The dataset loads raw features and apply specified transforms
     to return a dict containing the image tensors and other information.

@@ -31,7 +31,7 @@ class HMHead(nn.Layer):
         ch_out (int): The channel number of output Tensor.
         num_classes (int): Number of classes.
         conv_num (int): The convolution number of hm_feat.
-        dcn_head(bool): whether use dcn in head. False by default.
+        dcn_head(bool): whether use dcn in head. False by default. 
         lite_head(bool): whether use lite version. False by default.
         norm_type (string): norm type, 'sync_bn', 'bn', 'gn' are optional.
             bn by default

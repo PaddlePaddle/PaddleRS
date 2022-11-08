@@ -1,4 +1,4 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -299,17 +299,17 @@ class GhostBottleneck(nn.Layer):
 class GhostNet(nn.Layer):
     __shared__ = ['norm_type']
 
-    def __init__(self,
-                 scale=1.3,
-                 feature_maps=[6, 12, 15],
-                 with_extra_blocks=False,
-                 extra_block_filters=[[256, 512], [128, 256], [128, 256],
-                                      [64, 128]],
-                 lr_mult_list=[1.0, 1.0, 1.0, 1.0, 1.0],
-                 conv_decay=0.,
-                 norm_type='bn',
-                 norm_decay=0.0,
-                 freeze_norm=False):
+    def __init__(
+            self,
+            scale=1.3,
+            feature_maps=[6, 12, 15],
+            with_extra_blocks=False,
+            extra_block_filters=[[256, 512], [128, 256], [128, 256], [64, 128]],
+            lr_mult_list=[1.0, 1.0, 1.0, 1.0, 1.0],
+            conv_decay=0.,
+            norm_type='bn',
+            norm_decay=0.0,
+            freeze_norm=False):
         super(GhostNet, self).__init__()
         if isinstance(feature_maps, Integral):
             feature_maps = [feature_maps]

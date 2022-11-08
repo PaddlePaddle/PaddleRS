@@ -1,4 +1,4 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 from paddle import ParamAttr
-from paddle.nn import Conv2D, MaxPool2D, AdaptiveAvgPool2D
+from paddle.nn import Conv2D, MaxPool2D, AdaptiveAvgPool2D, BatchNorm
 from paddle.nn.initializer import KaimingNormal
 from paddle.regularizer import L2Decay
 

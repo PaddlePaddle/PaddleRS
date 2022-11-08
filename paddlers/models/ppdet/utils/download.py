@@ -96,8 +96,8 @@ DATASETS = {
         'https://paddlemodels.bj.bcebos.com/object_detection/roadsign_coco.tar',
         '49ce5a9b5ad0d6266163cd01de4b018e', ), ], ['annotations', 'images']),
     'spine_coco': ([(
-        'https://paddledet.bj.bcebos.com/data/spine_coco.tar',
-        '7ed69ae73f842cd2a8cf4f58dc3c5535', ), ], ['annotations', 'images']),
+        'https://paddledet.bj.bcebos.com/data/spine.tar',
+        '8a3a353c2c54a2284ad7d2780b65f6a6', ), ], ['annotations', 'images']),
     'mot': (),
     'objects365': (),
     'coco_ce': ([(
@@ -235,7 +235,7 @@ def create_voc_list(data_dir, devkit_subdir='VOCdevkit'):
     years = ['2007', '2012']
 
     # NOTE: since using auto download VOC
-    # dataset, VOC default label list should be used,
+    # dataset, VOC default label list should be used, 
     # do not generate label_list.txt here. For default
     # label, see ../data/source/voc.py
     create_list(devkit_dir, years, data_dir)
@@ -387,13 +387,18 @@ def _download(url, path, md5sum=None):
                     if chunk:
                         f.write(chunk)
         shutil.move(tmp_fullname, fullname)
-        return fullname
+    return fullname
 
 
 def _download_dist(url, path, md5sum=None):
     env = os.environ
     if 'PADDLE_TRAINERS_NUM' in env and 'PADDLE_TRAINER_ID' in env:
-        trainer_id = int(env['PADDLE_TRAINER_ID'])
+        # Mainly used to solve the problem of downloading data from
+        # different machines in the case of multiple machines.
+        # Different nodes will download data, and the same node
+        # will only download data once.
+        # Reference https://github.com/PaddlePaddle/PaddleClas/blob/release/2.5/ppcls/utils/download.py#L108
+        rank_id_curr_node = int(os.environ.get("PADDLE_RANK_IN_NODE", 0))
         num_trainers = int(env['PADDLE_TRAINERS_NUM'])
         if num_trainers <= 1:
             return _download(url, path, md5sum)
@@ -406,12 +411,9 @@ def _download_dist(url, path, md5sum=None):
                 os.makedirs(path)
 
             if not osp.exists(fullname):
-                from paddle.distributed import ParallelEnv
-                unique_endpoints = _get_unique_endpoints(ParallelEnv()
-                                                         .trainer_endpoints[:])
-                with open(lock_path, 'w'):  # touch
+                with open(lock_path, 'w'):  # touch    
                     os.utime(lock_path, None)
-                if ParallelEnv().current_endpoint in unique_endpoints:
+                if rank_id_curr_node == 0:
                     _download(url, path, md5sum)
                     os.remove(lock_path)
                 else:
@@ -423,7 +425,7 @@ def _download_dist(url, path, md5sum=None):
 
 
 def _check_exist_file_md5(filename, md5sum, url):
-    # if md5sum is None, and file to check is weights file,
+    # if md5sum is None, and file to check is weights file, 
     # read md5um from url and check, else check md5sum directly
     return _md5check_from_url(filename, url) if md5sum is None \
             and filename.endswith('pdparams') \
@@ -523,7 +525,7 @@ def _decompress_dist(fname):
             # trainer pipeline in order
             # **change this if you have more elegent methods**
             if ParallelEnv().current_endpoint in unique_endpoints:
-                with open(lock_path, 'w'):  # touch
+                with open(lock_path, 'w'):  # touch    
                     os.utime(lock_path, None)
                 _decompress(fname)
                 os.remove(lock_path)

@@ -23,7 +23,7 @@ else:
 import numpy as np
 
 from paddle.io import DataLoader, DistributedBatchSampler
-from paddle.fluid.dataloader.collate import default_collate_fn
+from .utils import default_collate_fn
 
 from paddlers.models.ppdet.core.workspace import register
 from . import transform
@@ -118,7 +118,7 @@ class BaseDataLoader(object):
         collate_batch (bool): whether to collate batch in dataloader.
             If set to True, the samples will collate into batch according
             to the batch size. Otherwise, the ground-truth will not collate,
-            which is used when the number of ground-truch is different in
+            which is used when the number of ground-truch is different in 
             samples.
         use_shared_memory (bool): whether to use shared memory to
                 accelerate data loading, enable this only if you
@@ -144,7 +144,7 @@ class BaseDataLoader(object):
         self._sample_transforms = Compose(
             sample_transforms, num_classes=num_classes)
 
-        # batch transfrom
+        # batch transfrom 
         self._batch_transforms = BatchCompose(batch_transforms, num_classes,
                                               collate_batch)
         self.batch_size = batch_size

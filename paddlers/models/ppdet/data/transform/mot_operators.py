@@ -132,7 +132,7 @@ class LetterBoxResize(BaseOperator):
 
 @register_op
 class MOTRandomAffine(BaseOperator):
-    """
+    """ 
     Affine transform to image and coords to achieve the rotate, scale and
     shift effect for training image.
 
@@ -271,7 +271,7 @@ class Gt2JDETargetThres(BaseOperator):
         anchors (list): anchors of JDE model
         anchor_masks (list): anchor_masks of JDE model
         downsample_ratios (list): downsample ratios of JDE model
-        ide_thresh (float): thresh of identity, higher is groud truth
+        ide_thresh (float): thresh of identity, higher is groud truth 
         fg_thresh (float): thresh of foreground, higher is foreground
         bg_thresh (float): thresh of background, lower is background
         num_classes (int): number of classes
@@ -529,8 +529,8 @@ class Gt2FairMOTTarget(Gt2TTFTarget):
     Generate FairMOT targets by ground truth data.
     Difference between Gt2FairMOTTarget and Gt2TTFTarget are:
         1. the gaussian kernal radius to generate a heatmap.
-        2. the targets needed during traing.
-
+        2. the targets needed during training.
+    
     Args:
         num_classes(int): the number of classes.
         down_ratio(int): the down ratio from images to heatmap, 4 by default.

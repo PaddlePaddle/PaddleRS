@@ -1,15 +1,15 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
+# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved. 
+#   
+# Licensed under the Apache License, Version 2.0 (the "License");   
+# you may not use this file except in compliance with the License.  
+# You may obtain a copy of the License at   
+#   
+#     http://www.apache.org/licenses/LICENSE-2.0    
+#   
+# Unless required by applicable law or agreed to in writing, software   
+# distributed under the License is distributed on an "AS IS" BASIS, 
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  
+# See the License for the specific language governing permissions and   
 # limitations under the License.
 
 import numpy as np
@@ -24,6 +24,7 @@ from paddlers.models.ppdet.core.workspace import register, create
 from .roi_extractor import RoIAlign
 from ..shape_spec import ShapeSpec
 from ..bbox_utils import bbox2delta
+from ..cls_utils import _get_class_default_kwargs
 from paddlers.models.ppdet.modeling.layers import ConvNormLayer
 
 __all__ = ['TwoFCHead', 'XConvNormHead', 'BBoxHead']
@@ -89,7 +90,7 @@ class XConvNormHead(nn.Layer):
         conv_dim (int): The number of channels for the conv layers
         out_channel (int): Output channels
         resolution (int): Resolution of input feature map
-        norm_type (string): Norm type, bn, gn, sync_bn are available,
+        norm_type (string): Norm type, bn, gn, sync_bn are available, 
             default `gn`
         freeze_norm (bool): Whether to freeze the norm
         stage_name (string): Prefix name for conv layer,  '' by default
@@ -168,22 +169,23 @@ class BBoxHead(nn.Layer):
         head (nn.Layer): Extract feature in bbox head
         in_channel (int): Input channel after RoI extractor
         roi_extractor (object): The module of RoI Extractor
-        bbox_assigner (object): The module of Box Assigner, label and sample the
+        bbox_assigner (object): The module of Box Assigner, label and sample the 
             box.
         with_pool (bool): Whether to use pooling for the RoI feature.
         num_classes (int): The number of classes
-        bbox_weight (List[float]): The weight to get the decode box
+        bbox_weight (List[float]): The weight to get the decode box 
     """
 
     def __init__(self,
                  head,
                  in_channel,
-                 roi_extractor=RoIAlign().__dict__,
+                 roi_extractor=_get_class_default_kwargs(RoIAlign),
                  bbox_assigner='BboxAssigner',
                  with_pool=False,
                  num_classes=80,
                  bbox_weight=[10., 10., 5., 5.],
-                 bbox_loss=None):
+                 bbox_loss=None,
+                 loss_normalize_pos=False):
         super(BBoxHead, self).__init__()
         self.head = head
         self.roi_extractor = roi_extractor
@@ -195,6 +197,7 @@ class BBoxHead(nn.Layer):
         self.num_classes = num_classes
         self.bbox_weight = bbox_weight
         self.bbox_loss = bbox_loss
+        self.loss_normalize_pos = loss_normalize_pos
 
         self.bbox_score = nn.Linear(
             in_channel,
@@ -249,14 +252,25 @@ class BBoxHead(nn.Layer):
         deltas = self.bbox_delta(feat)
 
         if self.training:
-            loss = self.get_loss(scores, deltas, targets, rois,
-                                 self.bbox_weight)
+            loss = self.get_loss(
+                scores,
+                deltas,
+                targets,
+                rois,
+                self.bbox_weight,
+                loss_normalize_pos=self.loss_normalize_pos)
             return loss, bbox_feat
         else:
             pred = self.get_prediction(scores, deltas)
             return pred, self.head
 
-    def get_loss(self, scores, deltas, targets, rois, bbox_weight):
+    def get_loss(self,
+                 scores,
+                 deltas,
+                 targets,
+                 rois,
+                 bbox_weight,
+                 loss_normalize_pos=False):
         """
         scores (Tensor): scores from bbox head outputs
         deltas (Tensor): deltas from bbox head outputs
@@ -279,8 +293,15 @@ class BBoxHead(nn.Layer):
         else:
             tgt_labels = tgt_labels.cast('int64')
             tgt_labels.stop_gradient = True
-            loss_bbox_cls = F.cross_entropy(
-                input=scores, label=tgt_labels, reduction='mean')
+
+            if not loss_normalize_pos:
+                loss_bbox_cls = F.cross_entropy(
+                    input=scores, label=tgt_labels, reduction='mean')
+            else:
+                loss_bbox_cls = F.cross_entropy(
+                    input=scores, label=tgt_labels,
+                    reduction='none').sum() / (tgt_labels.shape[0] + 1e-7)
+
             loss_bbox[cls_name] = loss_bbox_cls
 
         # bbox reg
@@ -321,9 +342,16 @@ class BBoxHead(nn.Layer):
         if self.bbox_loss is not None:
             reg_delta = self.bbox_transform(reg_delta)
             reg_target = self.bbox_transform(reg_target)
-            loss_bbox_reg = self.bbox_loss(
-                reg_delta, reg_target).sum() / tgt_labels.shape[0]
-            loss_bbox_reg *= self.num_classes
+
+            if not loss_normalize_pos:
+                loss_bbox_reg = self.bbox_loss(
+                    reg_delta, reg_target).sum() / tgt_labels.shape[0]
+                loss_bbox_reg *= self.num_classes
+
+            else:
+                loss_bbox_reg = self.bbox_loss(
+                    reg_delta, reg_target).sum() / (tgt_labels.shape[0] + 1e-7)
+
         else:
             loss_bbox_reg = paddle.abs(reg_delta - reg_target).sum(
             ) / tgt_labels.shape[0]

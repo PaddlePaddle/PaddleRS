@@ -77,7 +77,7 @@ class Detection(object):
         tlwh (Tensor): Bounding box in format `(top left x, top left y,
             width, height)`.
         score (Tensor): Bounding box confidence score.
-        feature (Tensor): A feature vector that describes the object
+        feature (Tensor): A feature vector that describes the object 
             contained in this image.
         cls_id (Tensor): Bounding box category id.
     """
@@ -205,8 +205,8 @@ def load_det_results(det_file, num_frames):
 
 def scale_coords(coords, input_shape, im_shape, scale_factor):
     # Note: ratio has only one value, scale_factor[0] == scale_factor[1]
-    #
-    # This function only used for JDE YOLOv3 or other detectors with
+    # 
+    # This function only used for JDE YOLOv3 or other detectors with 
     # LetterBoxResize and JDEBBoxPostProcess, coords output from detector had
     # not scaled back to the origin image.
 

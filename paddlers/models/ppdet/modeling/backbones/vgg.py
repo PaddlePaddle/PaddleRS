@@ -168,9 +168,9 @@ class VGG(nn.Layer):
         self.norms = []
         for i, n in enumerate(self.normalizations):
             if n != -1:
-                norm = self.add_sublayer(
-                    "norm{}".format(i),
-                    L2NormScale(self.extra_block_filters[i][1], n))
+                norm = self.add_sublayer("norm{}".format(i),
+                                         L2NormScale(
+                                             self.extra_block_filters[i][1], n))
             else:
                 norm = None
             self.norms.append(norm)

@@ -1,15 +1,15 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
+# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved. 
+#   
+# Licensed under the Apache License, Version 2.0 (the "License");   
+# you may not use this file except in compliance with the License.  
+# You may obtain a copy of the License at   
+#   
+#     http://www.apache.org/licenses/LICENSE-2.0    
+#   
+# Unless required by applicable law or agreed to in writing, software   
+# distributed under the License is distributed on an "AS IS" BASIS, 
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  
+# See the License for the specific language governing permissions and   
 # limitations under the License.
 
 from __future__ import absolute_import
@@ -22,12 +22,20 @@ import sys
 import math
 from collections import defaultdict
 import numpy as np
-import paddle
-import paddle.nn.functional as F
+
 from paddlers.models.ppdet.modeling.bbox_utils import bbox_iou_np_expand
 from .map_utils import ap_per_class
 from .metrics import Metric
 from .munkres import Munkres
+
+try:
+    import motmetrics as mm
+    mm.lap.default_solver = 'lap'
+except:
+    print(
+        'Warning: Unable to use MOT metric, please install motmetrics, for example: `pip install motmetrics`, see https://github.com/longcw/py-motmetrics'
+    )
+    pass
 
 from paddlers.models.ppdet.utils.logger import setup_logger
 logger = setup_logger(__name__)
@@ -36,8 +44,13 @@ __all__ = ['MOTEvaluator', 'MOTMetric', 'JDEDetMetric', 'KITTIMOTMetric']
 
 
 def read_mot_results(filename, is_gt=False, is_ignore=False):
-    valid_labels = {1}
-    ignore_labels = {2, 7, 8, 12}  # only in motchallenge datasets like 'MOT16'
+    valid_label = [1]
+    ignore_labels = [2, 7, 8, 12]  # only in motchallenge datasets like 'MOT16'
+    if is_gt:
+        logger.info(
+            "In MOT16/17 dataset the valid_label of ground truth is '{}', "
+            "in other dataset it should be '0' for single classs MOT.".format(
+                valid_label[0]))
     results_dict = dict()
     if os.path.isfile(filename):
         with open(filename, 'r') as f:
@@ -50,12 +63,10 @@ def read_mot_results(filename, is_gt=False, is_ignore=False):
                     continue
                 results_dict.setdefault(fid, list())
 
-                box_size = float(linelist[4]) * float(linelist[5])
-
                 if is_gt:
                     label = int(float(linelist[7]))
                     mark = int(float(linelist[6]))
-                    if mark == 0 or label not in valid_labels:
+                    if mark == 0 or label not in valid_label:
                         continue
                     score = 1
                 elif is_ignore:
@@ -112,24 +123,31 @@ class MOTEvaluator(object):
         self.data_type = data_type
 
         self.load_annotations()
+        try:
+            import motmetrics as mm
+            mm.lap.default_solver = 'lap'
+        except Exception as e:
+            raise RuntimeError(
+                'Unable to use MOT metric, please install motmetrics, for example: `pip install motmetrics`, see https://github.com/longcw/py-motmetrics'
+            )
         self.reset_accumulator()
 
     def load_annotations(self):
         assert self.data_type == 'mot'
         gt_filename = os.path.join(self.data_root, self.seq_name, 'gt',
                                    'gt.txt')
+        if not os.path.exists(gt_filename):
+            logger.warning(
+                "gt_filename '{}' of MOTEvaluator is not exist, so the MOTA will be -INF."
+            )
         self.gt_frame_dict = read_mot_results(gt_filename, is_gt=True)
         self.gt_ignore_frame_dict = read_mot_results(
             gt_filename, is_ignore=True)
 
     def reset_accumulator(self):
-        import motmetrics as mm
-        mm.lap.default_solver = 'lap'
         self.acc = mm.MOTAccumulator(auto_id=True)
 
     def eval_frame(self, frame_id, trk_tlwhs, trk_ids, rtn_events=False):
-        import motmetrics as mm
-        mm.lap.default_solver = 'lap'
         # results
         trk_tlwhs = np.copy(trk_tlwhs)
         trk_ids = np.copy(trk_ids)
@@ -187,8 +205,6 @@ class MOTEvaluator(object):
                     names,
                     metrics=('mota', 'num_switches', 'idp', 'idr', 'idf1',
                              'precision', 'recall')):
-        import motmetrics as mm
-        mm.lap.default_solver = 'lap'
         names = copy.deepcopy(names)
         if metrics is None:
             metrics = mm.metrics.motchallenge_metrics
@@ -225,8 +241,6 @@ class MOTMetric(Metric):
         self.result_root = result_root
 
     def accumulate(self):
-        import motmetrics as mm
-        import openpyxl
         metrics = mm.metrics.motchallenge_metrics
         mh = mm.metrics.create()
         summary = self.MOTEvaluator.get_summary(self.accs, self.seqs, metrics)
@@ -422,7 +436,7 @@ class KITTIEvaluation(object):
         self.ifn = 0  # number of ignored false negatives
         self.ifns = []  # number of ignored false negatives PER SEQUENCE
         self.fp = 0  # number of false positives
-        # a bit tricky, the number of ignored false negatives and ignored true positives
+        # a bit tricky, the number of ignored false negatives and ignored true positives 
         # is subtracted, but if both tracker detection and ground truth detection
         # are ignored this number is added again to avoid double counting
         self.fps = []  # above PER SEQUENCE
@@ -551,7 +565,7 @@ class KITTIEvaluation(object):
                             "track ids are not unique for sequence %d: frame %d"
                             % (seq, t_data.frame))
                         logger.info(
-                            "track id %d occured at least twice for this frame"
+                            "track id %d occurred at least twice for this frame"
                             % t_data.track_id)
                         logger.info("Exiting...")
                         #continue # this allows to evaluate non-unique result files

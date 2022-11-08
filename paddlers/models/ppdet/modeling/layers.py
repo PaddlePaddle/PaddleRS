@@ -39,6 +39,81 @@ def _to_list(l):
     return [l]
 
 
+class AlignConv(nn.Layer):
+    def __init__(self, in_channels, out_channels, kernel_size=3, groups=1):
+        super(AlignConv, self).__init__()
+        self.kernel_size = kernel_size
+        self.align_conv = paddle.vision.ops.DeformConv2D(
+            in_channels,
+            out_channels,
+            kernel_size=self.kernel_size,
+            padding=(self.kernel_size - 1) // 2,
+            groups=groups,
+            weight_attr=ParamAttr(initializer=Normal(0, 0.01)),
+            bias_attr=None)
+
+    @paddle.no_grad()
+    def get_offset(self, anchors, featmap_size, stride):
+        """
+        Args:
+            anchors: [B, L, 5] xc,yc,w,h,angle
+            featmap_size: (feat_h, feat_w)
+            stride: 8
+        Returns:
+
+        """
+        batch = anchors.shape[0]
+        dtype = anchors.dtype
+        feat_h, feat_w = featmap_size
+        pad = (self.kernel_size - 1) // 2
+        idx = paddle.arange(-pad, pad + 1, dtype=dtype)
+
+        yy, xx = paddle.meshgrid(idx, idx)
+        xx = paddle.reshape(xx, [-1])
+        yy = paddle.reshape(yy, [-1])
+
+        # get sampling locations of default conv
+        xc = paddle.arange(0, feat_w, dtype=dtype)
+        yc = paddle.arange(0, feat_h, dtype=dtype)
+        yc, xc = paddle.meshgrid(yc, xc)
+
+        xc = paddle.reshape(xc, [-1, 1])
+        yc = paddle.reshape(yc, [-1, 1])
+        x_conv = xc + xx
+        y_conv = yc + yy
+
+        # get sampling locations of anchors
+        x_ctr, y_ctr, w, h, a = paddle.split(anchors, 5, axis=-1)
+        x_ctr = x_ctr / stride
+        y_ctr = y_ctr / stride
+        w_s = w / stride
+        h_s = h / stride
+        cos, sin = paddle.cos(a), paddle.sin(a)
+        dw, dh = w_s / self.kernel_size, h_s / self.kernel_size
+        x, y = dw * xx, dh * yy
+        xr = cos * x - sin * y
+        yr = sin * x + cos * y
+        x_anchor, y_anchor = xr + x_ctr, yr + y_ctr
+        # get offset filed
+        offset_x = x_anchor - x_conv
+        offset_y = y_anchor - y_conv
+        offset = paddle.stack([offset_y, offset_x], axis=-1)
+        offset = offset.reshape(
+            [batch, feat_h, feat_w, self.kernel_size * self.kernel_size * 2])
+        offset = offset.transpose([0, 3, 1, 2])
+
+        return offset
+
+    def forward(self, x, refine_anchors, featmap_size, stride):
+        batch = paddle.shape(x)[0].numpy()
+        offset = self.get_offset(refine_anchors, featmap_size, stride)
+        if self.training:
+            x = F.relu(self.align_conv(x, offset.detach()))
+        else:
+            x = F.relu(self.align_conv(x, offset))
+        return x
+
+
 class DeformableConvV2(nn.Layer):
     def __init__(self,
                  in_channels,
@@ -128,7 +203,7 @@ class ConvNormLayer(nn.Layer):
                  dcn_lr_scale=2.,
                  dcn_regularizer=L2Decay(0.)):
         super(ConvNormLayer, self).__init__()
-        assert norm_type in ['bn', 'sync_bn', 'gn']
+        assert norm_type in ['bn', 'sync_bn', 'gn', None]
 
         if bias_on:
             bias_attr = ParamAttr(
@@ -183,10 +258,13 @@ class ConvNormLayer(nn.Layer):
                 num_channels=ch_out,
                 weight_attr=param_attr,
                 bias_attr=bias_attr)
+        else:
+            self.norm = None
 
     def forward(self, inputs):
         out = self.conv(inputs)
-        out = self.norm(out)
+        if self.norm is not None:
+            out = self.norm(out)
         return out
 
 
@@ -248,7 +326,7 @@ class LiteConv(nn.Layer):
 
 
 class DropBlock(nn.Layer):
-    def __init__(self, block_size, keep_prob, name, data_format='NCHW'):
+    def __init__(self, block_size, keep_prob, name=None, data_format='NCHW'):
         """
         DropBlock layer, see https://arxiv.org/abs/1810.12890
 
@@ -360,18 +438,20 @@ class AnchorGeneratorSSD(object):
 @register
 @serializable
 class RCNNBox(object):
-    __shared__ = ['num_classes']
+    __shared__ = ['num_classes', 'export_onnx']
 
     def __init__(self,
                  prior_box_var=[10., 10., 5., 5.],
                  code_type="decode_center_size",
                  box_normalized=False,
-                 num_classes=80):
+                 num_classes=80,
+                 export_onnx=False):
         super(RCNNBox, self).__init__()
         self.prior_box_var = prior_box_var
         self.code_type = code_type
         self.box_normalized = box_normalized
         self.num_classes = num_classes
+        self.export_onnx = export_onnx
 
     def __call__(self, bbox_head_out, rois, im_shape, scale_factor):
         bbox_pred = bbox_head_out[0]
@@ -379,39 +459,38 @@ class RCNNBox(object):
         roi = rois[0]
         rois_num = rois[1]
 
-        origin_shape = paddle.floor(im_shape / scale_factor + 0.5)
-        scale_list = []
-        origin_shape_list = []
+        if self.export_onnx:
+            onnx_rois_num_per_im = rois_num[0]
+            origin_shape = paddle.expand(im_shape[0, :],
+                                         [onnx_rois_num_per_im, 2])
 
-        batch_size = 1
-        if isinstance(roi, list):
-            batch_size = len(roi)
         else:
-            batch_size = paddle.slice(paddle.shape(im_shape), [0], [0], [1])
-        # bbox_pred.shape: [N, C*4]
-        for idx in range(batch_size):
-            roi_per_im = roi[idx]
-            rois_num_per_im = rois_num[idx]
-            expand_im_shape = paddle.expand(im_shape[idx, :],
-                                            [rois_num_per_im, 2])
-            origin_shape_list.append(expand_im_shape)
+            origin_shape_list = []
+            if isinstance(roi, list):
+                batch_size = len(roi)
+            else:
+                batch_size = paddle.slice(paddle.shape(im_shape), [0], [0], [1])
 
-        origin_shape = paddle.concat(origin_shape_list)
+            # bbox_pred.shape: [N, C*4]
+            for idx in range(batch_size):
+                rois_num_per_im = rois_num[idx]
+                expand_im_shape = paddle.expand(im_shape[idx, :],
+                                                [rois_num_per_im, 2])
+                origin_shape_list.append(expand_im_shape)
+
+            origin_shape = paddle.concat(origin_shape_list)
 
         # bbox_pred.shape: [N, C*4]
         # C=num_classes in faster/mask rcnn(bbox_head), C=1 in cascade rcnn(cascade_head)
         bbox = paddle.concat(roi)
-        if bbox.shape[0] == 0:
-            bbox = paddle.zeros([0, bbox_pred.shape[1]], dtype='float32')
-        else:
-            bbox = delta2bbox(bbox_pred, bbox, self.prior_box_var)
+        bbox = delta2bbox(bbox_pred, bbox, self.prior_box_var)
         scores = cls_prob[:, :-1]
 
         # bbox.shape: [N, C, 4]
         # bbox.shape[1] must be equal to scores.shape[1]
-        bbox_num_class = bbox.shape[1]
-        if bbox_num_class == 1:
-            bbox = paddle.tile(bbox, [1, self.num_classes, 1])
+        total_num = bbox.shape[0]
+        bbox_dim = bbox.shape[-1]
+        bbox = paddle.expand(bbox, [total_num, self.num_classes, bbox_dim])
 
         origin_h = paddle.unsqueeze(origin_shape[:, 0], axis=1)
         origin_w = paddle.unsqueeze(origin_shape[:, 1], axis=1)
@@ -436,7 +515,8 @@ class MultiClassNMS(object):
                  normalized=True,
                  nms_eta=1.0,
                  return_index=False,
-                 return_rois_num=True):
+                 return_rois_num=True,
+                 trt=False):
         super(MultiClassNMS, self).__init__()
         self.score_threshold = score_threshold
         self.nms_top_k = nms_top_k
@@ -446,20 +526,21 @@ class MultiClassNMS(object):
         self.nms_eta = nms_eta
         self.return_index = return_index
         self.return_rois_num = return_rois_num
+        self.trt = trt
 
     def __call__(self, bboxes, score, background_label=-1):
         """
-        bboxes (Tensor|List[Tensor]): 1. (Tensor) Predicted bboxes with shape
+        bboxes (Tensor|List[Tensor]): 1. (Tensor) Predicted bboxes with shape 
                                          [N, M, 4], N is the batch size and M
                                          is the number of bboxes
                                       2. (List[Tensor]) bboxes and bbox_num,
                                          bboxes have shape of [M, C, 4], C
                                          is the class number and bbox_num means
                                          the number of bboxes of each batch with
-                                         shape [N,]
+                                         shape [N,] 
         score (Tensor): Predicted scores with shape [N, C, M] or [M, C]
         background_label (int): Ignore the background label; For example, RCNN
-                                is num_classes and YOLO is -1.
+                                is num_classes and YOLO is -1. 
         """
         kwargs = self.__dict__.copy()
         if isinstance(bboxes, tuple):
@@ -467,7 +548,20 @@ class MultiClassNMS(object):
             kwargs.update({'rois_num': bbox_num})
         if background_label > -1:
             kwargs.update({'background_label': background_label})
-        return ops.multiclass_nms(bboxes, score, **kwargs)
+        kwargs.pop('trt')
+        # TODO(wangxinxin08): paddle version should be develop or 2.3 and above to run nms on tensorrt
+        if self.trt and (int(paddle.version.major) == 0 or
+                         (int(paddle.version.major) >= 2 and
+                          int(paddle.version.minor) >= 3)):
+            # TODO(wangxinxin08): tricky switch to run nms on tensorrt
+            kwargs.update({'nms_eta': 1.1})
+            bbox, bbox_num, _ = ops.multiclass_nms(bboxes, score, **kwargs)
+            bbox = bbox.reshape([1, -1, 6])
+            idx = paddle.nonzero(bbox[..., 0] != -1)
+            bbox = paddle.gather_nd(bbox, idx)
+            return bbox, bbox_num, None
+        else:
+            return ops.multiclass_nms(bboxes, score, **kwargs)
 
 
 @register
@@ -536,10 +630,15 @@ class YOLOBox(object):
         origin_shape = im_shape / scale_factor
         origin_shape = paddle.cast(origin_shape, 'int32')
         for i, head_out in enumerate(yolo_head_out):
-            boxes, scores = ops.yolo_box(head_out, origin_shape, anchors[i],
-                                         self.num_classes, self.conf_thresh,
-                                         self.downsample_ratio // 2**i,
-                                         self.clip_bbox, self.scale_x_y)
+            boxes, scores = paddle.vision.ops.yolo_box(
+                head_out,
+                origin_shape,
+                anchors[i],
+                self.num_classes,
+                self.conf_thresh,
+                self.downsample_ratio // 2**i,
+                self.clip_bbox,
+                scale_x_y=self.scale_x_y)
             boxes_list.append(boxes)
             scores_list.append(paddle.transpose(scores, perm=[0, 2, 1]))
         yolo_boxes = paddle.concat(boxes_list, axis=1)
@@ -550,9 +649,14 @@ class YOLOBox(object):
 @register
 @serializable
 class SSDBox(object):
-    def __init__(self, is_normalized=True):
+    def __init__(self,
+                 is_normalized=True,
+                 prior_box_var=[0.1, 0.1, 0.2, 0.2],
+                 use_fuse_decode=False):
         self.is_normalized = is_normalized
         self.norm_delta = float(not self.is_normalized)
+        self.prior_box_var = prior_box_var
+        self.use_fuse_decode = use_fuse_decode
 
     def __call__(self,
                  preds,
@@ -561,128 +665,42 @@ class SSDBox(object):
                  scale_factor,
                  var_weight=None):
         boxes, scores = preds
-        outputs = []
-        for box, score, prior_box in zip(boxes, scores, prior_boxes):
-            pb_w = prior_box[:, 2] - prior_box[:, 0] + self.norm_delta
-            pb_h = prior_box[:, 3] - prior_box[:, 1] + self.norm_delta
-            pb_x = prior_box[:, 0] + pb_w * 0.5
-            pb_y = prior_box[:, 1] + pb_h * 0.5
-            out_x = pb_x + box[:, :, 0] * pb_w * 0.1
-            out_y = pb_y + box[:, :, 1] * pb_h * 0.1
-            out_w = paddle.exp(box[:, :, 2] * 0.2) * pb_w
-            out_h = paddle.exp(box[:, :, 3] * 0.2) * pb_h
-
-            if self.is_normalized:
-                h = paddle.unsqueeze(
-                    im_shape[:, 0] / scale_factor[:, 0], axis=-1)
-                w = paddle.unsqueeze(
-                    im_shape[:, 1] / scale_factor[:, 1], axis=-1)
-                output = paddle.stack(
-                    [(out_x - out_w / 2.) * w, (out_y - out_h / 2.) * h,
-                     (out_x + out_w / 2.) * w, (out_y + out_h / 2.) * h],
-                    axis=-1)
-            else:
-                output = paddle.stack(
-                    [
-                        out_x - out_w / 2., out_y - out_h / 2.,
-                        out_x + out_w / 2. - 1., out_y + out_h / 2. - 1.
-                    ],
-                    axis=-1)
-            outputs.append(output)
-        boxes = paddle.concat(outputs, axis=1)
-
-        scores = F.softmax(paddle.concat(scores, axis=1))
-        scores = paddle.transpose(scores, [0, 2, 1])
-
-        return boxes, scores
-
-
-@register
-@serializable
-class AnchorGrid(object):
-    """Generate anchor grid
-
-    Args:
-        image_size (int or list): input image size, may be a single integer or
-            list of [h, w]. Default: 512
-        min_level (int): min level of the feature pyramid. Default: 3
-        max_level (int): max level of the feature pyramid. Default: 7
-        anchor_base_scale: base anchor scale. Default: 4
-        num_scales: number of anchor scales. Default: 3
-        aspect_ratios: aspect ratios. default: [[1, 1], [1.4, 0.7], [0.7, 1.4]]
-    """
-
-    def __init__(self,
-                 image_size=512,
-                 min_level=3,
-                 max_level=7,
-                 anchor_base_scale=4,
-                 num_scales=3,
-                 aspect_ratios=[[1, 1], [1.4, 0.7], [0.7, 1.4]]):
-        super(AnchorGrid, self).__init__()
-        if isinstance(image_size, Integral):
-            self.image_size = [image_size, image_size]
+        boxes = paddle.concat(boxes, axis=1)
+        prior_boxes = paddle.concat(prior_boxes)
+        if self.use_fuse_decode:
+            output_boxes = ops.box_coder(
+                prior_boxes,
+                self.prior_box_var,
+                boxes,
+                code_type="decode_center_size",
+                box_normalized=self.is_normalized)
         else:
-            self.image_size = image_size
-        for dim in self.image_size:
-            assert dim % 2 ** max_level == 0, \
-                "image size should be multiple of the max level stride"
-        self.min_level = min_level
-        self.max_level = max_level
-        self.anchor_base_scale = anchor_base_scale
-        self.num_scales = num_scales
-        self.aspect_ratios = aspect_ratios
+            pb_w = prior_boxes[:, 2] - prior_boxes[:, 0] + self.norm_delta
+            pb_h = prior_boxes[:, 3] - prior_boxes[:, 1] + self.norm_delta
+            pb_x = prior_boxes[:, 0] + pb_w * 0.5
+            pb_y = prior_boxes[:, 1] + pb_h * 0.5
+            out_x = pb_x + boxes[:, :, 0] * pb_w * self.prior_box_var[0]
+            out_y = pb_y + boxes[:, :, 1] * pb_h * self.prior_box_var[1]
+            out_w = paddle.exp(boxes[:, :, 2] * self.prior_box_var[2]) * pb_w
+            out_h = paddle.exp(boxes[:, :, 3] * self.prior_box_var[3]) * pb_h
+            output_boxes = paddle.stack(
+                [
+                    out_x - out_w / 2., out_y - out_h / 2., out_x + out_w / 2.,
+                    out_y + out_h / 2.
+                ],
+                axis=-1)
 
-    @property
-    def base_cell(self):
-        if not hasattr(self, '_base_cell'):
-            self._base_cell = self.make_cell()
-        return self._base_cell
+        if self.is_normalized:
+            h = (im_shape[:, 0] / scale_factor[:, 0]).unsqueeze(-1)
+            w = (im_shape[:, 1] / scale_factor[:, 1]).unsqueeze(-1)
+            im_shape = paddle.stack([w, h, w, h], axis=-1)
+            output_boxes *= im_shape
+        else:
+            output_boxes[..., -2:] -= 1.0
+        output_scores = F.softmax(paddle.concat(
+            scores, axis=1)).transpose([0, 2, 1])
 
-    def make_cell(self):
-        scales = [2**(i / self.num_scales) for i in range(self.num_scales)]
-        scales = np.array(scales)
-        ratios = np.array(self.aspect_ratios)
-        ws = np.outer(scales, ratios[:, 0]).reshape(-1, 1)
-        hs = np.outer(scales, ratios[:, 1]).reshape(-1, 1)
-        anchors = np.hstack((-0.5 * ws, -0.5 * hs, 0.5 * ws, 0.5 * hs))
-        return anchors
-
-    def make_grid(self, stride):
-        cell = self.base_cell * stride * self.anchor_base_scale
-        x_steps = np.arange(stride // 2, self.image_size[1], stride)
-        y_steps = np.arange(stride // 2, self.image_size[0], stride)
-        offset_x, offset_y = np.meshgrid(x_steps, y_steps)
-        offset_x = offset_x.flatten()
-        offset_y = offset_y.flatten()
-        offsets = np.stack((offset_x, offset_y, offset_x, offset_y), axis=-1)
-        offsets = offsets[:, np.newaxis, :]
-        return (cell + offsets).reshape(-1, 4)
-
-    def generate(self):
-        return [
-            self.make_grid(2**l)
-            for l in range(self.min_level, self.max_level + 1)
-        ]
-
-    def __call__(self):
-        if not hasattr(self, '_anchor_vars'):
-            anchor_vars = []
-            helper = LayerHelper('anchor_grid')
-            for idx, l in enumerate(range(self.min_level, self.max_level + 1)):
-                stride = 2**l
-                anchors = self.make_grid(stride)
-                var = helper.create_parameter(
-                    attr=ParamAttr(name='anchors_{}'.format(idx)),
-                    shape=anchors.shape,
-                    dtype='float32',
-                    stop_gradient=True,
-                    default_initializer=NumpyArrayInitializer(anchors))
-                anchor_vars.append(var)
-                var.persistable = True
-            self._anchor_vars = anchor_vars
-
-        return self._anchor_vars
+        return output_boxes, output_scores
 
 
 @register
@@ -722,7 +740,7 @@ class FCOSBox(object):
         Postprocess each layer of the output with corresponding locations.
         Args:
             locations (Tensor): anchor points for current layer, [H*W, 2]
-            box_cls (Tensor): categories prediction, [N, C, H, W],
+            box_cls (Tensor): categories prediction, [N, C, H, W], 
                 C is the number of classes
             box_reg (Tensor): bounding box prediction, [N, 4, H, W]
             box_ctn (Tensor): centerness prediction, [N, 1, H, W]
@@ -806,7 +824,6 @@ class TTFBox(object):
         cat, height, width = shape_fm[1], shape_fm[2], shape_fm[3]
         # batch size is 1
         scores_r = paddle.reshape(scores, [cat, -1])
-        topk_scores, topk_inds = paddle.topk(scores_r, k)
         topk_scores, topk_inds = paddle.topk(scores_r, k)
         topk_ys = topk_inds // width
         topk_xs = topk_inds % width
@@ -1198,11 +1215,11 @@ def _convert_attention_mask(attn_mask, dtype):
                 to prevents attention to some unwanted positions, usually the
                 paddings or the subsequent positions. It is a tensor with shape
                 broadcasted to `[batch_size, n_head, sequence_length, sequence_length]`.
-                When the data type is bool, the unwanted positions have `False`
-                values and the others have `True` values. When the data type is
-                int, the unwanted positions have 0 values and the others have 1
-                values. When the data type is float, the unwanted positions have
-                `-INF` values and the others have 0 values. It can be None when
+                When the data type is bool, the unwanted positions have `False` 
+                values and the others have `True` values. When the data type is 
+                int, the unwanted positions have 0 values and the others have 1 
+                values. When the data type is float, the unwanted positions have 
+                `-INF` values and the others have 0 values. It can be None when 
                 nothing wanted or needed to be prevented attention to. Default None.
         dtype (VarType): The target type of `attn_mask` we expect.
     Returns:

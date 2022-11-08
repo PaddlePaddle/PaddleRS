@@ -47,12 +47,12 @@ class DeepSORTTracker(object):
             Removes the oldest samples when the budget is reached.
         max_age (int): maximum number of missed misses before a track is deleted
         n_init (float): Number of frames that a track remains in initialization
-            phase. Number of consecutive detections before the track is confirmed.
-            The track state is set to `Deleted` if a miss occurs within the first
+            phase. Number of consecutive detections before the track is confirmed. 
+            The track state is set to `Deleted` if a miss occurs within the first 
             `n_init` frames.
-        metric_type (str): either "euclidean" or "cosine", the distance metric
+        metric_type (str): either "euclidean" or "cosine", the distance metric 
             used for measurement to track association.
-        matching_threshold (float): samples with larger distance are
+        matching_threshold (float): samples with larger distance are 
             considered an invalid match.
         max_iou_distance (float): max iou distance threshold
         motion (object): KalmanFilter instance
@@ -96,13 +96,16 @@ class DeepSORTTracker(object):
         Perform measurement update and track management.
         Args:
             pred_dets (np.array): Detection results of the image, the shape is
-                [N, 6], means 'x0, y0, x1, y1, score, cls_id'.
+                [N, 6], means 'cls_id, score, x0, y0, x1, y1'.
             pred_embs (np.array): Embedding results of the image, the shape is
                 [N, 128], usually pred_embs.shape[1] is a multiple of 128.
         """
-        pred_tlwhs = pred_dets[:, :4]
-        pred_scores = pred_dets[:, 4:5]
-        pred_cls_ids = pred_dets[:, 5:]
+        pred_cls_ids = pred_dets[:, 0:1]
+        pred_scores = pred_dets[:, 1:2]
+        pred_xyxys = pred_dets[:, 2:6]
+        pred_tlwhs = np.concatenate(
+            (pred_xyxys[:, 0:2], pred_xyxys[:, 2:4] - pred_xyxys[:, 0:2] + 1),
+            axis=1)
 
         detections = [
             Detection(tlwh, score, feat, cls_id)
