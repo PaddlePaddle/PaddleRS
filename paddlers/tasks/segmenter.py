@@ -36,7 +36,7 @@ from .utils.infer_nets import InferSegNet
 from .utils.slider_predict import slider_predict
 
 __all__ = [
-    "UNet", "DeepLabV3P", "FastSCNN", "HRNet", "BiSeNetV2", "FarSeg", "FactSeg"
+    "UNet", "DeepLabV3P", "FastSCNN", "HRNet", "BiSeNetV2", "FarSeg", "FactSeg", "C2FNet"
 ]
 
 
@@ -911,3 +911,127 @@ class FactSeg(BaseSegmenter):
             losses=losses,
             in_channels=in_channels,
             **params)
+
+class C2FNet(BaseSegmenter):
+    def __init__(self,
+                 in_channels=3,
+                 num_classes=2,
+                 backbone='HRNet_W18',
+                 use_mixed_loss=False,
+                 losses=None,
+                 output_stride=8,
+                 backbone_indices=(-1,),
+                 kernel_sizes=[128, 128],
+                 training_stride=32,
+                 sample_per_gpu=32,
+                 channels=None,
+                 align_corners=False,
+                 coase_model=None,
+                 coase_model_path=None,
+                 **params):
+        self.backbone_name = backbone
+        # if backbone not in ['ResNet50_vd', 'ResNet101_vd']:
+        #     raise ValueError(
+        #         "backbone: {} is not supported. Please choose one of "
+        #         "{'ResNet50_vd', 'ResNet101_vd'}.".format(backbone))
+        if params.get('with_net', True):
+            with DisablePrint():
+                backbone = getattr(ppseg.models, backbone)(
+                    in_channels=in_channels, output_stride=output_stride, 
+                    pretrained='https://bj.bcebos.com/paddleseg/dygraph/hrnet_w18_ssld.tar.gz')
+        else:
+            backbone = None
+
+        self.coase_model = dict(ppseg.models.__dict__)[coase_model](
+                            num_classes = num_classes,
+                            backbone = ppseg.models.backbones.HRNet_W18(align_corners=False),
+                            backbone_indices=[-1])
+        self.coase_model_path = coase_model_path
+
+        params.update({
+            'backbone': backbone,
+            'backbone_indices': backbone_indices,
+            'kernel_sizes': kernel_sizes,
+            'training_stride': training_stride,
+            'sample_per_gpu': sample_per_gpu,
+            'align_corners': align_corners
+        })
+        super(C2FNet, self).__init__(
+            model_name='C2FNet',
+            num_classes=num_classes,
+            use_mixed_loss=use_mixed_loss,
+            losses=losses,
+            **params)
+
+    def run(self, net, inputs, mode):
+        
+        coase_params = paddle.load(self.coase_model_path)
+        coase_model = self.coase_model
+        coase_model.set_state_dict(coase_params)
+        coase_model.eval()
+
+        with paddle.no_grad():
+            pre_coase = coase_model(inputs[0])
+            pre_coase = pre_coase[0]
+            heatmap = pre_coase
+
+        
+        if mode == 'test':
+            net_out = net(inputs[0], heatmap)
+            logit = net_out[0]
+            outputs = OrderedDict()
+            origin_shape = inputs[1]
+            if self.status == 'Infer':
+                label_map_list, score_map_list = self.postprocess(
+                    net_out, origin_shape, transforms=inputs[2])
+            else:
+                logit_list = self.postprocess(
+                    logit, origin_shape, transforms=inputs[2])
+                label_map_list = []
+                score_map_list = []
+                for logit in logit_list:
+                    logit = paddle.transpose(logit, perm=[0, 2, 3, 1])  # NHWC
+                    label_map_list.append(
+                        paddle.argmax(
+                            logit, axis=-1, keepdim=False, dtype='int32')
+                        .squeeze().numpy())
+                    score_map_list.append(
+                        F.softmax(
+                            logit, axis=-1).squeeze().numpy().astype('float32'))
+            outputs['label_map'] = label_map_list
+            outputs['score_map'] = score_map_list
+
+        if mode == 'eval':
+            net_out = net(inputs[0], heatmap)
+            logit = net_out[0]
+            outputs = OrderedDict()
+            if self.status == 'Infer':
+                pred = paddle.unsqueeze(net_out[0], axis=1)  # NCHW
+            else:
+                pred = paddle.argmax(logit, axis=1, keepdim=True, dtype='int32')
+            label = inputs[1]
+            if label.ndim == 3:
+                paddle.unsqueeze_(label, axis=1)
+            if label.ndim != 4:
+                raise ValueError("Expected label.ndim == 4 but got {}".format(
+                    label.ndim))
+            origin_shape = [label.shape[-2:]]
+            pred = self.postprocess(
+                pred, origin_shape, transforms=inputs[2])[0]  # NCHW
+            intersect_area, pred_area, label_area = ppseg.utils.metrics.calculate_area(
+                pred, label, self.num_classes)
+            outputs['intersect_area'] = intersect_area
+            outputs['pred_area'] = pred_area
+            outputs['label_area'] = label_area
+            outputs['conf_mat'] = metrics.confusion_matrix(pred, label,
+                                                           self.num_classes)
+        if mode == 'train':
+            net_out = net(inputs[0], heatmap, inputs[1])
+            logit = [net_out[0],]
+            labels = net_out[1]
+            outputs = OrderedDict()
+            loss_list = metrics.loss_computation(
+                logits_list=logit, labels=labels, losses=self.losses)
+            loss = sum(loss_list)
+            outputs['loss'] = loss
+        return outputs
