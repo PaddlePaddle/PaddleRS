@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# 图像分割模型DeepLab V3+训练示例脚本
+# 图像分割模型C2FNet训练示例脚本
 # 执行此脚本前，请确认已正确安装PaddleRS库
 
 import paddlers as pdrs
@@ -8,13 +8,13 @@ from paddlers import transforms as T
 
 
 # 数据集存放目录
-DATA_DIR = '/home/chensilin/data/iSAID/'
+DATA_DIR = './data/rsseg/iSAID/'
 # 训练集`file_list`文件路径
-TRAIN_FILE_LIST_PATH = '/home/chensilin/data/iSAID/train.txt'
+TRAIN_FILE_LIST_PATH = './data/rsseg/train.txt'
 # 验证集`file_list`文件路径
-EVAL_FILE_LIST_PATH = '/home/chensilin/data/iSAID/val.txt'
+EVAL_FILE_LIST_PATH = './data/rsseg/iSAID/val.txt'
 # 数据集类别信息文件路径
-LABEL_LIST_PATH = '/home/chensilin/data/iSAID/label.txt'
+LABEL_LIST_PATH = './data/rsseg/iSAID/label.txt'
 # 实验目录，保存输出的模型权重和结果
 EXP_DIR = './output/c2fnet/'
 
@@ -40,7 +40,6 @@ train_transforms = T.Compose([
 
 eval_transforms = T.Compose([
     T.DecodeImg(),
-    T.Resize(target_size=512),
     # 验证阶段与训练阶段的数据归一化方式必须相同
     T.Normalize(
         mean=[0.5] * NUM_BANDS, std=[0.5] * NUM_BANDS),
@@ -69,11 +68,9 @@ eval_dataset = pdrs.datasets.SegDataset(
 model = pdrs.tasks.seg.C2FNet(
     in_channels=NUM_BANDS,
     num_classes=len(train_dataset.labels),
-    backbone='ResNet50_vd',
     coase_model = 'FCN',
-    coase_model_path='/home/chensilin/model_isaid_512.pdparams')
-
-
+    coase_model_backbone = 'HRNet_W18',
+    coase_model_path='coase_model/fcn_hrnet.pdparams')
 
 # 执行模型训练
 model.train(
@@ -81,7 +78,7 @@ model.train(
     train_dataset=train_dataset,
     train_batch_size=4,
     eval_dataset=eval_dataset,
-    save_interval_epochs=4,
+    save_interval_epochs=1,
     # 每多少次迭代记录一次日志
     log_interval_steps=4,
     save_dir=EXP_DIR,
@@ -94,4 +91,3 @@ model.train(
     # 指定从某个检查点继续训练
     resume_checkpoint=None,
     pretrain_weights=None)
-
