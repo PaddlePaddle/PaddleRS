@@ -78,7 +78,7 @@ class C2FNet(nn.Layer):
         # Silin: For isaid id 1、8、9、10、11、14、15 are the small object categories.
         #        For ISPRS car is the small object.(id==4)
         heatmap = paddle.where((heatmap == 10) | (heatmap == 11) | (heatmap == 8) | 
-                                (heatmap == 15) | (heatmap ==9) | (heatmap == 1) | (heatmap == 14), 
+                                (heatmap == 15) | (heatmap == 9) | (heatmap == 1) | (heatmap == 14), 
                                paddle.ones_like(heatmap), paddle.zeros_like(heatmap)).astype('float32')
         
         # Silin: 
@@ -87,7 +87,7 @@ class C2FNet(nn.Layer):
             # Silin: 1、训练过程 处理label binarySeg，因此把小目标类别置为1、其他像素点置为0
             label = paddle.unsqueeze(label, axis=1).astype('float32')
             label = paddle.where((label == 10) | (label == 11) | (label == 8) | 
-                                (label == 15) | (label ==9) | (label == 1) | (label == 14), paddle.ones_like(label),
+                                (label == 15) | (label == 9) | (label == 1) | (label == 14), paddle.ones_like(label),
                                  paddle.zeros_like(label))
             # Silin：2、滑窗 coase_seg_map（heatmap)、输入图像img、binary label 
             mask_regions = F.unfold(heatmap, kernel_sizes=self.kernel_sizes, strides=self.training_stride, paddings=0,

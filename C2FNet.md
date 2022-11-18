@@ -102,4 +102,5 @@ d. other training details can be seen in [here](./blob/release/1.0/tutorials/tra
 
 ## Contact
 
-chensilin@baidu.com
+wangqingzhong@baidu.com
+silin.chen@cumt.edu.cn
