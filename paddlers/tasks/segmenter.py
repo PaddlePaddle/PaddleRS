@@ -36,7 +36,8 @@ from .utils.infer_nets import InferSegNet
 from .utils.slider_predict import slider_predict
 
 __all__ = [
-    "UNet", "DeepLabV3P", "FastSCNN", "HRNet", "BiSeNetV2", "FarSeg", "FactSeg", "C2FNet"
+    "UNet", "DeepLabV3P", "FastSCNN", "HRNet", "BiSeNetV2", "FarSeg", "FactSeg",
+    "C2FNet"
 ]
 
 
@@ -761,6 +762,7 @@ class UNet(BaseSegmenter):
             losses=losses,
             **params)
 
+
 class DeepLabV3P(BaseSegmenter):
     def __init__(self,
                  in_channels=3,
@@ -910,6 +912,7 @@ class FactSeg(BaseSegmenter):
             in_channels=in_channels,
             **params)
 
+
 class C2FNet(BaseSegmenter):
     def __init__(self,
                  in_channels=3,
@@ -918,7 +921,7 @@ class C2FNet(BaseSegmenter):
                  use_mixed_loss=False,
                  losses=None,
                  output_stride=8,
-                 backbone_indices=(-1,),
+                 backbone_indices=(-1, ),
                  kernel_sizes=[128, 128],
                  training_stride=32,
                  sample_per_gpu=32,
@@ -932,19 +935,22 @@ class C2FNet(BaseSegmenter):
         self.backbone_name = backbone
         if params.get('with_net', True):
             with DisablePrint():
-                backbone = getattr(ppseg.models, self.backbone_name)( 
-                    pretrained='https://bj.bcebos.com/paddleseg/dygraph/hrnet_w18_ssld.tar.gz')
+                backbone = getattr(
+                    ppseg.models, self.backbone_name
+                )(pretrained='https://bj.bcebos.com/paddleseg/dygraph/hrnet_w18_ssld.tar.gz'
+                  )
         else:
             backbone = None
 
         if coase_model_backbone in ['ResNet50_vd', 'ResNet101_vd']:
-            self.coase_model_backbone = getattr(ppseg.models, coase_model_backbone)(output_stride = 8)
+            self.coase_model_backbone = getattr(
+                ppseg.models, coase_model_backbone)(output_stride=8)
         elif coase_model_backbone in ['HRNet_W18', 'HRNet_W48']:
-            self.coase_model_backbone = getattr(ppseg.models, coase_model_backbone)(align_corners = False)
-        
+            self.coase_model_backbone = getattr(
+                ppseg.models, coase_model_backbone)(align_corners=False)
+
         self.coase_model = dict(ppseg.models.__dict__)[coase_model](
-                            num_classes = num_classes,
-                            backbone = self.coase_model_backbone)
+            num_classes=num_classes, backbone=self.coase_model_backbone)
         self.coase_params = paddle.load(coase_model_path)
         self.coase_model.set_state_dict(self.coase_params)
         self.coase_model.eval()
@@ -965,7 +971,7 @@ class C2FNet(BaseSegmenter):
             **params)
 
     def run(self, net, inputs, mode):
-        
+
         with paddle.no_grad():
             pre_coase = self.coase_model(inputs[0])
             pre_coase = pre_coase[0]
@@ -1021,12 +1027,12 @@ class C2FNet(BaseSegmenter):
                                                            self.num_classes)
         if mode == 'train':
             net_out = net(inputs[0], heatmap, inputs[1])
-            logit = [net_out[0],]
+            logit = [net_out[0], ]
             labels = net_out[1]
             outputs = OrderedDict()
             loss_list = metrics.loss_computation(
                 logits_list=logit, labels=labels, losses=self.losses)
             loss = sum(loss_list)
             outputs['loss'] = loss
-        
+
         return outputs

@@ -6,7 +6,6 @@
 import paddlers as pdrs
 from paddlers import transforms as T
 
-
 # 数据集存放目录
 DATA_DIR = './data/rsseg/iSAID/'
 # 训练集`file_list`文件路径
@@ -20,7 +19,6 @@ EXP_DIR = './output/c2fnet/'
 
 # 影像波段数量
 NUM_BANDS = 3
-
 
 # 定义训练和验证时使用的数据变换（数据增强、预处理等）
 # 使用Compose组合多种变换方式。Compose中包含的变换将按顺序串行执行
@@ -64,12 +62,11 @@ eval_dataset = pdrs.datasets.SegDataset(
     num_workers=0,
     shuffle=False)
 
-
 model = pdrs.tasks.seg.C2FNet(
     in_channels=NUM_BANDS,
     num_classes=len(train_dataset.labels),
-    coase_model = 'FCN',
-    coase_model_backbone = 'HRNet_W18',
+    coase_model='FCN',
+    coase_model_backbone='HRNet_W18',
     coase_model_path='coase_model/fcn_hrnet.pdparams')
 
 # 执行模型训练

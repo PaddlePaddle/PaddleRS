@@ -9,7 +9,7 @@ PaddlePaddle: 2.3.2
 PaddleRS: 1.0
 ```
 ### Install
-a. create a conda environment and activate it. 
+a. create a conda environment and activate it.
 ```
 conda create -n paddlers python=3.8
 conda activate paddlers
@@ -26,7 +26,6 @@ d. install dependencies
 cd PaddleRS
 git checkout develop
 pip install -r requirements.txt
-
 ```
 
 e. build
@@ -43,9 +42,15 @@ python setup.py install
 
 ### iSAID Prepare
 
-a. Download the proccessd dataset in this [link](www.baidu.com).
+a. Download the iSAID in this [link](https://captain-whu.github.io/iSAID).
 
-b. The following structure after downloading iSAID dataset
+b. run the dataset script
+
+```
+python tools/prepare_dataset/prepare_isaid_c2fnet.py {YOUR DOWNLOAD DATASET PATH}
+```
+
+c. The following structure after downloading iSAID dataset
 
 ```
 {PaddleRS}/data/rsseg/iSAID
@@ -73,7 +78,7 @@ b. The following structure after downloading iSAID dataset
 
 ## Train
 
-a. Train a coase model on PaddleSeg or Download from [here](www.baidu.com)
+a. Train a coase model on PaddleSeg/PaddleRS or Download the FCN_HRNet weight from [here](https://paddlers.bj.bcebos.com/pretrained/seg/isaid/weights/fcn_hrnet_isaid.pdparams)
 
 ```
 {PaddleRS}/coase_model/{YOUR COASE_MODEL NAME}.pdparams
@@ -97,8 +102,8 @@ d. other training details can be seen in [here](./blob/release/1.0/tutorials/tra
 
 | Model | Backbone | Resolution | Ship | Large_Vehicle | Small_Vehicle | Helicopter | Swimming_Pool |Plane| Harbor | Links |
 |:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-|FCN       |HRNet_W18|512x512|69.04|62.61|48.75|23.14|44.99|83.35|58.61|[model](www.baidu.com)|
-|FCN_C2FNet|HRNet_W18|512x512|69.31|63.03|50.90|23.53|45.93|83.82|59.62|[model](www.baidu.com) \| [log](www.baidu.com)|
+|FCN       |HRNet_W18|512x512|69.04|62.61|48.75|23.14|44.99|83.35|58.61|[model](https://paddlers.bj.bcebos.com/pretrained/seg/isaid/weights/fcn_hrnet_isaid.pdparams)|
+|FCN_C2FNet|HRNet_W18|512x512|69.31|63.03|50.90|23.53|45.93|83.82|59.62|[model](https://paddlers.bj.bcebos.com/pretrained/seg/isaid/weights/c2fnet_fcn_hrnet_isaid.pdparams)|
 
 ## Contact
 
