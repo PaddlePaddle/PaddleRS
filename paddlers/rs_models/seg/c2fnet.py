@@ -31,7 +31,7 @@ class C2FNet(nn.Layer):
          backbone_indices (tuple, optional): The values in the tuple indicate the indices of output of backbone.
             Default: (-1, ).
          kerneral_sizes(list): the sliding windows' size
-         tranining_stride(int): the stride of sliding windows
+         training_stride(int): the stride of sliding windows
          sample_per_gpu(int): the fined process's batch size
          channels (int, optional): The channels between conv layer and the last layer of FCNHead.
             If None, it will be the number of channels of input features. Default: None.

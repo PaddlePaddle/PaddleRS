@@ -47,13 +47,13 @@ a. 从官方网站下载[iSAID](https://captain-whu.github.io/iSAID)数据集.
 b. 运行针对c2fnet的iSAID处理脚本
 
 ```
-python tools/prepare_dataset/prepare_isaid_c2fnet.py {YOUR DOWNLOAD DATASET PATH}
+python examples/c2fnet/data/prepare_isaid_c2fnet.py {YOUR DOWNLOAD DATASET PATH}
 ```
 
 c. 处理完的数据集按照如下的目录设置
 
 ```
-{PaddleRS}/data/rsseg/iSAID
+{PaddleRS}/examples/c2fnet/data/iSAID
 ├── img_dir
 │   ├── train
 │   │   ├── *.png
@@ -84,19 +84,19 @@ c. 处理完的数据集按照如下的目录设置
 a. 通过[PaddleSeg](https://github.com/PaddlePaddle/PaddleSeg)或者[PaddleRS](https://github.com/PaddlePaddle/PaddleRS/tree/release/1.0/tutorials/train)训练一个粗分割模型,也可以下载我们训练好的基线模型[FCN_HRNetW18](https://paddlers.bj.bcebos.com/pretrained/seg/isaid/weights/fcn_hrnet_isaid.pdparams),并按照如下目录设置
 
 ```
-{PaddleRS}/coase_model/{YOUR COASE_MODEL NAME}.pdparams
+{PaddleRS}/examples/c2fnet/coase_model/{YOUR COASE_MODEL NAME}.pdparams
 ```
 
 c. 单GPU训练精细化模型
 ```
 export CUDA_VISIBLE_DEVICES=0
-python tutorials/train/semantic_segmentation/c2fnet.py
+python examples/c2fnet/train.py
 ```
 
 c. 多GPU训练精细化模型
 ```
 export CUDA_VISIBLE_DEVICES= {YOUR GPUs' IDs}
-python -m paddle.distributed.launch tutorials/train/semantic_segmentation/c2fnet.py
+python -m paddle.distributed.launch examples/c2fnet/train.py
 ```
 
 d. 其他训练的细节可以参考 [PaddleRS的训练说明](./tutorials/train/README.md)
