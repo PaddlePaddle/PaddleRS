@@ -99,7 +99,7 @@ export CUDA_VISIBLE_DEVICES= {YOUR GPUs' IDs}
 python -m paddle.distributed.launch examples/c2fnet/train.py
 ```
 
-d. 其他训练的细节可以参考 [PaddleRS的训练说明](./tutorials/train/README.md)
+d. 其他训练的细节可以参考 [PaddleRS的训练说明](/tutorials/train/README.md)
 
 ## 实验结果
 
