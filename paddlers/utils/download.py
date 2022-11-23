@@ -151,7 +151,28 @@ def decompress(fname):
 
     if fname.find('tar') >= 0 or fname.find('tgz') >= 0:
         with tarfile.open(fname) as tf:
-            tf.extractall(path=fpath_tmp)
+
+            def _is_within_directory(directory, target):
+                abs_directory = os.path.abspath(directory)
+                abs_target = os.path.abspath(target)
+
+                prefix = os.path.commonprefix([abs_directory, abs_target])
+
+                return prefix == abs_directory
+
+            def _safe_extract(tar,
+                              path=".",
+                              members=None,
+                              *,
+                              numeric_owner=False):
+                for member in tar.getmembers():
+                    member_path = os.path.join(path, member.name)
+                    if not _is_within_directory(path, member_path):
+                        raise Exception("Attempted Path Traversal in Tar File")
+
+                tar.extractall(path, members, numeric_owner=numeric_owner)
+
+            _safe_extract(tf, path=fpath_tmp)
     elif fname.find('zip') >= 0:
         with zipfile.ZipFile(fname) as zf:
             zf.extractall(path=fpath_tmp)
@@ -181,10 +202,13 @@ def download_and_decompress(url, path='.'):
     local_rank = paddle.distributed.get_rank()
     fname = osp.split(url)[-1]
     fullname = osp.join(path, fname)
+    pth_path = fullname + '.path'
 
     if nranks <= 1:
         dst_dir = url2dir(url, path)
         if dst_dir is not None:
+            with open(pth_path, 'w') as f:
+                f.write(dst_dir)
             fullname = dst_dir
     else:
         lock_path = fullname + '.lock'
@@ -194,9 +218,14 @@ def download_and_decompress(url, path='.'):
             if local_rank == 0:
                 dst_dir = url2dir(url, path)
                 if dst_dir is not None:
+                    with open(pth_path, 'w') as f:
+                        f.write(dst_dir)
                     fullname = dst_dir
                 os.remove(lock_path)
             else:
                 while os.path.exists(lock_path):
                     time.sleep(1)
+        if os.path.exists(pth_path):
+            with open(pth_path, 'r') as f:
+                fullname = next(f)
     return fullname
