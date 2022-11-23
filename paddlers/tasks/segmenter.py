@@ -931,7 +931,6 @@ class C2FNet(BaseSegmenter):
                  coarse_model_backbone=None,
                  coarse_model_path=None,
                  **params):
-
         self.backbone_name = backbone
         if params.get('with_net', True):
             with DisablePrint():
@@ -939,12 +938,24 @@ class C2FNet(BaseSegmenter):
                     in_channels=in_channels, align_corners=align_corners)
         else:
             backbone = None
-
+        if coarse_model_backbone in ['ResNet50_vd', 'ResNet101_vd']:
+            self.coarse_model_backbone = getattr(
+                ppseg.models, coarse_model_backbone)(output_stride=8)
+        elif coarse_model_backbone in ['HRNet_W18', 'HRNet_W48']:
+            self.coarse_model_backbone = getattr(
+                ppseg.models, coarse_model_backbone)(align_corners=False)
+        else:
+            raise ValueError(
+                "coarse_model_backbone: {} is not supported. Please choose one of "
+                "{'ResNet50_vd', 'ResNet101_vd', 'HRNet_W18', 'HRNet_W48'}.".
+                format(coarse_model_backbone))
+        self.coarse_model = dict(ppseg.models.__dict__)[coarse_model](
+            num_classes=num_classes, backbone=self.coarse_model_backbone)
+        self.coarse_params = paddle.load(coarse_model_path)
+        self.coarse_model.set_state_dict(self.coarse_params)
+        self.coarse_model.eval()
         params.update({
             'backbone': backbone,
-            'coarse_model': coarse_model,
-            'coarse_model_backbone': coarse_model_backbone,
-            'coarse_model_path': coarse_model_path,
             'backbone_indices': backbone_indices,
             'kernel_sizes': kernel_sizes,
             'training_stride': training_stride,
@@ -959,8 +970,12 @@ class C2FNet(BaseSegmenter):
             **params)
 
     def run(self, net, inputs, mode):
+        with paddle.no_grad():
+            pre_coarse = self.coarse_model(inputs[0])
+            pre_coarse = pre_coarse[0]
+            heatmaps = pre_coarse
         if mode == 'test':
-            net_out = net(inputs[0])
+            net_out = net(inputs[0], heatmaps)
             logit = net_out[0]
             outputs = OrderedDict()
             origin_shape = inputs[1]
@@ -985,7 +1000,7 @@ class C2FNet(BaseSegmenter):
             outputs['score_map'] = score_map_list
 
         if mode == 'eval':
-            net_out = net(inputs[0])
+            net_out = net(inputs[0], heatmaps)
             logit = net_out[0]
             outputs = OrderedDict()
             if self.status == 'Infer':
@@ -1009,7 +1024,7 @@ class C2FNet(BaseSegmenter):
             outputs['conf_mat'] = metrics.confusion_matrix(pred, label,
                                                            self.num_classes)
         if mode == 'train':
-            net_out = net(inputs[0], inputs[1])
+            net_out = net(inputs[0], heatmaps, inputs[1])
             logit = [net_out[0], ]
             labels = net_out[1]
             outputs = OrderedDict()

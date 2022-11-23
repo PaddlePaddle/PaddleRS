@@ -88,7 +88,7 @@ seg_pretrain_weights_dict = {
     'HRNet': ['CITYSCAPES', 'PascalVOC'],
     'BiSeNetV2': ['CITYSCAPES'],
     'FactSeg': ['iSAID'],
-    'C2FNet': ['IMAGENET']
+    'C2FNet': ['IMAGENET', 'iSAID']
 }
 
 cityscapes_weights = {
@@ -450,7 +450,9 @@ levircd_weights = {
 
 isaid_weights = {
     'FactSeg_iSAID':
-    'https://paddlers.bj.bcebos.com/pretrained/seg/isaid/weights/factseg_isaid.pdparams'
+    'https://paddlers.bj.bcebos.com/pretrained/seg/isaid/weights/factseg_isaid.pdparams',
+    'C2FNet_HRNet_W18_iSAID':
+    'https://paddlers.bj.bcebos.com/pretrained/seg/isaid/weights/c2fnet_fcn_hrnet_isaid.pdparams'
 }
 
 

@@ -8,6 +8,7 @@ Python: 3.8
 PaddlePaddle: 2.3.2
 PaddleRS: 1.0
 ```
+
 ### 安装过程
 a. 创建并激活一个conda虚拟环境。
 ```bash
@@ -39,12 +40,12 @@ f. 进入c2fnet目录。
 cd examples/c2fnet
 ```
 
-*注意：后续的操作默认在c2fnet目录*
+*注意：后续的操作默认在`c2fnet`目录*
 
 ## 数据集
 
 + iSAID: https://captain-whu.github.io/iSAID
-+ ISPR Potsdam/Vaihingen 将在后面的版本提供支持。
++ ISPRS Potsdam/Vaihingen 将在后面的版本提供支持。
 
 ### iSAID数据集处理
 
@@ -83,11 +84,9 @@ c. 处理完的数据集目录结构如下所示：
 
 其中`train.txt`、`val.txt`、`label.txt`可以参考[PaddleSeg](https://github.com/PaddlePaddle/PaddleSeg/blob/release/2.6/docs/data/marker/marker_cn.md)的方式生成。
 
-*ISPRS Potsdam/Vaihingen 将在后面的版本提供支持*
-
 ## 训练过程
 
-a. 通过[PaddleSeg](https://github.com/PaddlePaddle/PaddleSeg)或者[PaddleRS](https://github.com/PaddlePaddle/PaddleRS/tree/release/1.0/tutorials/train)训练一个粗分割模型，或者下载我们训练好的基线模型[FCN_HRNetW18](https://paddlers.bj.bcebos.com/pretrained/seg/isaid/weights/fcn_hrnet_isaid.pdparams)，并放置在如下位置。
+a. 通过[PaddleSeg](https://github.com/PaddlePaddle/PaddleSeg)或者[PaddleRS](https://github.com/PaddlePaddle/PaddleRS/tree/release/1.0/tutorials/train)训练一个粗分割模型，或者下载我们训练好的基线模型[FCN_HRNetW18](https://paddlers.bj.bcebos.com/pretrained/seg/isaid/weights/fcn_hrnet_isaid.pdparams)，并放置在如下位置：
 
 ```
 {c2fnet}/coarse_model/{YOUR COARSE_MODEL NAME}.pdparams
@@ -103,7 +102,7 @@ python train.py
 c. 多GPU训练精细化模型。
 ```bash
 # 指定显卡编号
-export CUDA_VISIBLE_DEVICES={你的GPU索引}
+export CUDA_VISIBLE_DEVICES={要使用的GPU编号}
 python -m paddle.distributed.launch train.py
 ```
 

@@ -16,6 +16,7 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 import paddlers.models.ppseg as ppseg
+import paddlers.utils.logging as logging
 
 from paddlers.models.ppseg.cvlibs import param_init
 from paddlers.rs_models.seg.layers import layers_lib as layers
@@ -29,9 +30,6 @@ class C2FNet(nn.Layer):
      Args:
          num_classes (int): The unique number of target classes.
          backbone (str): The backbone network.
-         coarse_model (str): The coarse model.
-         coarse_model_backbone (str): The backbone network of coarse model.
-         coarse_model_path (str): The weight path of coarse model.
          backbone_indices (tuple, optional): The values in the tuple indicate the indices of output of backbone.
             Default: (-1, ).
          kernel_sizes(tuple, optional): The sliding windows' size. Default: (128,128).
@@ -39,16 +37,13 @@ class C2FNet(nn.Layer):
          samples_per_gpu(int, optional): The fined process's batch size. Default: 32.
          channels (int, optional): The channels between conv layer and the last layer of FCNHead.
             If None, it will be the number of channels of input features. Default: None.
-         align_corners (bool): An argument of `F.interpolate`. It should be set to False when the output size of feature
+         align_corners (bool, optional): An argument of `F.interpolate`. It should be set to False when the output size of feature
             is even, e.g. 1024x512, otherwise it is True, e.g. 769x769.  Default: False.
      """
 
     def __init__(self,
                  num_classes,
                  backbone,
-                 coarse_model,
-                 coarse_model_backbone,
-                 coarse_model_path,
                  backbone_indices=(-1, ),
                  kernel_sizes=(128, 128),
                  training_stride=32,
@@ -60,25 +55,6 @@ class C2FNet(nn.Layer):
         backbone_channels = [
             backbone.feat_channels[i] for i in backbone_indices
         ]
-
-        if coarse_model_backbone in ['ResNet50_vd', 'ResNet101_vd']:
-            self.coarse_model_backbone = getattr(
-                ppseg.models, coarse_model_backbone)(output_stride=8)
-        elif coarse_model_backbone in ['HRNet_W18', 'HRNet_W48']:
-            self.coarse_model_backbone = getattr(
-                ppseg.models, coarse_model_backbone)(align_corners=False)
-        else:
-            raise ValueError(
-                "coarse_model_backbone: {} is not supported. Please choose one of "
-                "{'ResNet50_vd', 'ResNet101_vd', 'HRNet_W18', 'HRNet_W48'}.".
-                format(coarse_model_backbone))
-
-        self.coarse_model = dict(ppseg.models.__dict__)[coarse_model](
-            num_classes=num_classes, backbone=self.coarse_model_backbone)
-        self.coarse_params = paddle.load(coarse_model_path)
-        self.coarse_model.set_state_dict(self.coarse_params)
-        self.coarse_model.eval()
-
         self.head_fgbg = FCNHead(2, backbone_indices, backbone_channels,
                                  channels)
         self.num_cls = num_classes
@@ -87,13 +63,13 @@ class C2FNet(nn.Layer):
         self.samples = samples_per_gpu
         self.align_corners = align_corners
 
-    def forward(self, x, label=None):
-        with paddle.no_grad():
-            pre_coarse = self.coarse_model(x)
-            pre_coarse = pre_coarse[0]
-            heatmaps = pre_coarse
+    def forward(self, x, heatmaps, label=None):
         ori_heatmap = heatmaps
         heatmap = paddle.argmax(heatmaps, axis=1, keepdim=True, dtype='int32')
+        if paddle.max(heatmap) > 15:
+            logging.warning(
+                "Please note that currently C2FNet can only be trained and evaluated on the iSAID dataset."
+            )
         heatmap = paddle.where(
             (heatmap == 10) | (heatmap == 11) | (heatmap == 8) |
             (heatmap == 15) | (heatmap == 9) | (heatmap == 1) | (heatmap == 14),
