@@ -14,3 +14,4 @@
 
 from .farseg import FarSeg
 from .factseg import FactSeg
+from .c2fnet import C2FNet

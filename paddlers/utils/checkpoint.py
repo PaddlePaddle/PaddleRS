@@ -87,7 +87,8 @@ seg_pretrain_weights_dict = {
     'FastSCNN': ['CITYSCAPES'],
     'HRNet': ['CITYSCAPES', 'PascalVOC'],
     'BiSeNetV2': ['CITYSCAPES'],
-    'FactSeg': ['iSAID']
+    'FactSeg': ['iSAID'],
+    'C2FNet': ['IMAGENET', 'iSAID']
 }
 
 cityscapes_weights = {
@@ -323,7 +324,15 @@ imagenet_weights = {
     'DeepLabV3P_ResNet50_vd_IMAGENET':
     'https://bj.bcebos.com/paddleseg/dygraph/resnet50_vd_ssld_v2.tar.gz',
     'DeepLabV3P_ResNet101_vd_IMAGENET':
-    'https://bj.bcebos.com/paddleseg/dygraph/resnet101_vd_ssld.tar.gz'
+    'https://bj.bcebos.com/paddleseg/dygraph/resnet101_vd_ssld.tar.gz',
+    'C2FNet_ResNet50_vd_IMAGENET':
+    'https://bj.bcebos.com/paddleseg/dygraph/resnet50_vd_ssld_v2.tar.gz',
+    'C2FNet_ResNet101_vd_IMAGENET':
+    'https://bj.bcebos.com/paddleseg/dygraph/resnet101_vd_ssld.tar.gz',
+    'C2FNet_HRNet_W18_IMAGENET':
+    'https://bj.bcebos.com/paddleseg/dygraph/hrnet_w18_ssld.tar.gz',
+    'C2FNet_HRNet_W48_IMAGENET':
+    'https://bj.bcebos.com/paddleseg/dygraph/hrnet_w48_ssld.tar.gz',
 }
 
 pascalvoc_weights = {
@@ -441,7 +450,9 @@ levircd_weights = {
 
 isaid_weights = {
     'FactSeg_iSAID':
-    'https://paddlers.bj.bcebos.com/pretrained/seg/isaid/weights/factseg_isaid.pdparams'
+    'https://paddlers.bj.bcebos.com/pretrained/seg/isaid/weights/factseg_isaid.pdparams',
+    'C2FNet_HRNet_W18_iSAID':
+    'https://paddlers.bj.bcebos.com/pretrained/seg/isaid/weights/c2fnet_fcn_hrnet_isaid.pdparams'
 }
 
 

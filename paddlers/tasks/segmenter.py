@@ -36,7 +36,8 @@ from .utils.infer_nets import InferSegNet
 from .utils.slider_predict import slider_predict
 
 __all__ = [
-    "UNet", "DeepLabV3P", "FastSCNN", "HRNet", "BiSeNetV2", "FarSeg", "FactSeg"
+    "UNet", "DeepLabV3P", "FastSCNN", "HRNet", "BiSeNetV2", "FarSeg", "FactSeg",
+    "C2FNet"
 ]
 
 
@@ -410,7 +411,6 @@ class BaseSegmenter(BaseModel):
         """
 
         self._check_transforms(eval_dataset.transforms, 'eval')
-
         self.net.eval()
         nranks = paddle.distributed.get_world_size()
         local_rank = paddle.distributed.get_rank()
@@ -911,3 +911,126 @@ class FactSeg(BaseSegmenter):
             losses=losses,
             in_channels=in_channels,
             **params)
+
+
+class C2FNet(BaseSegmenter):
+    def __init__(self,
+                 in_channels=3,
+                 num_classes=2,
+                 backbone='HRNet_W18',
+                 use_mixed_loss=False,
+                 losses=None,
+                 output_stride=8,
+                 backbone_indices=(-1, ),
+                 kernel_sizes=(128, 128),
+                 training_stride=32,
+                 samples_per_gpu=32,
+                 channels=None,
+                 align_corners=False,
+                 coarse_model=None,
+                 coarse_model_backbone=None,
+                 coarse_model_path=None,
+                 **params):
+        self.backbone_name = backbone
+        if params.get('with_net', True):
+            with DisablePrint():
+                backbone = getattr(ppseg.models, self.backbone_name)(
+                    in_channels=in_channels, align_corners=align_corners)
+        else:
+            backbone = None
+        if coarse_model_backbone in ['ResNet50_vd', 'ResNet101_vd']:
+            self.coarse_model_backbone = getattr(
+                ppseg.models, coarse_model_backbone)(output_stride=8)
+        elif coarse_model_backbone in ['HRNet_W18', 'HRNet_W48']:
+            self.coarse_model_backbone = getattr(
+                ppseg.models, coarse_model_backbone)(align_corners=False)
+        else:
+            raise ValueError(
+                "coarse_model_backbone: {} is not supported. Please choose one of "
+                "{'ResNet50_vd', 'ResNet101_vd', 'HRNet_W18', 'HRNet_W48'}.".
+                format(coarse_model_backbone))
+        self.coarse_model = dict(ppseg.models.__dict__)[coarse_model](
+            num_classes=num_classes, backbone=self.coarse_model_backbone)
+        self.coarse_params = paddle.load(coarse_model_path)
+        self.coarse_model.set_state_dict(self.coarse_params)
+        self.coarse_model.eval()
+        params.update({
+            'backbone': backbone,
+            'backbone_indices': backbone_indices,
+            'kernel_sizes': kernel_sizes,
+            'training_stride': training_stride,
+            'samples_per_gpu': samples_per_gpu,
+            'align_corners': align_corners
+        })
+        super(C2FNet, self).__init__(
+            model_name='C2FNet',
+            num_classes=num_classes,
+            use_mixed_loss=use_mixed_loss,
+            losses=losses,
+            **params)
+
+    def run(self, net, inputs, mode):
+        with paddle.no_grad():
+            pre_coarse = self.coarse_model(inputs[0])
+            pre_coarse = pre_coarse[0]
+            heatmaps = pre_coarse
+        if mode == 'test':
+            net_out = net(inputs[0], heatmaps)
+            logit = net_out[0]
+            outputs = OrderedDict()
+            origin_shape = inputs[1]
+            if self.status == 'Infer':
+                label_map_list, score_map_list = self.postprocess(
+                    net_out, origin_shape, transforms=inputs[2])
+            else:
+                logit_list = self.postprocess(
+                    logit, origin_shape, transforms=inputs[2])
+                label_map_list = []
+                score_map_list = []
+                for logit in logit_list:
+                    logit = paddle.transpose(logit, perm=[0, 2, 3, 1])  # NHWC
+                    label_map_list.append(
+                        paddle.argmax(
+                            logit, axis=-1, keepdim=False, dtype='int32')
+                        .squeeze().numpy())
+                    score_map_list.append(
+                        F.softmax(
+                            logit, axis=-1).squeeze().numpy().astype('float32'))
+            outputs['label_map'] = label_map_list
+            outputs['score_map'] = score_map_list
+
+        if mode == 'eval':
+            net_out = net(inputs[0], heatmaps)
+            logit = net_out[0]
+            outputs = OrderedDict()
+            if self.status == 'Infer':
+                pred = paddle.unsqueeze(net_out[0], axis=1)  # NCHW
+            else:
+                pred = paddle.argmax(logit, axis=1, keepdim=True, dtype='int32')
+            label = inputs[1]
+            if label.ndim == 3:
+                paddle.unsqueeze_(label, axis=1)
+            if label.ndim != 4:
+                raise ValueError("Expected label.ndim == 4 but got {}".format(
+                    label.ndim))
+            origin_shape = [label.shape[-2:]]
+            pred = self.postprocess(
+                pred, origin_shape, transforms=inputs[2])[0]  # NCHW
+            intersect_area, pred_area, label_area = ppseg.utils.metrics.calculate_area(
+                pred, label, self.num_classes)
+            outputs['intersect_area'] = intersect_area
+            outputs['pred_area'] = pred_area
+            outputs['label_area'] = label_area
+            outputs['conf_mat'] = metrics.confusion_matrix(pred, label,
+                                                           self.num_classes)
+        if mode == 'train':
+            net_out = net(inputs[0], heatmaps, inputs[1])
+            logit = [net_out[0], ]
+            labels = net_out[1]
+            outputs = OrderedDict()
+            loss_list = metrics.loss_computation(
+                logits_list=logit, labels=labels, losses=self.losses)
+            loss = sum(loss_list)
+            outputs['loss'] = loss
+
+        return outputs
