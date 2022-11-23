@@ -202,10 +202,13 @@ def download_and_decompress(url, path='.'):
     local_rank = paddle.distributed.get_rank()
     fname = osp.split(url)[-1]
     fullname = osp.join(path, fname)
+    pth_path = fullname + '.path'
 
     if nranks <= 1:
         dst_dir = url2dir(url, path)
         if dst_dir is not None:
+            with open(pth_path, 'w') as f:
+                f.write(dst_dir)
             fullname = dst_dir
     else:
         lock_path = fullname + '.lock'
@@ -215,9 +218,14 @@ def download_and_decompress(url, path='.'):
             if local_rank == 0:
                 dst_dir = url2dir(url, path)
                 if dst_dir is not None:
+                    with open(pth_path, 'w') as f:
+                        f.write(dst_dir)
                     fullname = dst_dir
                 os.remove(lock_path)
             else:
                 while os.path.exists(lock_path):
                     time.sleep(1)
+        if os.path.exists(pth_path):
+            with open(pth_path, 'r') as f:
+                fullname = next(f)
     return fullname
