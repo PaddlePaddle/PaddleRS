@@ -9,51 +9,57 @@ PaddlePaddle: 2.3.2
 PaddleRS: 1.0
 ```
 ### 安装过程
-a. 创建并激活一个conda虚拟环境.
-```
+a. 创建并激活一个conda虚拟环境。
+```bash
 conda create -n paddlers python=3.8
 conda activate paddlers
 ```
-b. 安装PaddlePaddle [详见官方网址](https://www.paddlepaddle.org.cn/en/install/quick?docurl=/documentation/docs/en/install/pip/linux-pip_en.html) (PaddlePaddle版本需要 >= 2.3).
+b. 安装PaddlePaddle [详见官方网址](https://www.paddlepaddle.org.cn/en/install/quick?docurl=/documentation/docs/en/install/pip/linux-pip_en.html) (PaddlePaddle版本需要 >= 2.3)。
 
-c. 克隆PaddleRS代码库.
-```
+c. 克隆PaddleRS代码库。
+```bash
 git clone https://github.com/PaddlePaddle/PaddleRS
 ```
 
-d. 安装PaddleRS环境依赖
-```
+d. 安装PaddleRS环境依赖。
+```bash
 cd PaddleRS
 git checkout develop
 pip install -r requirements.txt
 ```
 
-e. 安装PaddleRS包
-
-```
+e. 安装PaddleRS包。
+```bash
 cd PaddleRS
 python setup.py install
 ```
 
+f. 进入c2fnet目录。
+```bash
+cd examples/c2fnet
+```
+
+*注意：后续的操作默认在c2fnet目录*
+
 ## 数据集
 
 + iSAID: https://captain-whu.github.io/iSAID
-+ ISPR Potsdam/Vaihingen 将在后面的版本提供支持.
++ ISPR Potsdam/Vaihingen 将在后面的版本提供支持。
 
 ### iSAID数据集处理
 
-a. 从官方网站下载[iSAID](https://captain-whu.github.io/iSAID)数据集.
+a. 从官方网站下载[iSAID](https://captain-whu.github.io/iSAID)数据集。
 
-b. 运行针对c2fnet的iSAID处理脚本
+b. 运行针对c2fnet的iSAID处理脚本。
+
+```python
+python data/prepare_isaid_c2fnet.py {下载的原始iSAID数据集存放路径}
+```
+
+c. 处理完的数据集目录结构如下所示：
 
 ```
-python examples/c2fnet/data/prepare_isaid_c2fnet.py {YOUR DOWNLOAD DATASET PATH}
-```
-
-c. 处理完的数据集按照如下的目录设置
-
-```
-{PaddleRS}/examples/c2fnet/data/iSAID
+{c2fnet}/data/iSAID
 ├── img_dir
 │   ├── train
 │   │   ├── *.png
@@ -75,31 +81,33 @@ c. 处理完的数据集按照如下的目录设置
 └── val.txt
 ```
 
-其中train.txt、val.txt、label.txt可以参考[PaddleSeg](https://github.com/PaddlePaddle/PaddleSeg/blob/release/2.6/docs/data/marker/marker_cn.md)的生成方式
+其中`train.txt`、`val.txt`、`label.txt`可以参考[PaddleSeg](https://github.com/PaddlePaddle/PaddleSeg/blob/release/2.6/docs/data/marker/marker_cn.md)的方式生成。
 
-### ISPRS Potsdam/Vaihingen 将在后面的版本提供支持.
+*ISPRS Potsdam/Vaihingen 将在后面的版本提供支持*
 
 ## 训练过程
 
-a. 通过[PaddleSeg](https://github.com/PaddlePaddle/PaddleSeg)或者[PaddleRS](https://github.com/PaddlePaddle/PaddleRS/tree/release/1.0/tutorials/train)训练一个粗分割模型,也可以下载我们训练好的基线模型[FCN_HRNetW18](https://paddlers.bj.bcebos.com/pretrained/seg/isaid/weights/fcn_hrnet_isaid.pdparams),并按照如下目录设置
+a. 通过[PaddleSeg](https://github.com/PaddlePaddle/PaddleSeg)或者[PaddleRS](https://github.com/PaddlePaddle/PaddleRS/tree/release/1.0/tutorials/train)训练一个粗分割模型，或者下载我们训练好的基线模型[FCN_HRNetW18](https://paddlers.bj.bcebos.com/pretrained/seg/isaid/weights/fcn_hrnet_isaid.pdparams)，并放置在如下位置。
 
 ```
-{PaddleRS}/examples/c2fnet/coase_model/{YOUR COASE_MODEL NAME}.pdparams
+{c2fnet}/coarse_model/{YOUR COARSE_MODEL NAME}.pdparams
 ```
 
-c. 单GPU训练精细化模型
-```
+c. 单GPU训练精细化模型。
+```bash
+# 指定显卡编号
 export CUDA_VISIBLE_DEVICES=0
-python examples/c2fnet/train.py
+python train.py
 ```
 
-c. 多GPU训练精细化模型
-```
-export CUDA_VISIBLE_DEVICES= {YOUR GPUs' IDs}
-python -m paddle.distributed.launch examples/c2fnet/train.py
+c. 多GPU训练精细化模型。
+```bash
+# 指定显卡编号
+export CUDA_VISIBLE_DEVICES={你的GPU索引}
+python -m paddle.distributed.launch train.py
 ```
 
-d. 其他训练的细节可以参考 [PaddleRS的训练说明](/tutorials/train/README.md)
+d. 其他训练的细节可以参考 [PaddleRS的训练说明](/tutorials/train/README.md)。
 
 ## 实验结果
 

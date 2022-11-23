@@ -15,6 +15,7 @@
 import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
+import paddlers.models.ppseg as ppseg
 
 from paddlers.models.ppseg.cvlibs import param_init
 from paddlers.rs_models.seg.layers import layers_lib as layers
@@ -23,74 +24,89 @@ from paddlers.models.ppseg.utils import utils
 
 class C2FNet(nn.Layer):
     """
-     A Coarse-to-Fine Segmentation Network for Small Objects in Remote Sensing Images
+     A Coarse-to-Fine Segmentation Network for Small Objects in Remote Sensing Images.
 
      Args:
          num_classes (int): The unique number of target classes.
-         backbone (str, optional): A backbone network
+         backbone (str): The backbone network.
+         coarse_model (str): The coarse model.
+         coarse_model_backbone (str): The backbone network of coarse model.
+         coarse_model_path (str): The weight path of coarse model.
          backbone_indices (tuple, optional): The values in the tuple indicate the indices of output of backbone.
             Default: (-1, ).
-         kerneral_sizes(list): the sliding windows' size
-         training_stride(int): the stride of sliding windows
-         sample_per_gpu(int): the fined process's batch size
+         kernel_sizes(tuple, optional): The sliding windows' size. Default: (128,128).
+         training_stride(int, optional): The stride of sliding windows. Default: 32.
+         samples_per_gpu(int, optional): The fined process's batch size. Default: 32.
          channels (int, optional): The channels between conv layer and the last layer of FCNHead.
             If None, it will be the number of channels of input features. Default: None.
-         align_corners (bool): An argument of F.interpolate. It should be set to False when the output size of feature
+         align_corners (bool): An argument of `F.interpolate`. It should be set to False when the output size of feature
             is even, e.g. 1024x512, otherwise it is True, e.g. 769x769.  Default: False.
-         pretrained (str, optional): The path or url of pretrained model. Default: None
      """
 
     def __init__(self,
                  num_classes,
                  backbone,
+                 coarse_model,
+                 coarse_model_backbone,
+                 coarse_model_path,
                  backbone_indices=(-1, ),
-                 kernel_sizes=[128, 128],
+                 kernel_sizes=(128, 128),
                  training_stride=32,
-                 sample_per_gpu=32,
+                 samples_per_gpu=32,
                  channels=None,
-                 align_corners=False,
-                 pretrained=None,
-                 bias=True,
-                 data_format="NCHW"):
+                 align_corners=False):
         super(C2FNet, self).__init__()
         self.backbone = backbone
         backbone_channels = [
             backbone.feat_channels[i] for i in backbone_indices
         ]
-        self.head_fgbg = FCNHead(
-            2, backbone_indices, backbone_channels, channels, bias=bias)
+
+        if coarse_model_backbone in ['ResNet50_vd', 'ResNet101_vd']:
+            self.coarse_model_backbone = getattr(
+                ppseg.models, coarse_model_backbone)(output_stride=8)
+        elif coarse_model_backbone in ['HRNet_W18', 'HRNet_W48']:
+            self.coarse_model_backbone = getattr(
+                ppseg.models, coarse_model_backbone)(align_corners=False)
+        else:
+            raise ValueError(
+                "coarse_model_backbone: {} is not supported. Please choose one of "
+                "{'ResNet50_vd', 'ResNet101_vd', 'HRNet_W18', 'HRNet_W48'}.".
+                format(coarse_model_backbone))
+
+        self.coarse_model = dict(ppseg.models.__dict__)[coarse_model](
+            num_classes=num_classes, backbone=self.coarse_model_backbone)
+        self.coarse_params = paddle.load(coarse_model_path)
+        self.coarse_model.set_state_dict(self.coarse_params)
+        self.coarse_model.eval()
+
+        self.head_fgbg = FCNHead(2, backbone_indices, backbone_channels,
+                                 channels)
         self.num_cls = num_classes
-        self.kernel_sizes = kernel_sizes
+        self.kernel_sizes = [kernel_sizes[0], kernel_sizes[1]]
         self.training_stride = training_stride
-        self.sample = sample_per_gpu
+        self.samples = samples_per_gpu
         self.align_corners = align_corners
-        self.pretrained = pretrained
-        self.data_format = data_format
-        self.init_weight()
 
-    def forward(self, x, heatmaps, label=None):
-
+    def forward(self, x, label=None):
+        with paddle.no_grad():
+            pre_coarse = self.coarse_model(x)
+            pre_coarse = pre_coarse[0]
+            heatmaps = pre_coarse
         ori_heatmap = heatmaps
         heatmap = paddle.argmax(heatmaps, axis=1, keepdim=True, dtype='int32')
-        # Silin: For isaid id 1、8、9、10、11、14、15 are the small object categories.
-        #        For ISPRS car is the small object.(id==4)
         heatmap = paddle.where(
             (heatmap == 10) | (heatmap == 11) | (heatmap == 8) |
             (heatmap == 15) | (heatmap == 9) | (heatmap == 1) | (heatmap == 14),
             paddle.ones_like(heatmap),
             paddle.zeros_like(heatmap)).astype('float32')
 
-        # Silin: 
-        # Training process get a fined model.
         if self.training:
-            # Silin: 1、训练过程 处理label binarySeg，因此把小目标类别置为1、其他像素点置为0
             label = paddle.unsqueeze(label, axis=1).astype('float32')
             label = paddle.where((label == 10) | (label == 11) | (label == 8) |
                                  (label == 15) | (label == 9) | (label == 1) |
                                  (label == 14),
                                  paddle.ones_like(label),
                                  paddle.zeros_like(label))
-            # Silin：2、滑窗 coase_seg_map（heatmap)、输入图像img、binary label 
             mask_regions = F.unfold(
                 heatmap,
                 kernel_sizes=self.kernel_sizes,
@@ -127,7 +143,6 @@ class C2FNet(nn.Layer):
                 label_regions,
                 shape=[-1, self.kernel_sizes[0] * self.kernel_sizes[1]])
 
-            # Silin：3、通过coase_seg_map找到包含小目标的pacth
             mask_regions_sum = paddle.sum(mask_regions, axis=1)
             mask_regions_selected = paddle.where(
                 mask_regions_sum > 0,
@@ -137,14 +152,11 @@ class C2FNet(nn.Layer):
                 mask_regions_selected).astype('bool')
             final_mask_regions_selected.stop_gradient = True
 
-            theld = self.sample * paddle.shape(x)[0]
-            # Silin：4、如果coase_map中发现足够多的patch则安装topn个patch训练；否则batch//8
+            theld = self.samples * paddle.shape(x)[0]
+
             if paddle.sum(mask_regions_selected) >= theld:
-                # Silin :5、TopK个块作为采样样本
                 _, top_k_idx = paddle.topk(mask_regions_sum, k=theld)
                 final_mask_regions_selected[top_k_idx] = True
-
-                # Silin: 6、根据index找到采样图像patches和label patches
                 selected_img_regions = img_regions[final_mask_regions_selected]
                 selected_img_regions = paddle.reshape(
                     selected_img_regions,
@@ -159,7 +171,6 @@ class C2FNet(nn.Layer):
                     shape=[theld, self.kernel_sizes[0],
                            self.kernel_sizes[1]]).astype('int32')
 
-                # Silin: fined model  前向传播，返回特征和二值label计算损失
                 feat_list = self.backbone(selected_img_regions)
                 bgfg = self.head_fgbg(feat_list)
 
@@ -200,9 +211,7 @@ class C2FNet(nn.Layer):
 
                 return [binary_fea, selected_label_regions]
 
-        # Silin: Inference Process
         else:
-            # Silin：1、处理coase_map和输入图像
             mask_regions = F.unfold(
                 heatmap,
                 kernel_sizes=self.kernel_sizes,
@@ -233,13 +242,9 @@ class C2FNet(nn.Layer):
                 paddle.ones_like(mask_regions_sum),
                 paddle.zeros_like(mask_regions_sum)).astype('bool')
 
-            # Silin: 2、如果不包含小目标，则直接返回coase_map
             if paddle.sum(mask_regions_selected.astype('int')) == 0:
                 return [ori_heatmap]
-
-            # Silin: 3、如果有小目标，则需要对这些patch进行refine
             else:
-                # Silin: 4、切割原始coase_map(是为了最终替换和prob整合)
                 ori_fea_regions = F.unfold(
                     ori_heatmap,
                     kernel_sizes=self.kernel_sizes,
@@ -255,8 +260,6 @@ class C2FNet(nn.Layer):
                         -1, self.num_cls * self.kernel_sizes[0] *
                         self.kernel_sizes[1]
                     ])
-
-                # Silin: 5、选择包含小目标的img_patches
                 selected_img_regions = img_regions[mask_regions_selected]
                 selected_img_regions = paddle.reshape(
                     selected_img_regions,
@@ -264,7 +267,6 @@ class C2FNet(nn.Layer):
                         paddle.shape(selected_img_regions)[0], 3,
                         self.kernel_sizes[0], self.kernel_sizes[1]
                     ])
-                # Silin: 6、选择包含小目标的coase_map patches
                 selected_fea_regions = ori_fea_regions[mask_regions_selected]
                 selected_fea_regions = paddle.reshape(
                     selected_fea_regions,
@@ -272,7 +274,6 @@ class C2FNet(nn.Layer):
                         paddle.shape(selected_fea_regions)[0], self.num_cls,
                         self.kernel_sizes[0], self.kernel_sizes[1]
                     ])
-                # Silin: 7、前向传播
                 feat_list = self.backbone(selected_img_regions)
                 bgfg = self.head_fgbg(feat_list)
                 binary_fea = F.interpolate(
@@ -280,19 +281,13 @@ class C2FNet(nn.Layer):
                     self.kernel_sizes,
                     mode='bilinear',
                     align_corners=self.align_corners)
-
-                # Silin: 8、切分前景概率
                 binary_fea = F.softmax(binary_fea, axis=1)
                 bg_binary, fg_binary = paddle.chunk(
                     binary_fea, chunks=2, axis=1)
-
-                # Silin: 9、切分coase_map概率
                 front, ship, mid, lv, sv, hl, swp, mid2, pl, hb = paddle.split(
                     selected_fea_regions,
                     num_or_sections=[1, 1, 6, 1, 1, 1, 1, 2, 1, 1],
                     axis=1)
-
-                # Silin: 10、聚合小目标prob
                 ship = paddle.add(ship, fg_binary)
                 lv = paddle.add(lv, fg_binary)
                 sv = paddle.add(sv, fg_binary)
@@ -300,8 +295,6 @@ class C2FNet(nn.Layer):
                 swp = paddle.add(swp, fg_binary)
                 pl = paddle.add(pl, fg_binary)
                 hb = paddle.add(hb, fg_binary)
-
-                # Silin： 11、得到refine prob map
                 selected_fea_regions = paddle.concat(
                     x=[front, ship, mid, lv, sv, hl, swp, mid2, pl, hb], axis=1)
                 selected_fea_regions = paddle.reshape(
@@ -326,18 +319,13 @@ class C2FNet(nn.Layer):
 
                 return [fea_out]
 
-    def init_weight(self):
-        if self.pretrained is not None:
-            utils.load_entire_model(self, self.pretrained)
-
 
 class FCNHead(nn.Layer):
     def __init__(self,
                  num_classes,
                  backbone_indices=(-1, ),
                  backbone_channels=(270, ),
-                 channels=None,
-                 bias=True):
+                 channels=None):
         super(FCNHead, self).__init__()
 
         self.num_classes = num_classes
@@ -350,13 +338,13 @@ class FCNHead(nn.Layer):
             out_channels=channels,
             kernel_size=1,
             stride=1,
-            bias_attr=bias)
+            bias_attr=True)
         self.cls = nn.Conv2D(
             in_channels=channels,
             out_channels=self.num_classes,
             kernel_size=1,
             stride=1,
-            bias_attr=bias)
+            bias_attr=True)
         self.init_weight()
 
     def forward(self, feat_list):

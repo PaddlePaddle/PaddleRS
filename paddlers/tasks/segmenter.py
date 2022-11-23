@@ -922,45 +922,33 @@ class C2FNet(BaseSegmenter):
                  losses=None,
                  output_stride=8,
                  backbone_indices=(-1, ),
-                 kernel_sizes=[128, 128],
+                 kernel_sizes=(128, 128),
                  training_stride=32,
-                 sample_per_gpu=32,
+                 samples_per_gpu=32,
                  channels=None,
                  align_corners=False,
-                 coase_model=None,
-                 coase_model_backbone=None,
-                 coase_model_path=None,
+                 coarse_model=None,
+                 coarse_model_backbone=None,
+                 coarse_model_path=None,
                  **params):
 
         self.backbone_name = backbone
         if params.get('with_net', True):
             with DisablePrint():
-                backbone = getattr(
-                    ppseg.models, self.backbone_name
-                )(pretrained='https://bj.bcebos.com/paddleseg/dygraph/hrnet_w18_ssld.tar.gz'
-                  )
+                backbone = getattr(ppseg.models, self.backbone_name)(
+                    in_channels=in_channels, align_corners=align_corners)
         else:
             backbone = None
 
-        if coase_model_backbone in ['ResNet50_vd', 'ResNet101_vd']:
-            self.coase_model_backbone = getattr(
-                ppseg.models, coase_model_backbone)(output_stride=8)
-        elif coase_model_backbone in ['HRNet_W18', 'HRNet_W48']:
-            self.coase_model_backbone = getattr(
-                ppseg.models, coase_model_backbone)(align_corners=False)
-
-        self.coase_model = dict(ppseg.models.__dict__)[coase_model](
-            num_classes=num_classes, backbone=self.coase_model_backbone)
-        self.coase_params = paddle.load(coase_model_path)
-        self.coase_model.set_state_dict(self.coase_params)
-        self.coase_model.eval()
-
         params.update({
             'backbone': backbone,
+            'coarse_model': coarse_model,
+            'coarse_model_backbone': coarse_model_backbone,
+            'coarse_model_path': coarse_model_path,
             'backbone_indices': backbone_indices,
             'kernel_sizes': kernel_sizes,
             'training_stride': training_stride,
-            'sample_per_gpu': sample_per_gpu,
+            'samples_per_gpu': samples_per_gpu,
             'align_corners': align_corners
         })
         super(C2FNet, self).__init__(
@@ -971,13 +959,8 @@ class C2FNet(BaseSegmenter):
             **params)
 
     def run(self, net, inputs, mode):
-
-        with paddle.no_grad():
-            pre_coase = self.coase_model(inputs[0])
-            pre_coase = pre_coase[0]
-            heatmap = pre_coase
         if mode == 'test':
-            net_out = net(inputs[0], heatmap)
+            net_out = net(inputs[0])
             logit = net_out[0]
             outputs = OrderedDict()
             origin_shape = inputs[1]
@@ -1002,7 +985,7 @@ class C2FNet(BaseSegmenter):
             outputs['score_map'] = score_map_list
 
         if mode == 'eval':
-            net_out = net(inputs[0], heatmap)
+            net_out = net(inputs[0])
             logit = net_out[0]
             outputs = OrderedDict()
             if self.status == 'Infer':
@@ -1026,7 +1009,7 @@ class C2FNet(BaseSegmenter):
             outputs['conf_mat'] = metrics.confusion_matrix(pred, label,
                                                            self.num_classes)
         if mode == 'train':
-            net_out = net(inputs[0], heatmap, inputs[1])
+            net_out = net(inputs[0], inputs[1])
             logit = [net_out[0], ]
             labels = net_out[1]
             outputs = OrderedDict()

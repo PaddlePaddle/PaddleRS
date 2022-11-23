@@ -1,21 +1,21 @@
 #!/usr/bin/env python
 
-# 图像分割模型C2FNet对FCN_HRNet优化的训练脚本
+# 图像分割模型C2FNet训练脚本，粗分割器模型为FCN_HRNet.
 # 执行此脚本前，请确认已正确安装PaddleRS库
 
 import paddlers as pdrs
 from paddlers import transforms as T
 
 # 数据集存放目录
-DATA_DIR = 'examples/c2fnet/data/iSAID/'
+DATA_DIR = './data/iSAID'
 # 训练集`file_list`文件路径
-TRAIN_FILE_LIST_PATH = 'examples/c2fnet/data/iSAID/train.txt'
+TRAIN_FILE_LIST_PATH = './data/iSAID/train.txt'
 # 验证集`file_list`文件路径
-EVAL_FILE_LIST_PATH = 'examples/c2fnet/data/iSAID/val.txt'
+EVAL_FILE_LIST_PATH = './data/iSAID/val.txt'
 # 数据集类别信息文件路径
-LABEL_LIST_PATH = 'examples/c2fnet/data/iSAID/label.txt'
+LABEL_LIST_PATH = './data/iSAID/label.txt'
 # 实验目录，保存输出的模型权重和结果
-EXP_DIR = 'examples/c2fnet/output/'
+EXP_DIR = './output/c2fnet/'
 
 # 影像波段数量
 NUM_BANDS = 3
@@ -65,10 +65,9 @@ eval_dataset = pdrs.datasets.SegDataset(
 model = pdrs.tasks.seg.C2FNet(
     in_channels=NUM_BANDS,
     num_classes=len(train_dataset.labels),
-    coase_model='FCN',
-    coase_model_backbone='HRNet_W18',
-    coase_model_path='examples/c2fnet/coase_model/fcn_hrnet_baseline_on_iSAID.pdparams'
-)
+    coarse_model='FCN',
+    coarse_model_backbone='HRNet_W18',
+    coarse_model_path='./coarse_model/fcn_hrnet_baseline_on_iSAID.pdparams')
 
 # 执行模型训练
 model.train(
@@ -88,4 +87,4 @@ model.train(
     use_vdl=True,
     # 指定从某个检查点继续训练
     resume_checkpoint=None,
-    pretrain_weights=None)
+    pretrain_weights='IMAGENET')
