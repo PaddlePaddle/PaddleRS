@@ -132,11 +132,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# test data
-tutorials/train/change_detection/DataSet/
-tutorials/train/classification/DataSet/
-optic_disc_seg.tar
-optic_disc_seg/
-output/
-
+/tutorials/train/**/output/
 /log
