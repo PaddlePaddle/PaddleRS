@@ -195,7 +195,10 @@ class BaseModel(metaclass=ModelMeta):
                 info['Transforms'] = list()
                 for op in self.test_transforms.transforms:
                     name = op.__class__.__name__
-                    attr = op.__dict__
+                    if hasattr(op, 'get_attrs_for_serialization'):
+                        attr = op.get_attrs_for_serialization()
+                    else:
+                        attr = op.__dict__
                     info['Transforms'].append({name: attr})
                 arrange = self.test_transforms.arrange
                 if arrange is not None:
