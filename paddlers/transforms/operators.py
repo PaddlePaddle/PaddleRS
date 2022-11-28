@@ -288,7 +288,10 @@ class DecodeImg(Transform):
             image = im_path
 
         if self.to_uint8:
-            image = F.to_uint8(image, stretch=self.use_stretch)
+            if self.use_stretch:
+                image = F.to_uint8(image, norm=False, stretch=True)
+            else:
+                image = F.to_uint8(image, norm=True, stretch=False)
 
         if self.read_geo_info:
             return image, geo_info_dict
