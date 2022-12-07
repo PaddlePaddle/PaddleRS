@@ -55,7 +55,7 @@ if __name__ == '__main__':
             cfg['download_url'], path=cfg['download_path'])
 
     if not isinstance(cfg['datasets']['eval'].args, dict):
-        raise ValueError("args of eval dataset must be a dict!")
+        raise TypeError("args of eval dataset must be a dict!")
     if cfg['datasets']['eval'].args.get('transforms', None) is not None:
         raise ValueError(
             "Found key 'transforms' in args of eval dataset and the value is not None."
@@ -67,7 +67,7 @@ if __name__ == '__main__':
 
     if cfg['cmd'] == 'train':
         if not isinstance(cfg['datasets']['train'].args, dict):
-            raise ValueError("args of train dataset must be a dict!")
+            raise TypeError("args of train dataset must be a dict!")
         if cfg['datasets']['train'].args.get('transforms', None) is not None:
             raise ValueError(
                 "Found key 'transforms' in args of train dataset and the value is not None."
