@@ -144,7 +144,7 @@ class _CommonTestNamespace:
                             result.shape, self.__class__.__name__))
             else:
                 raise ValueError(
-                    "result type must be str, int, bool, set, np.bool, np.int32, "
+                    "Result type must be str, int, bool, set, np.bool, np.int32, "
                     "np.int64, np.str, float, np.ndarray, np.float32, np.float64"
                 )
 
