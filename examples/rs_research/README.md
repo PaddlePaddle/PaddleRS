@@ -154,7 +154,7 @@ class MixedAttention(nn.Layer):
         return 't' in self.att_types
 ```
 
-在编写组网相关代码时请注意以下两点：
+在编写组网相关代码时请注意以下几点：
 
 1. 所有模型必须为`paddle.nn.Layer`的子类；
 2. 包含模型整体逻辑结构的最外层模块（如本例中的`CustomModel`类）须用`@attach`装饰；
@@ -219,7 +219,7 @@ class CustomTrainer(BaseChangeDetector):
             **params)
 ```
 
-在编写训练器定义相关代码时请注意以下两点：
+在编写训练器定义相关代码时请注意以下几点：
 
 1. 对于变化检测任务，训练器必须为`paddlers.tasks.cd.BaseChangeDetector`的子类；
 2. 与模型一样，训练器也须用`@attach`装饰；
