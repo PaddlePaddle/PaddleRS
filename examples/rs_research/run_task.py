@@ -17,6 +17,7 @@
 import os
 import random
 
+import numpy as np
 import paddle
 import paddlers
 from paddlers import transforms as T
