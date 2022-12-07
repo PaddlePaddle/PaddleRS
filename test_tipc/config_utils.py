@@ -159,7 +159,7 @@ def parse_args(*args, **kwargs):
     elif cfg_path != '':
         raise FileNotFoundError
     else:
-        args = parser.parse_args()
+        args = parser.parse_args(*args, **kwargs)
         return _args2cfg(dict(), args, set())
 
 
