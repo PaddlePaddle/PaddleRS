@@ -252,3 +252,16 @@ class TestFCCDNModel(TestCDModel):
             tar_c2, tar_c2, [self.get_zeros_array(8), tar_c2[1]],
             [self.get_zeros_array(2)]
         ]
+
+
+class TestP2VModel(TestCDModel):
+    MODEL_CLASS = paddlers.rs_models.cd.P2V
+
+    def set_specs(self):
+        base_spec = dict(in_channels=3, num_classes=2)
+        self.specs = [
+            base_spec,
+            dict(in_channels=8, num_classes=2),
+            dict(in_channels=3, num_classes=8),
+            dict(**base_spec, video_len=4)
+        ]   # yapf: disable
