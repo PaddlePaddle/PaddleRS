@@ -21,7 +21,7 @@ __all__ = [
     'TestBITModel', 'TestCDNetModel', 'TestChangeStarModel', 'TestDSAMNetModel',
     'TestDSIFNModel', 'TestFCEarlyFusionModel', 'TestFCSiamConcModel',
     'TestFCSiamDiffModel', 'TestSNUNetModel', 'TestSTANetModel',
-    'TestChangeFormerModel', 'TestFCCDNModel'
+    'TestChangeFormerModel', 'TestFCCDNModel', 'TestP2VModel'
 ]
 
 
