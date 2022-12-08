@@ -261,7 +261,15 @@ class TestP2VModel(TestCDModel):
         base_spec = dict(in_channels=3, num_classes=2)
         self.specs = [
             base_spec,
-            dict(in_channels=8, num_classes=2),
             dict(in_channels=3, num_classes=8),
-            dict(**base_spec, video_len=4)
+            dict(**base_spec, video_len=4),
+            dict(**base_spec, _phase='eval', _stop_grad=True)
         ]   # yapf: disable
+
+    def set_targets(self):
+        # Avoid allocation of large memories
+        tar_c2 = [self.get_zeros_array(2)] * 2
+        self.targets = [
+            tar_c2, [self.get_zeros_array(8)] * 2, tar_c2,
+            [self.get_zeros_array(2)]
+        ]
