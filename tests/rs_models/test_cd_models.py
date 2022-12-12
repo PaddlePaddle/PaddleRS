@@ -21,7 +21,7 @@ __all__ = [
     'TestBITModel', 'TestCDNetModel', 'TestChangeStarModel', 'TestDSAMNetModel',
     'TestDSIFNModel', 'TestFCEarlyFusionModel', 'TestFCSiamConcModel',
     'TestFCSiamDiffModel', 'TestSNUNetModel', 'TestSTANetModel',
-    'TestChangeFormerModel', 'TestFCCDNModel'
+    'TestChangeFormerModel', 'TestFCCDNModel', 'TestP2VModel'
 ]
 
 
@@ -250,5 +250,26 @@ class TestFCCDNModel(TestCDModel):
         ]
         self.targets = [
             tar_c2, tar_c2, [self.get_zeros_array(8), tar_c2[1]],
+            [self.get_zeros_array(2)]
+        ]
+
+
+class TestP2VModel(TestCDModel):
+    MODEL_CLASS = paddlers.rs_models.cd.P2V
+
+    def set_specs(self):
+        base_spec = dict(in_channels=3, num_classes=2)
+        self.specs = [
+            base_spec,
+            dict(in_channels=3, num_classes=8),
+            dict(**base_spec, video_len=4),
+            dict(**base_spec, _phase='eval', _stop_grad=True)
+        ]   # yapf: disable
+
+    def set_targets(self):
+        # Avoid allocation of large memories
+        tar_c2 = [self.get_zeros_array(2)] * 2
+        self.targets = [
+            tar_c2, [self.get_zeros_array(8)] * 2, tar_c2,
             [self.get_zeros_array(2)]
         ]

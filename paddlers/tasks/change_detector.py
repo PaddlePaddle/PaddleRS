@@ -39,7 +39,7 @@ from .utils.slider_predict import slider_predict
 
 __all__ = [
     "CDNet", "FCEarlyFusion", "FCSiamConc", "FCSiamDiff", "STANet", "BIT",
-    "SNUNet", "DSIFN", "DSAMNet", "ChangeStar", "ChangeFormer", "FCCDN"
+    "SNUNet", "DSIFN", "DSAMNet", "ChangeStar", "ChangeFormer", "FCCDN", "P2V"
 ]
 
 
@@ -950,7 +950,7 @@ class DSIFN(BaseChangeDetector):
             }
         else:
             raise ValueError(
-                f"Currently `use_mixed_loss` must be set to False for {self.__class__}"
+                f"Currently `use_mixed_loss` must be set to False for {self.__class__}."
             )
 
 
@@ -986,7 +986,7 @@ class DSAMNet(BaseChangeDetector):
             }
         else:
             raise ValueError(
-                f"Currently `use_mixed_loss` must be set to False for {self.__class__}"
+                f"Currently `use_mixed_loss` must be set to False for {self.__class__}."
             )
 
 
@@ -1022,7 +1022,7 @@ class ChangeStar(BaseChangeDetector):
             }
         else:
             raise ValueError(
-                f"Currently `use_mixed_loss` must be set to False for {self.__class__}"
+                f"Currently `use_mixed_loss` must be set to False for {self.__class__}."
             )
 
 
@@ -1072,5 +1072,34 @@ class FCCDN(BaseChangeDetector):
             }
         else:
             raise ValueError(
-                f"Currently `use_mixed_loss` must be set to False for {self.__class__}"
+                f"Currently `use_mixed_loss` must be set to False for {self.__class__}."
+            )
+
+
+class P2V(BaseChangeDetector):
+    def __init__(self,
+                 num_classes=2,
+                 use_mixed_loss=False,
+                 losses=None,
+                 in_channels=3,
+                 video_len=8,
+                 **params):
+        params.update({'in_channels': in_channels, 'video_len': video_len})
+        super(P2V, self).__init__(
+            model_name='P2V',
+            num_classes=num_classes,
+            use_mixed_loss=use_mixed_loss,
+            losses=losses,
+            **params)
+
+    def default_loss(self):
+        if self.use_mixed_loss is False:
+            return {
+                'types':
+                [seg_losses.CrossEntropyLoss(), seg_losses.CrossEntropyLoss()],
+                'coef': [1.0, 0.4]
+            }
+        else:
+            raise ValueError(
+                f"Currently `use_mixed_loss` must be set to False for {self.__class__}."
             )

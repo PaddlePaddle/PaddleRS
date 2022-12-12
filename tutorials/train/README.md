@@ -13,6 +13,7 @@
 |change_detection/fc_siam_conc.py | 变化检测 | FC-Siam-conc |
 |change_detection/fc_siam_diff.py | 变化检测 | FC-Siam-diff |
 |change_detection/fccdn.py | 变化检测 | FCCDN |
+|change_detection/p2v.py | 变化检测 | P2V-CD |
 |change_detection/snunet.py | 变化检测 | SNUNet |
 |change_detection/stanet.py | 变化检测 | STANet |
 |classification/condensenetv2.py | 场景分类 | CondenseNet V2 |
