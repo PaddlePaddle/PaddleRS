@@ -53,7 +53,7 @@ python deploy/export/export_model.py --model_dir=./output/deeplabv3p/best_model/
 完整命令示例：
 
 ```shell
-python deploy/export_model.py --model_dir=./output/deeplabv3p/best_model/ --save_dir=./inference_model/ --fixed_input_shape=[224,224]
+python deploy/export/export_model.py --model_dir=./output/deeplabv3p/best_model/ --save_dir=./inference_model/ --fixed_input_shape=[224,224]
 ```
 
 对于`--fixed_input_shape`选项，**请注意**：
