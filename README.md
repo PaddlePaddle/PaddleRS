@@ -84,6 +84,7 @@ PaddleRS具有以下五大特色：
           <li><a href="./tutorials/train/change_detection/fc_siam_conc.py">FC-Siam-conc</a></li>
           <li><a href="./tutorials/train/change_detection/fc_siam_diff.py">FC-Siam-diff</a></li>
           <li><a href="./tutorials/train/change_detection/fccdn.py">FCCDN</a></li>
+          <li><a href="./tutorials/train/change_detection/p2v.py">P2V-CD</a></li>
           <li><a href="./tutorials/train/change_detection/snunet.py">SNUNet</a></li>
           <li><a href="./tutorials/train/change_detection/stanet.py">STANet</a></li>
         </ul>
