@@ -28,7 +28,9 @@ with warnings.catch_warnings():
 from .utils import prepro_mask, calc_distance
 
 
-def cut_road_connection(mask: np.ndarray, line_width: int=6) -> np.ndarray:
+def cut_road_connection(mask: np.ndarray,
+                        area_threshold: int = 32,
+                        line_width: int=6) -> np.ndarray:
     """
     Connecting cut road lines.
 
@@ -44,16 +46,18 @@ def cut_road_connection(mask: np.ndarray, line_width: int=6) -> np.ndarray:
 
     Args:
         mask (np.ndarray): Mask of road.
-        line_width (int, optional): Width of the line used for patching.
-            . Default is 6.
+        area_threshold (int, optional): Area threshold of filter connection area. Default is 32.
+        line_width (int, optional): Width of the line used for patching. Default is 6.
 
     Returns:
         np.ndarray: Mask of road after connecting cut road lines.
     """
-    mask = prepro_mask(mask)
+    mask = prepro_mask(mask, area_threshold)
     skeleton = morphology.skeletonize(mask).astype("uint8")
     break_points = _find_breakpoint(skeleton)
     labels = _k_means(break_points)
+    if labels is None:
+        return mask * 255
     match_points = _get_match_points(break_points, labels)
     res = _draw_curve(mask, skeleton, match_points, line_width)
     return res
