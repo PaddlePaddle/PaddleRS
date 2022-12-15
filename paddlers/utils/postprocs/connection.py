@@ -29,7 +29,7 @@ from .utils import prepro_mask, calc_distance
 
 
 def cut_road_connection(mask: np.ndarray,
-                        area_threshold: int = 32,
+                        area_threshold: int=32,
                         line_width: int=6) -> np.ndarray:
     """
     Connecting cut road lines.
@@ -41,12 +41,13 @@ def cut_road_connection(mask: np.ndarray,
     This algorithm has no public code.
     The implementation procedure refers to original article,
     and it is not fully consistent with the article:
-    1. The way to determine the optimal number of clusters k used in k-means clustering is not described in the original article. In this implementation, we use the k that reports the highest silhouette score.
+    1. The way to determine the optimal number of clusters k used in k-means clustering is not described in the original article. 
+        In this implementation, we use the k that reports the highest silhouette score.
     2. We unmark the breakpoints if the angle between the two road extensions is less than 90°.
 
     Args:
         mask (np.ndarray): Mask of road.
-        area_threshold (int, optional): Area threshold of filter connection area. Default is 32.
+        area_threshold (int, optional): Threshold to filter out small connected area. Default is 32.
         line_width (int, optional): Width of the line used for patching. Default is 6.
 
     Returns:

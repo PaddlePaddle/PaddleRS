@@ -16,7 +16,7 @@ import numpy as np
 import cv2
 
 
-def prepro_mask(mask: np.ndarray, area_threshold: int = 32) -> np.ndarray:
+def prepro_mask(mask: np.ndarray, area_threshold: int=32) -> np.ndarray:
     mask_shape = mask.shape
     if len(mask_shape) != 2:
         mask = mask[..., 0]
@@ -34,9 +34,10 @@ def calc_distance(p1: np.ndarray, p2: np.ndarray) -> float:
     return float(np.sqrt(np.sum(np.power((p1[0] - p2[0]), 2))))
 
 
-def _del_small_connection(pred: np.ndarray, threshold: int = 32) -> np.ndarray:
+def _del_small_connection(pred: np.ndarray, threshold: int=32) -> np.ndarray:
     result = np.zeros_like(pred)
-    contours, reals = cv2.findContours(pred, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    contours, reals = cv2.findContours(pred, cv2.RETR_TREE,
+                                       cv2.CHAIN_APPROX_NONE)
     for contour, real in zip(contours, reals[0]):
         if real[-1] == -1:
             if cv2.contourArea(contour) > threshold:
