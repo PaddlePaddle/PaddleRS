@@ -38,7 +38,7 @@ def _del_small_connection(pred: np.ndarray, threshold: int = 32) -> np.ndarray:
     result = np.zeros_like(pred)
     contours, reals = cv2.findContours(pred, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
     for contour, real in zip(contours, reals[0]):
-        if real[-1] == -1:  # 没有父轮廓
+        if real[-1] == -1:
             if cv2.contourArea(contour) > threshold:
                 cv2.fillPoly(result, [contour], (1))
         else:
