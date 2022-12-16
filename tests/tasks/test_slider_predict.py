@@ -72,6 +72,33 @@ class _TestSliderPredictNamespace:
                     self.model.slider_predict(self.image_path, save_dir, 512, 0,
                                               self.transforms)
 
+        def test_eager_load(self):
+            with tempfile.TemporaryDirectory() as td:
+                # Lazy
+                save_dir = osp.join(td, 'lazy')
+                self.model.slider_predict(self.image_path, save_dir, 128, 64,
+                                          self.transforms)
+                pred_lazy = T.decode_image(
+                    osp.join(save_dir, self.basename),
+                    read_raw=True,
+                    decode_sar=False)
+
+                # Eager
+                save_dir = osp.join(td, 'eager')
+                self.model.slider_predict(
+                    self.image_path,
+                    save_dir,
+                    128,
+                    64,
+                    self.transforms,
+                    eager_load=True)
+                pred_eager = T.decode_image(
+                    osp.join(save_dir, self.basename),
+                    read_raw=True,
+                    decode_sar=False)
+
+                self.check_output_equal(pred_lazy, pred_eager)
+
         def test_merge_strategy(self):
             with tempfile.TemporaryDirectory() as td:
                 # Whole-image inference using predict()

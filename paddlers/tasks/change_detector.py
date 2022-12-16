@@ -591,6 +591,7 @@ class BaseChangeDetector(BaseModel):
                        invalid_value=255,
                        merge_strategy='keep_last',
                        batch_size=1,
+                       eager_load=False,
                        quiet=False):
         """
         Do inference using sliding windows.
@@ -615,12 +616,14 @@ class BaseChangeDetector(BaseModel):
                 order, respectively. 'accum' means determining the class of an overlapping 
                 pixel according to accumulated probabilities. Defaults to 'keep_last'.
             batch_size (int, optional): Batch size used in inference. Defaults to 1.
+            eager_load (bool, optional): Whether to load the whole image(s) eagerly.
+                Defaults to False.
             quiet (bool, optional): If True, disable the progress bar. Defaults to False.
         """
 
         slider_predict(self.predict, img_files, save_dir, block_size, overlap,
                        transforms, invalid_value, merge_strategy, batch_size,
-                       not quiet)
+                       eager_load, not quiet)
 
     def preprocess(self, images, transforms, to_tensor=True):
         self._check_transforms(transforms, 'test')
