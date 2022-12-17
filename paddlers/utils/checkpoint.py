@@ -30,6 +30,7 @@ cd_pretrain_weights_dict = {
     'FCSiamConc': ['LEVIRCD'],
     'FCSiamDiff': ['LEVIRCD'],
     'FCCDN': ['LEVIRCD'],
+    'P2V': ['LEVIRCD'],
     'SNUNet': ['LEVIRCD'],
     'STANet': ['LEVIRCD']
 }
@@ -442,6 +443,8 @@ levircd_weights = {
     'https://paddlers.bj.bcebos.com/pretrained/cd/levircd/weights/fc_siam_diff_levircd.pdparams',
     'FCCDN_LEVIRCD':
     'https://paddlers.bj.bcebos.com/pretrained/cd/levircd/weights/fccdn_levircd.pdparams',
+    'P2V_LEVIRCD':
+    'https://paddlers.bj.bcebos.com/pretrained/cd/levircd/weights/p2v_levircd.pdparams',
     'SNUNet_LEVIRCD':
     'https://paddlers.bj.bcebos.com/pretrained/cd/levircd/weights/snunet_levircd.pdparams',
     'STANet_LEVIRCD':
