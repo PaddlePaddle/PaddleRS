@@ -24,6 +24,7 @@ from .download import download_and_decompress
 cd_pretrain_weights_dict = {
     'BIT': ['LEVIRCD'],
     'CDNet': ['LEVIRCD'],
+    'ChangeFormer': ['LEVIRCD'],
     'DSAMNet': ['LEVIRCD'],
     'DSIFN': ['LEVIRCD'],
     'FCEarlyFusion': ['LEVIRCD'],
@@ -431,6 +432,8 @@ levircd_weights = {
     'https://paddlers.bj.bcebos.com/pretrained/cd/levircd/weights/bit_levircd.pdparams',
     'CDNet_LEVIRCD':
     'https://paddlers.bj.bcebos.com/pretrained/cd/levircd/weights/cdnet_levircd.pdparams',
+    'ChangeFormer_LEVIRCD':
+    'https://paddlers.bj.bcebos.com/pretrained/cd/levircd/weights/changeformer_levircd.pdparams',
     'DSAMNet_LEVIRCD':
     'https://paddlers.bj.bcebos.com/pretrained/cd/levircd/weights/dsamnet_levircd.pdparams',
     'DSIFN_LEVIRCD':
