@@ -29,9 +29,9 @@ PaddleRS is an end-to-end high-efficent development toolkit for remote sensing a
 
 ## <img src="./docs/images/feature.png" width="30"/> Features
 
-* <img src="./docs/images/f1.png" width="20"/> **High-Performance Models**: PaddleRS provides 30+ deep learning models, including those known in the computer vision field (e.g. DeepLab V3+, PP-YOLO) and those optimized for remote sensing tasks (e.g. BIT, FarSeg).
+* <img src="./docs/images/f1.png" width="20"/> **High-Performance Models**: PaddleRS provides 30+ deep learning models, including those reknowned in the computer vision field (e.g. DeepLab V3+, PP-YOLO) and those optimized for remote sensing tasks (e.g. BIT, FarSeg).
 
-* <img src="./docs/images/f1.png" width="20"/> **Support for Remote Sensing Tasks**: PaddleRS supports remote sensing tasks including change detection, and provides comprehensive training, deployment tutorials, as well as rich application examples.
+* <img src="./docs/images/f1.png" width="20"/> **Support for Remote Sensing Tasks**: PaddleRS supports remote sensing tasks (e.g. change detection) and provides comprehensive training, deployment tutorials, as well as rich application examples.
 
 * <img src="./docs/images/f2.png" width="20"/> **Optimization for Large Image Tiles**: PaddleRS is optimized for the sliding window inference of large remote sensing images, using a *lazy-loading* strategy to improve performance. Also, the geospatial meta infomation for large tiles can be read and written.
 
@@ -239,7 +239,7 @@ PaddleRS is an end-to-end high-efficent development toolkit for remote sensing a
           <li><a href="./paddlers/utils/visualize.py">map-raster visualization</a></li>
         </ul>
         </details>
-        <details><summary><b>Preprocessing of open-source datasets</b></summary>
+        <details><summary><b>Preprocessing of Public Datasets</b></summary>
         <ul>
           <li><a href="./tools/prepare_dataset/prepare_levircd.py">LEVIR-CD</a></li>
           <li><a href="./tools/prepare_dataset/prepare_svcd.py">Season-varying</a></li>
@@ -257,7 +257,7 @@ PaddleRS is an end-to-end high-efficent development toolkit for remote sensing a
         <li><a href="./examples/c2fnet/README.md">small object optimization</a></li>
       </ul>
       </details>
-      <details><summary><b>Community examples</b></summary>
+      <details><summary><b>Community Examples</b></summary>
       <ul>
       <li><a href="./examples/README.md">application examples of PaddleRS</a></li>
       </ul>
@@ -270,7 +270,7 @@ PaddleRS is an end-to-end high-efficent development toolkit for remote sensing a
 ## <img src="./docs/images/teach.png" width="30"/> Tutorials and Documents
 
 * Quick Start
-  * [Quick Start](./tutorials/train/README.md)
+  * [Quick start](./tutorials/train/README.md)
 * Data Preparation
   * [Open-source remote sensing datasets](./docs/data/dataset.md)
   * [Efficient interactive segmentation tool EISeg](https://github.com/PaddlePaddle/PaddleSeg/tree/release/2.6/EISeg)
