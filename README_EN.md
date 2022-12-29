@@ -29,7 +29,7 @@ PaddleRS is an end-to-end high-efficent development toolkit for remote sensing a
 
 ## <img src="./docs/images/feature.png" width="30"/> Features
 
-* <img src="./docs/images/f1.png" width="20"/> **High-Performance Models**: PaddleRS provides 30+ deep learning models, including those known in the computer vision field (e.g. DeepLabV3+, PP-YOLO) and those optimized for remote sensing tasks (e.g. BIT, FarSeg).
+* <img src="./docs/images/f1.png" width="20"/> **High-Performance Models**: PaddleRS provides 30+ deep learning models, including those known in the computer vision field (e.g. DeepLab V3+, PP-YOLO) and those optimized for remote sensing tasks (e.g. BIT, FarSeg).
 
 * <img src="./docs/images/f1.png" width="20"/> **Support for Remote Sensing Tasks**: PaddleRS supports remote sensing tasks including change detection, and provides comprehensive training, deployment tutorials, as well as rich application examples.
 
@@ -48,7 +48,7 @@ PaddleRS is an end-to-end high-efficent development toolkit for remote sensing a
 * If you have any questions, suggestions, or feature requests, please do not hesitate to create an issue in [GitHub Issues](https://github.com/PaddlePaddle/PaddleRS/issues).
 * Welcome to join PaddleRS WeChat group to communicate with us:
 <div align="center">
-<img src="https://user-images.githubusercontent.com/21275753/207209831-04a50ae6-6193-4777-a4ca-701804b75f66.png"  width = "150" />  
+<img src="https://user-images.githubusercontent.com/21275753/209800487-6e2317cd-ba00-4a1d-8222-50b31b650f59.png"  width = "150" />  
 </div>
 
 ## <img src="./docs/images/model.png" width="30"/> Overview
