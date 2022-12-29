@@ -15,7 +15,7 @@ opencv-contrib-python >= 4.3.0
 openpyxl
 # paddlepaddle >= 2.2.0
 # paddlepaddle-gpu >= 2.2.0
-paddleslim >= 2.2.1,< 2.3.5
+paddleslim >= 2.2.1,< 2.4.2
 pandas
 pycocotools
 scikit-learn == 0.23.2
