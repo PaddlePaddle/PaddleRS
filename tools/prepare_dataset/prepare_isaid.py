@@ -17,7 +17,7 @@ from common import (get_default_parser, add_crop_options, crop_patches,
 # ├── test
 # │   └── images
 # │       ├── P0006.png
-# │       └── ...
+# │       ├── ...
 # │       └── P0009.png
 # ├── train
 # │   └── images

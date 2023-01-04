@@ -48,7 +48,7 @@ PaddleRS is an end-to-end high-efficent development toolkit for remote sensing a
 * If you have any questions, suggestions, or feature requests, please do not hesitate to create an issue in [GitHub Issues](https://github.com/PaddlePaddle/PaddleRS/issues).
 * Welcome to join PaddleRS WeChat group to communicate with us:
 <div align="center">
-<img src="https://user-images.githubusercontent.com/21275753/209800487-6e2317cd-ba00-4a1d-8222-50b31b650f59.png"  width = "150" />  
+<img src="https://user-images.githubusercontent.com/21275753/210476095-a5ebdb51-bd04-4c52-8a9f-cbdd097bbff7.png"  width = "150" />  
 </div>
 
 ## <img src="./docs/images/model.png" width="30"/> Overview
