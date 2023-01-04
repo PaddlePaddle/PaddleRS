@@ -51,7 +51,7 @@ def predict(self, img_file, transforms=None):
 若`img_file`是一个字符串或NumPy数组，则返回对象为包含下列键值对的字典：
 
 ```
-{"label_map": 输出类别标签,
+{"class_ids_map": 输出类别标签,
  "scores_map": 输出类别概率,
  "label_names_map": 输出类别名称}
 ```
