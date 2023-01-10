@@ -50,7 +50,7 @@ PaddleRS具有以下五大特色：
 * 如果您发现任何PaddleRS存在的问题或是对PaddleRS有建议, 欢迎通过[GitHub Issues](https://github.com/PaddlePaddle/PaddleRS/issues)向我们提出。
 * 欢迎加入PaddleRS微信群：
 <div align="center">
-<img src="https://user-images.githubusercontent.com/21275753/210476095-a5ebdb51-bd04-4c52-8a9f-cbdd097bbff7.png"  width = "150" />  
+<img src="https://user-images.githubusercontent.com/21275753/211510652-fc4e0ddb-8f21-496e-842e-9723b7a6ba5a.png"  width = "150" />  
 </div>
 
 ## <img src="./docs/images/model.png" width="30"/> 产品矩阵
