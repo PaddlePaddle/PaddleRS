@@ -1,4 +1,4 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
+# Copyright (c) 2023 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .regularization import building_regularization
-from .connection import cut_road_connection
-from .crf import conditional_random_field
-from .mrf import markov_random_field
-from .utils import del_small_connection, fill_small_holes
+
+def conditional_random_field():
+    pass

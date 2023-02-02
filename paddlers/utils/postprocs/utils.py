@@ -21,7 +21,7 @@ def prepro_mask(mask: np.ndarray, area_threshold: int=32) -> np.ndarray:
     if len(mask_shape) != 2:
         mask = mask[..., 0]
     mask = mask.astype("uint8")
-    mask = _del_small_connection(mask, area_threshold)
+    mask = del_small_connection(mask, area_threshold)
     class_num = len(np.unique(mask))
     if class_num != 2:
         _, mask = cv2.threshold(mask, 0, 255, cv2.THRESH_BINARY |
@@ -34,7 +34,7 @@ def calc_distance(p1: np.ndarray, p2: np.ndarray) -> float:
     return float(np.sqrt(np.sum(np.power((p1[0] - p2[0]), 2))))
 
 
-def _del_small_connection(pred: np.ndarray, threshold: int=32) -> np.ndarray:
+def del_small_connection(pred: np.ndarray, threshold: int=32) -> np.ndarray:
     result = np.zeros_like(pred)
     contours, reals = cv2.findContours(pred, cv2.RETR_TREE,
                                        cv2.CHAIN_APPROX_NONE)
@@ -45,3 +45,7 @@ def _del_small_connection(pred: np.ndarray, threshold: int=32) -> np.ndarray:
         else:
             cv2.fillPoly(result, [contour], (0))
     return result.astype("uint8")
+
+
+def fill_small_holes():
+    pass
