@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Union, Callable
+from typing import Union, Callable, Dict, Any
 
 import cv2
 import numpy as np
@@ -144,8 +144,10 @@ def morphological_operation(mask: np.ndarray,
     return opened.astype("uint8")
 
 
-def deal_one_class(mask: np.ndarray, class_index: int,
-                   func: Callable) -> np.ndarray:
+def deal_one_class(mask: np.ndarray,
+                   class_index: int,
+                   func: Callable,
+                   **kwargs: Dict[str, Any]) -> np.ndarray:
     """
     Only a single category is processed. 
 
@@ -153,12 +155,13 @@ def deal_one_class(mask: np.ndarray, class_index: int,
         mask (np.ndarray): Mask of infer. Shape is [H, W].
         class_index (int): Index of class of need processed.
         func (Callable): Function of processed.
+        **kwargs (Dict[str, Any]): Function parameter.
 
     Returns:
         np.ndarray: Mask after processed.
     """
     btmp = (mask == class_index).astype("uint8")
-    res = func(btmp)
+    res = func(btmp, **kwargs)
     res *= class_index
     res[btmp == 0] = mask
     return res.astype("uint8")
