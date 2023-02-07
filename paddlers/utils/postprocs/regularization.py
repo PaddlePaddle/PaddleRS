@@ -17,7 +17,7 @@ import math
 import cv2
 import numpy as np
 
-from .utils import prepro_mask, calc_distance
+from .utils import del_small_connection, calc_distance
 
 S = 20
 TD = 3
@@ -52,7 +52,7 @@ def building_regularization(mask: np.ndarray, W: int=32) -> np.ndarray:
         np.ndarray: Mask of building after regularized.
     """
     # check and pro processing
-    mask = prepro_mask(mask)
+    mask = del_small_connection(mask)
     mask_shape = mask.shape
     # find contours
     contours, hierarchys = cv2.findContours(mask, cv2.RETR_TREE,

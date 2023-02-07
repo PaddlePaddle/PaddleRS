@@ -16,4 +16,4 @@ from .regularization import building_regularization
 from .connection import cut_road_connection
 from .crf import conditional_random_field
 from .mrf import markov_random_field
-from .utils import del_small_connection, fill_small_holes
+from .utils import del_small_connection, fill_small_holes, open, close

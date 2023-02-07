@@ -25,7 +25,7 @@ with warnings.catch_warnings():
     from sklearn import metrics
     from sklearn.cluster import KMeans
 
-from .utils import prepro_mask, calc_distance
+from .utils import del_small_connection, calc_distance
 
 
 def cut_road_connection(mask: np.ndarray,
@@ -53,7 +53,7 @@ def cut_road_connection(mask: np.ndarray,
     Returns:
         np.ndarray: Mask of road after connecting cut road lines.
     """
-    mask = prepro_mask(mask, area_threshold)
+    mask = del_small_connection(mask, area_threshold)
     skeleton = morphology.skeletonize(mask).astype("uint8")
     break_points = _find_breakpoint(skeleton)
     labels = _k_means(break_points)
