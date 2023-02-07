@@ -30,7 +30,7 @@ def markov_random_field(original_image: np.ndarray,
     Returns:
         np.ndarray: Mask after MRF.
     """
-    img = original_image.astype("double")
+    img = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY).astype("double")
     classes = sorted(np.unique(mask).tolist())
     cluster_num = len(classes)
     zlab = np.zeros_like(mask)
@@ -38,7 +38,7 @@ def markov_random_field(original_image: np.ndarray,
         zlab[mask == pix] = idx
     mask = zlab.astype('int64')
     res = _MRF(img, mask, max_iter, cluster_num)
-    return res.astype("uint8")
+    return res.astype("uint8") - 1
 
 
 def _MRF(img, label, max_iter, cluster_num):

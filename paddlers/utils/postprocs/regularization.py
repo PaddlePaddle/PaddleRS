@@ -17,7 +17,7 @@ import math
 import cv2
 import numpy as np
 
-from .utils import del_small_connection, calc_distance
+from .utils import del_small_connection, calc_distance, morphological_operation
 
 S = 20
 TD = 3
@@ -68,9 +68,8 @@ def building_regularization(mask: np.ndarray, W: int=32) -> np.ndarray:
         contour = _fine(contour, W)  # fine
         res_contours.append((contour, _get_priority(hierarchy)))
     result = _fill(mask, res_contours)  # fill
-    result = cv2.morphologyEx(result, cv2.MORPH_OPEN,
-                              cv2.getStructuringElement(cv2.MORPH_RECT,
-                                                        (3, 3)))  # open
+    result = morphological_operation(result, "open")
+    result = np.clip(result, 0, 1)
     return result
 
 

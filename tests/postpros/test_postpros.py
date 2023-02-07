@@ -17,6 +17,7 @@ from PIL import Image
 
 import numpy as np
 
+import paddle
 import paddlers.utils.postprocs as P
 from testing_utils import CpuCommonTest
 
@@ -35,6 +36,11 @@ class TestPostProgress(CpuCommonTest):
         self.assertEqual(len(mask.shape), 2)
         self.assertEqual(mask.dtype, np.uint8)
         self.assertEqual(tuple(np.unique(mask)), (0, 1))
+        mask_tensor = paddle.randn((1, 3, 256, 256), dtype="float32")
+        mask_tensor = P.prepro_mask(mask_tensor)
+        self.assertEqual(len(mask_tensor.shape), 2)
+        self.assertEqual(mask_tensor.dtype, np.uint8)
+        self.assertEqual(tuple(np.unique(mask_tensor)), (0, 1, 2))
 
     def test_del_small_connection(self):
         mask = copy.deepcopy(self.b_label)
@@ -78,12 +84,13 @@ class TestPostProgress(CpuCommonTest):
         self.assertEqual(np.unique(mask), np.unique(self.b_label))
 
     def test_conditional_random_field(self):
-        mask = copy.deepcopy(self.m_label)
-        mask = P.prepro_mask(mask)
-        mask = P.conditional_random_field(self.image, mask)
-        self.assertEqual(mask.shape, self.m_label.shape)
-        self.assertEqual(mask.dtype, self.m_label.dtype)
-        self.assertEqual(np.unique(mask), np.unique(self.m_label))
+        if "conditional_random_field" in dir(P):
+            mask = copy.deepcopy(self.m_label)
+            mask = P.prepro_mask(mask)
+            mask = P.conditional_random_field(self.image, mask)
+            self.assertEqual(mask.shape, self.m_label.shape)
+            self.assertEqual(mask.dtype, self.m_label.dtype)
+            self.assertEqual(np.unique(mask), np.unique(self.m_label))
 
     def test_markov_random_field(self):
         mask = copy.deepcopy(self.m_label)

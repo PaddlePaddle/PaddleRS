@@ -58,9 +58,10 @@ def cut_road_connection(mask: np.ndarray,
     break_points = _find_breakpoint(skeleton)
     labels = _k_means(break_points)
     if labels is None:
-        return mask * 255
+        return mask
     match_points = _get_match_points(break_points, labels)
     res = _draw_curve(mask, skeleton, match_points, line_width)
+    res = np.clip(res, 0, 1)
     return res
 
 
