@@ -14,7 +14,13 @@
 
 from .regularization import building_regularization
 from .connection import cut_road_connection
-from .crf import conditional_random_field
 from .mrf import markov_random_field
 from .utils import (prepro_mask, del_small_connection, fill_small_holes,
                     morphological_operation, deal_one_class)
+
+try:
+    from .crf import conditional_random_field
+except ImportError:
+    print(
+        "Can not use `conditional_random_field`, please install pydensecrf first!"
+    )

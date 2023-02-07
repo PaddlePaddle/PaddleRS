@@ -159,5 +159,6 @@ def deal_one_class(mask: np.ndarray, class_index: int,
     """
     btmp = (mask == class_index).astype("uint8")
     res = func(btmp)
+    res *= class_index
     res[btmp == 0] = mask
     return res.astype("uint8")
