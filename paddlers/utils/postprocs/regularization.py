@@ -44,7 +44,7 @@ def building_regularization(mask: np.ndarray, W: int=32) -> np.ndarray:
     The implementation is not fully consistent with the article.
 
     Args:
-        mask (np.ndarray): Mask of building.
+        mask (np.ndarray): Mask of building. Shape is [H, W] and values are 0 or 1.
         W (int, optional): Minimum threshold in main direction. Default is 32.
             The larger W, the more regular the image, but the worse the image detail.
 
