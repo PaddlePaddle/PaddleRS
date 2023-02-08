@@ -25,7 +25,7 @@ def calc_distance(p1: np.ndarray, p2: np.ndarray) -> float:
 
 def prepro_mask(input: Union[paddle.Tensor, np.ndarray]) -> np.ndarray:
     """
-    _summary_
+    Standardized mask.
 
     Args:
         input (Union[paddle.Tensor, np.ndarray]): Output of model, or user's mask.
