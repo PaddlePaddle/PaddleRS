@@ -17,6 +17,7 @@ from .connection import cut_road_connection
 from .mrf import markov_random_field
 from .utils import (prepro_mask, del_small_connection, fill_small_holes,
                     morphological_operation, deal_one_class)
+from .change_filter import change_detection_filter
 
 try:
     from .crf import conditional_random_field

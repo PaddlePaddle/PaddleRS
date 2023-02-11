@@ -26,7 +26,8 @@ __all__ = ['TestPostProgress']
 
 class TestPostProgress(CpuCommonTest):
     def setUp(self):
-        self.image = np.asarray(Image.open("data/ssmt/optical_t2.bmp"))
+        self.image1 = np.asarray(Image.open("data/ssmt/optical_t2.bmp"))
+        self.image2 = np.asarray(Image.open("data/ssmt/optical_t2.bmp"))
         self.b_label = np.asarray(Image.open("data/ssmt/binary_gt.bmp"))
         self.m_label = np.asarray(Image.open("data/ssmt/multiclass_gt2.bmp"))
 
@@ -87,7 +88,7 @@ class TestPostProgress(CpuCommonTest):
         if "conditional_random_field" in dir(P):
             mask = copy.deepcopy(self.m_label)
             mask = P.prepro_mask(mask)
-            mask = P.conditional_random_field(self.image, mask)
+            mask = P.conditional_random_field(self.image2, mask)
             self.assertEqual(mask.shape, self.m_label.shape)
             self.assertEqual(mask.dtype, self.m_label.dtype)
             self.assertEqual(np.unique(mask), np.unique(self.m_label))
@@ -95,7 +96,7 @@ class TestPostProgress(CpuCommonTest):
     def test_markov_random_field(self):
         mask = copy.deepcopy(self.m_label)
         mask = P.prepro_mask(mask)
-        mask = P.markov_random_field(self.image, mask)
+        mask = P.markov_random_field(self.image2, mask)
         self.assertEqual(mask.shape, self.m_label.shape)
         self.assertEqual(mask.dtype, self.m_label.dtype)
         self.assertEqual(np.unique(mask), np.unique(self.m_label))
@@ -105,6 +106,17 @@ class TestPostProgress(CpuCommonTest):
         mask = P.prepro_mask(mask)
         func = P.morphological_operation
         mask = P.deal_one_class(mask, 1, func, ops="dilate")
+        self.assertEqual(mask.shape, self.m_label.shape)
+        self.assertEqual(mask.dtype, self.m_label.dtype)
+        self.assertEqual(np.unique(mask), np.unique(self.m_label))
+
+    def test_change_(self):
+        mask = copy.deepcopy(self.m_label)
+        mask = P.prepro_mask(mask)
+        mask = P.change_detection_filter(mask, self.image1, self.image2, 0.8,
+                                         0.8, "GLI", {"b": 3,
+                                                      "g": 2,
+                                                      "r": 1})
         self.assertEqual(mask.shape, self.m_label.shape)
         self.assertEqual(mask.dtype, self.m_label.dtype)
         self.assertEqual(np.unique(mask), np.unique(self.m_label))

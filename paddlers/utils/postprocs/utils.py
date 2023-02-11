@@ -155,7 +155,6 @@ def deal_one_class(mask: np.ndarray,
         mask (np.ndarray): Mask of infer. Shape is [H, W].
         class_index (int): Index of class of need processed.
         func (Callable): Function of processed.
-        **kwargs (Dict[str, Any]): Function parameter.
 
     Returns:
         np.ndarray: Mask after processed.
