@@ -25,7 +25,7 @@ git rev-parse HEAD
 python -m pip install --user -r requirements.txt
 # According to 
 # https://stackoverflow.com/questions/74972995/opencv-aws-lambda-lib64-libz-so-1-version-zlib-1-2-9-not-found
-python -m pip install opencv-python-headless==4.6.0.66
+python -m pip install opencv-contrib-python==4.6.0.66
 python -m pip install --user -e .
 python -m pip install --user https://versaweb.dl.sourceforge.net/project/gdal-wheels-for-linux/GDAL-3.4.1-cp37-cp37m-manylinux_2_5_x86_64.manylinux1_x86_64.whl
 
