@@ -24,7 +24,7 @@ def markov_random_field(original_image: np.ndarray,
 
     Args:
         original_image (np.ndarray): Original image. Shape is [H, W, 3]. 
-        mask (np.ndarray): Mask of infer. Shape is [H, W].
+        mask (np.ndarray): Mask to refine. Shape is [H, W].
         max_iter (int, optional): Maximum number of iterations. Defaults to 2.
 
     Returns:

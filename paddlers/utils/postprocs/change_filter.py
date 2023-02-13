@@ -29,26 +29,26 @@ def change_detection_filter(mask: np.ndarray,
                             satellite: Optional[str]=None,
                             **kwargs: Dict[str, Any]) -> np.ndarray:
     """
-    Remote sensing index filter. It is a postprogress for change detection tasks.
+    Remote sensing index filter. It is a postprocessing method for change detection tasks.
 
     E.g. Filter plant seasonal variations in non-urban scenes
     1. Calculate NDVI of the two images separately
     2. Obtain vegetation mask by threshold filter
-    3. Take the intersection of the two images, called veg_mask
+    3. Take the intersection of the two vegetation masks, called veg_mask
     4. Filter mask through veg_mask
 
     Args:
-        mask (np.ndarray): Mask of infer. Shape is [H, W].
+        mask (np.ndarray): Change mask predicted by a change detection model. Shape is [H, W].
         t1 (np.ndarray): Original image of time 1.
         t2 (np.ndarray): Original image of time 2.
         threshold1 (float): Threshold of time 1.
         threshold2 (float): Threshold of time 2.
         
-        Other args please refer to transformer operator `AppendIndex`
+        For other arguments please refer to the data transformation operator `AppendIndex`
         (paddlers/transforms/operators.py)
 
     Returns:
-        np.ndarray: Mask after filtered.
+        np.ndarray: Filtered mask.
     """
     index_calculator = AppendIndex(index_type, band_indices, satellite,
                                    **kwargs)

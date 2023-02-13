@@ -28,7 +28,7 @@ def prepro_mask(input: Union[paddle.Tensor, np.ndarray]) -> np.ndarray:
     Standardized mask.
 
     Args:
-        input (Union[paddle.Tensor, np.ndarray]): Output of model, or user's mask.
+        input (Union[paddle.Tensor, np.ndarray]): Mask to refine, or user's mask.
 
     Returns:
         np.ndarray: Standard mask.
@@ -65,7 +65,7 @@ def del_small_connection(mask: np.ndarray, threshold: int=32) -> np.ndarray:
     Delete the connected region whose pixel area is less than the threshold from mask.
 
     Args:
-        mask (np.ndarray): Mask of infer. Shape is [H, W] and values are 0 or 1.
+        mask (np.ndarray): Mask to refine. Shape is [H, W] and values are 0 or 1.
         threshold (int, optional): Threshold of deleted area. Default is 32.
 
     Returns:
@@ -88,7 +88,7 @@ def fill_small_holes(mask: np.ndarray, threshold: int=32) -> np.ndarray:
     Fill the holed region whose pixel area is less than the threshold from mask.
 
     Args:
-        mask (np.ndarray): Mask of infer. Shape is [H, W] and values are 0 or 1.
+        mask (np.ndarray): Mask to refine. Shape is [H, W] and values are 0 or 1.
         threshold (int, optional): Threshold of filled area. Default is 32.
 
     Returns:
@@ -121,13 +121,13 @@ def morphological_operation(mask: np.ndarray,
     Dilate: It is used to Coarse goals.
 
     Args:
-        mask (np.ndarray): Mask of infer. Shape is [H, W].
+        mask (np.ndarray): Mask to refine. Shape is [H, W].
         ops (str): . Defaults to "open".
         k_size (int, optional): Size of the structuring element. Defaults to 3.
         iterations (int, optional): Number of times erosion and dilation are applied. Defaults to 1.
 
     Returns:
-        np.ndarray: Mask after open operation.
+        np.ndarray: Morphologically processed mask.
     """
     kv = {
         "open": cv2.MORPH_OPEN,
@@ -152,12 +152,12 @@ def deal_one_class(mask: np.ndarray,
     Only a single category is processed. 
 
     Args:
-        mask (np.ndarray): Mask of infer. Shape is [H, W].
+        mask (np.ndarray): Mask to refine. Shape is [H, W].
         class_index (int): Index of class of need processed.
         func (Callable): Function of processed.
 
     Returns:
-        np.ndarray: Mask after processed.
+        np.ndarray: Processed Mask.
     """
     btmp = (mask == class_index).astype("uint8")
     res = func(btmp, **kwargs)
