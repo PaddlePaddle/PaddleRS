@@ -27,7 +27,6 @@ PaddleRS is an end-to-end high-efficent development toolkit for remote sensing a
 <img src="https://user-images.githubusercontent.com/71769312/218403605-fa5a9a5b-ea2a-4b82-99a0-1534e4d44328.gif"  width = "2000" />  
 </div>
 
-
 ## <img src="./docs/images/feature.png" width="30"/> Features
 
 * <img src="./docs/images/f1.png" width="20"/> **High-Performance Models**: PaddleRS provides 30+ deep learning models, including those reknowned in the computer vision field (e.g. DeepLab V3+, PP-YOLO) and those optimized for remote sensing tasks (e.g. BIT, FarSeg).
