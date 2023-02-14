@@ -24,7 +24,7 @@
 PaddleRS is an end-to-end high-efficent development toolkit for remote sensing applications based on PaddlePaddle, which helps both developers and researchers in the whole process of designing deep learning models, training models, optimizing performance and inference speed, and deploying models. PaddleRS supports multiple tasks, including **image segmentation, object detection, scene classification, and image restoration**.
 
 <div align="center">
-<img src="https://user-images.githubusercontent.com/21275753/199727309-796b0b14-1af7-4cea-9a22-c5439766446b.gif"  width = "2000" />  
+<img src="https://user-images.githubusercontent.com/71769312/218403605-fa5a9a5b-ea2a-4b82-99a0-1534e4d44328.gif"  width = "2000" />  
 </div>
 
 ## <img src="./docs/images/feature.png" width="30"/> Features
