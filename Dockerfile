@@ -1,24 +1,25 @@
-# base image: paddle2.4.1-cpu with gdal3.4.1
-FROM geoyee/paddle:2.4.1-gdal3.4.1
+# base image: paddlepaddle2.4.1-cpu
+FROM paddlepaddle/paddle:2.4.1
 
-# clone
-WORKDIR /opt/
-RUN git clone https://github.com/PaddlePaddle/PaddleRS.git
+# install GDAL
+RUN wget https://next.a-boat.cn:2021/s/FyEtFZ9PDHLEWA3/download/GDAL-3.4.1-cp37-cp37m-manylinux_2_5_x86_64.manylinux1_x86_64.whl \
+	&& pip install GDAL-3.4.1-cp37-cp37m-manylinux_2_5_x86_64.manylinux1_x86_64.whl \
+	&& rm -rf GDAL-3.4.1-cp37-cp37m-manylinux_2_5_x86_64.manylinux1_x86_64.whl
 
-# env
-RUN chmod 777 -R /opt/PaddleRS/examples
+# clone paddlers
+WORKDIR /opt
+RUN git clone https://github.com/PaddlePaddle/PaddleRS.git \
+	&& chmod 777 -R /opt/PaddleRS/examples
 ENV PYTHONPATH /opt/PaddleRS
 
 # install requirements
 WORKDIR /opt/PaddleRS
-RUN pip install --upgrade --ignore-installed pip
 RUN pip install -r /opt/PaddleRS/requirements.txt -i https://mirror.baidu.com/pypi/simple
 
 # install pydensecrf
-RUN mkdir /usr/src/pydensecrf
-WORKDIR /usr/src/pydensecrf
-RUN pip install git+https://github.com/lucasb-eyer/pydensecrf.git
+WORKDIR /usr/src
+RUN pip install git+https://github.com/lucasb-eyer/pydensecrf.git \
+	&& rm -rf /usr/src/pydensecrf
 
-# clear
+# finish
 WORKDIR /opt/PaddleRS
-RUN rm -rf /usr/src/pydensecrf
