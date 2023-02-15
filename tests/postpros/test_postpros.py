@@ -28,7 +28,8 @@ class TestPostProgress(CpuCommonTest):
     def setUp(self):
         self.image1 = np.asarray(Image.open("data/ssmt/optical_t2.bmp"))
         self.image2 = np.asarray(Image.open("data/ssmt/optical_t2.bmp"))
-        self.b_label = np.asarray(Image.open("data/ssmt/binary_gt.bmp"))
+        self.b_label = np.asarray(Image.open("data/ssmt/binary_gt.bmp")).clip(0,
+                                                                              1)
         self.m_label = np.asarray(Image.open("data/ssmt/multiclass_gt2.png"))
 
     def test_prepro_mask(self):
@@ -49,7 +50,8 @@ class TestPostProgress(CpuCommonTest):
         mask = P.del_small_connection(mask)
         self.assertEqual(mask.shape, self.b_label.shape)
         self.assertEqual(mask.dtype, self.b_label.dtype)
-        self.assertEqual(np.unique(mask), np.unique(self.b_label))
+        self.assertEqual(
+            np.unique(mask).tolist(), np.unique(self.b_label).tolist())
 
     def test_fill_small_holes(self):
         mask = copy.deepcopy(self.b_label)
@@ -57,7 +59,8 @@ class TestPostProgress(CpuCommonTest):
         mask = P.fill_small_holes(mask)
         self.assertEqual(mask.shape, self.b_label.shape)
         self.assertEqual(mask.dtype, self.b_label.dtype)
-        self.assertEqual(np.unique(mask), np.unique(self.b_label))
+        self.assertEqual(
+            np.unique(mask).tolist(), np.unique(self.b_label).tolist())
 
     def test_morphological_operation(self):
         mask = copy.deepcopy(self.b_label)
@@ -66,7 +69,8 @@ class TestPostProgress(CpuCommonTest):
             mask = P.morphological_operation(mask, op)
             self.assertEqual(mask.shape, self.b_label.shape)
             self.assertEqual(mask.dtype, self.b_label.dtype)
-            self.assertEqual(np.unique(mask), np.unique(self.b_label))
+            self.assertEqual(
+                np.unique(mask).tolist(), np.unique(self.b_label).tolist())
 
     def test_building_regularization(self):
         mask = copy.deepcopy(self.b_label)
@@ -74,7 +78,8 @@ class TestPostProgress(CpuCommonTest):
         mask = P.building_regularization(mask)
         self.assertEqual(mask.shape, self.b_label.shape)
         self.assertEqual(mask.dtype, self.b_label.dtype)
-        self.assertEqual(np.unique(mask), np.unique(self.b_label))
+        self.assertEqual(
+            np.unique(mask).tolist(), np.unique(self.b_label).tolist())
 
     def test_cut_road_connection(self):
         mask = copy.deepcopy(self.b_label)
@@ -82,7 +87,8 @@ class TestPostProgress(CpuCommonTest):
         mask = P.cut_road_connection(mask)
         self.assertEqual(mask.shape, self.b_label.shape)
         self.assertEqual(mask.dtype, self.b_label.dtype)
-        self.assertEqual(np.unique(mask), np.unique(self.b_label))
+        self.assertEqual(
+            np.unique(mask).tolist(), np.unique(self.b_label).tolist())
 
     def test_conditional_random_field(self):
         if "conditional_random_field" in dir(P):
@@ -91,7 +97,8 @@ class TestPostProgress(CpuCommonTest):
             mask = P.conditional_random_field(self.image2, mask)
             self.assertEqual(mask.shape, self.m_label.shape)
             self.assertEqual(mask.dtype, self.m_label.dtype)
-            self.assertEqual(np.unique(mask), np.unique(self.m_label))
+            self.assertEqual(
+                np.unique(mask).tolist(), np.unique(self.m_label).tolist())
 
     def test_markov_random_field(self):
         mask = copy.deepcopy(self.m_label)
@@ -99,7 +106,8 @@ class TestPostProgress(CpuCommonTest):
         mask = P.markov_random_field(self.image2, mask)
         self.assertEqual(mask.shape, self.m_label.shape)
         self.assertEqual(mask.dtype, self.m_label.dtype)
-        self.assertEqual(np.unique(mask), np.unique(self.m_label))
+        self.assertEqual(
+            np.unique(mask).tolist(), np.unique(self.m_label).tolist())
 
     def test_deal_one_class(self):
         mask = copy.deepcopy(self.m_label)
@@ -108,7 +116,8 @@ class TestPostProgress(CpuCommonTest):
         mask = P.deal_one_class(mask, 1, func, ops="dilate")
         self.assertEqual(mask.shape, self.m_label.shape)
         self.assertEqual(mask.dtype, self.m_label.dtype)
-        self.assertEqual(np.unique(mask), np.unique(self.m_label))
+        self.assertEqual(
+            np.unique(mask).tolist(), np.unique(self.m_label).tolist())
 
     def test_change_(self):
         mask = copy.deepcopy(self.m_label)
@@ -119,4 +128,5 @@ class TestPostProgress(CpuCommonTest):
                                                       "r": 1})
         self.assertEqual(mask.shape, self.m_label.shape)
         self.assertEqual(mask.dtype, self.m_label.dtype)
-        self.assertEqual(np.unique(mask), np.unique(self.m_label))
+        self.assertEqual(
+            np.unique(mask).tolist(), np.unique(self.m_label).tolist())

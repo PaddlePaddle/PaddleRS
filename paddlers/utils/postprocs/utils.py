@@ -35,8 +35,8 @@ def prepro_mask(input: Union[paddle.Tensor, np.ndarray]) -> np.ndarray:
     """
     input_shape = input.shape
     if isinstance(input, paddle.Tensor):
-        if input_shape == 4:
-            mask = paddle.argmax(input, axis=1)._squeeze().numpy()
+        if len(input_shape) == 4:
+            mask = paddle.argmax(input, axis=1).squeeze_().numpy()
         else:
             raise ValueError("Invalid tensor, shape must be 4, not " + str(
                 input_shape) + ".")
@@ -162,5 +162,4 @@ def deal_one_class(mask: np.ndarray,
     btmp = (mask == class_index).astype("uint8")
     res = func(btmp, **kwargs)
     res *= class_index
-    res[btmp == 0] = mask
-    return res.astype("uint8")
+    return np.where(btmp == 0, mask, res).astype("uint8")
