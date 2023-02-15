@@ -73,6 +73,29 @@ Windows用户可以在[此站点](https://www.lfd.uci.edu/~gohlke/pythonlibs/#gd
 pip install GDAL‑3.3.3‑cp39‑cp39‑win_amd64.whl
 ```
 
+### *Docker安装
+
+1. 从dockerhub拉取
+
+```shell
+docker pull paddlepaddle/paddlers:1.0.0
+```
+
+- （可选）从头开始构建
+
+```shell
+git clone https://github.com/PaddlePaddle/PaddleRS
+cd PaddleRS
+docker build -t <imageName> .
+```
+
+2. 启动镜像
+
+```shell
+docker iamges  # 查看镜像的ID
+docker run -it <imageID>
+```
+
 ## 开始训练
 
 + 在安装完成PaddleRS后，使用如下命令执行单卡训练。脚本将自动下载训练数据。以DeepLab V3+图像分割模型为例：
