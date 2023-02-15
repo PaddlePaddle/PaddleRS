@@ -65,8 +65,7 @@ def batch_detect(net, img_batch):
         ymax = pred[:, 2:3]
         locs = np.concatenate((xmin, ymin, xmax, ymax), axis=1)
         bboxlists.append(
-            np.concatenate(
-                (locs * orig_size + shift, scores), axis=1))
+            np.concatenate((locs * orig_size + shift, scores), axis=1))
 
     return bboxlists
 

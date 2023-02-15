@@ -21,13 +21,13 @@ from paddle.utils.download import get_path_from_url
 from .fcn import FCN
 from .hrnet import HRNet_W18
 
+
 BISENET_WEIGHT_URL = 'https://paddlegan.bj.bcebos.com/models/faceseg_FCN-HRNetW18.pdparams'
 
 
 class FaceSeg:
     def __init__(self):
-        save_pth = get_path_from_url(BISENET_WEIGHT_URL,
-                                     osp.split(osp.realpath(__file__))[0])
+        save_pth = get_path_from_url(BISENET_WEIGHT_URL, osp.split(osp.realpath(__file__))[0])
 
         self.net = FCN(num_classes=2, backbone=HRNet_W18())
         state_dict = paddle.load(save_pth)
@@ -47,8 +47,7 @@ class FaceSeg:
         return mask
 
     def input_transform(self, image):
-        image_input = cv2.resize(
-            image, (384, 384), interpolation=cv2.INTER_AREA)
+        image_input = cv2.resize(image, (384, 384), interpolation=cv2.INTER_AREA)
         image_input = (image_input / 255.)[np.newaxis, :, :, :]
         image_input = np.transpose(image_input, (0, 3, 1, 2)).astype(np.float32)
         image_input = paddle.to_tensor(image_input)

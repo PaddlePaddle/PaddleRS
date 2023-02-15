@@ -22,19 +22,18 @@ class BlazeBlock(nn.Layer):
             padding = (kernel_size - 1) // 2
 
         self.convs = nn.Sequential(
-            nn.Conv2D(
-                in_channels=in_channels,
-                out_channels=in_channels,
-                kernel_size=kernel_size,
-                stride=stride,
-                padding=padding,
-                groups=in_channels),
-            nn.Conv2D(
-                in_channels=in_channels,
-                out_channels=out_channels,
-                kernel_size=1,
-                stride=1,
-                padding=0), )
+            nn.Conv2D(in_channels=in_channels,
+                      out_channels=in_channels,
+                      kernel_size=kernel_size,
+                      stride=stride,
+                      padding=padding,
+                      groups=in_channels),
+            nn.Conv2D(in_channels=in_channels,
+                      out_channels=out_channels,
+                      kernel_size=1,
+                      stride=1,
+                      padding=0),
+        )
 
         self.act = nn.ReLU()
 
@@ -53,7 +52,6 @@ class BlazeBlock(nn.Layer):
 class BlazeFace(nn.Layer):
     """The BlazeFace face detection model.
     """
-
     def __init__(self):
         super(BlazeFace, self).__init__()
 
@@ -72,34 +70,32 @@ class BlazeFace(nn.Layer):
 
     def _define_layers(self):
         self.backbone1 = nn.Sequential(
-            nn.Conv2D(
-                in_channels=3,
-                out_channels=24,
-                kernel_size=5,
-                stride=2,
-                padding=0),
+            nn.Conv2D(in_channels=3,
+                      out_channels=24,
+                      kernel_size=5,
+                      stride=2,
+                      padding=0),
             nn.ReLU(),
             BlazeBlock(24, 24),
             BlazeBlock(24, 28),
-            BlazeBlock(
-                28, 32, stride=2),
+            BlazeBlock(28, 32, stride=2),
             BlazeBlock(32, 36),
             BlazeBlock(36, 42),
-            BlazeBlock(
-                42, 48, stride=2),
+            BlazeBlock(42, 48, stride=2),
             BlazeBlock(48, 56),
             BlazeBlock(56, 64),
             BlazeBlock(64, 72),
             BlazeBlock(72, 80),
-            BlazeBlock(80, 88), )
+            BlazeBlock(80, 88),
+        )
 
         self.backbone2 = nn.Sequential(
-            BlazeBlock(
-                88, 96, stride=2),
+            BlazeBlock(88, 96, stride=2),
             BlazeBlock(96, 96),
             BlazeBlock(96, 96),
             BlazeBlock(96, 96),
-            BlazeBlock(96, 96), )
+            BlazeBlock(96, 96),
+        )
 
         self.classifier_8 = nn.Conv2D(88, 2, 1)
         self.classifier_16 = nn.Conv2D(96, 6, 1)
@@ -244,8 +240,8 @@ class BlazeFace(nn.Layer):
         output_detections = []
         for i in range(raw_box_tensor.shape[0]):
             boxes = paddle.to_tensor(detection_boxes[i, mask[i]])
-            scores = paddle.to_tensor(detection_scores[i, mask[i]]).unsqueeze(
-                axis=-1)
+            scores = paddle.to_tensor(
+                detection_scores[i, mask[i]]).unsqueeze(axis=-1)
             output_detections.append(paddle.concat((boxes, scores), axis=-1))
 
         return output_detections
@@ -300,8 +296,8 @@ class BlazeFace(nn.Layer):
 
             first_box = detection[:4]
             other_boxes = detections[remaining, :4]
-            ious = overlap_similarity(
-                paddle.to_tensor(first_box), paddle.to_tensor(other_boxes))
+            ious = overlap_similarity(paddle.to_tensor(first_box),
+                                      paddle.to_tensor(other_boxes))
 
             mask = ious > self.min_suppression_threshold
             mask = mask.numpy()

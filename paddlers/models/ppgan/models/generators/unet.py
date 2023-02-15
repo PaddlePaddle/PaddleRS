@@ -24,7 +24,6 @@ from .builder import GENERATORS
 @GENERATORS.register()
 class UnetGenerator(nn.Layer):
     """Create a Unet-based generator"""
-
     def __init__(self,
                  input_nc,
                  output_nc,
@@ -58,32 +57,28 @@ class UnetGenerator(nn.Layer):
             innermost=True)  # add the innermost layer
         for i in range(num_downs -
                        5):  # add intermediate layers with ngf * 8 filters
-            unet_block = UnetSkipConnectionBlock(
-                ngf * 8,
-                ngf * 8,
-                input_nc=None,
-                submodule=unet_block,
-                norm_layer=norm_layer,
-                use_dropout=use_dropout)
+            unet_block = UnetSkipConnectionBlock(ngf * 8,
+                                                 ngf * 8,
+                                                 input_nc=None,
+                                                 submodule=unet_block,
+                                                 norm_layer=norm_layer,
+                                                 use_dropout=use_dropout)
         # gradually reduce the number of filters from ngf * 8 to ngf
-        unet_block = UnetSkipConnectionBlock(
-            ngf * 4,
-            ngf * 8,
-            input_nc=None,
-            submodule=unet_block,
-            norm_layer=norm_layer)
-        unet_block = UnetSkipConnectionBlock(
-            ngf * 2,
-            ngf * 4,
-            input_nc=None,
-            submodule=unet_block,
-            norm_layer=norm_layer)
-        unet_block = UnetSkipConnectionBlock(
-            ngf,
-            ngf * 2,
-            input_nc=None,
-            submodule=unet_block,
-            norm_layer=norm_layer)
+        unet_block = UnetSkipConnectionBlock(ngf * 4,
+                                             ngf * 8,
+                                             input_nc=None,
+                                             submodule=unet_block,
+                                             norm_layer=norm_layer)
+        unet_block = UnetSkipConnectionBlock(ngf * 2,
+                                             ngf * 4,
+                                             input_nc=None,
+                                             submodule=unet_block,
+                                             norm_layer=norm_layer)
+        unet_block = UnetSkipConnectionBlock(ngf,
+                                             ngf * 2,
+                                             input_nc=None,
+                                             submodule=unet_block,
+                                             norm_layer=norm_layer)
         self.model = UnetSkipConnectionBlock(
             output_nc,
             ngf,
@@ -102,7 +97,6 @@ class UnetSkipConnectionBlock(nn.Layer):
         X -------------------identity----------------------
         |-- downsampling -- |submodule| -- upsampling --|
     """
-
     def __init__(self,
                  outer_nc,
                  inner_nc,
@@ -132,43 +126,43 @@ class UnetSkipConnectionBlock(nn.Layer):
             use_bias = norm_layer == nn.InstanceNorm2D
         if input_nc is None:
             input_nc = outer_nc
-        downconv = nn.Conv2D(
-            input_nc,
-            inner_nc,
-            kernel_size=4,
-            stride=2,
-            padding=1,
-            bias_attr=use_bias)
+        downconv = nn.Conv2D(input_nc,
+                             inner_nc,
+                             kernel_size=4,
+                             stride=2,
+                             padding=1,
+                             bias_attr=use_bias)
         downrelu = nn.LeakyReLU(0.2)
         downnorm = norm_layer(inner_nc)
         uprelu = nn.ReLU()
         upnorm = norm_layer(outer_nc)
 
         if outermost:
-            upconv = nn.Conv2DTranspose(
-                inner_nc * 2, outer_nc, kernel_size=4, stride=2, padding=1)
+            upconv = nn.Conv2DTranspose(inner_nc * 2,
+                                        outer_nc,
+                                        kernel_size=4,
+                                        stride=2,
+                                        padding=1)
             down = [downconv]
             up = [uprelu, upconv, nn.Tanh()]
             model = down + [submodule] + up
         elif innermost:
-            upconv = nn.Conv2DTranspose(
-                inner_nc,
-                outer_nc,
-                kernel_size=4,
-                stride=2,
-                padding=1,
-                bias_attr=use_bias)
+            upconv = nn.Conv2DTranspose(inner_nc,
+                                        outer_nc,
+                                        kernel_size=4,
+                                        stride=2,
+                                        padding=1,
+                                        bias_attr=use_bias)
             down = [downrelu, downconv]
             up = [uprelu, upconv, upnorm]
             model = down + up
         else:
-            upconv = nn.Conv2DTranspose(
-                inner_nc * 2,
-                outer_nc,
-                kernel_size=4,
-                stride=2,
-                padding=1,
-                bias_attr=use_bias)
+            upconv = nn.Conv2DTranspose(inner_nc * 2,
+                                        outer_nc,
+                                        kernel_size=4,
+                                        stride=2,
+                                        padding=1,
+                                        bias_attr=use_bias)
             down = [downrelu, downconv, downnorm]
             up = [uprelu, upconv, upnorm]
 

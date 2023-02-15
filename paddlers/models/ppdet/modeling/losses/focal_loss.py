@@ -1,4 +1,4 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
+# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ from paddlers.models.ppdet.core.workspace import register
 
 __all__ = ['FocalLoss']
 
-
 @register
 class FocalLoss(nn.Layer):
     """A wrapper around paddle.nn.functional.sigmoid_focal_loss.
@@ -33,8 +32,10 @@ class FocalLoss(nn.Layer):
         gamma (float): parameter gamma in Focal Loss
         loss_weight (float): final loss will be multiplied by this
     """
-
-    def __init__(self, use_sigmoid=True, alpha=0.25, gamma=2.0,
+    def __init__(self,
+                 use_sigmoid=True,
+                 alpha=0.25,
+                 gamma=2.0,
                  loss_weight=1.0):
         super(FocalLoss, self).__init__()
         assert use_sigmoid == True, \
@@ -52,12 +53,9 @@ class FocalLoss(nn.Layer):
             reduction (str): the way to reduce loss, one of (none, sum, mean)
         """
         num_classes = pred.shape[1]
-        target = F.one_hot(target, num_classes + 1).cast(pred.dtype)
+        target = F.one_hot(target, num_classes+1).cast(pred.dtype)
         target = target[:, :-1].detach()
         loss = F.sigmoid_focal_loss(
-            pred,
-            target,
-            alpha=self.alpha,
-            gamma=self.gamma,
+            pred, target, alpha=self.alpha, gamma=self.gamma,
             reduction=reduction)
         return loss * self.loss_weight

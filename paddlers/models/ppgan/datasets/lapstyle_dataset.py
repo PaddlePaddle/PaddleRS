@@ -36,7 +36,6 @@ class LapStyleDataset(Dataset):
     """
     coco2017 dataset for LapStyle model
     """
-
     def __init__(self, content_root, style_root, load_size, crop_size):
         super(LapStyleDataset, self).__init__()
         self.content_root = content_root

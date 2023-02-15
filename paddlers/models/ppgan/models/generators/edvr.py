@@ -109,31 +109,27 @@ class PredeblurResNetPyramid(nn.Layer):
         self.HR_in = True if HR_in else False
         self.Leaky_relu = nn.LeakyReLU(negative_slope=0.1)
         if self.HR_in:
-            self.conv_first_1 = nn.Conv2D(
-                in_channels=self.in_nf,
-                out_channels=self.nf,
-                kernel_size=3,
-                stride=1,
-                padding=1)
-            self.conv_first_2 = nn.Conv2D(
-                in_channels=self.nf,
-                out_channels=self.nf,
-                kernel_size=3,
-                stride=2,
-                padding=1)
-            self.conv_first_3 = nn.Conv2D(
-                in_channels=self.nf,
-                out_channels=self.nf,
-                kernel_size=3,
-                stride=2,
-                padding=1)
+            self.conv_first_1 = nn.Conv2D(in_channels=self.in_nf,
+                                          out_channels=self.nf,
+                                          kernel_size=3,
+                                          stride=1,
+                                          padding=1)
+            self.conv_first_2 = nn.Conv2D(in_channels=self.nf,
+                                          out_channels=self.nf,
+                                          kernel_size=3,
+                                          stride=2,
+                                          padding=1)
+            self.conv_first_3 = nn.Conv2D(in_channels=self.nf,
+                                          out_channels=self.nf,
+                                          kernel_size=3,
+                                          stride=2,
+                                          padding=1)
         else:
-            self.conv_first = nn.Conv2D(
-                in_channels=self.in_nf,
-                out_channels=self.nf,
-                kernel_size=3,
-                stride=1,
-                padding=1)
+            self.conv_first = nn.Conv2D(in_channels=self.in_nf,
+                                        out_channels=self.nf,
+                                        kernel_size=3,
+                                        stride=1,
+                                        padding=1)
         self.RB_L1_1 = ResidualBlockNoBN(nf=self.nf)
         self.RB_L1_2 = ResidualBlockNoBN(nf=self.nf)
         self.RB_L1_3 = ResidualBlockNoBN(nf=self.nf)
@@ -142,20 +138,20 @@ class PredeblurResNetPyramid(nn.Layer):
         self.RB_L2_1 = ResidualBlockNoBN(nf=self.nf)
         self.RB_L2_2 = ResidualBlockNoBN(nf=self.nf)
         self.RB_L3_1 = ResidualBlockNoBN(nf=self.nf)
-        self.deblur_L2_conv = nn.Conv2D(
-            in_channels=self.nf,
-            out_channels=self.nf,
-            kernel_size=3,
-            stride=2,
-            padding=1)
-        self.deblur_L3_conv = nn.Conv2D(
-            in_channels=self.nf,
-            out_channels=self.nf,
-            kernel_size=3,
-            stride=2,
-            padding=1)
-        self.upsample = nn.Upsample(
-            scale_factor=2, mode="bilinear", align_corners=False, align_mode=0)
+        self.deblur_L2_conv = nn.Conv2D(in_channels=self.nf,
+                                        out_channels=self.nf,
+                                        kernel_size=3,
+                                        stride=2,
+                                        padding=1)
+        self.deblur_L3_conv = nn.Conv2D(in_channels=self.nf,
+                                        out_channels=self.nf,
+                                        kernel_size=3,
+                                        stride=2,
+                                        padding=1)
+        self.upsample = nn.Upsample(scale_factor=2,
+                                    mode="bilinear",
+                                    align_corners=False,
+                                    align_mode=0)
 
     def forward(self, x):
         if self.HR_in:
@@ -203,88 +199,81 @@ class TSAFusion(nn.Layer):
         self.center = center
         self.sigmoid = nn.Sigmoid()
         self.Leaky_relu = nn.LeakyReLU(negative_slope=0.1)
-        self.tAtt_2 = nn.Conv2D(
-            in_channels=self.nf,
-            out_channels=self.nf,
-            kernel_size=3,
-            stride=1,
-            padding=1)
-        self.tAtt_1 = nn.Conv2D(
-            in_channels=self.nf,
-            out_channels=self.nf,
-            kernel_size=3,
-            stride=1,
-            padding=1)
-        self.fea_fusion = nn.Conv2D(
-            in_channels=self.nf * self.nframes,
-            out_channels=self.nf,
-            kernel_size=1,
-            stride=1,
-            padding=0)
-        self.sAtt_1 = nn.Conv2D(
-            in_channels=self.nf * self.nframes,
-            out_channels=self.nf,
-            kernel_size=1,
-            stride=1,
-            padding=0)
+        self.tAtt_2 = nn.Conv2D(in_channels=self.nf,
+                                out_channels=self.nf,
+                                kernel_size=3,
+                                stride=1,
+                                padding=1)
+        self.tAtt_1 = nn.Conv2D(in_channels=self.nf,
+                                out_channels=self.nf,
+                                kernel_size=3,
+                                stride=1,
+                                padding=1)
+        self.fea_fusion = nn.Conv2D(in_channels=self.nf * self.nframes,
+                                    out_channels=self.nf,
+                                    kernel_size=1,
+                                    stride=1,
+                                    padding=0)
+        self.sAtt_1 = nn.Conv2D(in_channels=self.nf * self.nframes,
+                                out_channels=self.nf,
+                                kernel_size=1,
+                                stride=1,
+                                padding=0)
         self.max_pool = nn.MaxPool2D(3, stride=2, padding=1)
         self.avg_pool = nn.AvgPool2D(3, stride=2, padding=1, exclusive=False)
-        self.sAtt_2 = nn.Conv2D(
-            in_channels=2 * self.nf,
-            out_channels=self.nf,
-            kernel_size=1,
-            stride=1,
-            padding=0)
-        self.sAtt_3 = nn.Conv2D(
-            in_channels=self.nf,
-            out_channels=self.nf,
-            kernel_size=3,
-            stride=1,
-            padding=1)
+        self.sAtt_2 = nn.Conv2D(in_channels=2 * self.nf,
+                                out_channels=self.nf,
+                                kernel_size=1,
+                                stride=1,
+                                padding=0)
+        self.sAtt_3 = nn.Conv2D(in_channels=self.nf,
+                                out_channels=self.nf,
+                                kernel_size=3,
+                                stride=1,
+                                padding=1)
         self.sAtt_4 = nn.Conv2D(
             in_channels=self.nf,
             out_channels=self.nf,
             kernel_size=1,
             stride=1,
-            padding=0, )
-        self.sAtt_5 = nn.Conv2D(
-            in_channels=self.nf,
-            out_channels=self.nf,
-            kernel_size=3,
-            stride=1,
-            padding=1)
-        self.sAtt_add_1 = nn.Conv2D(
-            in_channels=self.nf,
-            out_channels=self.nf,
-            kernel_size=1,
-            stride=1,
-            padding=0)
-        self.sAtt_add_2 = nn.Conv2D(
-            in_channels=self.nf,
-            out_channels=self.nf,
-            kernel_size=1,
-            stride=1,
-            padding=0)
-        self.sAtt_L1 = nn.Conv2D(
-            in_channels=self.nf,
-            out_channels=self.nf,
-            kernel_size=1,
-            stride=1,
-            padding=0)
+            padding=0,
+        )
+        self.sAtt_5 = nn.Conv2D(in_channels=self.nf,
+                                out_channels=self.nf,
+                                kernel_size=3,
+                                stride=1,
+                                padding=1)
+        self.sAtt_add_1 = nn.Conv2D(in_channels=self.nf,
+                                    out_channels=self.nf,
+                                    kernel_size=1,
+                                    stride=1,
+                                    padding=0)
+        self.sAtt_add_2 = nn.Conv2D(in_channels=self.nf,
+                                    out_channels=self.nf,
+                                    kernel_size=1,
+                                    stride=1,
+                                    padding=0)
+        self.sAtt_L1 = nn.Conv2D(in_channels=self.nf,
+                                 out_channels=self.nf,
+                                 kernel_size=1,
+                                 stride=1,
+                                 padding=0)
         self.sAtt_L2 = nn.Conv2D(
             in_channels=2 * self.nf,
             out_channels=self.nf,
             kernel_size=3,
             stride=1,
-            padding=1, )
-        self.sAtt_L3 = nn.Conv2D(
-            in_channels=self.nf,
-            out_channels=self.nf,
-            kernel_size=3,
-            stride=1,
-            padding=1)
-        self.upsample = nn.Upsample(
-            scale_factor=2, mode="bilinear", align_corners=False, align_mode=0)
+            padding=1,
+        )
+        self.sAtt_L3 = nn.Conv2D(in_channels=self.nf,
+                                 out_channels=self.nf,
+                                 kernel_size=3,
+                                 stride=1,
+                                 padding=1)
+        self.upsample = nn.Upsample(scale_factor=2,
+                                    mode="bilinear",
+                                    align_corners=False,
+                                    align_mode=0)
 
     def forward(self, aligned_fea):
         """
@@ -376,24 +365,23 @@ class DCNPack(nn.Layer):
         self.num_filters = num_filters
         if isinstance(kernel_size, int):
             self.kernel_size = [kernel_size, kernel_size]
-        self.conv_offset_mask = nn.Conv2D(
-            in_channels=self.num_filters,
-            out_channels=self.deformable_groups * 3 * self.kernel_size[0] *
-            self.kernel_size[1],
-            kernel_size=self.kernel_size,
-            stride=stride,
-            padding=padding)
+        self.conv_offset_mask = nn.Conv2D(in_channels=self.num_filters,
+                                          out_channels=self.deformable_groups *
+                                          3 * self.kernel_size[0] *
+                                          self.kernel_size[1],
+                                          kernel_size=self.kernel_size,
+                                          stride=stride,
+                                          padding=padding)
         self.total_channels = self.deformable_groups * 3 * self.kernel_size[
             0] * self.kernel_size[1]
         self.split_channels = self.total_channels // 3
-        self.dcn = DeformConv2D(
-            in_channels=self.num_filters,
-            out_channels=self.num_filters,
-            kernel_size=self.kernel_size,
-            stride=stride,
-            padding=padding,
-            dilation=dilation,
-            deformable_groups=self.deformable_groups)
+        self.dcn = DeformConv2D(in_channels=self.num_filters,
+                                out_channels=self.num_filters,
+                                kernel_size=self.kernel_size,
+                                stride=stride,
+                                padding=padding,
+                                dilation=dilation,
+                                deformable_groups=self.deformable_groups)
         self.sigmoid = nn.Sigmoid()
         # init conv offset
         constant_init(self.conv_offset_mask, 0., 0.)
@@ -430,97 +418,99 @@ class PCDAlign(nn.Layer):
         self.nf = nf
         self.groups = groups
         self.Leaky_relu = nn.LeakyReLU(negative_slope=0.1)
-        self.upsample = nn.Upsample(
-            scale_factor=2, mode="bilinear", align_corners=False, align_mode=0)
+        self.upsample = nn.Upsample(scale_factor=2,
+                                    mode="bilinear",
+                                    align_corners=False,
+                                    align_mode=0)
         # Pyramid has three levels:
         # L3: level 3, 1/4 spatial size
         # L2: level 2, 1/2 spatial size
         # L1: level 1, original spatial size
 
         # L3
-        self.PCD_Align_L3_offset_conv1 = nn.Conv2D(
-            in_channels=nf * 2,
-            out_channels=nf,
-            kernel_size=3,
-            stride=1,
-            padding=1)
-        self.PCD_Align_L3_offset_conv2 = nn.Conv2D(
-            in_channels=nf, out_channels=nf, kernel_size=3, stride=1, padding=1)
-        self.PCD_Align_L3_dcn = DCNPack(
-            num_filters=nf,
-            kernel_size=3,
-            stride=1,
-            padding=1,
-            deformable_groups=groups)
+        self.PCD_Align_L3_offset_conv1 = nn.Conv2D(in_channels=nf * 2,
+                                                   out_channels=nf,
+                                                   kernel_size=3,
+                                                   stride=1,
+                                                   padding=1)
+        self.PCD_Align_L3_offset_conv2 = nn.Conv2D(in_channels=nf,
+                                                   out_channels=nf,
+                                                   kernel_size=3,
+                                                   stride=1,
+                                                   padding=1)
+        self.PCD_Align_L3_dcn = DCNPack(num_filters=nf,
+                                        kernel_size=3,
+                                        stride=1,
+                                        padding=1,
+                                        deformable_groups=groups)
         #L2
-        self.PCD_Align_L2_offset_conv1 = nn.Conv2D(
-            in_channels=nf * 2,
-            out_channels=nf,
-            kernel_size=3,
-            stride=1,
-            padding=1)
-        self.PCD_Align_L2_offset_conv2 = nn.Conv2D(
-            in_channels=nf * 2,
-            out_channels=nf,
-            kernel_size=3,
-            stride=1,
-            padding=1)
-        self.PCD_Align_L2_offset_conv3 = nn.Conv2D(
-            in_channels=nf, out_channels=nf, kernel_size=3, stride=1, padding=1)
-        self.PCD_Align_L2_dcn = DCNPack(
-            num_filters=nf,
-            kernel_size=3,
-            stride=1,
-            padding=1,
-            deformable_groups=groups)
-        self.PCD_Align_L2_fea_conv = nn.Conv2D(
-            in_channels=nf * 2,
-            out_channels=nf,
-            kernel_size=3,
-            stride=1,
-            padding=1)
+        self.PCD_Align_L2_offset_conv1 = nn.Conv2D(in_channels=nf * 2,
+                                                   out_channels=nf,
+                                                   kernel_size=3,
+                                                   stride=1,
+                                                   padding=1)
+        self.PCD_Align_L2_offset_conv2 = nn.Conv2D(in_channels=nf * 2,
+                                                   out_channels=nf,
+                                                   kernel_size=3,
+                                                   stride=1,
+                                                   padding=1)
+        self.PCD_Align_L2_offset_conv3 = nn.Conv2D(in_channels=nf,
+                                                   out_channels=nf,
+                                                   kernel_size=3,
+                                                   stride=1,
+                                                   padding=1)
+        self.PCD_Align_L2_dcn = DCNPack(num_filters=nf,
+                                        kernel_size=3,
+                                        stride=1,
+                                        padding=1,
+                                        deformable_groups=groups)
+        self.PCD_Align_L2_fea_conv = nn.Conv2D(in_channels=nf * 2,
+                                               out_channels=nf,
+                                               kernel_size=3,
+                                               stride=1,
+                                               padding=1)
         #L1
-        self.PCD_Align_L1_offset_conv1 = nn.Conv2D(
-            in_channels=nf * 2,
-            out_channels=nf,
-            kernel_size=3,
-            stride=1,
-            padding=1)
-        self.PCD_Align_L1_offset_conv2 = nn.Conv2D(
-            in_channels=nf * 2,
-            out_channels=nf,
-            kernel_size=3,
-            stride=1,
-            padding=1)
-        self.PCD_Align_L1_offset_conv3 = nn.Conv2D(
-            in_channels=nf, out_channels=nf, kernel_size=3, stride=1, padding=1)
-        self.PCD_Align_L1_dcn = DCNPack(
-            num_filters=nf,
-            kernel_size=3,
-            stride=1,
-            padding=1,
-            deformable_groups=groups)
-        self.PCD_Align_L1_fea_conv = nn.Conv2D(
-            in_channels=nf * 2,
-            out_channels=nf,
-            kernel_size=3,
-            stride=1,
-            padding=1)
+        self.PCD_Align_L1_offset_conv1 = nn.Conv2D(in_channels=nf * 2,
+                                                   out_channels=nf,
+                                                   kernel_size=3,
+                                                   stride=1,
+                                                   padding=1)
+        self.PCD_Align_L1_offset_conv2 = nn.Conv2D(in_channels=nf * 2,
+                                                   out_channels=nf,
+                                                   kernel_size=3,
+                                                   stride=1,
+                                                   padding=1)
+        self.PCD_Align_L1_offset_conv3 = nn.Conv2D(in_channels=nf,
+                                                   out_channels=nf,
+                                                   kernel_size=3,
+                                                   stride=1,
+                                                   padding=1)
+        self.PCD_Align_L1_dcn = DCNPack(num_filters=nf,
+                                        kernel_size=3,
+                                        stride=1,
+                                        padding=1,
+                                        deformable_groups=groups)
+        self.PCD_Align_L1_fea_conv = nn.Conv2D(in_channels=nf * 2,
+                                               out_channels=nf,
+                                               kernel_size=3,
+                                               stride=1,
+                                               padding=1)
         #cascade
-        self.PCD_Align_cas_offset_conv1 = nn.Conv2D(
-            in_channels=nf * 2,
-            out_channels=nf,
-            kernel_size=3,
-            stride=1,
-            padding=1)
-        self.PCD_Align_cas_offset_conv2 = nn.Conv2D(
-            in_channels=nf, out_channels=nf, kernel_size=3, stride=1, padding=1)
-        self.PCD_Align_cascade_dcn = DCNPack(
-            num_filters=nf,
-            kernel_size=3,
-            stride=1,
-            padding=1,
-            deformable_groups=groups)
+        self.PCD_Align_cas_offset_conv1 = nn.Conv2D(in_channels=nf * 2,
+                                                    out_channels=nf,
+                                                    kernel_size=3,
+                                                    stride=1,
+                                                    padding=1)
+        self.PCD_Align_cas_offset_conv2 = nn.Conv2D(in_channels=nf,
+                                                    out_channels=nf,
+                                                    kernel_size=3,
+                                                    stride=1,
+                                                    padding=1)
+        self.PCD_Align_cascade_dcn = DCNPack(num_filters=nf,
+                                             kernel_size=3,
+                                             stride=1,
+                                             padding=1,
+                                             deformable_groups=groups)
 
     def forward(self, nbr_fea_l, ref_fea_l):
         """Align neighboring frame features to the reference frame features.
@@ -639,94 +629,90 @@ class EDVRNet(nn.Layer):
 
         self.Leaky_relu = nn.LeakyReLU(negative_slope=0.1)
         if self.predeblur:
-            self.pre_deblur = PredeblurResNetPyramid(
-                in_nf=self.in_nf, nf=self.nf, HR_in=self.HR_in)
-            self.cov_1 = nn.Conv2D(
-                in_channels=self.nf,
-                out_channels=self.nf,
-                kernel_size=1,
-                stride=1)
+            self.pre_deblur = PredeblurResNetPyramid(in_nf=self.in_nf,
+                                                     nf=self.nf,
+                                                     HR_in=self.HR_in)
+            self.cov_1 = nn.Conv2D(in_channels=self.nf,
+                                   out_channels=self.nf,
+                                   kernel_size=1,
+                                   stride=1)
         else:
-            self.conv_first = nn.Conv2D(
-                in_channels=self.in_nf,
-                out_channels=self.nf,
-                kernel_size=3,
-                stride=1,
-                padding=1)
+            self.conv_first = nn.Conv2D(in_channels=self.in_nf,
+                                        out_channels=self.nf,
+                                        kernel_size=3,
+                                        stride=1,
+                                        padding=1)
 
         #feature extraction module
         self.feature_extractor = MakeMultiBlocks(ResidualBlockNoBN,
                                                  self.front_RBs, self.nf)
-        self.fea_L2_conv1 = nn.Conv2D(
-            in_channels=self.nf,
-            out_channels=self.nf,
-            kernel_size=3,
-            stride=2,
-            padding=1)
-        self.fea_L2_conv2 = nn.Conv2D(
-            in_channels=self.nf,
-            out_channels=self.nf,
-            kernel_size=3,
-            stride=1,
-            padding=1)
+        self.fea_L2_conv1 = nn.Conv2D(in_channels=self.nf,
+                                      out_channels=self.nf,
+                                      kernel_size=3,
+                                      stride=2,
+                                      padding=1)
+        self.fea_L2_conv2 = nn.Conv2D(in_channels=self.nf,
+                                      out_channels=self.nf,
+                                      kernel_size=3,
+                                      stride=1,
+                                      padding=1)
         self.fea_L3_conv1 = nn.Conv2D(
             in_channels=self.nf,
             out_channels=self.nf,
             kernel_size=3,
             stride=2,
-            padding=1, )
-        self.fea_L3_conv2 = nn.Conv2D(
-            in_channels=self.nf,
-            out_channels=self.nf,
-            kernel_size=3,
-            stride=1,
-            padding=1)
+            padding=1,
+        )
+        self.fea_L3_conv2 = nn.Conv2D(in_channels=self.nf,
+                                      out_channels=self.nf,
+                                      kernel_size=3,
+                                      stride=1,
+                                      padding=1)
 
         #PCD alignment module
         self.PCDModule = PCDAlign(nf=self.nf, groups=self.groups)
 
         #TSA Fusion module
         if self.w_TSA:
-            self.TSAModule = TSAFusion(
-                nf=self.nf, nframes=self.nframes, center=self.center)
+            self.TSAModule = TSAFusion(nf=self.nf,
+                                       nframes=self.nframes,
+                                       center=self.center)
         else:
-            self.TSAModule = nn.Conv2D(
-                in_channels=self.nframes * self.nf,
-                out_channels=self.nf,
-                kernel_size=1,
-                stride=1)
+            self.TSAModule = nn.Conv2D(in_channels=self.nframes * self.nf,
+                                       out_channels=self.nf,
+                                       kernel_size=1,
+                                       stride=1)
 
         #reconstruction module
         self.reconstructor = MakeMultiBlocks(ResidualBlockNoBN, self.back_RBs,
                                              self.nf)
-        self.upconv1 = nn.Conv2D(
-            in_channels=self.nf,
-            out_channels=4 * self.nf,
-            kernel_size=3,
-            stride=1,
-            padding=1)
+        self.upconv1 = nn.Conv2D(in_channels=self.nf,
+                                 out_channels=4 * self.nf,
+                                 kernel_size=3,
+                                 stride=1,
+                                 padding=1)
 
         self.pixel_shuffle = nn.PixelShuffle(2)
-        self.upconv2 = nn.Conv2D(
-            in_channels=self.nf,
-            out_channels=4 * 64,
-            kernel_size=3,
-            stride=1,
-            padding=1)
-        self.HRconv = nn.Conv2D(
-            in_channels=64, out_channels=64, kernel_size=3, stride=1, padding=1)
-        self.conv_last = nn.Conv2D(
-            in_channels=64,
-            out_channels=self.out_nf,
-            kernel_size=3,
-            stride=1,
-            padding=1)
+        self.upconv2 = nn.Conv2D(in_channels=self.nf,
+                                 out_channels=4 * 64,
+                                 kernel_size=3,
+                                 stride=1,
+                                 padding=1)
+        self.HRconv = nn.Conv2D(in_channels=64,
+                                out_channels=64,
+                                kernel_size=3,
+                                stride=1,
+                                padding=1)
+        self.conv_last = nn.Conv2D(in_channels=64,
+                                   out_channels=self.out_nf,
+                                   kernel_size=3,
+                                   stride=1,
+                                   padding=1)
         if self.scale_factor == 4:
-            self.upsample = nn.Upsample(
-                scale_factor=self.scale_factor,
-                mode="bilinear",
-                align_corners=False,
-                align_mode=0)
+            self.upsample = nn.Upsample(scale_factor=self.scale_factor,
+                                        mode="bilinear",
+                                        align_corners=False,
+                                        align_mode=0)
 
     def forward(self, x):
         """
@@ -770,13 +756,13 @@ class EDVRNet(nn.Layer):
             L1_fea[:, self.center, :, :, :], L2_fea[:, self.center, :, :, :],
             L3_fea[:, self.center, :, :, :]
         ]
-        aligned_fea = []
-        for i in range(N):
-            nbr_fea_l = [
-                L1_fea[:, i, :, :, :], L2_fea[:, i, :, :, :],
-                L3_fea[:, i, :, :, :]
-            ]
-            aligned_fea.append(self.PCDModule(nbr_fea_l, ref_fea_l))
+
+        aligned_fea = [
+            self.PCDModule([
+                L1_fea[:, i, :, :, :], L2_fea[:, i, :, :, :], L3_fea[:,
+                                                                     i, :, :, :]
+            ], ref_fea_l) for i in range(N)
+        ]
 
         # TSA Fusion
         aligned_fea = paddle.stack(aligned_fea, axis=1)  # [B, N, C, H, W]

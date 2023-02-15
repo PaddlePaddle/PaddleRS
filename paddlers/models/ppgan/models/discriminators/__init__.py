@@ -17,10 +17,13 @@ from .nlayers import NLayerDiscriminator, NLayerDiscriminatorWithClassification
 from .discriminator_ugatit import UGATITDiscriminator
 from .dcdiscriminator import DCDiscriminator
 from .discriminator_animegan import AnimeDiscriminator
-from .discriminator_styleganv2 import StyleGANv2Discriminator
+from .discriminator_styleganv2 import StyleGANv2Discriminator, GPENDiscriminator
 from .syncnet import SyncNetColor
 from .wav2lip_disc_qual import Wav2LipDiscQual
 from .discriminator_starganv2 import StarGANv2Discriminator
 from .discriminator_firstorder import FirstOrderDiscriminator
 from .discriminator_lapstyle import LapStyleDiscriminator
 from .discriminator_photopen import MultiscaleDiscriminator
+from .discriminator_singan import SinGANDiscriminator
+from .arcface_arch_paddle import ResNetArcFace
+from .discriminator_aotgan import Discriminator

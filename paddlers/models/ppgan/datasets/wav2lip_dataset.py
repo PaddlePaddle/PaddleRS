@@ -9,8 +9,8 @@ import numpy as np
 from PIL import Image
 from glob import glob
 from os.path import dirname, join, basename, isfile
-from ppgan.utils import audio
-from ppgan.utils.audio_config import get_audio_config
+from paddlers.models.ppgan.utils import audio
+from paddlers.models.ppgan.utils.audio_config import get_audio_config
 import numpy as np
 
 import paddle

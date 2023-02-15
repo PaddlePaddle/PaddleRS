@@ -1,4 +1,4 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
+# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -208,8 +208,7 @@ class CenterNetHead(nn.Layer):
                 else:
                     # inputs['size'] is ltrb, but regress as wh
                     # shape: [bs, max_per_img, 4]
-                    size_target = inputs['size'][:, :, 0:2] + inputs[
-                        'size'][:, :, 2:]
+                    size_target = inputs['size'][:, :, 0:2] + inputs['size'][:, :, 2:]
 
             size_target.stop_gradient = True
             size_loss = F.l1_loss(

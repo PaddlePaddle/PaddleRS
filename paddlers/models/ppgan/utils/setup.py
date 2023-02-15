@@ -14,11 +14,12 @@
 
 import os
 import time
+import yaml
 import paddle
 import numpy as np
 import random
+from .config import cfg2dict
 from .logger import setup_logger
-
 
 def setup(args, cfg):
     if args.evaluate_only:
@@ -39,10 +40,14 @@ def setup(args, cfg):
 
     logger = setup_logger(cfg.output_dir)
 
-    logger.info('Configs: {}'.format(cfg))
+    logger.info('Configs: \n{}'.format(yaml.dump(cfg2dict(cfg))))
 
     if paddle.is_compiled_with_cuda():
         paddle.set_device('gpu')
+    elif paddle.is_compiled_with_npu():
+        paddle.set_device('npu')
+    elif paddle.is_compiled_with_xpu():
+        paddle.set_device('xpu')
     else:
         paddle.set_device('cpu')
 
@@ -51,3 +56,7 @@ def setup(args, cfg):
         random.seed(args.seed)
         np.random.seed(args.seed)
         paddle.framework.random._manual_program_seed(args.seed)
+
+    # add amp and amp_level args into cfg
+    cfg['amp'] = args.amp
+    cfg['amp_level'] = args.amp_level

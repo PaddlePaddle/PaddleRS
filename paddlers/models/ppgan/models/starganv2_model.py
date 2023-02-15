@@ -2,7 +2,6 @@
 # Users should be careful about adopting these functions in any commercial matters.
 # https://github.com/clovaai/stargan-v2#license
 
-from paddle.fluid.layers.nn import soft_relu
 from .base_model import BaseModel
 
 from paddle import nn
@@ -12,7 +11,7 @@ from .builder import MODELS
 from .generators.builder import build_generator
 from .discriminators.builder import build_discriminator
 from ..modules.init import kaiming_normal_, constant_
-from ppgan.utils.visual import make_grid, tensor2img
+from paddlers.models.ppgan.utils.visual import make_grid, tensor2img
 
 import numpy as np
 
@@ -88,12 +87,11 @@ def adv_loss(logits, target):
 def r1_reg(d_out, x_in):
     # zero-centered gradient penalty for real images
     batch_size = x_in.shape[0]
-    grad_dout = paddle.grad(
-        outputs=d_out.sum(),
-        inputs=x_in,
-        create_graph=True,
-        retain_graph=True,
-        only_inputs=True)[0]
+    grad_dout = paddle.grad(outputs=d_out.sum(),
+                            inputs=x_in,
+                            create_graph=True,
+                            retain_graph=True,
+                            only_inputs=True)[0]
     grad_dout2 = grad_dout.pow(2)
     assert (grad_dout2.shape == x_in.shape)
     reg = 0.5 * paddle.reshape(grad_dout2, (batch_size, -1)).sum(1).mean(0)
@@ -109,8 +107,8 @@ def soft_update(source, target, beta=1.0):
     target_model_map = dict(target.named_parameters())
     for param_name, source_param in source.named_parameters():
         target_param = target_model_map[param_name]
-        target_param.set_value(beta * source_param + (1.0 - beta) *
-                               target_param)
+        target_param.set_value(beta * source_param +
+                               (1.0 - beta) * target_param)
 
 
 def dump_model(model):
@@ -197,17 +195,18 @@ def he_init(module):
 @MODELS.register()
 class StarGANv2Model(BaseModel):
     def __init__(
-            self,
-            generator,
-            style=None,
-            mapping=None,
-            discriminator=None,
-            fan=None,
-            latent_dim=16,
-            lambda_reg=1,
-            lambda_sty=1,
-            lambda_ds=1,
-            lambda_cyc=1, ):
+        self,
+        generator,
+        style=None,
+        mapping=None,
+        discriminator=None,
+        fan=None,
+        latent_dim=16,
+        lambda_reg=1,
+        lambda_sty=1,
+        lambda_ds=1,
+        lambda_cyc=1,
+    ):
         super(StarGANv2Model, self).__init__()
         self.w_hpf = generator['w_hpf']
         self.nets_ema = {}
@@ -277,74 +276,69 @@ class StarGANv2Model(BaseModel):
             masks = None
 
         # train the discriminator
-        d_loss, d_losses_latent = compute_d_loss(
-            self.nets,
-            self.lambda_reg,
-            x_real,
-            y_org,
-            y_trg,
-            z_trg=z_trg,
-            masks=masks)
+        d_loss, d_losses_latent = compute_d_loss(self.nets,
+                                                 self.lambda_reg,
+                                                 x_real,
+                                                 y_org,
+                                                 y_trg,
+                                                 z_trg=z_trg,
+                                                 masks=masks)
         self._reset_grad(optimizers)
         d_loss.backward()
         optimizers['discriminator'].minimize(d_loss)
 
-        d_loss, d_losses_ref = compute_d_loss(
-            self.nets,
-            self.lambda_reg,
-            x_real,
-            y_org,
-            y_trg,
-            x_ref=x_ref,
-            masks=masks)
+        d_loss, d_losses_ref = compute_d_loss(self.nets,
+                                              self.lambda_reg,
+                                              x_real,
+                                              y_org,
+                                              y_trg,
+                                              x_ref=x_ref,
+                                              masks=masks)
         self._reset_grad(optimizers)
         d_loss.backward()
         optimizers['discriminator'].step()
 
         # train the generator
-        g_loss, g_losses_latent = compute_g_loss(
-            self.nets,
-            self.w_hpf,
-            self.lambda_sty,
-            self.lambda_ds,
-            self.lambda_cyc,
-            x_real,
-            y_org,
-            y_trg,
-            z_trgs=[z_trg, z_trg2],
-            masks=masks)
+        g_loss, g_losses_latent = compute_g_loss(self.nets,
+                                                 self.w_hpf,
+                                                 self.lambda_sty,
+                                                 self.lambda_ds,
+                                                 self.lambda_cyc,
+                                                 x_real,
+                                                 y_org,
+                                                 y_trg,
+                                                 z_trgs=[z_trg, z_trg2],
+                                                 masks=masks)
         self._reset_grad(optimizers)
         g_loss.backward()
         optimizers['generator'].step()
         optimizers['mapping_network'].step()
         optimizers['style_encoder'].step()
 
-        g_loss, g_losses_ref = compute_g_loss(
-            self.nets,
-            self.w_hpf,
-            self.lambda_sty,
-            self.lambda_ds,
-            self.lambda_cyc,
-            x_real,
-            y_org,
-            y_trg,
-            x_refs=[x_ref, x_ref2],
-            masks=masks)
+        g_loss, g_losses_ref = compute_g_loss(self.nets,
+                                              self.w_hpf,
+                                              self.lambda_sty,
+                                              self.lambda_ds,
+                                              self.lambda_cyc,
+                                              x_real,
+                                              y_org,
+                                              y_trg,
+                                              x_refs=[x_ref, x_ref2],
+                                              masks=masks)
         self._reset_grad(optimizers)
         g_loss.backward()
         optimizers['generator'].step()
 
         # compute moving average of network parameters
-        soft_update(
-            self.nets['generator'], self.nets_ema['generator'], beta=0.999)
-        soft_update(
-            self.nets['mapping_network'],
-            self.nets_ema['mapping_network'],
-            beta=0.999)
-        soft_update(
-            self.nets['style_encoder'],
-            self.nets_ema['style_encoder'],
-            beta=0.999)
+        soft_update(self.nets['generator'],
+                    self.nets_ema['generator'],
+                    beta=0.999)
+        soft_update(self.nets['mapping_network'],
+                    self.nets_ema['mapping_network'],
+                    beta=0.999)
+        soft_update(self.nets['style_encoder'],
+                    self.nets_ema['style_encoder'],
+                    beta=0.999)
 
         # decay weight for diversity sensitive loss
         if self.lambda_ds > 0:
@@ -362,16 +356,15 @@ class StarGANv2Model(BaseModel):
         #TODO
         self.nets_ema['generator'].eval()
         self.nets_ema['style_encoder'].eval()
-        soft_update(
-            self.nets['generator'], self.nets_ema['generator'], beta=0.999)
-        soft_update(
-            self.nets['mapping_network'],
-            self.nets_ema['mapping_network'],
-            beta=0.999)
-        soft_update(
-            self.nets['style_encoder'],
-            self.nets_ema['style_encoder'],
-            beta=0.999)
+        soft_update(self.nets['generator'],
+                    self.nets_ema['generator'],
+                    beta=0.999)
+        soft_update(self.nets['mapping_network'],
+                    self.nets_ema['mapping_network'],
+                    beta=0.999)
+        soft_update(self.nets['style_encoder'],
+                    self.nets_ema['style_encoder'],
+                    beta=0.999)
         src_img = self.input['src']
         ref_img = self.input['ref']
         ref_label = self.input['ref_cls']

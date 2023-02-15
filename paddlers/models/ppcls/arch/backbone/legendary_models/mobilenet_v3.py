@@ -1,4 +1,4 @@
-# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# reference: https://arxiv.org/abs/1905.02244
+
 from __future__ import absolute_import, division, print_function
 
 import paddle
@@ -19,8 +21,9 @@ import paddle.nn as nn
 from paddle import ParamAttr
 from paddle.nn import AdaptiveAvgPool2D, BatchNorm, Conv2D, Dropout, Linear
 from paddle.regularizer import L2Decay
-from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+
+from ..base.theseus_layer import TheseusLayer
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "MobileNetV3_small_x0_35":
@@ -46,7 +49,8 @@ MODEL_URLS = {
 }
 
 MODEL_STAGES_PATTERN = {
-    "MobileNetV3_small": ["blocks[0]", "blocks[2]", "blocks[7]", "blocks[10]"],
+    "MobileNetV3_small":
+    ["blocks[0]", "blocks[2]", "blocks[7]", "blocks[10]"],
     "MobileNetV3_large":
     ["blocks[0]", "blocks[2]", "blocks[5]", "blocks[11]", "blocks[14]"]
 }
@@ -151,7 +155,8 @@ class MobileNetV3(TheseusLayer):
                  class_expand=LAST_CONV,
                  dropout_prob=0.2,
                  return_patterns=None,
-                 return_stages=None):
+                 return_stages=None,
+                 **kwargs):
         super().__init__()
 
         self.cfg = config
@@ -171,7 +176,7 @@ class MobileNetV3(TheseusLayer):
             if_act=True,
             act="hardswish")
 
-        self.blocks = nn.Sequential(*[
+        self.blocks = nn.Sequential(* [
             ResidualUnit(
                 in_c=_make_divisible(self.inplanes * self.scale if i == 0 else
                                      self.cfg[i - 1][2] * self.scale),

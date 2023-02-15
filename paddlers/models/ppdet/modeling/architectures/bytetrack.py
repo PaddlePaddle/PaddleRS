@@ -34,7 +34,10 @@ class ByteTrack(BaseArch):
     """
     __category__ = 'architecture'
 
-    def __init__(self, detector='YOLOX', reid=None, tracker='JDETracker'):
+    def __init__(self,
+                 detector='YOLOX',
+                 reid=None,
+                 tracker='JDETracker'):
         super(ByteTrack, self).__init__()
         self.detector = detector
         self.reid = reid
@@ -77,3 +80,4 @@ class ByteTrack(BaseArch):
 
     def get_pred(self):
         return self._forward()
+

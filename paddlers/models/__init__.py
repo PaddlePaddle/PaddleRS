@@ -12,8 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import ppcls, ppdet, ppseg, ppgan
-import paddlers.models.ppseg.models.losses as seg_losses
-import paddlers.models.ppdet.modeling.losses as det_losses
-import paddlers.models.ppcls.loss as clas_losses
-import paddlers.models.ppgan.models.criterions as res_losses
+from . import paddleseg as ppseg
+
+from .ppcls import loss as clas_losses
+# TODO: Disable ppdet import warning
+from .ppdet.modeling import losses as det_losses
+from .paddleseg.models import losses as seg_losses
+from .ppgan.models import criterions as res_losses
+
+# Initialize ppcls logger, otherwise it raises error
+from .ppcls.utils import logger as ppcls_logger
+ppcls_logger.init_logger()

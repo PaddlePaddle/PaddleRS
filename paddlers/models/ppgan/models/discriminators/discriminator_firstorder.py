@@ -31,7 +31,6 @@ class FirstOrderDiscriminator(nn.Layer):
         loss_weights:
             discriminator_gan (int): weight of discriminator loss
     """
-
     def __init__(self, discriminator_cfg, common_params, train_params):
         super(FirstOrderDiscriminator, self).__init__()
         self.discriminator = MultiScaleDiscriminator(**discriminator_cfg,
@@ -48,8 +47,8 @@ class FirstOrderDiscriminator(nn.Layer):
         kp_driving = generated['kp_driving']
         discriminator_maps_generated = self.discriminator(
             pyramide_generated, kp=detach_kp(kp_driving))
-        discriminator_maps_real = self.discriminator(
-            pyramide_real, kp=detach_kp(kp_driving))
+        discriminator_maps_real = self.discriminator(pyramide_real,
+                                                     kp=detach_kp(kp_driving))
 
         loss_values = {}
         value_total = 0
@@ -67,7 +66,6 @@ class DownBlock2d(nn.Layer):
     """
     Simple block for processing video (encoder).
     """
-
     def __init__(self,
                  in_features,
                  out_features,
@@ -76,15 +74,16 @@ class DownBlock2d(nn.Layer):
                  pool=False,
                  sn=False):
         super(DownBlock2d, self).__init__()
-        self.conv = nn.Conv2D(
-            in_features, out_features, kernel_size=kernel_size)
+        self.conv = nn.Conv2D(in_features,
+                              out_features,
+                              kernel_size=kernel_size)
         if sn:
             self.conv = spectral_norm(self.conv)
         else:
             self.sn = None
         if norm:
-            self.norm = nn.InstanceNorm2D(
-                num_features=out_features, epsilon=1e-05)
+            self.norm = nn.InstanceNorm2D(num_features=out_features,
+                                          epsilon=1e-05)
         else:
             self.norm = None
 
@@ -118,21 +117,19 @@ class Discriminator(nn.Layer):
         down_blocks = []
         for i in range(num_blocks):
             down_blocks.append(
-                DownBlock2d(
-                    num_channels + num_kp * use_kp
-                    if i == 0 else min(max_features, block_expansion * (2**i)),
-                    min(max_features, block_expansion * (2**(i + 1))),
-                    norm=(i != 0),
-                    kernel_size=4,
-                    pool=(i != num_blocks - 1),
-                    sn=sn))
+                DownBlock2d(num_channels + num_kp * use_kp if i == 0 else min(
+                    max_features, block_expansion * (2**i)),
+                            min(max_features, block_expansion * (2**(i + 1))),
+                            norm=(i != 0),
+                            kernel_size=4,
+                            pool=(i != num_blocks - 1),
+                            sn=sn))
 
         self.down_blocks = nn.LayerList(down_blocks)
-        self.conv = nn.Conv2D(
-            self.down_blocks[len(self.down_blocks) - 1].conv.parameters()[0]
-            .shape[0],
-            1,
-            kernel_size=1)
+        self.conv = nn.Conv2D(self.down_blocks[len(self.down_blocks) -
+                                               1].conv.parameters()[0].shape[0],
+                              1,
+                              kernel_size=1)
         if sn:
             self.conv = spectral_norm(self.conv)
         else:
@@ -159,7 +156,6 @@ class MultiScaleDiscriminator(nn.Layer):
     """
     Multi-scale (scale) discriminator
     """
-
     def __init__(self, scales=(), **kwargs):
         super(MultiScaleDiscriminator, self).__init__()
         self.scales = scales

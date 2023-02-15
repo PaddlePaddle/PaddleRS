@@ -81,11 +81,10 @@ def _stft(y):
         return _lws_processor(audio_config).stft(y).T
     else:
         librosa = try_import('librosa')
-        return librosa.stft(
-            y=y,
-            n_fft=audio_config.n_fft,
-            hop_length=get_hop_size(),
-            win_length=audio_config.win_size)
+        return librosa.stft(y=y,
+                            n_fft=audio_config.n_fft,
+                            hop_length=get_hop_size(),
+                            win_length=audio_config.win_size)
 
 
 ##########################################################
@@ -150,15 +149,16 @@ def _db_to_amp(x):
 def _normalize(S):
     if audio_config.allow_clipping_in_normalization:
         if audio_config.symmetric_mels:
-            return np.clip((2 * audio_config.max_abs_value) * (
-                (S - audio_config.min_level_db) /
-                (-audio_config.min_level_db)) - audio_config.max_abs_value,
-                           -audio_config.max_abs_value,
-                           audio_config.max_abs_value)
+            return np.clip(
+                (2 * audio_config.max_abs_value) *
+                ((S - audio_config.min_level_db) /
+                 (-audio_config.min_level_db)) - audio_config.max_abs_value,
+                -audio_config.max_abs_value, audio_config.max_abs_value)
         else:
-            return np.clip(audio_config.max_abs_value * (
-                (S - audio_config.min_level_db) / (-audio_config.min_level_db)),
-                           0, audio_config.max_abs_value)
+            return np.clip(
+                audio_config.max_abs_value * ((S - audio_config.min_level_db) /
+                                              (-audio_config.min_level_db)), 0,
+                audio_config.max_abs_value)
 
     assert S.max() <= 0 and S.min() - audio_config.min_level_db >= 0
     if audio_config.symmetric_mels:
@@ -166,18 +166,18 @@ def _normalize(S):
             (S - audio_config.min_level_db) /
             (-audio_config.min_level_db)) - audio_config.max_abs_value
     else:
-        return audio_config.max_abs_value * (
-            (S - audio_config.min_level_db) / (-audio_config.min_level_db))
+        return audio_config.max_abs_value * ((S - audio_config.min_level_db) /
+                                             (-audio_config.min_level_db))
 
 
 def _denormalize(D):
     if audio_config.allow_clipping_in_normalization:
         if audio_config.symmetric_mels:
-            return (
-                ((np.clip(D, -audio_config.max_abs_value,
-                          audio_config.max_abs_value) +
-                  audio_config.max_abs_value) * -audio_config.min_level_db /
-                 (2 * audio_config.max_abs_value)) + audio_config.min_level_db)
+            return (((np.clip(D, -audio_config.max_abs_value,
+                              audio_config.max_abs_value) +
+                      audio_config.max_abs_value) * -audio_config.min_level_db /
+                     (2 * audio_config.max_abs_value)) +
+                    audio_config.min_level_db)
         else:
             return ((np.clip(D, 0, audio_config.max_abs_value) *
                      -audio_config.min_level_db / audio_config.max_abs_value) +

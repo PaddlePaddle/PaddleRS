@@ -23,8 +23,8 @@ import tarfile
 import tqdm
 import zipfile
 
-from ppcls.arch import similar_architectures
-from ppcls.utils import logger
+from ..arch.utils import similar_architectures
+from . import logger
 
 __all__ = ['get']
 
@@ -151,28 +151,7 @@ def _decompress(fname):
 
     if fname.find('tar') >= 0:
         with tarfile.open(fname) as tf:
-
-            def _is_within_directory(directory, target):
-                abs_directory = os.path.abspath(directory)
-                abs_target = os.path.abspath(target)
-
-                prefix = os.path.commonprefix([abs_directory, abs_target])
-
-                return prefix == abs_directory
-
-            def _safe_extract(tar,
-                              path=".",
-                              members=None,
-                              *,
-                              numeric_owner=False):
-                for member in tar.getmembers():
-                    member_path = os.path.join(path, member.name)
-                    if not _is_within_directory(path, member_path):
-                        raise Exception("Attempted Path Traversal in Tar File")
-
-                tar.extractall(path, members, numeric_owner=numeric_owner)
-
-            _safe_extract(tf, path=fpath_tmp)
+            tf.extractall(path=fpath_tmp)
     elif fname.find('zip') >= 0:
         with zipfile.ZipFile(fname) as zf:
             zf.extractall(path=fpath_tmp)

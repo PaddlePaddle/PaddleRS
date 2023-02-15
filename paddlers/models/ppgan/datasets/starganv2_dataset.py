@@ -107,7 +107,6 @@ class ReferenceDataset(Dataset):
 class StarGANv2Dataset(BaseDataset):
     """
     """
-
     def __init__(self, dataroot, is_train, preprocess, test_count=0):
         """Initialize single dataset class.
 
@@ -126,10 +125,10 @@ class StarGANv2Dataset(BaseDataset):
         else:
             files = os.listdir(self.dataroot)
             if 'src' in files and 'ref' in files:
-                self.src_loader = ImageFolder(
-                    os.path.join(self.dataroot, 'src'))
-                self.ref_loader = ImageFolder(
-                    os.path.join(self.dataroot, 'ref'))
+                self.src_loader = ImageFolder(os.path.join(
+                    self.dataroot, 'src'))
+                self.ref_loader = ImageFolder(os.path.join(
+                    self.dataroot, 'ref'))
             else:
                 self.src_loader = ImageFolder(self.dataroot)
                 self.ref_loader = ImageFolder(self.dataroot)

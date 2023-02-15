@@ -231,7 +231,7 @@ class CSPLayer(nn.Layer):
             in_channels, hidden_channels, ksize=1, stride=1, bias=bias, act=act)
         self.conv2 = BaseConv(
             in_channels, hidden_channels, ksize=1, stride=1, bias=bias, act=act)
-        self.bottlenecks = nn.Sequential(*[
+        self.bottlenecks = nn.Sequential(* [
             BottleNeck(
                 hidden_channels,
                 hidden_channels,

@@ -82,8 +82,8 @@ class MakeupDataset(paddle.io.Dataset):
                 T.Transpose(),
             ])
         else:
-            transform = T.Resize(
-                size=self.trans_size, interpolation=cv2.INTER_NEAREST)
+            transform = T.Resize(size=self.trans_size,
+                                 interpolation=cv2.INTER_NEAREST)
 
         return transform
 
@@ -107,42 +107,44 @@ class MakeupDataset(paddle.io.Dataset):
                 index_B = int(index % num_b)
             image_A = Image.open(
                 os.path.join(self.image_path,
-                             getattr(self, self.cls_A + "_filenames")[
-                                 index_A])).convert("RGB")
+                             getattr(self, self.cls_A +
+                                     "_filenames")[index_A])).convert("RGB")
 
             image_B = Image.open(
                 os.path.join(self.image_path,
-                             getattr(self, self.cls_B + "_filenames")[
-                                 index_B])).convert("RGB")
+                             getattr(self, self.cls_B +
+                                     "_filenames")[index_B])).convert("RGB")
             mask_A = np.array(
                 Image.open(
-                    os.path.join(self.image_path,
-                                 getattr(self, self.cls_A + "_mask_filenames")[
-                                     index_A])))
+                    os.path.join(
+                        self.image_path,
+                        getattr(self,
+                                self.cls_A + "_mask_filenames")[index_A])))
             mask_B = np.array(
                 Image.open(
-                    os.path.join(self.image_path,
-                                 getattr(self, self.cls_B + "_mask_filenames")[
-                                     index_B])).convert('L'))
+                    os.path.join(
+                        self.image_path,
+                        getattr(self, self.cls_B +
+                                "_mask_filenames")[index_B])).convert('L'))
             image_A = np.array(image_A)
             image_B = np.array(image_B)
 
             image_A = self.transform(image_A)
             image_B = self.transform(image_B)
 
-            mask_A = cv2.resize(
-                mask_A, (256, 256), interpolation=cv2.INTER_NEAREST)
-            mask_B = cv2.resize(
-                mask_B, (256, 256), interpolation=cv2.INTER_NEAREST)
+            mask_A = cv2.resize(mask_A, (256, 256),
+                                interpolation=cv2.INTER_NEAREST)
+            mask_B = cv2.resize(mask_B, (256, 256),
+                                interpolation=cv2.INTER_NEAREST)
 
             lmks_A = np.loadtxt(
-                os.path.join(self.image_path,
-                             getattr(self, self.cls_A + "_lmks_filenames")[
-                                 index_A]))
+                os.path.join(
+                    self.image_path,
+                    getattr(self, self.cls_A + "_lmks_filenames")[index_A]))
             lmks_B = np.loadtxt(
-                os.path.join(self.image_path,
-                             getattr(self, self.cls_B + "_lmks_filenames")[
-                                 index_B]))
+                os.path.join(
+                    self.image_path,
+                    getattr(self, self.cls_B + "_lmks_filenames")[index_B]))
             lmks_A = lmks_A / image_A.shape[:2] * self.trans_size
             lmks_B = lmks_B / image_B.shape[:2] * self.trans_size
 

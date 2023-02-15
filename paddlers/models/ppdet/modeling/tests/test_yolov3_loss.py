@@ -1,4 +1,4 @@
-#   Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
+#   Copyright (c) 2018 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -356,7 +356,10 @@ class TestYolov3LossOp(unittest.TestCase):
             x, t, gtbox, anchor, self.downsample_ratio, self.scale_x_y)
         for k in yolo_loss2:
             self.assertAlmostEqual(
-                float(yolo_loss1[k]), float(yolo_loss2[k]), delta=1e-2, msg=k)
+                yolo_loss1[k].numpy()[0],
+                yolo_loss2[k].numpy()[0],
+                delta=1e-2,
+                msg=k)
 
 
 class TestYolov3LossNoGTScore(TestYolov3LossOp):

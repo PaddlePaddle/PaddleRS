@@ -23,7 +23,7 @@ import paddle.nn.functional as F
 from paddle.static import InputSpec
 
 import paddlers
-import paddlers.models.ppseg as ppseg
+import paddlers.models.paddleseg as ppseg
 import paddlers.rs_models.seg as cmseg
 import paddlers.utils.logging as logging
 from paddlers.models import seg_losses

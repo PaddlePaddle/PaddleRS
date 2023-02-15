@@ -1,4 +1,4 @@
-# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # Code was based on https://github.com/facebookresearch/LeViT
+# reference: https://openaccess.thecvf.com/content/ICCV2021/html/Graham_LeViT_A_Vision_Transformer_in_ConvNets_Clothing_for_Faster_Inference_ICCV_2021_paper.html
 
 import itertools
 import math
@@ -26,7 +27,7 @@ from paddle.regularizer import L2Decay
 
 from .vision_transformer import trunc_normal_, zeros_, ones_, Identity
 
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "LeViT_128S":
@@ -366,8 +367,8 @@ class LeViT(nn.Layer):
         down_ops.append([''])
         resolution = img_size // patch_size
         for i, (ed, kd, dpth, nh, ar, mr, do) in enumerate(
-                zip(embed_dim, key_dim, depth, num_heads, attn_ratio, mlp_ratio,
-                    down_ops)):
+                zip(embed_dim, key_dim, depth, num_heads, attn_ratio,
+                    mlp_ratio, down_ops)):
             for _ in range(dpth):
                 self.blocks.append(
                     Residual(

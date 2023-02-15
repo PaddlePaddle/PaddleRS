@@ -28,7 +28,6 @@ __all__ = ['resnext101_32x8d_wsl']
 class ResNetEx(ResNet):
     """ResNet extention model, support ResNeXt.
     """
-
     def __init__(self,
                  block,
                  depth,
@@ -50,13 +49,13 @@ class ResNetEx(ResNet):
             stride = 1
         if stride != 1 or self.inplanes != planes * block.expansion:
             downsample = nn.Sequential(
-                nn.Conv2D(
-                    self.inplanes,
-                    planes * block.expansion,
-                    1,
-                    stride=stride,
-                    bias_attr=False),
-                norm_layer(planes * block.expansion), )
+                nn.Conv2D(self.inplanes,
+                          planes * block.expansion,
+                          1,
+                          stride=stride,
+                          bias_attr=False),
+                norm_layer(planes * block.expansion),
+            )
 
         layers = []
         layers.append(
@@ -65,12 +64,11 @@ class ResNetEx(ResNet):
         self.inplanes = planes * block.expansion
         for _ in range(1, blocks):
             layers.append(
-                block(
-                    self.inplanes,
-                    planes,
-                    groups=self.groups,
-                    base_width=self.base_width,
-                    norm_layer=norm_layer))
+                block(self.inplanes,
+                      planes,
+                      groups=self.groups,
+                      base_width=self.base_width,
+                      norm_layer=norm_layer))
 
         return nn.Sequential(*layers)
 

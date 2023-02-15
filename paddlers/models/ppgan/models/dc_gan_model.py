@@ -28,7 +28,6 @@ class DCGANModel(BaseModel):
     This class implements the DCGAN model, for learning a distribution from input images.
     DCGAN paper: https://arxiv.org/pdf/1511.06434
     """
-
     def __init__(self, generator, discriminator=None, gan_criterion=None):
         """Initialize the DCGAN class.
         Args:

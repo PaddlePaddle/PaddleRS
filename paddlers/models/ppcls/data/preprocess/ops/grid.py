@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # This code is based on https://github.com/akuxcw/GridMask
+# reference: https://arxiv.org/abs/2001.04086.
 
 import numpy as np
 from PIL import Image
@@ -77,8 +78,8 @@ class GridMask(object):
         mask = Image.fromarray(np.uint8(mask))
         mask = mask.rotate(r)
         mask = np.asarray(mask)
-        mask = mask[(hh - h) // 2:(hh - h) // 2 + h, (ww - w) // 2:(ww - w) // 2
-                    + w]
+        mask = mask[(hh - h) // 2:(hh - h) // 2 + h, (ww - w) // 2:(ww - w) //
+                    2 + w]
 
         if self.mode == 1:
             mask = 1 - mask

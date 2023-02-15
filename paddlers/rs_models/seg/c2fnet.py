@@ -15,12 +15,12 @@
 import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
-import paddlers.models.ppseg as ppseg
-import paddlers.utils.logging as logging
 
-from paddlers.models.ppseg.cvlibs import param_init
+import paddlers.utils.logging as logging
+import paddlers.models.paddleseg as ppseg
+from paddlers.models.paddleseg.cvlibs import param_init
 from paddlers.rs_models.seg.layers import layers_lib as layers
-from paddlers.models.ppseg.utils import utils
+from paddlers.models.paddleseg.utils import utils
 
 
 class C2FNet(nn.Layer):

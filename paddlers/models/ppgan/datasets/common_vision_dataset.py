@@ -25,7 +25,6 @@ class CommonVisionDataset(paddle.io.Dataset):
     """
     Dataset for using paddle vision default datasets, such as mnist, flowers.
     """
-
     def __init__(self,
                  dataset_name,
                  transforms=None,

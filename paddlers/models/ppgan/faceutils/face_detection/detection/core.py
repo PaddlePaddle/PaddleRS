@@ -28,7 +28,6 @@ class FaceDetector(object):
     bounding boxes. Optionally, for speed considerations detect from path is
     recommended.
     """
-
     def __init__(self, verbose):
         self.verbose = verbose
 
@@ -90,8 +89,8 @@ class FaceDetector(object):
         files = []
         for extension in extensions:
             files.extend(
-                glob.glob(
-                    path + additional_pattern + extension, recursive=recursive))
+                glob.glob(path + additional_pattern + extension,
+                          recursive=recursive))
 
         if self.verbose:
             logger.info("Finished searching for images. %s images found",
@@ -133,8 +132,9 @@ class FaceDetector(object):
         if isinstance(tensor_or_path, str):
             return cv2.imread(tensor_or_path) if not rgb else cv2.imread(
                 tensor_or_path)[..., ::-1]
-        elif isinstance(tensor_or_path,
-                        (paddle.static.Variable, paddle.Tensor)):
+        elif isinstance(
+                tensor_or_path,
+            (paddle.static.Variable, paddle.Tensor)):
             # Call cpu in case its coming from cuda
             return tensor_or_path.numpy()[
                 ..., ::-1].copy() if not rgb else tensor_or_path.numpy()

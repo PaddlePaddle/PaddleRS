@@ -1,4 +1,4 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
+# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -198,7 +198,7 @@ class YOLOXHead(nn.Layer):
             self.stem_conv.append(BaseConv(in_c, feat_channels, 1, 1, act=act))
 
             self.conv_cls.append(
-                nn.Sequential(*[
+                nn.Sequential(* [
                     ConvBlock(
                         feat_channels, feat_channels, 3, 1, act=act), ConvBlock(
                             feat_channels, feat_channels, 3, 1, act=act),
@@ -210,7 +210,7 @@ class YOLOXHead(nn.Layer):
                 ]))
 
             self.conv_reg.append(
-                nn.Sequential(*[
+                nn.Sequential(* [
                     ConvBlock(
                         feat_channels, feat_channels, 3, 1, act=act),
                     ConvBlock(

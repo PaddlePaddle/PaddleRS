@@ -49,7 +49,6 @@ class FirstOrderModel(BaseModel):
     """ This class implements the FirstOrderMotion model, FirstOrderMotion paper:
     https://proceedings.neurips.cc/paper/2019/file/31c0b36aef265d9221af80872ceb62f9-Paper.pdf.
     """
-
     def __init__(self,
                  common_params,
                  train_params,
@@ -66,9 +65,8 @@ class FirstOrderModel(BaseModel):
         generator_cfg = generator
         generator_cfg.update({'common_params': common_params})
         generator_cfg.update({'train_params': train_params})
-        generator_cfg.update({
-            'dis_scales': discriminator.discriminator_cfg.scales
-        })
+        generator_cfg.update(
+            {'dis_scales': discriminator.discriminator_cfg.scales})
         self.nets['Gen_Full'] = build_generator(generator_cfg)
         discriminator_cfg = discriminator
         discriminator_cfg.update({'common_params': common_params})
@@ -79,18 +77,15 @@ class FirstOrderModel(BaseModel):
         self.is_train = False
 
     def setup_lr_schedulers(self, lr_cfg):
-        self.kp_lr = MultiStepDecay(
-            learning_rate=lr_cfg['lr_kp_detector'],
-            milestones=lr_cfg['epoch_milestones'],
-            gamma=0.1)
-        self.gen_lr = MultiStepDecay(
-            learning_rate=lr_cfg['lr_generator'],
-            milestones=lr_cfg['epoch_milestones'],
-            gamma=0.1)
-        self.dis_lr = MultiStepDecay(
-            learning_rate=lr_cfg['lr_discriminator'],
-            milestones=lr_cfg['epoch_milestones'],
-            gamma=0.1)
+        self.kp_lr = MultiStepDecay(learning_rate=lr_cfg['lr_kp_detector'],
+                                    milestones=lr_cfg['epoch_milestones'],
+                                    gamma=0.1)
+        self.gen_lr = MultiStepDecay(learning_rate=lr_cfg['lr_generator'],
+                                     milestones=lr_cfg['epoch_milestones'],
+                                     gamma=0.1)
+        self.dis_lr = MultiStepDecay(learning_rate=lr_cfg['lr_discriminator'],
+                                     milestones=lr_cfg['epoch_milestones'],
+                                     gamma=0.1)
         self.lr_scheduler = {
             "kp_lr": self.kp_lr,
             "gen_lr": self.gen_lr,
@@ -138,6 +133,7 @@ class FirstOrderModel(BaseModel):
         """Run forward pass; called by both functions <optimize_parameters> and <test>."""
         self.losses_generator, self.generated = \
             self.nets['Gen_Full'](self.input_data.copy(), self.nets['discriminator'])
+        
 
     def backward_G(self):
         loss_values = [val.mean() for val in self.losses_generator.values()]
@@ -175,7 +171,7 @@ class FirstOrderModel(BaseModel):
         if not self.is_train:
             self.is_train = True
             self.setup_net_parallel()
-
+        
         self.nets['kp_detector'].eval()
         self.nets['generator'].eval()
         with paddle.no_grad():
@@ -189,8 +185,8 @@ class FirstOrderModel(BaseModel):
                                              kp_source=kp_source,
                                              kp_driving=kp_driving)
                 out.update({'kp_source': kp_source, 'kp_driving': kp_driving})
-                loss = paddle.abs(out['prediction'] - driving).mean().cpu(
-                ).numpy()
+                loss = paddle.abs(out['prediction'] -
+                                  driving).mean().cpu().numpy()
                 self.test_loss.append(loss)
             self.visual_items['driving_source_gen'] = self.visualizer.visualize(
                 driving, source, out)
@@ -213,11 +209,12 @@ class FirstOrderModel(BaseModel):
                 paddle.inverse(kp_driving_initial['jacobian']))
             kp_norm['jacobian'] = paddle.matmul(jacobian_diff,
                                                 kp_source['jacobian'])
-            out = self.generator(
-                source, kp_source=kp_source, kp_driving=kp_norm)
+            out = self.generator(source,
+                                 kp_source=kp_source,
+                                 kp_driving=kp_norm)
             return out['prediction']
 
-    def export_model(self, export_model=None, output_dir=None, inputs_size=[]):
+    def export_model(self, export_model=None, output_dir=None, inputs_size=[], export_serving_model=False, model_name=None):
 
         source = paddle.rand(shape=inputs_size[0], dtype='float32')
         driving = paddle.rand(shape=inputs_size[1], dtype='float32')
@@ -234,16 +231,14 @@ class FirstOrderModel(BaseModel):
         outpath = os.path.join(output_dir, "fom_dy2st")
         if not os.path.exists(outpath):
             os.makedirs(outpath)
-        paddle.jit.save(
-            self.nets['Gen_Full'].kp_extractor,
-            os.path.join(outpath, "kp_detector"),
-            input_spec=[source])
+        paddle.jit.save(self.nets['Gen_Full'].kp_extractor,
+                        os.path.join(outpath, "kp_detector"),
+                        input_spec=[source])
         infer_generator = self.InferGenerator()
         infer_generator.set_generator(self.nets['Gen_Full'].generator)
-        paddle.jit.save(
-            infer_generator,
-            os.path.join(outpath, "generator"),
-            input_spec=[source, driving1, driving2, driving3])
+        paddle.jit.save(infer_generator,
+                        os.path.join(outpath, "generator"),
+                        input_spec=[source, driving1, driving2, driving3])
 
 
 @MODELS.register()
@@ -251,7 +246,6 @@ class FirstOrderModelMobile(FirstOrderModel):
     """ This class implements the FirstOrderMotionMobile model, modified according to the FirstOrderMotion paper:
     https://proceedings.neurips.cc/paper/2019/file/31c0b36aef265d9221af80872ceb62f9-Paper.pdf.
     """
-
     def __init__(self,
                  common_params,
                  train_params,
@@ -274,9 +268,8 @@ class FirstOrderModelMobile(FirstOrderModel):
         generator_ori_cfg = generator_ori
         generator_ori_cfg.update({'common_params': common_params})
         generator_ori_cfg.update({'train_params': train_params})
-        generator_ori_cfg.update({
-            'dis_scales': discriminator.discriminator_cfg.scales
-        })
+        generator_ori_cfg.update(
+            {'dis_scales': discriminator.discriminator_cfg.scales})
         self.Gen_Full_ori = build_generator(generator_ori_cfg)
         discriminator_cfg = discriminator
         discriminator_cfg.update({'common_params': common_params})
@@ -287,19 +280,16 @@ class FirstOrderModelMobile(FirstOrderModel):
         generator_cfg = generator
         generator_cfg.update({'common_params': common_params})
         generator_cfg.update({'train_params': train_params})
-        generator_cfg.update({
-            'dis_scales': discriminator.discriminator_cfg.scales
-        })
+        generator_cfg.update(
+            {'dis_scales': discriminator.discriminator_cfg.scales})
         if (mode == "kp_detector"):
             print("just train kp_detector, fix generator")
-            generator_cfg.update({
-                'generator_cfg': generator_ori_cfg['generator_cfg']
-            })
+            generator_cfg.update(
+                {'generator_cfg': generator_ori_cfg['generator_cfg']})
         elif mode == "generator":
             print("just train generator, fix kp_detector")
-            generator_cfg.update({
-                'kp_detector_cfg': generator_ori_cfg['kp_detector_cfg']
-            })
+            generator_cfg.update(
+                {'kp_detector_cfg': generator_ori_cfg['kp_detector_cfg']})
         elif mode == "both":
             print("train both kp_detector and generator")
         self.mode = mode
@@ -309,6 +299,7 @@ class FirstOrderModelMobile(FirstOrderModel):
         self.visualizer = Visualizer()
         self.test_loss = []
         self.is_train = False
+        
 
     def setup_net_parallel(self):
         if isinstance(self.nets['Gen_Full'], paddle.DataParallel):
@@ -324,8 +315,8 @@ class FirstOrderModelMobile(FirstOrderModel):
         self.kp_detector_ori = self.Gen_Full_ori.kp_extractor
         if self.is_train:
             return
-
-        from ppgan.utils.download import get_path_from_url
+       
+        from paddlers.models.ppgan.utils.download import get_path_from_url
         vox_cpk_weight_url = 'https://paddlegan.bj.bcebos.com/applications/first_order_model/vox-cpk.pdparams'
         weight_path = get_path_from_url(vox_cpk_weight_url)
         checkpoint = paddle.load(weight_path)
@@ -490,8 +481,8 @@ class Visualizer:
         ## Occlusion map
         if 'occlusion_map' in out:
             occlusion_map = out['occlusion_map'].cpu().tile([1, 3, 1, 1])
-            occlusion_map = F.interpolate(
-                occlusion_map, size=source.shape[1:3]).numpy()
+            occlusion_map = F.interpolate(occlusion_map,
+                                          size=source.shape[1:3]).numpy()
             occlusion_map = np.transpose(occlusion_map, [0, 2, 3, 1])
             images.append(occlusion_map)
 
@@ -508,8 +499,9 @@ class Visualizer:
 
                 if i != 0:
                     color = np.array(
-                        self.colormap((i - 1) / (out['sparse_deformed'].shape[1]
-                                                 - 1)))[:3]
+                        self.colormap(
+                            (i - 1) /
+                            (out['sparse_deformed'].shape[1] - 1)))[:3]
                 else:
                     color = np.array((0, 0, 0))
 

@@ -1,4 +1,4 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
+# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ from paddlers.models.ppdet.core.workspace import register
 
 __all__ = ['SmoothL1Loss']
 
-
 @register
 class SmoothL1Loss(nn.Layer):
     """Smooth L1 Loss.
@@ -31,8 +30,9 @@ class SmoothL1Loss(nn.Layer):
         beta (float): controls smooth region, it becomes L1 Loss when beta=0.0
         loss_weight (float): the final loss will be multiplied by this 
     """
-
-    def __init__(self, beta=1.0, loss_weight=1.0):
+    def __init__(self,
+                 beta=1.0,
+                 loss_weight=1.0):
         super(SmoothL1Loss, self).__init__()
         assert beta >= 0
         self.beta = beta
@@ -52,8 +52,7 @@ class SmoothL1Loss(nn.Layer):
         else:
             n = paddle.abs(pred - target)
             cond = n < self.beta
-            loss = paddle.where(cond, 0.5 * n**2 / self.beta,
-                                n - 0.5 * self.beta)
+            loss = paddle.where(cond, 0.5 * n ** 2 / self.beta, n - 0.5 * self.beta)
         if reduction == 'mean':
             loss = loss.mean() if loss.size > 0 else 0.0 * loss.sum()
         elif reduction == 'sum':

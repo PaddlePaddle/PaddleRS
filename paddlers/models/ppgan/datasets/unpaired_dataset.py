@@ -23,7 +23,6 @@ from .builder import DATASETS
 class UnpairedDataset(BaseDataset):
     """
     """
-
     def __init__(self, dataroot_a, dataroot_b, max_size, is_train, preprocess):
         """Initialize unpaired dataset class.
 
