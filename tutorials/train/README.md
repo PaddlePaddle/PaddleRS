@@ -75,18 +75,20 @@ pip install GDAL‑3.3.3‑cp39‑cp39‑win_amd64.whl
 
 ### *Docker安装
 
-1. 从dockerhub拉取
+1. 从dockerhub拉取:
 
 ```shell
-docker pull paddlepaddle/paddlers:1.0.0
+docker pull paddlepaddle/paddlers:1.0.0  # 暂无
 ```
 
-- （可选）从头开始构建
+- （可选）从头开始构建，可以通过设置`PPTAG`选择PaddlePaddle的多种基础镜像，构建CPU或不同GPU环境:
 
 ```shell
 git clone https://github.com/PaddlePaddle/PaddleRS
 cd PaddleRS
-docker build -t <imageName> .
+docker build -t <imageName> .  # 默认为2.4.1的cpu版本
+# docker build -t <imageName> . --build-arg PPTAG=2.4.1-gpu-cuda10.2-cudnn7.6-trt7.0  # 2.4.1的gpu版本之一
+# 其余Tag可以参考：https://hub.docker.com/r/paddlepaddle/paddle/tags
 ```
 
 2. 启动镜像
