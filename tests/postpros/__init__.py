@@ -12,16 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .regularization import building_regularization
-from .connection import cut_road_connection
-from .mrf import markov_random_field
-from .utils import (prepro_mask, del_small_connection, fill_small_holes,
-                    morphological_operation, deal_one_class)
-from .change_filter import change_detection_filter
-
-try:
-    from .crf import conditional_random_field
-except ImportError:
-    print(
-        "Can not use `conditional_random_field`. Please install pydensecrf first!"
-    )
+from .test_postpros import *
