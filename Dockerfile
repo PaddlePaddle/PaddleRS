@@ -2,7 +2,7 @@
 FROM paddlepaddle/paddle:2.4.1
 
 # install GDAL
-RUN wget https://next.a-boat.cn:2021/s/FyEtFZ9PDHLEWA3/download/GDAL-3.4.1-cp37-cp37m-manylinux_2_5_x86_64.manylinux1_x86_64.whl \
+RUN wget https://paddlers.bj.bcebos.com/dependencies/gdal/GDAL-3.4.1-cp37-cp37m-manylinux_2_5_x86_64.manylinux1_x86_64.whl \
 	&& pip install GDAL-3.4.1-cp37-cp37m-manylinux_2_5_x86_64.manylinux1_x86_64.whl \
 	&& rm -rf GDAL-3.4.1-cp37-cp37m-manylinux_2_5_x86_64.manylinux1_x86_64.whl
 
