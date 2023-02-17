@@ -490,7 +490,6 @@ def slider_predict(predict_func,
             else:
                 batch_data.append(im)
 
-            # FIXME: Update offset
             if merge_strategy == 'swell':
                 batch_offsets.append((xoff + overlap[1], yoff + overlap[0]))
             else:
