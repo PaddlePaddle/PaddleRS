@@ -17,7 +17,7 @@ import math
 import cv2
 import numpy as np
 
-from .utils import prepro_mask, calc_distance
+from .utils import del_small_connection, calc_distance, morphological_operation
 
 S = 20
 TD = 3
@@ -44,7 +44,7 @@ def building_regularization(mask: np.ndarray, W: int=32) -> np.ndarray:
     The implementation is not fully consistent with the article.
 
     Args:
-        mask (np.ndarray): Mask of building.
+        mask (np.ndarray): Mask of building. Shape is [H, W] and values are 0 or 1.
         W (int, optional): Minimum threshold in main direction. Default is 32.
             The larger W, the more regular the image, but the worse the image detail.
 
@@ -52,7 +52,7 @@ def building_regularization(mask: np.ndarray, W: int=32) -> np.ndarray:
         np.ndarray: Mask of building after regularized.
     """
     # check and pro processing
-    mask = prepro_mask(mask)
+    mask = del_small_connection(mask)
     mask_shape = mask.shape
     # find contours
     contours, hierarchys = cv2.findContours(mask, cv2.RETR_TREE,
@@ -68,9 +68,8 @@ def building_regularization(mask: np.ndarray, W: int=32) -> np.ndarray:
         contour = _fine(contour, W)  # fine
         res_contours.append((contour, _get_priority(hierarchy)))
     result = _fill(mask, res_contours)  # fill
-    result = cv2.morphologyEx(result, cv2.MORPH_OPEN,
-                              cv2.getStructuringElement(cv2.MORPH_RECT,
-                                                        (3, 3)))  # open
+    result = morphological_operation(result, "open")
+    result = np.clip(result, 0, 1)
     return result
 
 

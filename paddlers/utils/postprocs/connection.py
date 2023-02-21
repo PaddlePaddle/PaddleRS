@@ -25,7 +25,7 @@ with warnings.catch_warnings():
     from sklearn import metrics
     from sklearn.cluster import KMeans
 
-from .utils import prepro_mask, calc_distance
+from .utils import del_small_connection, calc_distance
 
 
 def cut_road_connection(mask: np.ndarray,
@@ -46,21 +46,22 @@ def cut_road_connection(mask: np.ndarray,
     2. We unmark the breakpoints if the angle between the two road extensions is less than 90°.
 
     Args:
-        mask (np.ndarray): Mask of road.
+        mask (np.ndarray): Mask of road. Shape is [H, W] and values are 0 or 1.
         area_threshold (int, optional): Threshold to filter out small connected area. Default is 32.
         line_width (int, optional): Width of the line used for patching. Default is 6.
 
     Returns:
         np.ndarray: Mask of road after connecting cut road lines.
     """
-    mask = prepro_mask(mask, area_threshold)
+    mask = del_small_connection(mask, area_threshold)
     skeleton = morphology.skeletonize(mask).astype("uint8")
     break_points = _find_breakpoint(skeleton)
     labels = _k_means(break_points)
     if labels is None:
-        return mask * 255
+        return mask
     match_points = _get_match_points(break_points, labels)
     res = _draw_curve(mask, skeleton, match_points, line_width)
+    res = np.clip(res, 0, 1)
     return res
 
 
