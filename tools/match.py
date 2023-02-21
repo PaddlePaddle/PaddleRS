@@ -14,7 +14,6 @@
 
 import argparse
 
-import paddlers
 import numpy as np
 import cv2
 
@@ -26,10 +25,10 @@ class MatchError(Exception):
         return "Cannot match the two images."
 
 
-def _calcu_tf(im1, im2):
+def _calcu_tf(image1, image2):
     orb = cv2.AKAZE_create()
-    kp1, des1 = orb.detectAndCompute(im1, None)
-    kp2, des2 = orb.detectAndCompute(im2, None)
+    kp1, des1 = orb.detectAndCompute(image1, None)
+    kp2, des2 = orb.detectAndCompute(image2, None)
     bf = cv2.BFMatcher()
     mathces = bf.knnMatch(des2, des1, k=2)
     good_matches = []
@@ -63,34 +62,34 @@ def _get_match_img(raster, bands):
 
 
 @time_it
-def match(im1_path,
-          im2_path,
+def match(image1_path,
+          image2_path,
           save_path,
-          im1_bands=[1, 2, 3],
-          im2_bands=[1, 2, 3]):
-    im1_ras = Raster(im1_path)
-    im2_ras = Raster(im2_path)
-    im1 = _get_match_img(im1_ras._src_data, im1_bands)
-    im2 = _get_match_img(im2_ras._src_data, im2_bands)
-    H = _calcu_tf(im1, im2)
-    im2_arr_t = cv2.warpPerspective(im2_ras.getArray(), H,
-                                    (im1_ras.width, im1_ras.height))
-    save_geotiff(im2_arr_t, save_path, im1_ras.proj, im1_ras.geot,
-                 im1_ras.datatype)
+          image1_bands=[1, 2, 3],
+          image2_bands=[1, 2, 3]):
+    image1_ras = Raster(image1_path)
+    image2_ras = Raster(image2_path)
+    image1 = _get_match_img(image1_ras._src_data, image1_bands)
+    image2 = _get_match_img(image2_ras._src_data, image2_bands)
+    H = _calcu_tf(image1, image2)
+    im2_arr_t = cv2.warpPerspective(image2_ras.getArray(), H,
+                                    (image1_ras.width, image1_ras.height))
+    save_geotiff(im2_arr_t, save_path, image1_ras.proj, image1_ras.geot,
+                 image1_ras.datatype)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="input parameters")
-    parser.add_argument('--im1_path', type=str, required=True, \
+    parser.add_argument('--image1_path', type=str, required=True, \
                         help="Path of time1 image (with geoinfo).")
-    parser.add_argument('--im2_path', type=str, required=True, \
+    parser.add_argument('--image2_path', type=str, required=True, \
                         help="Path of time2 image.")
     parser.add_argument('--save_path', type=str, required=True, \
                         help="Path to save matching result.")
-    parser.add_argument('--im1_bands', type=int, nargs="+", default=[1, 2, 3], \
-                        help="Bands of im1 to be used for matching, RGB or monochrome. The default value is [1, 2, 3].")
-    parser.add_argument('--im2_bands', type=int, nargs="+", default=[1, 2, 3], \
-                        help="Bands of im2 to be used for matching, RGB or monochrome. The default value is [1, 2, 3].")
+    parser.add_argument('--image1_bands', type=int, nargs="+", default=[1, 2, 3], \
+                        help="Bands of image1 to be used for matching, RGB or monochrome. The default value is [1, 2, 3].")
+    parser.add_argument('--image2_bands', type=int, nargs="+", default=[1, 2, 3], \
+                        help="Bands of image2 to be used for matching, RGB or monochrome. The default value is [1, 2, 3].")
     args = parser.parse_args()
-    match(args.im1_path, args.im2_path, args.save_path, args.im1_bands,
-          args.im2_bands)
+    match(args.image1_path, args.image2_path, args.save_path, args.image1_bands,
+          args.image2_bands)

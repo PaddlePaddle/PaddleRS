@@ -201,18 +201,18 @@ def get_path_tuples(*dirs, glob_pattern='*', data_dir=None):
     Returns:
         list[tuple]: For directories with the following structure:
             ├── img  
-            │   ├── im1.png
-            │   ├── im2.png
+            │   ├── image1.png
+            │   ├── image2.png
             │   └── im3.png
             │
             ├── mask
-            │   ├── im1.png
-            │   ├── im2.png
+            │   ├── image1.png
+            │   ├── image2.png
             │   └── im3.png
             └── ...
 
         `get_path_tuples('img', 'mask', '*.png')` will return list of tuples:
-            [('img/im1.png', 'mask/im1.png'), ('img/im2.png', 'mask/im2.png'), ('img/im3.png', 'mask/im3.png')]
+            [('img/image1.png', 'mask/image1.png'), ('img/image2.png', 'mask/image2.png'), ('img/im3.png', 'mask/im3.png')]
     """
 
     all_paths = []

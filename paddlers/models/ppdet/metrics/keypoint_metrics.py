@@ -59,7 +59,7 @@ class KeyPointTopDownCOCOEval(object):
             'all_preds': np.zeros(
                 (self.num_samples, self.num_joints, 3), dtype=np.float32),
             'all_boxes': np.zeros((self.num_samples, 6)),
-            'image_path': []
+            'src_img_path': []
         }
         self.eval_results = {}
         self.idx = 0
@@ -85,9 +85,9 @@ class KeyPointTopDownCOCOEval(object):
             5] = np.squeeze(inputs['score'].numpy()) if isinstance(
                 inputs['score'], paddle.Tensor) else np.squeeze(inputs['score'])
         if isinstance(inputs['im_id'], paddle.Tensor):
-            self.results['image_path'].extend(inputs['im_id'].numpy())
+            self.results['src_img_path'].extend(inputs['im_id'].numpy())
         else:
-            self.results['image_path'].extend(inputs['im_id'])
+            self.results['src_img_path'].extend(inputs['im_id'])
         self.idx += num_images
 
     def _write_coco_keypoint_results(self, keypoints):
@@ -190,7 +190,7 @@ class KeyPointTopDownCOCOEval(object):
     def accumulate(self):
         self.get_final_results(self.results['all_preds'],
                                self.results['all_boxes'],
-                               self.results['image_path'])
+                               self.results['src_img_path'])
         if self.save_prediction_only:
             logger.info(f'The keypoint result is saved to {self.res_file} '
                         'and do not evaluate the mAP.')
@@ -256,7 +256,7 @@ class KeyPointTopDownMPIIEval(object):
         results['boxes'][:, 2:4] = inputs['scale'].numpy()[:, 0:2]
         results['boxes'][:, 4] = np.prod(inputs['scale'].numpy() * 200, 1)
         results['boxes'][:, 5] = np.squeeze(inputs['score'].numpy())
-        results['image_path'] = inputs['image_file']
+        results['src_img_path'] = inputs['image_file']
 
         self.results.append(results)
 
@@ -277,7 +277,7 @@ class KeyPointTopDownMPIIEval(object):
             result = [{
                 'preds': res['preds'][k].tolist(),
                 'boxes': res['boxes'][k].tolist(),
-                'image_path': res['image_path'][k],
+                'src_img_path': res['src_img_path'][k],
             } for k in range(len(res))]
             results.extend(result)
         with open(self.res_file, 'w') as f:

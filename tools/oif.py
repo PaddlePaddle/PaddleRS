@@ -15,7 +15,6 @@
 import itertools
 import argparse
 
-import paddlers
 import numpy as np
 import pandas as pd
 from easydict import EasyDict as edict
@@ -35,14 +34,14 @@ def _calcOIF(rgb, stds, rho):
 
 
 @time_it
-def oif(img_path, topk=5):
-    raster = Raster(img_path)
-    img = raster.getArray()
-    img_flatten = img.reshape([-1, raster.bands])
-    stds = np.std(img_flatten, axis=0)
+def oif(image_path, topk=5):
+    raster = Raster(image_path)
+    image = raster.getArray()
+    image_flatten = image.reshape([-1, raster.bands])
+    stds = np.std(image_flatten, axis=0)
     datas = edict()
     for c in range(raster.bands):
-        datas[str(c + 1)] = img_flatten[:, c]
+        datas[str(c + 1)] = image_flatten[:, c]
     datas = pd.DataFrame(datas)
     rho = datas.corr().values
     band_combs = edict()
@@ -58,9 +57,9 @@ def oif(img_path, topk=5):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--im_path", type=str, required=True, \
+    parser.add_argument("--src_img_path", type=str, required=True, \
                         help="Path of HSIs image.")
     parser.add_argument("--topk", type=int, default=5, \
                         help="Number of top results. The default value is 5.")
     args = parser.parse_args()
-    oif(args.im_path, args.topk)
+    oif(args.image_path, args.topk)

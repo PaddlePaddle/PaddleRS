@@ -71,7 +71,7 @@ def split_data(image_path, mask_path, block_size, save_dir):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="input parameters")
-    parser.add_argument("--image_path", type=str, required=True, \
+    parser.add_argument("--src_img_path", type=str, required=True, \
                         help="Path of input image.")
     parser.add_argument("--mask_path", type=str, default=None, \
                         help="Path of input labels.")

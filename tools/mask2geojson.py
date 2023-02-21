@@ -16,7 +16,6 @@ import os
 import codecs
 import argparse
 
-import paddlers
 import numpy as np
 import cv2
 import geojson
@@ -70,4 +69,4 @@ if __name__ == "__main__":
     parser.add_argument("--save_path", type=str, required=True, \
                         help="Path to store the GeoJSON file (the coordinate system is WGS84).")
     args = parser.parse_args()
-    convert_data(args.raster_path, args.geojson_path)
+    convert_data(args.mask_path, args.save_path)

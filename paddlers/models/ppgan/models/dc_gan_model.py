@@ -58,7 +58,7 @@ class DCGANModel(BaseModel):
         """
         # get 1-channel gray image, or 3-channel color image
         self.real = paddle.to_tensor(input['img'])
-        if 'img_path' in input:
+        if 'src_img_path' in input:
             self.image_paths = input['A_path']
 
     def forward(self):

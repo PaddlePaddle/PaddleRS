@@ -19,7 +19,6 @@ import json
 import argparse
 from collections import defaultdict
 
-import paddlers
 import numpy as np
 import cv2
 import glob

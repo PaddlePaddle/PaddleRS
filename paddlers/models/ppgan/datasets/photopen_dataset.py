@@ -95,7 +95,7 @@ class PhotoPenDataset(Dataset):
             pos=[left, top, left + self.crop_size, top + self.crop_size],
             flip=flip,
             is_image=False)
-        return {'img': img, 'ins': ins, 'img_path': self.inst_list[idx]}
+        return {'img': img, 'ins': ins, 'src_img_path': self.inst_list[idx]}
 
     def __len__(self):
         return len(self.inst_list)
@@ -137,7 +137,7 @@ class PhotoPenDataset_test(Dataset):
             pos=[left, top, left + self.crop_size, top + self.crop_size],
             flip=flip,
             is_image=False)
-        return {'ins': ins, 'img_path': self.inst_list[idx]}
+        return {'ins': ins, 'src_img_path': self.inst_list[idx]}
 
     def __len__(self):
         return len(self.inst_list)
