@@ -55,7 +55,7 @@ eiseg
 
 - 若需要使用GeoView，则需要按照如下方式启动：
 
-  1. 启动后端：
+  1. 新建一个终端，启动镜像加载后端：
 
   ```shell
   docker run --name <containerName> -p 5008:5008 -p 3000:3000 -it <imageID>
@@ -90,13 +90,13 @@ eiseg
   vim ../config.yaml
   ```
 
-  6. 启动后端
+  6. 启动后端：
 
   ```shell
   python app.py
   ```
 
-  7. 新建一个终端，根据上面的`<containerName>`来启动前端。
+  7. 新建一个终端，根据上面的`<containerName>`来启动前端：
 
   ```shell
   docker exec -it <containerName> bash -c "cd frontend && npm run serve"
