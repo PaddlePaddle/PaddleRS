@@ -53,4 +53,51 @@ docker run -it -v <本机文件夹绝对路径:容器文件夹绝对路径> <ima
 eiseg
 ```
 
-- 若需要使用GeoView，则需要
+- 若需要使用GeoView，则需要按照如下方式启动：
+
+  1. 启动后端：
+
+  ```shell
+  docker run --name <containerName> -p 5008:5008 -p 3000:3000 -it <imageID>
+  ```
+
+  2. 启动MySQL：
+
+  ```shell
+  service mysql start
+  mysql -u root
+  ```
+
+  3. 注册MySQL的用户并赋予权限：
+
+  ```sql
+  CREATE USER 'paddle_rs'@'localhost' IDENTIFIED BY '123456';
+  GRANT ALL PRIVILEGES ON *.* TO 'paddle_rs'@'localhost';
+  FLUSH PRIVILEGES;
+  quit;
+  ```
+
+  4. 进入后端，根据实际修改flaskenv：
+
+  ```shell
+  cd backend
+  vim .flaskenv
+  ```
+
+  5. 设置百度地图Access Key，百度地图的Access Key可在[百度地图开放平台](http://lbsyun.baidu.com/apiconsole/key?application=key)申请：
+
+  ```shell
+  vim ../config.yaml
+  ```
+
+  6. 启动后端
+
+  ```shell
+  python app.py
+  ```
+
+  7. 新建一个终端，根据上面的`<containerName>`来启动前端。
+
+  ```shell
+  docker exec -it <containerName> bash -c "cd frontend && npm run serve"
+  ```

@@ -6,8 +6,7 @@ RUN apt-get update \
 	&& apt-get install -y mysql-server mysql-client libmysqlclient-dev \ 
 		git curl \
 	&& curl -sL https://deb.nodesource.com/setup_16.x | bash - \
-	&& apt-get install -y nodejs \
-	&& service mysql start
+	&& apt-get install -y nodejs
 
 # 2. clone geoview
 WORKDIR /opt
@@ -17,7 +16,8 @@ ENV PYTHONPATH /opt/GeoView/PaddleRS
 
 # 3. install requirements about backend
 WORKDIR /opt/GeoView/backend
-RUN pip install -r requirements.txt -i https://mirror.baidu.com/pypi/simple
+RUN pip install -r requirements.txt -i https://mirror.baidu.com/pypi/simple \
+	&& mv .flaskenv_template .flaskenv
 
 # 4. install requirements about frontend
 WORKDIR /opt/GeoView/frontend
