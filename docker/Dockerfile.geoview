@@ -1,0 +1,27 @@
+# 0. from base paddlers iamge
+FROM paddlers:latest
+
+# 1. install mysql and nodejs
+RUN apt-get update \
+	&& apt-get install -y mysql-server mysql-client libmysqlclient-dev \ 
+		git curl \
+	&& curl -sL https://deb.nodesource.com/setup_16.x | bash - \
+	&& apt-get install -y nodejs \
+	&& service mysql start
+
+# 2. clone geoview
+WORKDIR /opt
+RUN git clone https://github.com/PaddleCV-SIG/GeoView.git \
+	&& mv PaddleRS GeoView/PaddleRS
+ENV PYTHONPATH /opt/GeoView/PaddleRS
+
+# 3. install requirements about backend
+WORKDIR /opt/GeoView/backend
+RUN pip install -r requirements.txt -i https://mirror.baidu.com/pypi/simple
+
+# 4. install requirements about frontend
+WORKDIR /opt/GeoView/frontend
+RUN npm install
+
+# 5. finish
+WORKDIR /opt/GeoView/PaddleRS
