@@ -1,5 +1,5 @@
 # 0. from base paddlers iamge
-FROM geoyee/paddlers:1.0.0
+FROM paddlers:latest
 
 # 1. install mysql and nodejs
 RUN apt-get update \
