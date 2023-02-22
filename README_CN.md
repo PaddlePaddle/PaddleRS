@@ -276,7 +276,7 @@ PaddleRS具有以下五大特色：
 * 数据准备
   * [快速了解遥感与遥感数据](./docs/data/rs_data.md)
   * [开源遥感数据集汇总表](./docs/data/dataset.md)
-  * [智能标注工具EISeg](https://github.com/PaddlePaddle/PaddleSeg/tree/release/2.6/EISeg)
+  * [智能标注工具EISeg](https://github.com/PaddlePaddle/PaddleSeg/tree/release/2.7/EISeg)
   * [遥感影像处理工具集](./docs/data/tools.md)
 * 组件介绍
   * [数据集预处理脚本](./docs/intro/data_prep.md)
