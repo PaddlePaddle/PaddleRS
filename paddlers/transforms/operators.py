@@ -2127,10 +2127,9 @@ class ArrangeRestorer(Arrange):
         if 'target' in sample:
             target = F.permute(sample['target'], False)
         image = F.permute(sample['image'], False)
-        trans_info = sample['trans_info']
         if self.mode == 'train':
             return image, target
         if self.mode == 'eval':
-            return image, target, trans_info
+            return image, target
         if self.mode == 'test':
-            return image, trans_info
+            return image,
