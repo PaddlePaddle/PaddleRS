@@ -462,7 +462,6 @@ class BaseChangeDetector(BaseModel):
                 math.ceil(eval_dataset.num_samples * 1.0 / batch_size)))
         with paddle.no_grad():
             for step, data in enumerate(self.eval_data_loader):
-                data.append(eval_dataset.transforms.transforms)
                 outputs = self.run(self.net, data, 'eval')
                 pred_area = outputs['pred_area']
                 label_area = outputs['label_area']
@@ -561,10 +560,10 @@ class BaseChangeDetector(BaseModel):
             images = [img_file]
         else:
             images = img_file
-        batch_im1, batch_im2, batch_origin_shape = self.preprocess(
+        batch_im1, batch_im2, batch_trans_info = self.preprocess(
             images, transforms, self.model_type)
         self.net.eval()
-        data = (batch_im1, batch_im2, batch_origin_shape, transforms.transforms)
+        data = (batch_im1, batch_im2, batch_trans_info)
         outputs = self.run(self.net, data, 'test')
         label_map_list = outputs['label_map']
         score_map_list = outputs['score_map']
@@ -626,18 +625,19 @@ class BaseChangeDetector(BaseModel):
     def preprocess(self, images, transforms, to_tensor=True):
         self._check_transforms(transforms, 'test')
         batch_im1, batch_im2 = list(), list()
-        batch_ori_shape = list()
+        batch_trans_info = list()
         for im1, im2 in images:
             if isinstance(im1, str) or isinstance(im2, str):
                 im1 = decode_image(im1, read_raw=True)
                 im2 = decode_image(im2, read_raw=True)
-            ori_shape = im1.shape[:2]
             # XXX: sample do not contain 'image_t1' and 'image_t2'.
             sample = {'image': im1, 'image2': im2}
-            im1, im2 = transforms(sample)[:2]
+            data = transforms(sample)
+            im1, im2 = data[:2]
+            trans_info = data[-1]
             batch_im1.append(im1)
             batch_im2.append(im2)
-            batch_ori_shape.append(ori_shape)
+            batch_trans_info.append(trans_info)
         if to_tensor:
             batch_im1 = paddle.to_tensor(batch_im1)
             batch_im2 = paddle.to_tensor(batch_im2)
@@ -645,7 +645,7 @@ class BaseChangeDetector(BaseModel):
             batch_im1 = np.asarray(batch_im1)
             batch_im2 = np.asarray(batch_im2)
 
-        return batch_im1, batch_im2, batch_ori_shape
+        return batch_im1, batch_im2, batch_trans_info
 
     @staticmethod
     def get_transforms_shape_info(batch_ori_shape, transforms):

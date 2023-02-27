@@ -439,7 +439,6 @@ class BaseSegmenter(BaseModel):
                 math.ceil(eval_dataset.num_samples * 1.0 / batch_size)))
         with paddle.no_grad():
             for step, data in enumerate(self.eval_data_loader):
-                data.append(eval_dataset.transforms.transforms)
                 outputs = self.run(self.net, data, 'eval')
                 pred_area = outputs['pred_area']
                 label_area = outputs['label_area']
@@ -527,10 +526,10 @@ class BaseSegmenter(BaseModel):
             images = [img_file]
         else:
             images = img_file
-        batch_im, batch_origin_shape = self.preprocess(images, transforms,
-                                                       self.model_type)
+        batch_im, batch_trans_info = self.preprocess(images, transforms,
+                                                     self.model_type)
         self.net.eval()
-        data = (batch_im, batch_origin_shape, transforms.transforms)
+        data = (batch_im, batch_trans_info)
         outputs = self.run(self.net, data, 'test')
         label_map_list = outputs['label_map']
         score_map_list = outputs['score_map']
@@ -592,21 +591,22 @@ class BaseSegmenter(BaseModel):
     def preprocess(self, images, transforms, to_tensor=True):
         self._check_transforms(transforms, 'test')
         batch_im = list()
-        batch_ori_shape = list()
+        batch_trans_info = list()
         for im in images:
             if isinstance(im, str):
                 im = decode_image(im, read_raw=True)
-            ori_shape = im.shape[:2]
             sample = {'image': im}
-            im = transforms(sample)[0]
+            data = transforms(sample)
+            im = data[0]
+            trans_info = data[-1]
             batch_im.append(im)
-            batch_ori_shape.append(ori_shape)
+            batch_trans_info.append(trans_info)
         if to_tensor:
             batch_im = paddle.to_tensor(batch_im)
         else:
             batch_im = np.asarray(batch_im)
 
-        return batch_im, batch_ori_shape
+        return batch_im, batch_trans_info
 
     def postprocess(self, batch_pred, batch_restore_list):
         if isinstance(batch_pred, (tuple, list)) and self.status == 'Infer':
