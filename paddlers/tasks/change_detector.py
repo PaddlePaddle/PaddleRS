@@ -116,13 +116,12 @@ class BaseChangeDetector(BaseModel):
         logit = net_out[0]
         outputs = OrderedDict()
         if mode == 'test':
-            origin_shape = inputs[2]
+            batch_restore_list = inputs[-1]
             if self.status == 'Infer':
                 label_map_list, score_map_list = self.postprocess(
-                    net_out, origin_shape, transforms=inputs[3])
+                    net_out, batch_restore_list)
             else:
-                logit_list = self.postprocess(
-                    logit, origin_shape, transforms=inputs[3])
+                logit_list = self.postprocess(logit, batch_restore_list)
                 label_map_list = []
                 score_map_list = []
                 for logit in logit_list:
@@ -138,6 +137,7 @@ class BaseChangeDetector(BaseModel):
             outputs['score_map'] = score_map_list
 
         if mode == 'eval':
+            batch_restore_list = inputs[-1]
             if self.status == 'Infer':
                 pred = paddle.unsqueeze(net_out[0], axis=1)  # NCHW
             else:
@@ -148,9 +148,7 @@ class BaseChangeDetector(BaseModel):
             if label.ndim != 4:
                 raise ValueError("Expected label.ndim == 4 but got {}".format(
                     label.ndim))
-            origin_shape = [label.shape[-2:]]
-            pred = self.postprocess(
-                pred, origin_shape, transforms=inputs[3])[0]  # NCHW
+            pred = self.postprocess(pred, batch_restore_list)[0]  # NCHW
             intersect_area, pred_area, label_area = ppseg.utils.metrics.calculate_area(
                 pred, label, self.num_classes)
             outputs['intersect_area'] = intersect_area
@@ -697,9 +695,7 @@ class BaseChangeDetector(BaseModel):
             batch_restore_list.append(restore_list)
         return batch_restore_list
 
-    def postprocess(self, batch_pred, batch_origin_shape, transforms):
-        batch_restore_list = BaseChangeDetector.get_transforms_shape_info(
-            batch_origin_shape, transforms)
+    def postprocess(self, batch_pred, batch_restore_list):
         if isinstance(batch_pred, (tuple, list)) and self.status == 'Infer':
             return self._infer_postprocess(
                 batch_label_map=batch_pred[0],
