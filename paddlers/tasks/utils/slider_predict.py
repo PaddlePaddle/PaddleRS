@@ -141,6 +141,9 @@ class OverlapProcessor(metaclass=ABCMeta):
         self.sh = sh
         self.sw = sw
 
+    def update_batch_offsets(self, xoff, yoff):
+        return xoff, yoff
+
     @abstractmethod
     def process_pred(self, out, xoff, yoff):
         pass
@@ -205,6 +208,9 @@ class SwellProcessor(OverlapProcessor):
         super(SwellProcessor, self).__init__(h, w, ch, cw, sh, sw)
         self.oh = oh
         self.ow = ow
+
+    def update_batch_offsets(self, xoff, yoff):
+        return xoff + self.oh, yoff + self.ow
 
     def process_pred(self, out, xoff, yoff):
         pred = out['label_map']
@@ -333,7 +339,7 @@ def slider_predict(predict_func,
             means keeping the values of the first and the last block in 
             traversal order, respectively. 'accum' means determining the class 
             of an overlapping pixel according to accumulated probabilities.
-            'swell' means keep center block only.
+            'swell' means keeping only the center part of each block prediction.
         batch_size (int): Batch size used in inference.
         eager_load (bool, optional): Whether to load the whole image(s) eagerly.
             Defaults to False.
@@ -490,10 +496,8 @@ def slider_predict(predict_func,
             else:
                 batch_data.append(im)
 
-            if merge_strategy == 'swell':
-                batch_offsets.append((xoff + overlap[1], yoff + overlap[0]))
-            else:
-                batch_offsets.append((xoff, yoff))
+            xoff, yoff = overlap_processor.update_batch_offsets(xoff, yoff)
+            batch_offsets.append((xoff, yoff))
 
             len_batch = len(batch_data)
 
