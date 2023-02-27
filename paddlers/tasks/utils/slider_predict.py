@@ -496,8 +496,8 @@ def slider_predict(predict_func,
             else:
                 batch_data.append(im)
 
-            xoff, yoff = overlap_processor.update_batch_offsets(xoff, yoff)
-            batch_offsets.append((xoff, yoff))
+            batch_offsets.append(
+                overlap_processor.update_batch_offsets(xoff, yoff))
 
             len_batch = len(batch_data)
 
