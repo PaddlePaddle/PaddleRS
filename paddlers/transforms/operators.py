@@ -373,6 +373,11 @@ class DecodeImg(Transform):
             else:
                 sample['target'] = self.apply_im(sample['target'])
 
+        # the `trans_info` will save the process of image shape,
+        # and will be used in evaluation and prediction.
+        if 'trans_info' not in sample:
+            sample['trans_info'] = []
+
         sample['im_shape'] = np.array(
             sample['image'].shape[:2], dtype=np.float32)
         sample['scale_factor'] = np.array([1., 1.], dtype=np.float32)
