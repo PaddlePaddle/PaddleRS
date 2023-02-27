@@ -2115,11 +2115,7 @@ class ArrangeDetector(Arrange):
     def apply(self, sample):
         if self.mode == 'eval' and 'gt_poly' in sample:
             del sample['gt_poly']
-        trans_info = sample['trans_info']
-        if self.mode in ['test', 'eval']:
-            return sample, trans_info
-        else:
-            return sample
+        return sample
 
 
 class ArrangeRestorer(Arrange):
