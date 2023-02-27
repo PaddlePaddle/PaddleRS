@@ -151,6 +151,21 @@ class _TestSliderPredictNamespace:
                     decode_sar=False)
                 self.check_output_equal(pred_accum.shape, pred_whole.shape)
 
+                # 'swell'
+                save_dir = osp.join(td, 'swell')
+                self.model.slider_predict(
+                    self.image_path,
+                    save_dir,
+                    128,
+                    64,
+                    self.transforms,
+                    merge_strategy='swell')
+                pred_swell = T.decode_image(
+                    osp.join(save_dir, self.basename),
+                    read_raw=True,
+                    decode_sar=False)
+                self.check_output_equal(pred_swell.shape, pred_whole.shape)
+
         def test_geo_info(self):
             with tempfile.TemporaryDirectory() as td:
                 _, geo_info_in = T.decode_image(
