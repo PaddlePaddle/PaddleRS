@@ -108,9 +108,6 @@ class Compose(object):
             and compose_obj.arrange_outputs().
         """
 
-        # the `trans_info` will save the process of image shape, and will be used in evaluation and prediction.
-        if 'trans_info' not in sample.keys():
-            sample['trans_info'] = []
         sample = self.apply_transforms(sample)
         sample = self.arrange_outputs(sample)
         return sample

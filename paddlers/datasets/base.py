@@ -31,5 +31,9 @@ class BaseDataset(Dataset):
 
     def __getitem__(self, idx):
         sample = deepcopy(self.file_list[idx])
+        # the `trans_info` will save the process of image shape,
+        # and will be used in evaluation and prediction.
+        if 'trans_info' not in sample.keys():
+            sample['trans_info'] = []
         outputs = self.transforms(sample)
         return outputs
