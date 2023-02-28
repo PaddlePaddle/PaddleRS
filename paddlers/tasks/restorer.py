@@ -67,7 +67,7 @@ class BaseRestorer(BaseModel):
         # Currently, only use models from cmres.
         if not hasattr(cmres, self.model_name):
             raise ValueError("ERROR: There is no model named {}.".format(
-                model_name))
+                self.model_name))
         net = dict(**cmres.__dict__)[self.model_name](**params)
         return net
 
