@@ -39,7 +39,7 @@ class COCODetDataset(BaseDataset):
         label_list (str|None, optional): Path of the file that contains the category names. Defaults to None.
         num_workers (int|str, optional): Number of processes used for data loading. If `num_workers` is 'auto',
             the number of workers will be automatically determined according to the number of CPU cores: If 
-            there are more than 16 cores，8 workers will be used. Otherwise, the number of workers will be half 
+            there are more than 16 cores, 8 workers will be used. Otherwise, the number of workers will be half 
             the number of CPU cores. Defaults: 'auto'.
         shuffle (bool, optional): Whether to shuffle the samples. Defaults to False.
         allow_empty (bool, optional): Whether to add negative samples. Defaults to False.
