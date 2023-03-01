@@ -417,7 +417,7 @@ IM2_PATH="data/levircd/LEVIR-CD/test/B/test_13/test_13_3.png"
 
 python tools/visualize_feats.py \
     --model_dir "exp/levircd/custom_model/best_model" \
-    --im_path "${IM1_PATH}" "${IM2_PATH}" \
+    --src_img_path "${IM1_PATH}" "${IM2_PATH}" \
     --save_dir "exp/vis/test_13_3/in" \
     --hook_type 'forward_in' \
     --layer_names 'att4' \
@@ -426,7 +426,7 @@ python tools/visualize_feats.py \
 
 python tools/visualize_feats.py \
     --model_dir "exp/levircd/custom_model/best_model" \
-    --im_path "${IM1_PATH}" "${IM2_PATH}" \
+    --src_img_path "${IM1_PATH}" "${IM2_PATH}" \
     --save_dir "exp/vis/test_13_3/out" \
     --hook_type 'forward_out' \
     --layer_names 'att4' \

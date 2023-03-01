@@ -17,7 +17,6 @@ import os.path as osp
 import numpy as np
 import argparse
 
-import paddlers
 from sklearn.decomposition import PCA
 from joblib import dump
 
@@ -25,15 +24,15 @@ from utils import Raster, save_geotiff, time_it
 
 
 @time_it
-def pca_train(img_path, save_dir="output", dim=3):
-    raster = Raster(img_path)
-    im = raster.getArray()
-    n_im = np.reshape(im, (-1, raster.bands))
+def pca_train(image_path, save_dir="output", dim=3):
+    raster = Raster(image_path)
+    image = raster.getArray()
+    n_im = np.reshape(image, (-1, raster.bands))
     pca = PCA(n_components=dim, whiten=True)
     pca_model = pca.fit(n_im)
     if not osp.exists(save_dir):
         os.makedirs(save_dir)
-    name = osp.splitext(osp.normpath(img_path).split(os.sep)[-1])[0]
+    name = osp.splitext(osp.normpath(image_path).split(os.sep)[-1])[0]
     model_save_path = osp.join(save_dir, (name + "_pca.joblib"))
     image_save_path = osp.join(save_dir, (name + "_pca.tif"))
     dump(pca_model, model_save_path)  # Save model
@@ -46,11 +45,11 @@ def pca_train(img_path, save_dir="output", dim=3):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--im_path", type=str, required=True, \
+    parser.add_argument("--src_img_path", type=str, required=True, \
                         help="Path of HSIs image.")
     parser.add_argument("--save_dir", type=str, default="output", \
                         help="Directory to save PCA params(*.joblib). Default: output.")
     parser.add_argument("--dim", type=int, default=3, \
                         help="Dimension to reduce to. Default: 3.")
     args = parser.parse_args()
-    pca_train(args.im_path, args.save_dir, args.dim)
+    pca_train(args.image_path, args.save_dir, args.dim)

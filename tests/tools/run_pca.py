@@ -19,5 +19,5 @@ from testing_utils import run_script
 if __name__ == '__main__':
     with tempfile.TemporaryDirectory() as td:
         run_script(
-            f"python pca.py --im_path ../tests/data/ssst/multispectral.tif --save_dir {td} --dim 5",
+            f"python pca.py --image_path ../tests/data/ssst/multispectral.tif --save_dir {td} --dim 5",
             wd="../tools")

@@ -57,7 +57,7 @@ def decode_image(im_path,
             projection).
     """
 
-    # Do a presence check. osp.exists() assumes `im_path` is a path-like object.
+    # Do a presence check. osp.exists() assumes `src_img_path` is a path-like object.
     if not osp.exists(im_path):
         raise ValueError(f"{im_path} does not exist!")
     if read_raw:

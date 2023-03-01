@@ -49,7 +49,7 @@ def map_display(mask_path: str,
 
     Args:
     mask_path (str): Path of predicted or ground-truth masks.
-    img_path (str|None, optional): Path of the original image. Defaults to None.
+    src_img_path (str|None, optional): Path of the original image. Defaults to None.
     band_list (list[int]|tuple[int]|None, optional): 
         Bands to select from the original image for display (the band index starts from 1). 
         If None, use all bands. Defaults to None.

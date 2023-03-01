@@ -64,7 +64,7 @@ class PhotoPenModel(BaseModel):
         if 'img' in input.keys():
             self.img = paddle.to_tensor(input['img'])
         self.ins = paddle.to_tensor(input['ins'])
-        self.img_paths = input['img_path']
+        self.img_paths = input['src_img_path']
 
     def forward(self):
         self.one_hot = data_onehot_pro(self.ins, self.opt)

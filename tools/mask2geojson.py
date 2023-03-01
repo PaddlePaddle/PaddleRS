@@ -16,7 +16,6 @@ import os
 import codecs
 import argparse
 
-import paddlers
 import numpy as np
 import cv2
 import geojson

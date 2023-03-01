@@ -28,7 +28,7 @@ class PKSampler(DistributedBatchSampler):
     Then for each identity randomly sample K instances.
     Therefore batch size is P*K, and the sampler called PKSampler.
     Args:
-        dataset (paddle.io.Dataset): list of (img_path, pid, cam_id).
+        dataset (paddle.io.Dataset): list of (src_img_path, pid, cam_id).
         sample_per_id(int): number of instances per identity in a batch.
         batch_size (int): number of examples in a batch.
         shuffle(bool): whether to shuffle indices order before generating

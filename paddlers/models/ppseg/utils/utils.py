@@ -166,11 +166,11 @@ def get_image_list(image_path):
                     image_list.append(os.path.join(root, f))
     else:
         raise FileNotFoundError(
-            '`--image_path` is not found. it should be a path of image, or a file list containing image paths, or a directory including images.'
+            '`--src_img_path` is not found. it should be a path of image, or a file list containing image paths, or a directory including images.'
         )
 
     if len(image_list) == 0:
-        raise RuntimeError(
-            'There are not image file in `--image_path`={}'.format(image_path))
+        raise RuntimeError('There are not image file in `--src_img_path`={}'.
+                           format(image_path))
 
     return image_list, image_dir
