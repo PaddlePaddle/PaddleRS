@@ -16,6 +16,7 @@ import collections
 import copy
 import os
 import os.path as osp
+import functools
 
 import numpy as np
 import paddle
@@ -33,6 +34,7 @@ import paddlers.utils.logging as logging
 from paddlers.utils.checkpoint import det_pretrain_weights_dict
 from .base import BaseModel
 from .utils.det_metrics import VOCMetric, COCOMetric
+from paddlers.models.ppdet.core.workspace import global_config
 
 __all__ = [
     "YOLOv3", "FasterRCNN", "PPYOLO", "PPYOLOTiny", "PPYOLOv2", "MaskRCNN"
@@ -124,6 +126,8 @@ class BaseDetector(BaseModel):
                           num_steps_each_epoch,
                           reg_coeff=1e-04,
                           scheduler='Piecewise',
+                          cosine_decay_num_epoch=1000,
+                          clip_grad_by_norm=None,
                           num_epochs=None):
         if scheduler.lower() == 'piecewise':
             if warmup_steps > 0 and warmup_steps > lr_decay_epochs[
@@ -162,7 +166,7 @@ class BaseDetector(BaseModel):
                     "please modify 'num_epochs' or 'warmup_steps' in train function".
                     format(num_epochs * num_steps_each_epoch),
                     exit=True)
-            T_max = num_epochs * num_steps_each_epoch - warmup_steps
+            T_max = cosine_decay_num_epoch * num_steps_each_epoch - warmup_steps
             scheduler = paddle.optimizer.lr.CosineAnnealingDecay(
                 learning_rate=learning_rate,
                 T_max=T_max,
@@ -179,11 +183,19 @@ class BaseDetector(BaseModel):
                 warmup_steps=warmup_steps,
                 start_lr=warmup_start_lr,
                 end_lr=learning_rate)
+
+        if clip_grad_by_norm is not None:
+            grad_clip = paddle.nn.ClipGradByGlobalNorm(
+                clip_norm=clip_grad_by_norm)
+        else:
+            grad_clip = None
+
         optimizer = paddle.optimizer.Momentum(
             scheduler,
             momentum=.9,
             weight_decay=paddle.regularizer.L2Decay(coeff=reg_coeff),
-            parameters=parameters)
+            parameters=parameters,
+            grad_clip=grad_clip)
         return optimizer
 
     def train(self,
@@ -199,13 +211,16 @@ class BaseDetector(BaseModel):
               learning_rate=.001,
               warmup_steps=0,
               warmup_start_lr=0.0,
+              scheduler='Piecewise',
               lr_decay_epochs=(216, 243),
               lr_decay_gamma=0.1,
+              cosine_decay_num_epoch=1000,
               metric=None,
               use_ema=False,
               early_stop=False,
               early_stop_patience=5,
               use_vdl=True,
+              clip_grad_by_norm=None,
               resume_checkpoint=None):
         """
         Train the model.
@@ -261,12 +276,13 @@ class BaseDetector(BaseModel):
     def _pre_train(self, in_args):
         return in_args
 
-    def _real_train(
-            self, num_epochs, train_dataset, train_batch_size, eval_dataset,
-            optimizer, save_interval_epochs, log_interval_steps, save_dir,
-            pretrain_weights, learning_rate, warmup_steps, warmup_start_lr,
-            lr_decay_epochs, lr_decay_gamma, metric, use_ema, early_stop,
-            early_stop_patience, use_vdl, resume_checkpoint):
+    def _real_train(self, num_epochs, train_dataset, train_batch_size,
+                    eval_dataset, optimizer, save_interval_epochs,
+                    log_interval_steps, save_dir, pretrain_weights,
+                    learning_rate, warmup_steps, warmup_start_lr,
+                    lr_decay_epochs, lr_decay_gamma, metric, use_ema,
+                    early_stop, early_stop_patience, use_vdl, resume_checkpoint,
+                    scheduler, cosine_decay_num_epoch, clip_grad_by_norm):
 
         if self.status == 'Infer':
             logging.error(
@@ -312,13 +328,17 @@ class BaseDetector(BaseModel):
         if optimizer is None:
             num_steps_each_epoch = len(train_dataset) // train_batch_size
             self.optimizer = self.default_optimizer(
+                scheduler=scheduler,
                 parameters=self.net.parameters(),
                 learning_rate=learning_rate,
                 warmup_steps=warmup_steps,
                 warmup_start_lr=warmup_start_lr,
                 lr_decay_epochs=lr_decay_epochs,
                 lr_decay_gamma=lr_decay_gamma,
-                num_steps_each_epoch=num_steps_each_epoch)
+                num_steps_each_epoch=num_steps_each_epoch,
+                num_epochs=num_epochs,
+                clip_grad_by_norm=clip_grad_by_norm,
+                cosine_decay_num_epoch=cosine_decay_num_epoch, )
         else:
             self.optimizer = optimizer
 
@@ -941,10 +961,30 @@ class PicoDet(BaseDetector):
                                                                batch_size, mode)
 
 
+def create(cls_name, extra_kwargs, **kwargs):
+    cls = global_config[cls_name]
+    extra_kwargs = extra_kwargs or {}
+    if 'ignore' in extra_kwargs:
+        ignore_keys = extra_kwargs.pop('ignore')
+        kwargs = {}
+    new_kwargs = {}
+    for k, v in extra_kwargs.items():
+        if 'type' in v:
+            sub_cls_name = v.pop('type')
+            v = create(sub_cls_name, v)
+        new_kwargs[k] = v
+
+    return cls(**extra_kwargs, **kwargs)
+
+
 class YOLOv3(BaseDetector):
     def __init__(self,
                  num_classes=80,
                  backbone='MobileNetV1',
+                 neck="YOLOv3FPN",
+                 loss="YOLOv3Loss",
+                 head="YOLOv3Head",
+                 post_process=None,
                  anchors=[[10, 13], [16, 30], [33, 23], [30, 61], [62, 45],
                           [59, 119], [116, 90], [156, 198], [373, 326]],
                  anchor_masks=[[6, 7, 8], [3, 4, 5], [0, 1, 2]],
@@ -953,7 +993,11 @@ class YOLOv3(BaseDetector):
                  nms_topk=1000,
                  nms_keep_topk=100,
                  nms_iou_threshold=0.45,
+                 nms_normalized=True,
                  label_smooth=False,
+                 neck_kwargs=None,
+                 loss_kwargs=None,
+                 head_kwargs=None,
                  **params):
         self.init_params = locals()
         if backbone not in {
@@ -1001,15 +1045,20 @@ class YOLOv3(BaseDetector):
                     norm_decay=0.)
             else:
                 backbone = self._get_backbone('DarkNet', norm_type=norm_type)
-
-            neck = ppdet.modeling.YOLOv3FPN(
+            neck = create(
+                neck,
+                neck_kwargs,
                 norm_type=norm_type,
                 in_channels=[i.channels for i in backbone.out_shape])
-            loss = ppdet.modeling.YOLOv3Loss(
+            loss = create(
+                loss,
+                loss_kwargs,
                 num_classes=num_classes,
                 ignore_thresh=ignore_threshold,
                 label_smooth=label_smooth)
-            yolo_head = ppdet.modeling.YOLOv3Head(
+            head = create(
+                head,
+                head_kwargs,
                 in_channels=[i.channels for i in neck.out_shape],
                 anchors=anchors,
                 anchor_masks=anchor_masks,
@@ -1021,11 +1070,12 @@ class YOLOv3(BaseDetector):
                     score_threshold=nms_score_threshold,
                     nms_top_k=nms_topk,
                     keep_top_k=nms_keep_topk,
-                    nms_threshold=nms_iou_threshold))
+                    nms_threshold=nms_iou_threshold,
+                    normalized=nms_normalized))
             params.update({
                 'backbone': backbone,
                 'neck': neck,
-                'yolo_head': yolo_head,
+                'yolo_head': head,
                 'post_process': post_process
             })
         super(YOLOv3, self).__init__(

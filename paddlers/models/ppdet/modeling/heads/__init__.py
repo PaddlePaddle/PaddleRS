@@ -55,3 +55,4 @@ from .sparsercnn_head import *
 from .tood_head import *
 from .retina_head import *
 from .ppyoloe_head import *
+from .fcosr_head import *

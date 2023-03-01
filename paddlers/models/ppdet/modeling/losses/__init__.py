@@ -43,3 +43,4 @@ from .detr_loss import *
 from .sparsercnn_loss import *
 from .focal_loss import *
 from .smooth_l1_loss import *
+from .probiou_loss import *

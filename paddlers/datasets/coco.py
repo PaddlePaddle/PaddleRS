@@ -17,7 +17,7 @@ import copy
 import os
 import os.path as osp
 import random
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 
 import numpy as np
 
@@ -52,7 +52,8 @@ class COCODetDataset(BaseDataset):
                  image_dir,
                  anno_path,
                  transforms,
-                 label_list,
+                 batch_transforms=None,
+                 label_list=None,
                  num_workers='auto',
                  shuffle=False,
                  allow_empty=False,
@@ -78,17 +79,14 @@ class COCODetDataset(BaseDataset):
                     self.num_max_boxes *= 2
                     break
 
-        self.batch_transforms = None
+        self.batch_transforms = batch_transforms
         self.allow_empty = allow_empty
         self.empty_ratio = empty_ratio
         self.file_list = list()
         neg_file_list = list()
         self.labels = list()
 
-        annotations = dict()
-        annotations['images'] = list()
-        annotations['categories'] = list()
-        annotations['annotations'] = list()
+        annotations = defaultdict(list)
 
         cname2cid = OrderedDict()
         label_id = 0
@@ -156,7 +154,9 @@ class COCODetDataset(BaseDataset):
             gt_classes = []
             gt_bboxs = []
             gt_scores = []
+            gt_poly = []
             difficults = []
+            segmentations = []
 
             for inst in instances:
                 # Check gt bbox
@@ -183,12 +183,21 @@ class COCODetDataset(BaseDataset):
                         'area: {} x1: {}, y1: {}, x2: {}, y2: {}.'.format(
                             img_id, float(inst['area']), x1, y1, x2, y2))
 
+                if 'segmentation' in inst and inst['iscrowd']:
+                    gt_poly.append([0.0 for _ in range(8)])
+                elif 'segmentation' in inst and inst['segmentation']:
+                    if not np.array(
+                            inst['segmentation'],
+                            dtype=object).size > 0 and not self.allow_empty:
+                        continue
+                    else:
+                        gt_poly.append(inst['segmentation'])
+
                 is_crowds.append([inst['iscrowd']])
                 gt_classes.append([inst['category_id']])
                 gt_bboxs.append(inst['clean_bbox'])
                 gt_scores.append([1.])
-                difficults.append([0])
-
+                difficults.append(inst.get('difficult', 0.))
                 annotations['annotations'].append({
                     'iscrowd': inst['iscrowd'],
                     'image_id': int(inst['image_id']),
@@ -196,8 +205,10 @@ class COCODetDataset(BaseDataset):
                     'area': inst['area'],
                     'category_id': inst['category_id'],
                     'id': inst['id'],
-                    'difficult': 0
+                    'difficult': inst.get('difficult', 0.)
                 })
+                if gt_poly:
+                    annotations['annotations'][-1].append(gt_poly[-1])
 
             label_info = {
                 'is_crowd': np.array(is_crowds),
@@ -205,9 +216,10 @@ class COCODetDataset(BaseDataset):
                 'gt_bbox': np.array(gt_bboxs).astype(np.float32),
                 'gt_score': np.array(gt_scores).astype(np.float32),
                 'difficult': np.array(difficults),
+                'gt_poly': np.array(gt_poly),
             }
 
-            if label_info['gt_bbox'].size > 0:
+            if label_info['gt_bbox'].size > 0 or label_info['gt_poly'].size > 0:
                 self.file_list.append({ ** im_info, ** label_info})
                 annotations['images'].append({
                     'height': im_h,
@@ -261,6 +273,8 @@ class COCODetDataset(BaseDataset):
                 DecodeImg(to_rgb=False)(sample_mix)
             ])
         sample = self.transforms(sample)
+        if self.batch_transforms is not None:
+            sample = self.batch_transforms(sample)
         return sample
 
     def __len__(self):

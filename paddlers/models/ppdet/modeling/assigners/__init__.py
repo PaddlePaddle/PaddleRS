@@ -23,3 +23,4 @@ from .task_aligned_assigner import *
 from .atss_assigner import *
 from .simota_assigner import *
 from .max_iou_assigner import *
+from .fcosr_assigner import *
