@@ -18,6 +18,7 @@ import time
 import copy
 import math
 import json
+from typing import Optional
 from functools import partial, wraps
 from inspect import signature
 
@@ -29,23 +30,13 @@ from paddleslim.analysis import flops
 from paddleslim import L1NormFilterPruner, FPGMFilterPruner
 
 import paddlers
-from paddlers.transforms.operators import (
-    ArrangeClassifier, ArrangeDetector, ArrangeSegmenter, ArrangeChangeDetector,
-    ArrangeRestorer)
+from paddlers.transforms.operators import Arrange
 import paddlers.utils.logging as logging
 from paddlers.utils import (
     seconds_to_hms, get_single_card_bs, dict2str, get_pretrain_weights,
     load_pretrain_weights, load_checkpoint, SmoothedValue, TrainingStats,
     _get_shared_memory_size_in_M, EarlyStop, to_data_parallel, scheduler_step)
 from .slim.prune import _pruner_eval_fn, _pruner_template_input, sensitive_prune
-
-ARRANGES = {
-    "classifier": ArrangeClassifier,
-    "detector": ArrangeDetector,
-    "segmenter": ArrangeSegmenter,
-    "change_detector": ArrangeChangeDetector,
-    "restorer": ArrangeRestorer
-}
 
 
 class ModelMeta(type):
@@ -72,6 +63,9 @@ class ModelMeta(type):
 
 
 class BaseModel(metaclass=ModelMeta):
+    # subclasses need to be set
+    _ARRANGE: Optional[Arrange] = None
+
     def __init__(self, model_type):
         self.model_type = model_type
         self.in_channels = None
@@ -279,8 +273,9 @@ class BaseModel(metaclass=ModelMeta):
 
     def build_data_loader(self, dataset, batch_size, mode='train'):
         # back_push arrange in transforms
-        arrange = ARRANGES[self.model_type](mode)
-        dataset.transforms.transforms.append(arrange)
+        if not isinstance(self._ARRANGE, Arrange):
+            raise ValueError('There are no base class `_ARRANGE` overrides.')
+        dataset.transforms.transforms.append(self._ARRANGE(mode))
 
         if dataset.num_samples < batch_size:
             raise ValueError(

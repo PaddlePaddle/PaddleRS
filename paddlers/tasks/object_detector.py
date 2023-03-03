@@ -26,6 +26,7 @@ import paddlers.models.ppdet as ppdet
 from paddlers.models.ppdet.modeling.proposal_generator.target_layer import BBoxAssigner, MaskAssigner
 from paddlers.transforms import decode_image
 from paddlers.transforms.operators import _NormalizeBox, _PadBox, _BboxXYXY2XYWH, Resize, Pad
+from paddlers.transforms.operators import ArrangeDetector
 from paddlers.transforms.batch_operators import BatchCompose, BatchRandomResize, BatchRandomResizeByShort, \
     _BatchPad, _Gt2YoloTarget
 from paddlers.models.ppdet.optimizer import ModelEMA
@@ -40,6 +41,8 @@ __all__ = [
 
 
 class BaseDetector(BaseModel):
+    _ARRANGE = ArrangeDetector
+
     def __init__(self, model_name, num_classes=80, **params):
         self.init_params.update(locals())
         if 'with_net' in self.init_params:

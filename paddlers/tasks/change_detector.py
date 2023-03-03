@@ -30,6 +30,7 @@ import paddlers.rs_models.cd as cmcd
 import paddlers.utils.logging as logging
 from paddlers.models import seg_losses
 from paddlers.transforms import Resize, decode_image
+from paddlers.transforms.operators import ArrangeChangeDetector
 from paddlers.utils import get_single_card_bs
 from paddlers.utils.checkpoint import cd_pretrain_weights_dict
 from .base import BaseModel
@@ -44,6 +45,8 @@ __all__ = [
 
 
 class BaseChangeDetector(BaseModel):
+    _ARRANGE = ArrangeChangeDetector
+
     def __init__(self,
                  model_name,
                  num_classes=2,

@@ -29,6 +29,7 @@ import paddlers.models.ppgan.metrics as metrics
 import paddlers.utils.logging as logging
 from paddlers.models import res_losses
 from paddlers.transforms import Resize, decode_image
+from paddlers.transforms.operators import ArrangeRestorer
 from paddlers.transforms.functions import calc_hr_shape
 from paddlers.utils import get_single_card_bs
 from paddlers.utils.checkpoint import res_pretrain_weights_dict
@@ -40,6 +41,7 @@ __all__ = ["DRN", "LESRCNN", "ESRGAN"]
 
 
 class BaseRestorer(BaseModel):
+    _ARRANGE = ArrangeRestorer
     MIN_MAX = (0., 1.)
     TEST_OUT_KEY = None
 

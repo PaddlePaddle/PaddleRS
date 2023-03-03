@@ -32,12 +32,15 @@ from paddlers.models import clas_losses
 from paddlers.models.ppcls.data.postprocess import build_postprocess
 from paddlers.utils.checkpoint import cls_pretrain_weights_dict
 from paddlers.transforms import Resize, decode_image
+from paddlers.transforms.operators import ArrangeClassifier
 from .base import BaseModel
 
 __all__ = ["ResNet50_vd", "MobileNetV3", "HRNet", "CondenseNetV2"]
 
 
 class BaseClassifier(BaseModel):
+    _ARRANGE = ArrangeClassifier
+
     def __init__(self,
                  model_name,
                  in_channels=3,
