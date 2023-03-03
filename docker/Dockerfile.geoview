@@ -11,7 +11,7 @@ RUN apt-get update \
 # 2. clone geoview
 WORKDIR /opt
 RUN git clone https://github.com/PaddleCV-SIG/GeoView.git \
-	&& mv PaddleRS GeoView/PaddleRS
+	&& mv PaddleRS GeoView
 ENV PYTHONPATH /opt/GeoView/PaddleRS
 
 # 3. install requirements about backend
