@@ -35,7 +35,7 @@ class COCODetDataset(BaseDataset):
         data_dir (str): Root directory of the dataset.
         image_dir (str): Directory that contains the images.
         ann_path (str): Path to COCO annotations.
-        transforms (paddlers.transforms.Compose): Data preprocessing and data augmentation operators to apply.
+        transforms (list): Data preprocessing and data augmentation operators to apply.
         label_list (str|None, optional): Path of the file that contains the category names. Defaults to None.
         num_workers (int|str, optional): Number of processes used for data loading. If `num_workers` is 'auto',
             the number of workers will be automatically determined according to the number of CPU cores: If 

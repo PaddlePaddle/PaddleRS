@@ -32,7 +32,6 @@ import paddlers.transforms.indices as indices
 import paddlers.transforms.satellites as satellites
 
 __all__ = [
-    "Compose",
     "DecodeImg",
     "Resize",
     "RandomResize",
@@ -58,11 +57,6 @@ __all__ = [
     "ReloadMask",
     "AppendIndex",
     "MatchRadiance",
-    "ArrangeRestorer",
-    "ArrangeSegmenter",
-    "ArrangeChangeDetector",
-    "ArrangeClassifier",
-    "ArrangeDetector",
 ]
 
 interp_dict = {
@@ -99,7 +93,6 @@ class Compose(object):
                 "Length of transforms must not be less than 1, but received is {}."
                 .format(len(transforms)))
         transforms = copy.deepcopy(transforms)
-        self.arrange = self._pick_arrange(transforms)
         self.transforms = transforms
 
     def __call__(self, sample):
@@ -108,6 +101,7 @@ class Compose(object):
             and compose_obj.arrange_outputs().
         """
 
+        self.arrange = self._pick_arrange(self.transforms)
         sample = self.apply_transforms(sample)
         sample = self.arrange_outputs(sample)
         return sample

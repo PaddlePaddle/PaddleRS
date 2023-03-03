@@ -16,6 +16,7 @@ from copy import deepcopy
 
 from paddle.io import Dataset
 
+from paddlers.transforms.operators import DecodeImg, Compose
 from paddlers.utils import get_num_workers
 
 
@@ -26,6 +27,10 @@ class BaseDataset(Dataset):
         self.data_dir = data_dir
         self.label_list = label_list
         self.transforms = deepcopy(transforms)
+        # check decodeimg and convert to compose
+        if not isinstance(self.transforms[0], DecodeImg):
+            self.transforms.insert(DecodeImg(), 0)
+        self.transforms = Compose(self.transforms)
         self.num_workers = get_num_workers(num_workers)
         self.shuffle = shuffle
 
