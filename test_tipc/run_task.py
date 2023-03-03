@@ -60,7 +60,7 @@ if __name__ == '__main__':
         raise ValueError(
             "Found key 'transforms' in args of eval dataset and the value is not None."
         )
-    eval_transforms = T.Compose(build_objects(cfg['transforms']['eval'], mod=T))
+    eval_transforms = build_objects(cfg['transforms']['eval'], mod=T)
     # Inplace modification
     cfg['datasets']['eval'].args['transforms'] = eval_transforms
     eval_dataset = build_objects(cfg['datasets']['eval'], mod=paddlers.datasets)
@@ -72,9 +72,7 @@ if __name__ == '__main__':
             raise ValueError(
                 "Found key 'transforms' in args of train dataset and the value is not None."
             )
-        train_transforms = T.Compose(
-            build_objects(
-                cfg['transforms']['train'], mod=T))
+        train_transforms = build_objects(cfg['transforms']['train'], mod=T)
         # Inplace modification
         cfg['datasets']['train'].args['transforms'] = train_transforms
         train_dataset = build_objects(

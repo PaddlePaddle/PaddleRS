@@ -37,9 +37,6 @@ def add_op_tests(cls):
                                                      T.operators.Transform):
             if op_class is T.DecodeImg or op_class in WHITE_LIST or op_name in WHITE_LIST:
                 continue
-            if issubclass(op_class, T.Compose) or issubclass(
-                    op_class, T.operators.Arrange):
-                continue
             attr_name = 'test_' + op_name
             if hasattr(cls, attr_name):
                 continue
