@@ -383,7 +383,6 @@ class BaseModel(metaclass=ModelMeta):
             step_time_tic = time.time()
 
             for step, data in enumerate(self.train_data_loader()):
-                data
                 if nranks > 1:
                     outputs = self.train_step(step, data, ddp_net)
                 else:
