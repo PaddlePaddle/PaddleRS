@@ -17,15 +17,19 @@ import paddle.nn as nn
 import math
 import cv2
 import numpy as np
-from ppgan.utils.download import get_path_from_url
-from ppgan.models.generators import GPEN
-from ppgan.faceutils.face_detection.detection.blazeface.utils import *
+from paddlers.models.ppgan.utils.download import get_path_from_url
+from paddlers.models.ppgan.models.generators import GPEN
+from paddlers.models.ppgan.faceutils.face_detection.detection.blazeface.utils import *
 
 GPEN_weights = 'https://paddlegan.bj.bcebos.com/models/GPEN-512.pdparams'
 
 
 class FaceEnhancement(object):
-    def __init__(self, path_to_enhance=None, size=512, batch_size=1):
+    def __init__(self,
+                 path_to_enhance=None,
+                 size = 512,
+                 batch_size=1
+                 ):
         super(FaceEnhancement, self).__init__()
 
         # Initialise the face detector
@@ -34,19 +38,17 @@ class FaceEnhancement(object):
             model_weights = paddle.load(model_weights_path)
         else:
             model_weights = paddle.load(path_to_enhance)
-
+            
         self.face_enhance = GPEN(size=512, style_dim=512, n_mlp=8)
         self.face_enhance.load_dict(model_weights)
         self.face_enhance.eval()
         self.size = size
         self.mask = np.zeros((512, 512), np.float32)
-        cv2.rectangle(self.mask, (26, 26), (486, 486), (1, 1, 1), -1,
-                      cv2.LINE_AA)
+        cv2.rectangle(self.mask, (26, 26), (486, 486), (1, 1, 1), -1, cv2.LINE_AA)
         self.mask = cv2.GaussianBlur(self.mask, (101, 101), 11)
         self.mask = cv2.GaussianBlur(self.mask, (101, 101), 11)
-        self.mask = paddle.tile(
-            paddle.to_tensor(self.mask).unsqueeze(0).unsqueeze(-1),
-            repeat_times=[batch_size, 1, 1, 3]).numpy()
+        self.mask = paddle.tile(paddle.to_tensor(self.mask).unsqueeze(0).unsqueeze(-1), repeat_times=[batch_size,1,1,3]).numpy()
+        
 
     def enhance_from_image(self, img):
         if isinstance(img, np.ndarray):
@@ -63,14 +65,14 @@ class FaceEnhancement(object):
         else:
             assert img.shape[1:] == [3, 512, 512]
             img_ori = img.transpose([0, 2, 3, 1]).numpy()
-        img_t = (img / 255. - 0.5) / 0.5
-
+        img_t = (img/255. - 0.5) / 0.5
+        
         with paddle.no_grad():
             out, __ = self.face_enhance(img_t)
-
+        
         image_tensor = out * 0.5 + 0.5
-        image_tensor = image_tensor.transpose([0, 2, 3, 1])  # RGB
+        image_tensor = image_tensor.transpose([0, 2, 3, 1]) # RGB
         image_numpy = paddle.clip(image_tensor, 0, 1) * 255.0
-
+        
         out = image_numpy.astype(np.uint8).cpu().numpy()
-        return out * self.mask + (1 - self.mask) * img_ori
+        return out * self.mask + (1-self.mask) * img_ori 

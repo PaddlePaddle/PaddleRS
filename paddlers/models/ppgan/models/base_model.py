@@ -19,9 +19,13 @@ import numpy as np
 from collections import OrderedDict
 from abc import ABC, abstractmethod
 
+from paddle.jit import to_static
+from paddle.static import InputSpec
+
 from .criterions.builder import build_criterion
 from ..solver import build_lr_scheduler, build_optimizer
 from ..utils.visual import tensor2img
+from ..utils.logger import get_logger
 
 
 class BaseModel(ABC):
@@ -49,7 +53,6 @@ class BaseModel(ABC):
     #         save checkpoint (model.nets)                     \/
 
     """
-
     def __init__(self, params=None):
         """Initialize the BaseModel class.
 
@@ -127,8 +130,8 @@ class BaseModel(ABC):
                 parameters = []
                 for net_name in net_names:
                     parameters += self.nets[net_name].parameters()
-                self.optimizers[opt_name] = build_optimizer(cfg_, lr,
-                                                            parameters)
+                self.optimizers[opt_name] = build_optimizer(
+                    cfg_, lr, parameters)
 
         return self.optimizers
 
@@ -184,19 +187,47 @@ class BaseModel(ABC):
                 for param in net.parameters():
                     param.trainable = requires_grad
 
-    def export_model(self, export_model, output_dir=None, inputs_size=[]):
+    def export_model(self, export_model, output_dir=None, inputs_size=[], export_serving_model=False, model_name=None):
         inputs_num = 0
         for net in export_model:
             input_spec = [
-                paddle.static.InputSpec(
-                    shape=inputs_size[inputs_num + i], dtype="float32")
+                paddle.static.InputSpec(shape=inputs_size[inputs_num + i],
+                                        dtype="float32")
                 for i in range(net["inputs_num"])
             ]
             inputs_num = inputs_num + net["inputs_num"]
-            static_model = paddle.jit.to_static(
-                self.nets[net["name"]], input_spec=input_spec)
+            self.nets[net["name"]].export_mode = True
+            static_model = paddle.jit.to_static(self.nets[net["name"]],
+                                                input_spec=input_spec)
             if output_dir is None:
                 output_dir = 'inference_model'
-            paddle.jit.save(static_model,
-                            os.path.join(output_dir, '{}_{}'.format(
-                                self.__class__.__name__.lower(), net["name"])))
+            if model_name is None:
+                model_name = '{}_{}'.format(self.__class__.__name__.lower(),
+                                               net["name"])
+            paddle.jit.save(
+                static_model,
+                os.path.join(
+                    output_dir, model_name))
+            if export_serving_model:
+                from paddle_serving_client.io import inference_model_to_serving
+                model_name = '{}_{}'.format(self.__class__.__name__.lower(),
+                                                    net["name"])
+
+                inference_model_to_serving(
+                    dirname=output_dir,
+                    serving_server="{}/{}/serving_server".format(output_dir,
+                                                                model_name),
+                    serving_client="{}/{}/serving_client".format(output_dir,
+                                                                model_name),
+                    model_filename="{}.pdmodel".format(model_name),
+                    params_filename="{}.pdiparams".format(model_name))
+
+def apply_to_static(support_to_static, image_shape, model):
+    if support_to_static:
+        specs = None
+        if image_shape is not None:
+            specs = [InputSpec([None] + image_shape)]
+        model = to_static(model, input_spec=specs)
+        logger = get_logger('ppgan')
+        logger.info("Successfully to apply @to_static with specs: {}".format(specs))
+    return model

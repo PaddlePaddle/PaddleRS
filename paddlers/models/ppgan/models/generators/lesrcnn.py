@@ -63,14 +63,12 @@ class _UpsampleBlock(nn.Layer):
         if scale == 2 or scale == 4 or scale == 8:
             for _ in range(int(math.log(scale, 2))):
                 modules += [
-                    nn.Conv2D(
-                        n_channels, 4 * n_channels, 3, 1, 1, groups=group)
+                    nn.Conv2D(n_channels, 4 * n_channels, 3, 1, 1, groups=group)
                 ]
                 modules += [nn.PixelShuffle(2)]
         elif scale == 3:
             modules += [
-                nn.Conv2D(
-                    n_channels, 9 * n_channels, 3, 1, 1, groups=group)
+                nn.Conv2D(n_channels, 9 * n_channels, 3, 1, 1, groups=group)
             ]
             modules += [nn.PixelShuffle(3)]
 
@@ -91,12 +89,12 @@ class LESRCNNGenerator(nn.Layer):
         multi_scale (bool): Whether to train multi scale model.
         group (int): group option for convolution.
     """
-
     def __init__(
-            self,
-            scale=4,
-            multi_scale=False,
-            group=1, ):
+        self,
+        scale=4,
+        multi_scale=False,
+        group=1,
+    ):
         super(LESRCNNGenerator, self).__init__()
 
         kernel_size = 3
@@ -112,197 +110,165 @@ class LESRCNNGenerator(nn.Layer):
         self.add_mean = MeanShift((0.4488, 0.4371, 0.4040), sub=False)
 
         self.conv1 = nn.Sequential(
-            nn.Conv2D(
-                in_channels=channels,
-                out_channels=features,
-                kernel_size=kernel_size,
-                padding=padding,
-                groups=1,
-                bias_attr=False))
+            nn.Conv2D(in_channels=channels,
+                      out_channels=features,
+                      kernel_size=kernel_size,
+                      padding=padding,
+                      groups=1,
+                      bias_attr=False))
         self.conv2 = nn.Sequential(
-            nn.Conv2D(
-                in_channels=features,
-                out_channels=features,
-                kernel_size=kernel_size,
-                padding=1,
-                groups=1,
-                bias_attr=False),
-            nn.ReLU())
+            nn.Conv2D(in_channels=features,
+                      out_channels=features,
+                      kernel_size=kernel_size,
+                      padding=1,
+                      groups=1,
+                      bias_attr=False), nn.ReLU())
         self.conv3 = nn.Sequential(
-            nn.Conv2D(
-                in_channels=features,
-                out_channels=features,
-                kernel_size=kernel_size1,
-                padding=0,
-                groups=groups,
-                bias_attr=False))
+            nn.Conv2D(in_channels=features,
+                      out_channels=features,
+                      kernel_size=kernel_size1,
+                      padding=0,
+                      groups=groups,
+                      bias_attr=False))
         self.conv4 = nn.Sequential(
-            nn.Conv2D(
-                in_channels=features,
-                out_channels=features,
-                kernel_size=kernel_size,
-                padding=1,
-                groups=1,
-                bias_attr=False),
-            nn.ReLU())
+            nn.Conv2D(in_channels=features,
+                      out_channels=features,
+                      kernel_size=kernel_size,
+                      padding=1,
+                      groups=1,
+                      bias_attr=False), nn.ReLU())
         self.conv5 = nn.Sequential(
-            nn.Conv2D(
-                in_channels=features,
-                out_channels=features,
-                kernel_size=kernel_size1,
-                padding=0,
-                groups=groups,
-                bias_attr=False))
+            nn.Conv2D(in_channels=features,
+                      out_channels=features,
+                      kernel_size=kernel_size1,
+                      padding=0,
+                      groups=groups,
+                      bias_attr=False))
         self.conv6 = nn.Sequential(
-            nn.Conv2D(
-                in_channels=features,
-                out_channels=features,
-                kernel_size=kernel_size,
-                padding=1,
-                groups=1,
-                bias_attr=False),
-            nn.ReLU())
+            nn.Conv2D(in_channels=features,
+                      out_channels=features,
+                      kernel_size=kernel_size,
+                      padding=1,
+                      groups=1,
+                      bias_attr=False), nn.ReLU())
         self.conv7 = nn.Sequential(
-            nn.Conv2D(
-                in_channels=features,
-                out_channels=features,
-                kernel_size=kernel_size1,
-                padding=0,
-                groups=groups,
-                bias_attr=False))
+            nn.Conv2D(in_channels=features,
+                      out_channels=features,
+                      kernel_size=kernel_size1,
+                      padding=0,
+                      groups=groups,
+                      bias_attr=False))
         self.conv8 = nn.Sequential(
-            nn.Conv2D(
-                in_channels=features,
-                out_channels=features,
-                kernel_size=kernel_size,
-                padding=1,
-                groups=1,
-                bias_attr=False),
-            nn.ReLU())
+            nn.Conv2D(in_channels=features,
+                      out_channels=features,
+                      kernel_size=kernel_size,
+                      padding=1,
+                      groups=1,
+                      bias_attr=False), nn.ReLU())
         self.conv9 = nn.Sequential(
-            nn.Conv2D(
-                in_channels=features,
-                out_channels=features,
-                kernel_size=kernel_size1,
-                padding=0,
-                groups=groups,
-                bias_attr=False))
+            nn.Conv2D(in_channels=features,
+                      out_channels=features,
+                      kernel_size=kernel_size1,
+                      padding=0,
+                      groups=groups,
+                      bias_attr=False))
         self.conv10 = nn.Sequential(
-            nn.Conv2D(
-                in_channels=features,
-                out_channels=features,
-                kernel_size=kernel_size,
-                padding=1,
-                groups=1,
-                bias_attr=False),
-            nn.ReLU())
+            nn.Conv2D(in_channels=features,
+                      out_channels=features,
+                      kernel_size=kernel_size,
+                      padding=1,
+                      groups=1,
+                      bias_attr=False), nn.ReLU())
         self.conv11 = nn.Sequential(
-            nn.Conv2D(
-                in_channels=features,
-                out_channels=features,
-                kernel_size=kernel_size1,
-                padding=0,
-                groups=groups,
-                bias_attr=False))
+            nn.Conv2D(in_channels=features,
+                      out_channels=features,
+                      kernel_size=kernel_size1,
+                      padding=0,
+                      groups=groups,
+                      bias_attr=False))
         self.conv12 = nn.Sequential(
-            nn.Conv2D(
-                in_channels=features,
-                out_channels=features,
-                kernel_size=kernel_size,
-                padding=1,
-                groups=1,
-                bias_attr=False),
-            nn.ReLU())
+            nn.Conv2D(in_channels=features,
+                      out_channels=features,
+                      kernel_size=kernel_size,
+                      padding=1,
+                      groups=1,
+                      bias_attr=False), nn.ReLU())
         self.conv13 = nn.Sequential(
-            nn.Conv2D(
-                in_channels=features,
-                out_channels=features,
-                kernel_size=kernel_size1,
-                padding=0,
-                groups=groups,
-                bias_attr=False))
+            nn.Conv2D(in_channels=features,
+                      out_channels=features,
+                      kernel_size=kernel_size1,
+                      padding=0,
+                      groups=groups,
+                      bias_attr=False))
         self.conv14 = nn.Sequential(
-            nn.Conv2D(
-                in_channels=features,
-                out_channels=features,
-                kernel_size=kernel_size,
-                padding=1,
-                groups=1,
-                bias_attr=False),
-            nn.ReLU())
+            nn.Conv2D(in_channels=features,
+                      out_channels=features,
+                      kernel_size=kernel_size,
+                      padding=1,
+                      groups=1,
+                      bias_attr=False), nn.ReLU())
         self.conv15 = nn.Sequential(
-            nn.Conv2D(
-                in_channels=features,
-                out_channels=features,
-                kernel_size=kernel_size1,
-                padding=0,
-                groups=groups,
-                bias_attr=False))
+            nn.Conv2D(in_channels=features,
+                      out_channels=features,
+                      kernel_size=kernel_size1,
+                      padding=0,
+                      groups=groups,
+                      bias_attr=False))
         self.conv16 = nn.Sequential(
-            nn.Conv2D(
-                in_channels=features,
-                out_channels=features,
-                kernel_size=kernel_size,
-                padding=1,
-                groups=1,
-                bias_attr=False),
-            nn.ReLU())
+            nn.Conv2D(in_channels=features,
+                      out_channels=features,
+                      kernel_size=kernel_size,
+                      padding=1,
+                      groups=1,
+                      bias_attr=False), nn.ReLU())
         self.conv17 = nn.Sequential(
-            nn.Conv2D(
-                in_channels=features,
-                out_channels=features,
-                kernel_size=kernel_size1,
-                padding=0,
-                groups=groups,
-                bias_attr=False))
+            nn.Conv2D(in_channels=features,
+                      out_channels=features,
+                      kernel_size=kernel_size1,
+                      padding=0,
+                      groups=groups,
+                      bias_attr=False))
         self.conv17_1 = nn.Sequential(
-            nn.Conv2D(
-                in_channels=features,
-                out_channels=features,
-                kernel_size=kernel_size,
-                padding=1,
-                groups=1,
-                bias_attr=False),
-            nn.ReLU())
+            nn.Conv2D(in_channels=features,
+                      out_channels=features,
+                      kernel_size=kernel_size,
+                      padding=1,
+                      groups=1,
+                      bias_attr=False), nn.ReLU())
         self.conv17_2 = nn.Sequential(
-            nn.Conv2D(
-                in_channels=features,
-                out_channels=features,
-                kernel_size=kernel_size,
-                padding=1,
-                groups=1,
-                bias_attr=False),
-            nn.ReLU())
+            nn.Conv2D(in_channels=features,
+                      out_channels=features,
+                      kernel_size=kernel_size,
+                      padding=1,
+                      groups=1,
+                      bias_attr=False), nn.ReLU())
         self.conv17_3 = nn.Sequential(
-            nn.Conv2D(
-                in_channels=features,
-                out_channels=features,
-                kernel_size=kernel_size,
-                padding=1,
-                groups=1,
-                bias_attr=False),
-            nn.ReLU())
+            nn.Conv2D(in_channels=features,
+                      out_channels=features,
+                      kernel_size=kernel_size,
+                      padding=1,
+                      groups=1,
+                      bias_attr=False), nn.ReLU())
         self.conv17_4 = nn.Sequential(
-            nn.Conv2D(
-                in_channels=features,
-                out_channels=features,
-                kernel_size=kernel_size,
-                padding=1,
-                groups=1,
-                bias_attr=False),
-            nn.ReLU())
+            nn.Conv2D(in_channels=features,
+                      out_channels=features,
+                      kernel_size=kernel_size,
+                      padding=1,
+                      groups=1,
+                      bias_attr=False), nn.ReLU())
         self.conv18 = nn.Sequential(
-            nn.Conv2D(
-                in_channels=features,
-                out_channels=3,
-                kernel_size=kernel_size,
-                padding=padding,
-                groups=groups,
-                bias_attr=False))
+            nn.Conv2D(in_channels=features,
+                      out_channels=3,
+                      kernel_size=kernel_size,
+                      padding=padding,
+                      groups=groups,
+                      bias_attr=False))
 
         self.ReLU = nn.ReLU()
-        self.upsample = UpsampleBlock(
-            64, scale=scale, multi_scale=multi_scale, group=1)
+        self.upsample = UpsampleBlock(64,
+                                      scale=scale,
+                                      multi_scale=multi_scale,
+                                      group=1)
 
     def forward(self, x, scale=None):
         if scale is None:

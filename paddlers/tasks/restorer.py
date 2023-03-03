@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import os.path as osp
 from collections import OrderedDict
 
@@ -28,9 +27,9 @@ import paddlers.rs_models.res as cmres
 import paddlers.models.ppgan.metrics as metrics
 import paddlers.utils.logging as logging
 from paddlers.models import res_losses
+from paddlers.models.ppgan.modules.init import init_weights
 from paddlers.transforms import Resize, decode_image
 from paddlers.transforms.functions import calc_hr_shape
-from paddlers.utils import get_single_card_bs
 from paddlers.utils.checkpoint import res_pretrain_weights_dict
 from .base import BaseModel
 from .utils.res_adapters import GANAdapter, OptimizerAdapter
@@ -705,7 +704,6 @@ class DRN(BaseRestorer):
             **params)
 
     def build_net(self, **params):
-        from ppgan.modules.init import init_weights
         generators = [ppgan.models.generators.DRNGenerator(**params)]
         init_weights(generators[-1])
         for scale in params['scale']:
@@ -829,7 +827,6 @@ class ESRGAN(BaseRestorer):
             **params)
 
     def build_net(self, **params):
-        from ppgan.modules.init import init_weights
         generator = ppgan.models.generators.RRDBNet(**params)
         init_weights(generator)
         if self.use_gan:

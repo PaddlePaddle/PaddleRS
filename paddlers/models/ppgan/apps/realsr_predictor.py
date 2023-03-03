@@ -20,10 +20,10 @@ from PIL import Image
 from tqdm import tqdm
 
 import paddle
-from ppgan.models.generators import RRDBNet
-from ppgan.utils.video import frames2video, video2frames
-from ppgan.utils.download import get_path_from_url
-from ppgan.utils.logger import get_logger
+from paddlers.models.ppgan.models.generators import RRDBNet
+from paddlers.models.ppgan.utils.video import frames2video, video2frames
+from paddlers.models.ppgan.utils.download import get_path_from_url
+from paddlers.models.ppgan.utils.logger import get_logger
 
 from .base_predictor import BasePredictor
 

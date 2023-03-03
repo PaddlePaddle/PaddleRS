@@ -25,6 +25,7 @@ from .discriminators.builder import build_discriminator
 from ..solver import build_lr_scheduler, build_optimizer
 
 
+
 def r1_penalty(real_pred, real_img):
     """
     R1 regularization for discriminator. The core idea is to
@@ -39,25 +40,27 @@ def r1_penalty(real_pred, real_img):
     Eq. 9 in Which training methods for GANs do actually converge.
     """
 
-    grad_real = paddle.grad(
-        outputs=real_pred.sum(), inputs=real_img, create_graph=True)[0]
+    grad_real = paddle.grad(outputs=real_pred.sum(),
+                            inputs=real_img,
+                            create_graph=True)[0]
     grad_penalty = (grad_real * grad_real).reshape([grad_real.shape[0],
                                                     -1]).sum(1).mean()
     return grad_penalty
 
 
 def g_path_regularize(fake_img, latents, mean_path_length, decay=0.01):
-    noise = paddle.randn(fake_img.shape) / math.sqrt(fake_img.shape[2] *
-                                                     fake_img.shape[3])
-    grad = paddle.grad(
-        outputs=(fake_img * noise).sum(), inputs=latents, create_graph=True)[0]
+    noise = paddle.randn(fake_img.shape) / math.sqrt(
+        fake_img.shape[2] * fake_img.shape[3])
+    grad = paddle.grad(outputs=(fake_img * noise).sum(),
+                       inputs=latents,
+                       create_graph=True)[0]
     path_lengths = paddle.sqrt((grad * grad).sum(2).mean(1))
 
     path_mean = mean_path_length + decay * (path_lengths.mean() -
                                             mean_path_length)
 
-    path_penalty = (
-        (path_lengths - path_mean) * (path_lengths - path_mean)).mean()
+    path_penalty = ((path_lengths - path_mean) *
+                    (path_lengths - path_mean)).mean()
 
     return path_penalty, path_lengths.detach().mean(), path_mean.detach()
 
@@ -69,7 +72,6 @@ class StyleGAN2Model(BaseModel):
 
     StyleGAN2 paper: https://arxiv.org/pdf/1912.04958.pdf
     """
-
     def __init__(self,
                  generator,
                  discriminator=None,
@@ -93,11 +95,11 @@ class StyleGAN2Model(BaseModel):
             'gen_iters', 4)
         self.disc_iters = 16 if self.params is None else self.params.get(
             'disc_iters', 16)
-        self.disc_start_iters = (0 if self.params is None else
-                                 self.params.get('disc_start_iters', 0))
+        self.disc_start_iters = (0 if self.params is None else self.params.get(
+            'disc_start_iters', 0))
 
-        self.visual_iters = (500 if self.params is None else
-                             self.params.get('visual_iters', 500))
+        self.visual_iters = (500 if self.params is None else self.params.get(
+            'visual_iters', 500))
 
         self.mixing_prob = mixing_prob
         self.num_style_feat = num_style_feat
@@ -172,8 +174,8 @@ class StyleGAN2Model(BaseModel):
         net_g_ema_params = dict(neg_g_ema.named_parameters())
 
         for k in net_g_ema_params.keys():
-            net_g_ema_params[k].set_value(net_g_ema_params[k] * (decay) + (
-                net_g_params[k] * (1 - decay)))
+            net_g_ema_params[k].set_value(net_g_ema_params[k] * (decay) +
+                                          (net_g_params[k] * (1 - decay)))
 
     def setup_input(self, input):
         """Unpack input data from the dataloader and perform necessary pre-processing steps.
@@ -218,9 +220,9 @@ class StyleGAN2Model(BaseModel):
         real_pred = self.nets['disc'](self.real_img)
         # wgan loss with softplus (logistic loss) for discriminator
         l_d_total = 0.
-        l_d = self.gan_criterion(
-            real_pred, True, is_disc=True) + self.gan_criterion(
-                fake_pred, False, is_disc=True)
+        l_d = self.gan_criterion(real_pred, True,
+                                 is_disc=True) + self.gan_criterion(
+                                     fake_pred, False, is_disc=True)
         self.losses['l_d'] = l_d
         # In wgan, real_score should be positive and fake_score should be
         # negative
@@ -233,8 +235,8 @@ class StyleGAN2Model(BaseModel):
             self.real_img.stop_gradient = False
             real_pred = self.nets['disc'](self.real_img)
             l_d_r1 = r1_penalty(real_pred, self.real_img)
-            l_d_r1 = (self.r1_reg_weight / 2 * l_d_r1 * self.disc_iters + 0 *
-                      real_pred[0])
+            l_d_r1 = (self.r1_reg_weight / 2 * l_d_r1 * self.disc_iters +
+                      0 * real_pred[0])
 
             self.losses['l_d_r1'] = l_d_r1.detach().mean()
 
@@ -263,8 +265,8 @@ class StyleGAN2Model(BaseModel):
             l_g_path, path_lengths, self.mean_path_length = g_path_regularize(
                 fake_img, latents, self.mean_path_length)
 
-            l_g_path = (self.path_reg_weight * self.gen_iters * l_g_path + 0 *
-                        fake_img[0, 0, 0, 0])
+            l_g_path = (self.path_reg_weight * self.gen_iters * l_g_path +
+                        0 * fake_img[0, 0, 0, 0])
 
             l_g_total += l_g_path
             self.losses['l_g_path'] = l_g_path.detach().mean()
@@ -299,23 +301,25 @@ class StyleGAN2Model(BaseModel):
 
         def forward(self, style, truncation):
             truncation_latent = self.generator.get_mean_style()
-            out = self.generator(
-                styles=style,
-                truncation=truncation,
-                truncation_latent=truncation_latent)
+            out = self.generator(styles=style,
+                                 truncation=truncation,
+                                 truncation_latent=truncation_latent)
             return out[0]
 
     def export_model(self,
                      export_model=None,
                      output_dir=None,
-                     inputs_size=[[1, 1, 512], [1, 1]]):
+                     inputs_size=[[1, 1, 512], [1, 1]],
+                     export_serving_model=False,
+                     model_name=None):
         infer_generator = self.InferGenerator()
         infer_generator.set_generator(self.nets['gen'])
         style = paddle.rand(shape=inputs_size[0], dtype='float32')
         truncation = paddle.rand(shape=inputs_size[1], dtype='float32')
         if output_dir is None:
             output_dir = 'inference_model'
-        paddle.jit.save(
-            infer_generator,
-            os.path.join(output_dir, "stylegan2model_gen"),
-            input_spec=[style, truncation])
+        if model_name is None:
+            model_name = "stylegan2model_gen"
+        paddle.jit.save(infer_generator,
+                        os.path.join(output_dir, model_name),
+                        input_spec=[style, truncation])

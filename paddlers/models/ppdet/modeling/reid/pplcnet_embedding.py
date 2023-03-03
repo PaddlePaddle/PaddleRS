@@ -1,4 +1,4 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved. 
+# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserved. 
 #   
 # Licensed under the Apache License, Version 2.0 (the "License");   
 # you may not use this file except in compliance with the License.  
@@ -28,6 +28,7 @@ from paddlers.models.ppdet.core.workspace import register
 
 __all__ = ['PPLCNetEmbedding']
 
+
 # Each element(list) represents a depthwise block, which is composed of k, in_c, out_c, s, use_se.
 # k: kernel_size
 # in_c: input channel number in depthwise block
@@ -41,9 +42,9 @@ NET_CONFIG = {
     [[3, 16, 32, 1, False]],
     "blocks3": [[3, 32, 64, 2, False], [3, 64, 64, 1, False]],
     "blocks4": [[3, 64, 128, 2, False], [3, 128, 128, 1, False]],
-    "blocks5":
-    [[3, 128, 256, 2, False], [5, 256, 256, 1, False], [5, 256, 256, 1, False],
-     [5, 256, 256, 1, False], [5, 256, 256, 1, False], [5, 256, 256, 1, False]],
+    "blocks5": [[3, 128, 256, 2, False], [5, 256, 256, 1, False],
+                [5, 256, 256, 1, False], [5, 256, 256, 1, False],
+                [5, 256, 256, 1, False], [5, 256, 256, 1, False]],
     "blocks6": [[5, 256, 512, 2, True], [5, 512, 512, 1, True]]
 }
 
@@ -269,7 +270,6 @@ class PPLCNetEmbedding(nn.Layer):
         input_ch (int): Number of channels of input conv feature.
         output_ch (int): Number of channels of output conv feature.
     """
-
     def __init__(self, scale=2.5, input_ch=1280, output_ch=512):
         super(PPLCNetEmbedding, self).__init__()
         self.backbone = PPLCNet(scale=scale)

@@ -25,11 +25,9 @@ __all__ = ['ResNetEmbedding']
 @register
 class ResNetEmbedding(nn.Layer):
     in_planes = 2048
-
     def __init__(self, model_name='ResNet50', last_stride=1):
         super(ResNetEmbedding, self).__init__()
-        assert model_name in ['ResNet50', 'ResNet101'
-                              ], "Unsupported ReID arch: {}".format(model_name)
+        assert model_name in ['ResNet50', 'ResNet101'], "Unsupported ReID arch: {}".format(model_name)
         self.base = eval(model_name)(last_conv_stride=last_stride)
         self.gap = nn.AdaptiveAvgPool2D(output_size=1)
         self.flatten = nn.Flatten(start_axis=1, stop_axis=-1)

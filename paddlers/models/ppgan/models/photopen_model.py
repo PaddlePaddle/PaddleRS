@@ -23,43 +23,44 @@ from .discriminators.builder import build_discriminator
 
 from ..modules.init import init_weights
 from ..solver import build_optimizer
-from ppgan.utils.photopen import data_onehot_pro, Dict
+from paddlers.models.ppgan.utils.photopen import data_onehot_pro, Dict
 
 
 @MODELS.register()
 class PhotoPenModel(BaseModel):
-    def __init__(
-            self,
-            generator,
-            discriminator,
-            criterion,
-            label_nc,
-            contain_dontcare_label,
-            batchSize,
-            crop_size,
-            lambda_feat, ):
+    def __init__(self,
+                 generator,
+                 discriminator,
+                 criterion,
+                 label_nc,
+                 contain_dontcare_label,
+                 batchSize,
+                 crop_size,
+                 lambda_feat,
+                ):
 
         super(PhotoPenModel, self).__init__()
-
+        
         opt = {
-            'label_nc': label_nc,
-            'contain_dontcare_label': contain_dontcare_label,
-            'batchSize': batchSize,
-            'crop_size': crop_size,
-            'lambda_feat': lambda_feat,
-            #              'semantic_nc': semantic_nc,
-            #              'use_vae': use_vae,
-            #              'nef': nef,
-        }
+             'label_nc': label_nc,
+             'contain_dontcare_label': contain_dontcare_label,
+             'batchSize': batchSize,
+             'crop_size': crop_size,
+             'lambda_feat': lambda_feat,
+#              'semantic_nc': semantic_nc,
+#              'use_vae': use_vae,
+#              'nef': nef,
+            }
         self.opt = Dict(opt)
-
+        
+        
         # define nets
         self.nets['net_gen'] = build_generator(generator)
-        #         init_weights(self.nets['net_gen'])
+#         init_weights(self.nets['net_gen'])
         self.nets['net_des'] = build_discriminator(discriminator)
-        #         init_weights(self.nets['net_des'])
+#         init_weights(self.nets['net_des'])
         self.net_vgg = build_criterion(criterion)
-
+    
     def setup_input(self, input):
         if 'img' in input.keys():
             self.img = paddle.to_tensor(input['img'])
@@ -76,49 +77,48 @@ class PhotoPenModel(BaseModel):
         real_data = paddle.concat((self.one_hot, self.img), 1)
         fake_and_real_data = paddle.concat((fake_data, real_data), 0)
         pred = self.nets['net_des'](fake_and_real_data)
+        
         """content loss"""
         g_ganloss = 0.
         for i in range(len(pred)):
             pred_i = pred[i][-1][:self.opt.batchSize]
-            new_loss = -pred_i.mean()  # hinge loss
+            new_loss = -pred_i.mean() # hinge loss
             g_ganloss += new_loss
         g_ganloss /= len(pred)
 
         g_featloss = 0.
         for i in range(len(pred)):
-            for j in range(len(pred[i]) - 1):  # 除去最后一层的中间层featuremap
-                unweighted_loss = (
-                    pred[i][j][:self.opt.batchSize] -
-                    pred[i][j][self.opt.batchSize:]).abs().mean()  # L1 loss
+            for j in range(len(pred[i]) - 1): # 除去最后一层的中间层featuremap
+                unweighted_loss = (pred[i][j][:self.opt.batchSize] - pred[i][j][self.opt.batchSize:]).abs().mean() # L1 loss
                 g_featloss += unweighted_loss * self.opt.lambda_feat / len(pred)
-
+                
         g_vggloss = self.net_vgg(self.img, self.img_f)
         self.g_loss = g_ganloss + g_featloss + g_vggloss
-
+        
         self.g_loss.backward()
         self.losses['g_ganloss'] = g_ganloss
         self.losses['g_featloss'] = g_featloss
         self.losses['g_vggloss'] = g_vggloss
+        
 
     def backward_D(self):
         fake_data = paddle.concat((self.one_hot, self.img_f), 1)
         real_data = paddle.concat((self.one_hot, self.img), 1)
         fake_and_real_data = paddle.concat((fake_data, real_data), 0)
         pred = self.nets['net_des'](fake_and_real_data)
+        
         """content loss"""
         df_ganloss = 0.
         for i in range(len(pred)):
             pred_i = pred[i][-1][:self.opt.batchSize]
-            new_loss = -paddle.minimum(
-                -pred_i - 1, paddle.zeros_like(pred_i)).mean()  # hingle loss
+            new_loss = -paddle.minimum(-pred_i - 1, paddle.zeros_like(pred_i)).mean() # hingle loss
             df_ganloss += new_loss
         df_ganloss /= len(pred)
 
         dr_ganloss = 0.
         for i in range(len(pred)):
             pred_i = pred[i][-1][self.opt.batchSize:]
-            new_loss = -paddle.minimum(
-                pred_i - 1, paddle.zeros_like(pred_i)).mean()  # hingle loss
+            new_loss = -paddle.minimum(pred_i - 1, paddle.zeros_like(pred_i)).mean() # hingle loss
             dr_ganloss += new_loss
         dr_ganloss /= len(pred)
 
@@ -126,18 +126,19 @@ class PhotoPenModel(BaseModel):
         self.d_loss.backward()
         self.losses['df_ganloss'] = df_ganloss
         self.losses['dr_ganloss'] = dr_ganloss
-
+        
+        
     def train_iter(self, optimizers=None):
         self.forward()
         self.optimizers['optimG'].clear_grad()
         self.backward_G()
         self.optimizers['optimG'].step()
-
+        
         self.forward()
         self.optimizers['optimD'].clear_grad()
         self.backward_D()
         self.optimizers['optimD'].step()
-
+ 
     def test_iter(self, metrics=None):
         self.eval()
         with paddle.no_grad():
@@ -158,6 +159,7 @@ class PhotoPenModel(BaseModel):
                 lr = learning_rate * 4
             else:
                 lr = learning_rate
-            self.optimizers[opt_name] = build_optimizer(cfg_, lr, parameters)
+            self.optimizers[opt_name] = build_optimizer(
+                cfg_, lr, parameters)
 
         return self.optimizers

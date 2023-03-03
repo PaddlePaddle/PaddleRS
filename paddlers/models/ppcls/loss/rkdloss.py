@@ -1,4 +1,4 @@
-# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ def pdist(e, squared=False, eps=1e-12):
 
 
 class RKdAngle(nn.Layer):
+    # paper : [Relational Knowledge Distillation](https://arxiv.org/abs/1904.05068?context=cs.LG)
     # reference: https://github.com/lenscloth/RKD/blob/master/metric/loss.py
     def __init__(self, target_size=None):
         super().__init__()
@@ -64,6 +65,7 @@ class RKdAngle(nn.Layer):
 
 
 class RkdDistance(nn.Layer):
+    # paper : [Relational Knowledge Distillation](https://arxiv.org/abs/1904.05068?context=cs.LG)
     # reference: https://github.com/lenscloth/RKD/blob/master/metric/loss.py
     def __init__(self, eps=1e-12, target_size=1):
         super().__init__()

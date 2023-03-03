@@ -32,7 +32,6 @@ class GANModel(BaseModel):
 
     vanilla GAN paper: https://arxiv.org/abs/1406.2661
     """
-
     def __init__(self,
                  generator,
                  discriminator=None,
@@ -51,12 +50,12 @@ class GANModel(BaseModel):
 
         self.disc_iters = 1 if self.params is None else self.params.get(
             'disc_iters', 1)
-        self.disc_start_iters = (0 if self.params is None else
-                                 self.params.get('disc_start_iters', 0))
-        self.samples_every_row = (8 if self.params is None else
-                                  self.params.get('samples_every_row', 8))
-        self.visual_interval = (500 if self.params is None else
-                                self.params.get('visual_interval', 500))
+        self.disc_start_iters = (0 if self.params is None else self.params.get(
+            'disc_start_iters', 0))
+        self.samples_every_row = (8 if self.params is None else self.params.get(
+            'samples_every_row', 8))
+        self.visual_interval = (500 if self.params is None else self.params.get(
+            'visual_interval', 500))
 
         # define generator
         self.nets['netG'] = build_generator(generator)
@@ -90,8 +89,7 @@ class GANModel(BaseModel):
                 self.n_class = self.nets['netG'].n_class
 
             self.D_real_inputs += [
-                paddle.to_tensor(
-                    input['class_id'], dtype='int64')
+                paddle.to_tensor(input['class_id'], dtype='int64')
             ]
         else:
             self.n_class = 0
@@ -112,7 +110,9 @@ class GANModel(BaseModel):
                 rows_num = (batch_size - 1) // self.samples_every_row + 1
                 class_ids = paddle.randint(0, self.n_class, [rows_num, 1])
                 class_ids = class_ids.tile([1, self.samples_every_row])
-                class_ids = class_ids.reshape([-1, ])[:batch_size].detach()
+                class_ids = class_ids.reshape([
+                    -1,
+                ])[:batch_size].detach()
                 self.G_fixed_inputs[1] = class_ids.detach()
 
     def forward(self):
@@ -143,8 +143,8 @@ class GANModel(BaseModel):
 
         # combine loss and calculate gradients
         if self.criterionGAN.gan_mode in ['vanilla', 'lsgan']:
-            self.loss_D = self.loss_D + (self.loss_D_fake + self.loss_D_real
-                                         ) * 0.5
+            self.loss_D = self.loss_D + (self.loss_D_fake +
+                                         self.loss_D_real) * 0.5
         else:
             self.loss_D = self.loss_D + self.loss_D_fake + self.loss_D_real
 

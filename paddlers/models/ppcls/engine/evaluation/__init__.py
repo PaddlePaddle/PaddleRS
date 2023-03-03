@@ -12,5 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from ppcls.engine.evaluation.classification import classification_eval
-from ppcls.engine.evaluation.retrieval import retrieval_eval
+from paddlers.models.ppcls.engine.evaluation.classification import classification_eval
+from paddlers.models.ppcls.engine.evaluation.retrieval import retrieval_eval
+from paddlers.models.ppcls.engine.evaluation.adaface import adaface_eval

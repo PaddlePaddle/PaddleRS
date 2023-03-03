@@ -45,7 +45,6 @@ class IconVSR(nn.Layer):
             then the (0, 5, 10, 15, ...)-th frame will be the keyframes.
             Default: 5.
     """
-
     def __init__(self,
                  mid_channels=64,
                  num_blocks=30,
@@ -65,17 +64,25 @@ class IconVSR(nn.Layer):
         self.spynet.set_state_dict(paddle.load(weight_path))
 
         # information-refill
-        self.edvr = EDVRFeatureExtractor(
-            num_frames=padding * 2 + 1, center_frame_idx=padding)
+        self.edvr = EDVRFeatureExtractor(num_frames=padding * 2 + 1,
+                                         center_frame_idx=padding)
 
         edvr_wight_path = get_path_from_url(
             'https://paddlegan.bj.bcebos.com/models/edvrm.pdparams')
         self.edvr.set_state_dict(paddle.load(edvr_wight_path))
 
-        self.backward_fusion = nn.Conv2D(
-            2 * mid_channels, mid_channels, 3, 1, 1, bias_attr=True)
-        self.forward_fusion = nn.Conv2D(
-            2 * mid_channels, mid_channels, 3, 1, 1, bias_attr=True)
+        self.backward_fusion = nn.Conv2D(2 * mid_channels,
+                                         mid_channels,
+                                         3,
+                                         1,
+                                         1,
+                                         bias_attr=True)
+        self.forward_fusion = nn.Conv2D(2 * mid_channels,
+                                        mid_channels,
+                                        3,
+                                        1,
+                                        1,
+                                        bias_attr=True)
 
         # propagation branches
         self.backward_resblocks = ResidualBlocksWithInputConv(
@@ -85,14 +92,19 @@ class IconVSR(nn.Layer):
 
         # upsample
         # self.fusion = nn.Conv2D(mid_channels * 2, mid_channels, 1, 1, 0)
-        self.upsample1 = PixelShufflePack(
-            mid_channels, mid_channels, 2, upsample_kernel=3)
-        self.upsample2 = PixelShufflePack(
-            mid_channels, 64, 2, upsample_kernel=3)
+        self.upsample1 = PixelShufflePack(mid_channels,
+                                          mid_channels,
+                                          2,
+                                          upsample_kernel=3)
+        self.upsample2 = PixelShufflePack(mid_channels,
+                                          64,
+                                          2,
+                                          upsample_kernel=3)
         self.conv_hr = nn.Conv2D(64, 64, 3, 1, 1)
         self.conv_last = nn.Conv2D(64, 3, 3, 1, 1)
-        self.img_upsample = nn.Upsample(
-            scale_factor=4, mode='bilinear', align_corners=False)
+        self.img_upsample = nn.Upsample(scale_factor=4,
+                                        mode='bilinear',
+                                        align_corners=False)
 
         # activation function
         self.lrelu = nn.LeakyReLU(negative_slope=0.1)
@@ -307,7 +319,6 @@ class EDVRFeatureExtractor(nn.Layer):
             0. Default: 2.
         with_tsa (bool): Whether to use TSA module. Default: True.
     """
-
     def __init__(self,
                  in_channels=3,
                  out_channel=3,
@@ -325,8 +336,9 @@ class EDVRFeatureExtractor(nn.Layer):
         self.with_tsa = with_tsa
 
         self.conv_first = nn.Conv2D(in_channels, mid_channels, 3, 1, 1)
-        self.feature_extraction = make_layer(
-            ResidualBlockNoBN, num_blocks_extraction, nf=mid_channels)
+        self.feature_extraction = make_layer(ResidualBlockNoBN,
+                                             num_blocks_extraction,
+                                             nf=mid_channels)
 
         # generate pyramid features
         self.feat_l2_conv1 = nn.Conv2D(mid_channels, mid_channels, 3, 2, 1)
@@ -338,10 +350,9 @@ class EDVRFeatureExtractor(nn.Layer):
         self.pcd_alignment = PCDAlign(nf=mid_channels, groups=deform_groups)
         # fusion
         if self.with_tsa:
-            self.fusion = TSAFusion(
-                nf=mid_channels,
-                nframes=num_frames,
-                center=self.center_frame_idx)
+            self.fusion = TSAFusion(nf=mid_channels,
+                                    nframes=num_frames,
+                                    center=self.center_frame_idx)
         else:
             self.fusion = nn.Conv2D(num_frames * mid_channels, mid_channels, 1,
                                     1)

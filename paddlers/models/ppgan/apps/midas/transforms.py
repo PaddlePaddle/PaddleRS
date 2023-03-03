@@ -8,7 +8,6 @@ import math
 class Resize(object):
     """Resize sample to given size (width, height).
     """
-
     def __init__(self,
                  width,
                  height,
@@ -97,15 +96,15 @@ class Resize(object):
                     f"resize_method {self.__resize_method} not implemented")
 
         if self.__resize_method == "lower_bound":
-            new_height = self.constrain_to_multiple_of(
-                scale_height * height, min_val=self.__height)
-            new_width = self.constrain_to_multiple_of(
-                scale_width * width, min_val=self.__width)
+            new_height = self.constrain_to_multiple_of(scale_height * height,
+                                                       min_val=self.__height)
+            new_width = self.constrain_to_multiple_of(scale_width * width,
+                                                      min_val=self.__width)
         elif self.__resize_method == "upper_bound":
-            new_height = self.constrain_to_multiple_of(
-                scale_height * height, max_val=self.__height)
-            new_width = self.constrain_to_multiple_of(
-                scale_width * width, max_val=self.__width)
+            new_height = self.constrain_to_multiple_of(scale_height * height,
+                                                       max_val=self.__height)
+            new_width = self.constrain_to_multiple_of(scale_width * width,
+                                                      max_val=self.__width)
         elif self.__resize_method == "minimal":
             new_height = self.constrain_to_multiple_of(scale_height * height)
             new_width = self.constrain_to_multiple_of(scale_width * width)
@@ -123,24 +122,26 @@ class Resize(object):
         sample["image"] = cv2.resize(
             sample["image"],
             (width, height),
-            interpolation=self.__image_interpolation_method, )
+            interpolation=self.__image_interpolation_method,
+        )
 
         if self.__resize_target:
             if "disparity" in sample:
                 sample["disparity"] = cv2.resize(
                     sample["disparity"],
                     (width, height),
-                    interpolation=cv2.INTER_NEAREST, )
+                    interpolation=cv2.INTER_NEAREST,
+                )
 
             if "depth" in sample:
-                sample["depth"] = cv2.resize(
-                    sample["depth"], (width, height),
-                    interpolation=cv2.INTER_NEAREST)
+                sample["depth"] = cv2.resize(sample["depth"], (width, height),
+                                             interpolation=cv2.INTER_NEAREST)
 
             sample["mask"] = cv2.resize(
                 sample["mask"].astype(np.float32),
                 (width, height),
-                interpolation=cv2.INTER_NEAREST, )
+                interpolation=cv2.INTER_NEAREST,
+            )
             sample["mask"] = sample["mask"].astype(bool)
 
         return sample
@@ -149,7 +150,6 @@ class Resize(object):
 class NormalizeImage(object):
     """Normlize image by given mean and std.
     """
-
     def __init__(self, mean, std):
         self.__mean = mean
         self.__std = std
@@ -163,7 +163,6 @@ class NormalizeImage(object):
 class PrepareForNet(object):
     """Prepare sample for usage as network input.
     """
-
     def __init__(self):
         pass
 

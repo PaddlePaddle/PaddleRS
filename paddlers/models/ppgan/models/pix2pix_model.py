@@ -31,7 +31,6 @@ class Pix2PixModel(BaseModel):
 
     pix2pix paper: https://arxiv.org/pdf/1611.07004.pdf
     """
-
     def __init__(self,
                  generator,
                  discriminator=None,

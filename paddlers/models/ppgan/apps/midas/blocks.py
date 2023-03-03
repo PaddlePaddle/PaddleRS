@@ -13,8 +13,10 @@ def _make_encoder(backbone,
     if backbone == "resnext101_wsl":
         # resnext101_wsl
         pretrained = _make_pretrained_resnext101_wsl(use_pretrained)
-        scratch = _make_scratch(
-            [256, 512, 1024, 2048], features, groups=groups, expand=expand)
+        scratch = _make_scratch([256, 512, 1024, 2048],
+                                features,
+                                groups=groups,
+                                expand=expand)
     else:
         print(f"Backbone '{backbone}' not implemented")
         assert False
@@ -34,38 +36,34 @@ def _make_scratch(in_shape, out_shape, groups=1, expand=False):
         out_shape3 = out_shape * 4
         out_shape4 = out_shape * 8
 
-    scratch.layer1_rn = nn.Conv2D(
-        in_shape[0],
-        out_shape1,
-        kernel_size=3,
-        stride=1,
-        padding=1,
-        bias_attr=False,
-        groups=groups)
-    scratch.layer2_rn = nn.Conv2D(
-        in_shape[1],
-        out_shape2,
-        kernel_size=3,
-        stride=1,
-        padding=1,
-        bias_attr=False,
-        groups=groups)
-    scratch.layer3_rn = nn.Conv2D(
-        in_shape[2],
-        out_shape3,
-        kernel_size=3,
-        stride=1,
-        padding=1,
-        bias_attr=False,
-        groups=groups)
-    scratch.layer4_rn = nn.Conv2D(
-        in_shape[3],
-        out_shape4,
-        kernel_size=3,
-        stride=1,
-        padding=1,
-        bias_attr=False,
-        groups=groups)
+    scratch.layer1_rn = nn.Conv2D(in_shape[0],
+                                  out_shape1,
+                                  kernel_size=3,
+                                  stride=1,
+                                  padding=1,
+                                  bias_attr=False,
+                                  groups=groups)
+    scratch.layer2_rn = nn.Conv2D(in_shape[1],
+                                  out_shape2,
+                                  kernel_size=3,
+                                  stride=1,
+                                  padding=1,
+                                  bias_attr=False,
+                                  groups=groups)
+    scratch.layer3_rn = nn.Conv2D(in_shape[2],
+                                  out_shape3,
+                                  kernel_size=3,
+                                  stride=1,
+                                  padding=1,
+                                  bias_attr=False,
+                                  groups=groups)
+    scratch.layer4_rn = nn.Conv2D(in_shape[3],
+                                  out_shape4,
+                                  kernel_size=3,
+                                  stride=1,
+                                  padding=1,
+                                  bias_attr=False,
+                                  groups=groups)
 
     return scratch
 
@@ -91,7 +89,6 @@ def _make_pretrained_resnext101_wsl(use_pretrained):
 class ResidualConvUnit(nn.Layer):
     """Residual convolution module.
     """
-
     def __init__(self, features):
         """Init.
 
@@ -100,21 +97,19 @@ class ResidualConvUnit(nn.Layer):
         """
         super().__init__()
 
-        self.conv1 = nn.Conv2D(
-            features,
-            features,
-            kernel_size=3,
-            stride=1,
-            padding=1,
-            bias_attr=True)
+        self.conv1 = nn.Conv2D(features,
+                               features,
+                               kernel_size=3,
+                               stride=1,
+                               padding=1,
+                               bias_attr=True)
 
-        self.conv2 = nn.Conv2D(
-            features,
-            features,
-            kernel_size=3,
-            stride=1,
-            padding=1,
-            bias_attr=True)
+        self.conv2 = nn.Conv2D(features,
+                               features,
+                               kernel_size=3,
+                               stride=1,
+                               padding=1,
+                               bias_attr=True)
 
         self.relu = nn.ReLU()
 
@@ -138,7 +133,6 @@ class ResidualConvUnit(nn.Layer):
 class FeatureFusionBlock(nn.Layer):
     """Feature fusion block.
     """
-
     def __init__(self, features):
         """Init.
 
@@ -162,7 +156,9 @@ class FeatureFusionBlock(nn.Layer):
             output += self.resConfUnit1(xs[1])
 
         output = self.resConfUnit2(output)
-        output = nn.functional.interpolate(
-            output, scale_factor=2, mode="bilinear", align_corners=True)
+        output = nn.functional.interpolate(output,
+                                           scale_factor=2,
+                                           mode="bilinear",
+                                           align_corners=True)
 
         return output

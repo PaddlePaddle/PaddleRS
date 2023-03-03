@@ -1,4 +1,4 @@
-# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from ppcls.utils import logger
+from paddlers.models.ppcls.utils import logger
 
 
 class CELoss(nn.Layer):
@@ -51,7 +51,6 @@ class CELoss(nn.Layer):
             loss = paddle.sum(x * label, axis=-1)
         else:
             if label.shape[-1] == x.shape[-1]:
-                label = F.softmax(label, axis=-1)
                 soft_label = True
             else:
                 soft_label = False

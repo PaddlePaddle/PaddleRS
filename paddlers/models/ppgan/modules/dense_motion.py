@@ -13,7 +13,6 @@ class DenseMotionNetwork(nn.Layer):
     """
     Module that predicting a dense motion from sparse motion representation given by kp_source and kp_driving
     """
-
     def __init__(self,
                  block_expansion,
                  num_blocks,
@@ -25,71 +24,64 @@ class DenseMotionNetwork(nn.Layer):
                  kp_variance=0.01,
                  mobile_net=False):
         super(DenseMotionNetwork, self).__init__()
-        self.hourglass = Hourglass(
-            block_expansion=block_expansion,
-            in_features=(num_kp + 1) * (num_channels + 1),
-            max_features=max_features,
-            num_blocks=num_blocks,
-            mobile_net=mobile_net)
+        self.hourglass = Hourglass(block_expansion=block_expansion,
+                                   in_features=(num_kp + 1) *
+                                   (num_channels + 1),
+                                   max_features=max_features,
+                                   num_blocks=num_blocks,
+                                   mobile_net=mobile_net)
 
         if mobile_net:
             self.mask = nn.Sequential(
-                nn.Conv2D(
-                    self.hourglass.out_filters,
-                    self.hourglass.out_filters,
-                    kernel_size=3,
-                    weight_attr=nn.initializer.KaimingUniform(),
-                    padding=1),
-                nn.ReLU(),
-                nn.Conv2D(
-                    self.hourglass.out_filters,
-                    self.hourglass.out_filters,
-                    kernel_size=3,
-                    weight_attr=nn.initializer.KaimingUniform(),
-                    padding=1),
-                nn.ReLU(),
-                nn.Conv2D(
-                    self.hourglass.out_filters,
-                    num_kp + 1,
-                    kernel_size=3,
-                    weight_attr=nn.initializer.KaimingUniform(),
-                    padding=1))
+                    nn.Conv2D(self.hourglass.out_filters,
+                                self.hourglass.out_filters,
+                                kernel_size=3,
+                                weight_attr=nn.initializer.KaimingUniform(),
+                                padding=1),
+                    nn.ReLU(),
+                    nn.Conv2D(self.hourglass.out_filters,
+                                self.hourglass.out_filters,
+                                kernel_size=3,
+                                weight_attr=nn.initializer.KaimingUniform(),
+                                padding=1),
+                    nn.ReLU(),
+                    nn.Conv2D(self.hourglass.out_filters,
+                                num_kp + 1,
+                                kernel_size=3,
+                                weight_attr=nn.initializer.KaimingUniform(),
+                                padding=1))
         else:
-            self.mask = nn.Conv2D(
-                self.hourglass.out_filters,
-                num_kp + 1,
-                kernel_size=(7, 7),
-                padding=(3, 3))
+            self.mask = nn.Conv2D(self.hourglass.out_filters,
+                              num_kp + 1,
+                              kernel_size=(7, 7),
+                              padding=(3, 3))
 
         if estimate_occlusion_map:
             if mobile_net:
-                self.occlusion = nn.Sequential(
-                    nn.Conv2D(
-                        self.hourglass.out_filters,
-                        self.hourglass.out_filters,
-                        kernel_size=3,
-                        padding=1,
-                        weight_attr=nn.initializer.KaimingUniform()),
+                self.occlusion =  nn.Sequential(
+                    nn.Conv2D(self.hourglass.out_filters,
+                                       self.hourglass.out_filters,
+                                       kernel_size=3,
+                                       padding=1, 
+                                       weight_attr=nn.initializer.KaimingUniform()),
                     nn.ReLU(),
-                    nn.Conv2D(
-                        self.hourglass.out_filters,
-                        self.hourglass.out_filters,
-                        kernel_size=3,
-                        weight_attr=nn.initializer.KaimingUniform(),
-                        padding=1),
+                    nn.Conv2D(self.hourglass.out_filters,
+                                       self.hourglass.out_filters,
+                                       kernel_size=3, 
+                                       weight_attr=nn.initializer.KaimingUniform(),
+                                       padding=1),
                     nn.ReLU(),
-                    nn.Conv2D(
-                        self.hourglass.out_filters,
-                        1,
-                        kernel_size=3,
-                        padding=1,
-                        weight_attr=nn.initializer.KaimingUniform()))
+                    nn.Conv2D(self.hourglass.out_filters,
+                                       1,
+                                       kernel_size=3,
+                                       padding=1, 
+                                       weight_attr=nn.initializer.KaimingUniform())
+                    )
             else:
-                self.occlusion = nn.Conv2D(
-                    self.hourglass.out_filters,
-                    1,
-                    kernel_size=(7, 7),
-                    padding=(3, 3))
+                self.occlusion = nn.Conv2D(self.hourglass.out_filters,
+                                       1,
+                                       kernel_size=(7, 7),
+                                       padding=(3, 3))
         else:
             self.occlusion = None
 
@@ -98,8 +90,9 @@ class DenseMotionNetwork(nn.Layer):
         self.kp_variance = kp_variance
 
         if self.scale_factor != 1:
-            self.down = AntiAliasInterpolation2d(
-                num_channels, self.scale_factor, mobile_net=mobile_net)
+            self.down = AntiAliasInterpolation2d(num_channels,
+                                                 self.scale_factor,
+                                                 mobile_net=mobile_net)
 
     def create_heatmap_representations(self, source_image, kp_driving,
                                        kp_source):
@@ -107,10 +100,12 @@ class DenseMotionNetwork(nn.Layer):
         Eq 6. in the paper H_k(z)
         """
         spatial_size = source_image.shape[2:]
-        gaussian_driving = kp2gaussian(
-            kp_driving, spatial_size=spatial_size, kp_variance=self.kp_variance)
-        gaussian_source = kp2gaussian(
-            kp_source, spatial_size=spatial_size, kp_variance=self.kp_variance)
+        gaussian_driving = kp2gaussian(kp_driving,
+                                       spatial_size=spatial_size,
+                                       kp_variance=self.kp_variance)
+        gaussian_source = kp2gaussian(kp_source,
+                                      spatial_size=spatial_size,
+                                      kp_variance=self.kp_variance)
         heatmap = gaussian_driving - gaussian_source
 
         #adding background feature
@@ -126,8 +121,8 @@ class DenseMotionNetwork(nn.Layer):
         Eq 4. in the paper T_{s<-d}(z)
         """
         bs, _, h, w = source_image.shape
-        identity_grid = make_coordinate_grid(
-            (h, w), type=kp_source['value'].dtype)
+        identity_grid = make_coordinate_grid((h, w),
+                                             type=kp_source['value'].dtype)
         identity_grid = identity_grid.reshape([1, 1, h, w, 2])
         coordinate_grid = identity_grid - kp_driving['value'].reshape(
             [bs, self.num_kp, 1, 1, 2])
@@ -151,8 +146,8 @@ class DenseMotionNetwork(nn.Layer):
 
         #adding background feature
         identity_grid = paddle.tile(identity_grid, (bs, 1, 1, 1, 1))
-        sparse_motions = paddle.concat(
-            [identity_grid, driving_to_source], axis=1)
+        sparse_motions = paddle.concat([identity_grid, driving_to_source],
+                                       axis=1)
         return sparse_motions
 
     def create_deformed_source_image(self, source_image, sparse_motions):
@@ -162,18 +157,17 @@ class DenseMotionNetwork(nn.Layer):
         bs, _, h, w = source_image.shape
         source_repeat = paddle.tile(
             source_image.unsqueeze(1).unsqueeze(1),
-            [1, self.num_kp + 1, 1, 1, 1,
-             1])  #.repeat(1, self.num_kp + 1, 1, 1, 1, 1)
+            [1, self.num_kp + 1, 1, 1, 1, 1
+             ])  #.repeat(1, self.num_kp + 1, 1, 1, 1, 1)
         source_repeat = source_repeat.reshape(
             [bs * (self.num_kp + 1), -1, h, w])
         sparse_motions = sparse_motions.reshape(
             (bs * (self.num_kp + 1), h, w, -1))
-        sparse_deformed = F.grid_sample(
-            source_repeat,
-            sparse_motions,
-            mode='bilinear',
-            padding_mode='zeros',
-            align_corners=True)
+        sparse_deformed = F.grid_sample(source_repeat,
+                                        sparse_motions,
+                                        mode='bilinear',
+                                        padding_mode='zeros',
+                                        align_corners=True)
         sparse_deformed = sparse_deformed.reshape(
             (bs, self.num_kp + 1, -1, h, w))
         return sparse_deformed
@@ -189,8 +183,8 @@ class DenseMotionNetwork(nn.Layer):
             source_image, kp_driving, kp_source)
         sparse_motion = self.create_sparse_motions(source_image, kp_driving,
                                                    kp_source)
-        deformed_source = self.create_deformed_source_image(source_image,
-                                                            sparse_motion)
+        deformed_source = self.create_deformed_source_image(
+            source_image, sparse_motion)
         out_dict['sparse_deformed'] = deformed_source
 
         temp = paddle.concat([heatmap_representation, deformed_source], axis=2)

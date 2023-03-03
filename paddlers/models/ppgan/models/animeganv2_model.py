@@ -29,7 +29,6 @@ from ..utils.filesystem import load
 class AnimeGANV2Model(BaseModel):
     """ This class implements the AnimeGANV2 model.
     """
-
     def __init__(self,
                  generator,
                  discriminator=None,
@@ -127,11 +126,10 @@ class AnimeGANV2Model(BaseModel):
 
     @staticmethod
     def rgb2yuv(rgb):
-        kernel = paddle.to_tensor(
-            [[0.299, -0.14714119, 0.61497538],
-             [0.587, -0.28886916, -0.51496512],
-             [0.114, 0.43601035, -0.10001026]],
-            dtype='float32')
+        kernel = paddle.to_tensor([[0.299, -0.14714119, 0.61497538],
+                                   [0.587, -0.28886916, -0.51496512],
+                                   [0.114, 0.43601035, -0.10001026]],
+                                  dtype='float32')
         rgb = paddle.transpose(rgb, (0, 2, 3, 1))
         yuv = paddle.matmul(rgb, kernel)
         return yuv

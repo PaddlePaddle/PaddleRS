@@ -1,4 +1,4 @@
-# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,12 +13,13 @@
 # limitations under the License.
 
 # Code was heavily based on https://github.com/facebookresearch/deit
+# reference: https://arxiv.org/abs/2012.12877
 
 import paddle
 import paddle.nn as nn
 from .vision_transformer import VisionTransformer, Identity, trunc_normal_, zeros_
 
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "DeiT_tiny_patch16_224":
@@ -175,7 +176,8 @@ def DeiT_base_patch16_224(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def DeiT_tiny_distilled_patch16_224(pretrained=False, use_ssld=False, **kwargs):
+def DeiT_tiny_distilled_patch16_224(pretrained=False, use_ssld=False,
+                                    **kwargs):
     model = DistilledVisionTransformer(
         patch_size=16,
         embed_dim=192,
@@ -193,7 +195,8 @@ def DeiT_tiny_distilled_patch16_224(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def DeiT_small_distilled_patch16_224(pretrained=False, use_ssld=False,
+def DeiT_small_distilled_patch16_224(pretrained=False,
+                                     use_ssld=False,
                                      **kwargs):
     model = DistilledVisionTransformer(
         patch_size=16,
@@ -212,7 +215,8 @@ def DeiT_small_distilled_patch16_224(pretrained=False, use_ssld=False,
     return model
 
 
-def DeiT_base_distilled_patch16_224(pretrained=False, use_ssld=False, **kwargs):
+def DeiT_base_distilled_patch16_224(pretrained=False, use_ssld=False,
+                                    **kwargs):
     model = DistilledVisionTransformer(
         patch_size=16,
         embed_dim=768,
@@ -249,7 +253,8 @@ def DeiT_base_patch16_384(pretrained=False, use_ssld=False, **kwargs):
     return model
 
 
-def DeiT_base_distilled_patch16_384(pretrained=False, use_ssld=False, **kwargs):
+def DeiT_base_distilled_patch16_384(pretrained=False, use_ssld=False,
+                                    **kwargs):
     model = DistilledVisionTransformer(
         img_size=384,
         patch_size=16,

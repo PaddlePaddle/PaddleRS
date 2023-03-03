@@ -1,4 +1,4 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
+# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -102,7 +102,12 @@ class BaseTrack(object):
 @register
 @serializable
 class STrack(BaseTrack):
-    def __init__(self, tlwh, score, cls_id, buff_size=30, temp_feat=None):
+    def __init__(self,
+                 tlwh,
+                 score,
+                 cls_id,
+                 buff_size=30,
+                 temp_feat=None):
         # wait activate
         self._tlwh = np.asarray(tlwh, dtype=np.float)
         self.score = score

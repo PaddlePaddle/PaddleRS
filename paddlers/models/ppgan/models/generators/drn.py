@@ -10,12 +10,11 @@ from .builder import GENERATORS
 
 
 def default_conv(in_channels, out_channels, kernel_size, bias=True):
-    return nn.Conv2D(
-        in_channels,
-        out_channels,
-        kernel_size,
-        padding=(kernel_size // 2),
-        bias_attr=bias)
+    return nn.Conv2D(in_channels,
+                     out_channels,
+                     kernel_size,
+                     padding=(kernel_size // 2),
+                     bias_attr=bias)
 
 
 class MeanShift(nn.Conv2D):
@@ -54,36 +53,32 @@ class DownBlock(nn.Layer):
 
         dual_block = [
             nn.Sequential(
-                nn.Conv2D(
-                    in_channels,
-                    nFeat,
-                    kernel_size=3,
-                    stride=2,
-                    padding=1,
-                    bias_attr=False),
-                nn.LeakyReLU(negative_slope=negval))
+                nn.Conv2D(in_channels,
+                          nFeat,
+                          kernel_size=3,
+                          stride=2,
+                          padding=1,
+                          bias_attr=False), nn.LeakyReLU(negative_slope=negval))
         ]
 
         for _ in range(1, int(math.log2(scale))):
             dual_block.append(
                 nn.Sequential(
-                    nn.Conv2D(
-                        nFeat,
-                        nFeat,
-                        kernel_size=3,
-                        stride=2,
-                        padding=1,
-                        bias_attr=False),
+                    nn.Conv2D(nFeat,
+                              nFeat,
+                              kernel_size=3,
+                              stride=2,
+                              padding=1,
+                              bias_attr=False),
                     nn.LeakyReLU(negative_slope=negval)))
 
         dual_block.append(
-            nn.Conv2D(
-                nFeat,
-                out_channels,
-                kernel_size=3,
-                stride=1,
-                padding=1,
-                bias_attr=False))
+            nn.Conv2D(nFeat,
+                      out_channels,
+                      kernel_size=3,
+                      stride=1,
+                      padding=1,
+                      bias_attr=False))
 
         self.dual_module = nn.Sequential(*dual_block)
 
@@ -100,12 +95,16 @@ class CALayer(nn.Layer):
         self.avg_pool = nn.AdaptiveAvgPool2D(1)
         # feature channel downscale and upscale --> channel weight
         self.conv_du = nn.Sequential(
-            nn.Conv2D(
-                channel, channel // reduction, 1, padding=0, bias_attr=True),
-            nn.ReLU(),
-            nn.Conv2D(
-                channel // reduction, channel, 1, padding=0, bias_attr=True),
-            nn.Sigmoid())
+            nn.Conv2D(channel,
+                      channel // reduction,
+                      1,
+                      padding=0,
+                      bias_attr=True), nn.ReLU(),
+            nn.Conv2D(channel // reduction,
+                      channel,
+                      1,
+                      padding=0,
+                      bias_attr=True), nn.Sigmoid())
 
     def forward(self, x):
         y = self.avg_pool(x)
@@ -171,24 +170,25 @@ class Upsampler(nn.Sequential):
 @GENERATORS.register()
 class DRNGenerator(nn.Layer):
     """DRNGenerator"""
-
     def __init__(
-            self,
-            scale,
-            n_blocks=30,
-            n_feats=16,
-            n_colors=3,
-            rgb_range=255,
-            negval=0.2,
-            kernel_size=3,
-            conv=default_conv, ):
+        self,
+        scale,
+        n_blocks=30,
+        n_feats=16,
+        n_colors=3,
+        rgb_range=255,
+        negval=0.2,
+        kernel_size=3,
+        conv=default_conv,
+    ):
         super(DRNGenerator, self).__init__()
         self.scale = scale
         self.phase = len(scale)
         act = nn.ReLU()
 
-        self.upsample = nn.Upsample(
-            scale_factor=max(scale), mode='bicubic', align_corners=False)
+        self.upsample = nn.Upsample(scale_factor=max(scale),
+                                    mode='bicubic',
+                                    align_corners=False)
 
         rgb_mean = (0.4488, 0.4371, 0.4040)
         rgb_std = (1.0, 1.0, 1.0)
@@ -205,35 +205,30 @@ class DRNGenerator(nn.Layer):
         self.down = nn.LayerList(self.down)
 
         up_body_blocks = [[
-            RCAB(
-                conv, n_feats * pow(2, p), kernel_size, act=act)
+            RCAB(conv, n_feats * pow(2, p), kernel_size, act=act)
             for _ in range(n_blocks)
         ] for p in range(self.phase, 1, -1)]
 
-        up_body_blocks.insert(
-            0, [
-                RCAB(
-                    conv, n_feats * pow(2, self.phase), kernel_size, act=act)
-                for _ in range(n_blocks)
-            ])
+        up_body_blocks.insert(0, [
+            RCAB(conv, n_feats * pow(2, self.phase), kernel_size, act=act)
+            for _ in range(n_blocks)
+        ])
 
         # The fisrt upsample block
         up = [[
-            Upsampler(
-                conv, 2, n_feats * pow(2, self.phase), act=False), conv(
-                    n_feats * pow(2, self.phase),
-                    n_feats * pow(2, self.phase - 1),
-                    kernel_size=1)
+            Upsampler(conv, 2, n_feats * pow(2, self.phase), act=False),
+            conv(n_feats * pow(2, self.phase),
+                 n_feats * pow(2, self.phase - 1),
+                 kernel_size=1)
         ]]
 
         # The rest upsample blocks
         for p in range(self.phase - 1, 0, -1):
             up.append([
-                Upsampler(
-                    conv, 2, 2 * n_feats * pow(2, p), act=False), conv(
-                        2 * n_feats * pow(2, p),
-                        n_feats * pow(2, p - 1),
-                        kernel_size=1)
+                Upsampler(conv, 2, 2 * n_feats * pow(2, p), act=False),
+                conv(2 * n_feats * pow(2, p),
+                     n_feats * pow(2, p - 1),
+                     kernel_size=1)
             ])
 
         self.up_blocks = nn.LayerList()

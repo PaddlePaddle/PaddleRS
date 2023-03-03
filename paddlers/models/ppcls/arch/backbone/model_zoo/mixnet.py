@@ -1,4 +1,4 @@
-# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,11 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-    MixNet for ImageNet-1K, implemented in Paddle.
-    Original paper: 'MixConv: Mixed Depthwise Convolutional Kernels,'
-    https://arxiv.org/abs/1907.09595.
-"""
+
+# reference: https://arxiv.org/abs/1907.09595
 
 import os
 from inspect import isfunction
@@ -23,7 +20,7 @@ from functools import reduce
 import paddle
 import paddle.nn as nn
 
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "MixNet_S":
@@ -691,7 +688,8 @@ class MixNet(nn.Layer):
             "final_pool", nn.AvgPool2D(
                 kernel_size=7, stride=1))
 
-        self.output = nn.Linear(in_features=in_channels, out_features=class_num)
+        self.output = nn.Linear(
+            in_features=in_channels, out_features=class_num)
 
     def forward(self, x):
         x = self.features(x)

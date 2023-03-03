@@ -1,4 +1,4 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
+# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,12 +37,8 @@ class BBoxPostProcess(object):
     __shared__ = ['num_classes', 'export_onnx', 'export_eb']
     __inject__ = ['decode', 'nms']
 
-    def __init__(self,
-                 num_classes=80,
-                 decode=None,
-                 nms=None,
-                 export_onnx=False,
-                 export_eb=False):
+    def __init__(self, num_classes=80, decode=None, nms=None,
+                 export_onnx=False, export_eb=False):
         super(BBoxPostProcess, self).__init__()
         self.num_classes = num_classes
         self.decode = decode
@@ -108,7 +104,7 @@ class BBoxPostProcess(object):
         if self.export_eb:
             # enable rcnn models for edgeboard hw to skip the following postprocess.
             return bboxes, bboxes, bbox_num
-
+            
         if not self.export_onnx:
             bboxes_list = []
             bbox_num_list = []

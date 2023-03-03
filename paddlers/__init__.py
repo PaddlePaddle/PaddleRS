@@ -15,10 +15,7 @@
 __version__ = '0.0.0.dev0'
 
 from paddlers.utils.env import get_environ_info, init_parallel_env
-init_parallel_env()
-
-env_info = get_environ_info()
-
-log_level = 2
-
 from . import tasks, datasets, transforms, utils, tools, models, deploy
+
+init_parallel_env()
+env_info = get_environ_info()

@@ -17,43 +17,37 @@ class Wav2LipDiscQual(nn.Layer):
 
         self.face_encoder_blocks = nn.LayerList([
             nn.Sequential(
-                NonNormConv2d(
-                    3, 32, kernel_size=7, stride=1, padding=3)),  # 48,96
+                NonNormConv2d(3, 32, kernel_size=7, stride=1,
+                              padding=3)),  # 48,96
             nn.Sequential(
-                NonNormConv2d(
-                    32, 64, kernel_size=5, stride=(1, 2), padding=2),  # 48,48
-                NonNormConv2d(
-                    64, 64, kernel_size=5, stride=1, padding=2)),
+                NonNormConv2d(32, 64, kernel_size=5, stride=(1, 2),
+                              padding=2),  # 48,48
+                NonNormConv2d(64, 64, kernel_size=5, stride=1, padding=2)),
             nn.Sequential(
-                NonNormConv2d(
-                    64, 128, kernel_size=5, stride=2, padding=2),  # 24,24
-                NonNormConv2d(
-                    128, 128, kernel_size=5, stride=1, padding=2)),
+                NonNormConv2d(64, 128, kernel_size=5, stride=2,
+                              padding=2),  # 24,24
+                NonNormConv2d(128, 128, kernel_size=5, stride=1, padding=2)),
             nn.Sequential(
-                NonNormConv2d(
-                    128, 256, kernel_size=5, stride=2, padding=2),  # 12,12
-                NonNormConv2d(
-                    256, 256, kernel_size=5, stride=1, padding=2)),
+                NonNormConv2d(128, 256, kernel_size=5, stride=2,
+                              padding=2),  # 12,12
+                NonNormConv2d(256, 256, kernel_size=5, stride=1, padding=2)),
             nn.Sequential(
-                NonNormConv2d(
-                    256, 512, kernel_size=3, stride=2, padding=1),  # 6,6
-                NonNormConv2d(
-                    512, 512, kernel_size=3, stride=1, padding=1)),
+                NonNormConv2d(256, 512, kernel_size=3, stride=2,
+                              padding=1),  # 6,6
+                NonNormConv2d(512, 512, kernel_size=3, stride=1, padding=1)),
             nn.Sequential(
-                NonNormConv2d(
-                    512, 512, kernel_size=3, stride=2, padding=1),  # 3,3
-                NonNormConv2d(
-                    512, 512, kernel_size=3, stride=1, padding=1), ),
+                NonNormConv2d(512, 512, kernel_size=3, stride=2,
+                              padding=1),  # 3,3
+                NonNormConv2d(512, 512, kernel_size=3, stride=1, padding=1),
+            ),
             nn.Sequential(
-                NonNormConv2d(
-                    512, 512, kernel_size=3, stride=1, padding=0),  # 1, 1
-                NonNormConv2d(
-                    512, 512, kernel_size=1, stride=1, padding=0)),
+                NonNormConv2d(512, 512, kernel_size=3, stride=1,
+                              padding=0),  # 1, 1
+                NonNormConv2d(512, 512, kernel_size=1, stride=1, padding=0)),
         ])
 
         self.binary_pred = nn.Sequential(
-            nn.Conv2D(
-                512, 1, kernel_size=1, stride=1, padding=0), nn.Sigmoid())
+            nn.Conv2D(512, 1, kernel_size=1, stride=1, padding=0), nn.Sigmoid())
         self.label_noise = .0
 
     def get_lower_half(self, face_sequences):
@@ -77,9 +71,8 @@ class Wav2LipDiscQual(nn.Layer):
         binary_pred = self.binary_pred(false_feats).reshape(
             (len(false_feats), -1))
 
-        false_pred_loss = F.binary_cross_entropy(binary_pred,
-                                                 paddle.ones(
-                                                     (len(false_feats), 1)))
+        false_pred_loss = F.binary_cross_entropy(
+            binary_pred, paddle.ones((len(false_feats), 1)))
 
         return false_pred_loss
 

@@ -31,15 +31,16 @@ class _SpectralNorm(nn.SpectralNorm):
         inputs = {'Weight': weight, 'U': self.weight_u, 'V': self.weight_v}
         out = self._helper.create_variable_for_type_inference(self._dtype)
         _power_iters = self._power_iters if self.training else 0
-        self._helper.append_op(
-            type="spectral_norm",
-            inputs=inputs,
-            outputs={"Out": out, },
-            attrs={
-                "dim": self._dim,
-                "power_iters": _power_iters,
-                "eps": self._eps,
-            })
+        self._helper.append_op(type="spectral_norm",
+                               inputs=inputs,
+                               outputs={
+                                   "Out": out,
+                               },
+                               attrs={
+                                   "dim": self._dim,
+                                   "power_iters": _power_iters,
+                                   "eps": self._eps,
+                               })
 
         return out
 
@@ -55,8 +56,8 @@ class Spectralnorm(paddle.nn.Layer):
         self.layer = layer
         weight = layer._parameters['weight']
         del layer._parameters['weight']
-        self.weight_orig = self.create_parameter(
-            weight.shape, dtype=weight.dtype)
+        self.weight_orig = self.create_parameter(weight.shape,
+                                                 dtype=weight.dtype)
         self.weight_orig.set_value(weight)
 
     def forward(self, x):

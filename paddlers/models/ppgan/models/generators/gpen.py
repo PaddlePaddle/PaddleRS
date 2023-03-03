@@ -12,25 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# code was heavily based on https://github.com/yangxy/GPEN
+# code was heavily based on code was heavily based on https://github.com/yangxy/GPEN
 
+import math
 import paddle
 import paddle.nn as nn
-import math
-from ...models.generators import StyleGANv2Generator
-from ...models.discriminators.discriminator_styleganv2 import ConvLayer
-from ...modules.equalized import EqualLinear
-
+from paddlers.models.ppgan.models.generators.builder import GENERATORS
+from paddlers.models.ppgan.models.generators import StyleGANv2Generator
+from paddlers.models.ppgan.models.discriminators.discriminator_styleganv2 import ConvLayer
+from paddlers.models.ppgan.modules.equalized import EqualLinear
 
 class GPEN(nn.Layer):
+
     def __init__(
-            self,
-            size,
-            style_dim,
-            n_mlp,
-            channel_multiplier=2,
-            blur_kernel=[1, 3, 3, 1],
-            lr_mlp=0.01, ):
+        self,
+        size,
+        style_dim,
+        n_mlp,
+        channel_multiplier=2,
+        blur_kernel=[1, 3, 3, 1],
+        lr_mlp=0.01,
+        is_concat=True,
+    ):
         super(GPEN, self).__init__()
         channels = {
             4: 512,
@@ -43,7 +46,6 @@ class GPEN(nn.Layer):
             512: 32 * channel_multiplier,
             1024: 16 * channel_multiplier,
         }
-
         self.log_size = int(math.log(size, 2))
         self.generator = StyleGANv2Generator(
             size,
@@ -52,7 +54,7 @@ class GPEN(nn.Layer):
             channel_multiplier=channel_multiplier,
             blur_kernel=blur_kernel,
             lr_mlp=lr_mlp,
-            is_concat=True)
+            is_concat=is_concat)
 
         conv = [ConvLayer(3, channels[size], 1)]
         self.ecd0 = nn.Sequential(*conv)
@@ -66,17 +68,19 @@ class GPEN(nn.Layer):
                     nn.Sequential(*conv))
             in_channel = out_channel
         self.final_linear = nn.Sequential(
-            EqualLinear(
-                channels[4] * 4 * 4, style_dim, activation='fused_lrelu'))
+            EqualLinear(channels[4] * 4 * 4,
+                        style_dim,
+                        activation='fused_lrelu'))
 
     def forward(
-            self,
-            inputs,
-            return_latents=False,
-            inject_index=None,
-            truncation=1,
-            truncation_latent=None,
-            input_is_latent=False, ):
+        self,
+        inputs,
+        return_latents=False,
+        inject_index=None,
+        truncation=1,
+        truncation_latent=None,
+        input_is_latent=False,
+        ):
         noise = []
         for i in range(self.log_size - 1):
             ecd = getattr(self, self.names[i])
@@ -84,12 +88,7 @@ class GPEN(nn.Layer):
             noise.append(inputs)
         inputs = inputs.reshape([inputs.shape[0], -1])
         outs = self.final_linear(inputs)
-        outs = self.generator(
-            [outs],
-            return_latents,
-            inject_index,
-            truncation,
-            truncation_latent,
-            input_is_latent,
-            noise=noise[::-1])
+        outs = self.generator([outs], return_latents, inject_index, truncation,
+                              truncation_latent, input_is_latent, 
+                              noise=noise[::-1])
         return outs
