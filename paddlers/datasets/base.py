@@ -18,6 +18,7 @@ from paddle.io import Dataset
 from paddle.fluid.dataloader.collate import default_collate_fn
 
 from paddlers.utils import get_num_workers
+from paddlers.transforms import construct_sample_from_dict
 
 
 class BaseDataset(Dataset):
@@ -33,7 +34,7 @@ class BaseDataset(Dataset):
         self.shuffle = shuffle
 
     def __getitem__(self, idx):
-        sample = deepcopy(self.file_list[idx])
+        sample = construct_sample_from_dict(self.file_list[idx])
         # `trans_info` will be used to store meta info about image shape
         sample['trans_info'] = []
         outputs, trans_info = self.transforms(sample)

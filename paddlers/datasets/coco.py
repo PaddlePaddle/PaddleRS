@@ -23,7 +23,7 @@ import numpy as np
 
 from .base import BaseDataset
 from paddlers.utils import logging, get_encoding, norm_path, is_pic
-from paddlers.transforms import DecodeImg, MixupImage
+from paddlers.transforms import DecodeImg, MixupImage, construct_sample_from_dict
 from paddlers.tools import YOLOAnchorCluster
 
 
@@ -242,7 +242,7 @@ class COCODetDataset(BaseDataset):
         self._epoch = 0
 
     def __getitem__(self, idx):
-        sample = copy.deepcopy(self.file_list[idx])
+        sample = construct_sample_from_dict(self.file_list[idx])
         if self.data_fields is not None:
             sample = {k: sample[k] for k in self.data_fields}
         if self.use_mix and (self.mixup_op.mixup_epoch == -1 or
@@ -252,7 +252,7 @@ class COCODetDataset(BaseDataset):
                 mix_pos = (mix_idx + idx) % self.num_samples
             else:
                 mix_pos = 0
-            sample_mix = copy.deepcopy(self.file_list[mix_pos])
+            sample_mix = construct_sample_from_dict(self.file_list[mix_pos])
             if self.data_fields is not None:
                 sample_mix = {k: sample_mix[k] for k in self.data_fields}
             sample = self.mixup_op(sample=[

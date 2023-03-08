@@ -155,7 +155,7 @@ class Predictor(object):
         if self.model_type == 'classifier':
             preprocessed_samples = {'image': preprocessed_samples}
         elif self.model_type == 'segmenter':
-            preprocessed_samples = {'image': preprocessed_samples}
+            preprocessed_samples = {'image': preprocessed_samples[0]}
         elif self.model_type == 'detector':
             pass
         elif self.model_type == 'change_detector':
@@ -164,7 +164,7 @@ class Predictor(object):
                 'image2': preprocessed_samples[1]
             }
         elif self.model_type == 'restorer':
-            preprocessed_samples = {'image': preprocessed_samples}
+            preprocessed_samples = {'image': preprocessed_samples[0]}
         else:
             logging.error(
                 "Invalid model type {}".format(self.model_type), exit=True)

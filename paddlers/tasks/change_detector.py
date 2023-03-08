@@ -28,7 +28,7 @@ import paddlers.models.paddleseg as ppseg
 import paddlers.rs_models.cd as cmcd
 import paddlers.utils.logging as logging
 from paddlers.models import seg_losses
-from paddlers.transforms import Resize, decode_image
+from paddlers.transforms import Resize, decode_image, construct_sample
 from paddlers.utils import get_single_card_bs
 from paddlers.utils.checkpoint import cd_pretrain_weights_dict
 from .base import BaseModel
@@ -557,10 +557,8 @@ class BaseChangeDetector(BaseModel):
             images = [img_file]
         else:
             images = img_file
-        batch_im1, batch_im2, batch_trans_info = self.preprocess(
-            images, transforms, self.model_type)
+        data = self.preprocess(images, transforms, self.model_type)
         self.net.eval()
-        data = (batch_im1, batch_im2, batch_trans_info)
         outputs = self.run(self.net, data, 'test')
         label_map_list = outputs['label_map']
         score_map_list = outputs['score_map']
@@ -628,7 +626,7 @@ class BaseChangeDetector(BaseModel):
                 im1 = decode_image(im1, read_raw=True)
                 im2 = decode_image(im2, read_raw=True)
             # XXX: sample do not contain 'image_t1' and 'image_t2'.
-            sample = {'image': im1, 'image2': im2}
+            sample = construct_sample(image=im1, image2=im2)
             data = transforms(sample)
             im1, im2 = data[0][:2]
             trans_info = data[1]

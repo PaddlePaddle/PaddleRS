@@ -18,6 +18,7 @@ import random
 from numbers import Number
 from functools import partial
 from operator import methodcaller
+from collections import OrderedDict
 from collections.abc import Sequence
 
 import numpy as np
@@ -32,6 +33,8 @@ import paddlers.transforms.indices as indices
 import paddlers.transforms.satellites as satellites
 
 __all__ = [
+    "construct_sample",
+    "construct_sample_from_dict",
     "Compose",
     "DecodeImg",
     "Resize",
@@ -72,6 +75,19 @@ interp_dict = {
     'AREA': cv2.INTER_AREA,
     'LANCZOS4': cv2.INTER_LANCZOS4
 }
+
+
+def construct_sample(**kwargs):
+    sample = OrderedDict()
+    for k, v in kwargs.items():
+        sample[k] = v
+    if 'trans_info' not in sample:
+        sample['trans_info'] = []
+    return sample
+
+
+def construct_sample_from_dict(dict_like_obj):
+    return construct_sample(**dict_like_obj)
 
 
 class Compose(object):

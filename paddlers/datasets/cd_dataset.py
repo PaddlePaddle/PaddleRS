@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import copy
 from enum import IntEnum
 import os.path as osp
 
 from .base import BaseDataset
 from paddlers.utils import logging, get_encoding, norm_path, is_pic
+from paddlers.transforms import construct_sample_from_dict
 
 
 class CDDataset(BaseDataset):
@@ -130,7 +130,7 @@ class CDDataset(BaseDataset):
             len(self.file_list), file_list))
 
     def __getitem__(self, idx):
-        sample = copy.deepcopy(self.file_list[idx])
+        sample = construct_sample_from_dict(self.file_list[idx])
         sample['trans_info'] = []
         sample = self.transforms.apply_transforms(sample)
 

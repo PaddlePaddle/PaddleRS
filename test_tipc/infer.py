@@ -148,7 +148,7 @@ class TIPCPredictor(object):
         if self._model.model_type == 'classifier':
             preprocessed_samples = {'image': preprocessed_samples}
         elif self._model.model_type == 'segmenter':
-            preprocessed_samples = {'image': preprocessed_samples}
+            preprocessed_samples = {'image': preprocessed_samples[0]}
         elif self._model.model_type == 'detector':
             pass
         elif self._model.model_type == 'change_detector':
@@ -157,7 +157,7 @@ class TIPCPredictor(object):
                 'image2': preprocessed_samples[1]
             }
         elif self._model.model_type == 'restorer':
-            preprocessed_samples = {'image': preprocessed_samples}
+            preprocessed_samples = {'image': preprocessed_samples[0]}
         else:
             logging.error(
                 "Invalid model type {}".format(self.model_type), exit=True)

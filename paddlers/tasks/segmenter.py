@@ -27,7 +27,7 @@ import paddlers.models.paddleseg as ppseg
 import paddlers.rs_models.seg as cmseg
 import paddlers.utils.logging as logging
 from paddlers.models import seg_losses
-from paddlers.transforms import Resize, decode_image
+from paddlers.transforms import Resize, decode_image, construct_sample
 from paddlers.utils import get_single_card_bs, DisablePrint
 from paddlers.utils.checkpoint import seg_pretrain_weights_dict
 from .base import BaseModel
@@ -524,10 +524,8 @@ class BaseSegmenter(BaseModel):
             images = [img_file]
         else:
             images = img_file
-        batch_im, batch_trans_info = self.preprocess(images, transforms,
-                                                     self.model_type)
+        data = self.preprocess(images, transforms, self.model_type)
         self.net.eval()
-        data = (batch_im, batch_trans_info)
         outputs = self.run(self.net, data, 'test')
         label_map_list = outputs['label_map']
         score_map_list = outputs['score_map']
@@ -593,7 +591,7 @@ class BaseSegmenter(BaseModel):
         for im in images:
             if isinstance(im, str):
                 im = decode_image(im, read_raw=True)
-            sample = {'image': im}
+            sample = construct_sample(image=im)
             data = transforms(sample)
             im = data[0][0]
             trans_info = data[1]
@@ -604,7 +602,7 @@ class BaseSegmenter(BaseModel):
         else:
             batch_im = np.asarray(batch_im)
 
-        return batch_im, batch_trans_info
+        return (batch_im, ), batch_trans_info
 
     def postprocess(self, batch_pred, batch_restore_list):
         if isinstance(batch_pred, (tuple, list)) and self.status == 'Infer':

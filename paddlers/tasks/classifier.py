@@ -12,26 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import math
 import os.path as osp
 from collections import OrderedDict
 from operator import itemgetter
 
 import numpy as np
 import paddle
-import paddle.nn.functional as F
 from paddle.static import InputSpec
 
 import paddlers
 import paddlers.models.ppcls as ppcls
 import paddlers.rs_models.clas as cmcls
 import paddlers.utils.logging as logging
-from paddlers.utils import get_single_card_bs, DisablePrint
 from paddlers.models.ppcls.metric import build_metrics
 from paddlers.models import clas_losses
 from paddlers.models.ppcls.data.postprocess import build_postprocess
 from paddlers.utils.checkpoint import cls_pretrain_weights_dict
-from paddlers.transforms import Resize, decode_image
+from paddlers.transforms import Resize, decode_image, construct_sample
 from .base import BaseModel
 
 __all__ = ["ResNet50_vd", "MobileNetV3", "HRNet", "CondenseNetV2"]
@@ -458,9 +455,8 @@ class BaseClassifier(BaseModel):
             images = [img_file]
         else:
             images = img_file
-        batch_im, _ = self.preprocess(images, transforms, self.model_type)
+        data, _ = self.preprocess(images, transforms, self.model_type)
         self.net.eval()
-        data = (batch_im, )
 
         if self.postprocess is None:
             self.build_postprocess_from_labels()
@@ -489,7 +485,7 @@ class BaseClassifier(BaseModel):
         for im in images:
             if isinstance(im, str):
                 im = decode_image(im, read_raw=True)
-            sample = {'image': im}
+            sample = construct_sample(image=im)
             data = transforms(sample)
             im = data[0][0]
             batch_im.append(im)

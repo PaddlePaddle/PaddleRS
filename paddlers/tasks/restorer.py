@@ -28,7 +28,7 @@ import paddlers.models.ppgan.metrics as metrics
 import paddlers.utils.logging as logging
 from paddlers.models import res_losses
 from paddlers.models.ppgan.modules.init import init_weights
-from paddlers.transforms import Resize, decode_image
+from paddlers.transforms import Resize, decode_image, construct_sample
 from paddlers.transforms.functions import calc_hr_shape
 from paddlers.utils.checkpoint import res_pretrain_weights_dict
 from .base import BaseModel
@@ -466,10 +466,8 @@ class BaseRestorer(BaseModel):
             images = [img_file]
         else:
             images = img_file
-        batch_im, batch_trans_info = self.preprocess(images, transforms,
-                                                     self.model_type)
+        data = self.preprocess(images, transforms, self.model_type)
         self.net.eval()
-        data = (batch_im, batch_trans_info)
         outputs = self.run(self.net, data, 'test')
         res_map_list = outputs['res_map']
         if isinstance(img_file, list):
@@ -485,7 +483,7 @@ class BaseRestorer(BaseModel):
         for im in images:
             if isinstance(im, str):
                 im = decode_image(im, read_raw=True)
-            sample = {'image': im}
+            sample = construct_sample(image=im)
             data = transforms(sample)
             im = data[0][0]
             trans_info = data[1]
@@ -496,7 +494,7 @@ class BaseRestorer(BaseModel):
         else:
             batch_im = np.asarray(batch_im)
 
-        return batch_im, batch_trans_info
+        return (batch_im, ), batch_trans_info
 
     def postprocess(self, batch_pred, batch_restore_list):
         if self.status == 'Infer':
