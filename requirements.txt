@@ -15,7 +15,7 @@ opencv-contrib-python >= 4.3.0
 openpyxl
 # paddlepaddle >= 2.2.0
 # paddlepaddle-gpu >= 2.2.0
-paddleslim
+paddleslim >= 2.2.1,< 2.3.5
 pandas
 pycocotools
 # pydensecrf
