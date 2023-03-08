@@ -15,11 +15,11 @@ opencv-contrib-python >= 4.3.0
 openpyxl
 # paddlepaddle >= 2.2.0
 # paddlepaddle-gpu >= 2.2.0
-paddleslim >= 2.2.1,< 2.3.5
+paddleslim
 pandas
 pycocotools
 # pydensecrf
-scikit-learn == 0.23.2
+scikit-learn
 scikit-image >= 0.14.0
 scipy
 shapely
