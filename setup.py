@@ -13,35 +13,38 @@
 # limitations under the License.
 
 import setuptools
-import paddlers
 
-DESCRIPTION = "Awesome Remote Sensing Toolkit based on PaddlePaddle"
+if __name__ == '__main__':
+    DESCRIPTION = "Awesome Remote Sensing Toolkit based on PaddlePaddle"
 
-with open("README.md", "r", encoding='utf8') as fh:
-    LONG_DESCRIPTION = fh.read()
+    with open("README_EN.md", 'r', encoding='utf8') as fh:
+        LONG_DESCRIPTION = fh.read()
 
-with open("requirements.txt") as fin:
-    REQUIRED_PACKAGES = fin.read()
+    with open("requirements.txt", 'r') as fin:
+        REQUIRED_PACKAGES = fin.read()
 
-setuptools.setup(
-    name="paddlers",
-    version=paddlers.__version__.replace('-', ''),
-    author='PaddleRS Authors',
-    author_email="",
-    description=DESCRIPTION,
-    long_description=LONG_DESCRIPTION,
-    long_description_content_type="text/plain",
-    url="https://github.com/PaddlePaddle/PaddleRS",
-    packages=setuptools.find_packages(include=['paddlers', 'paddlers.*']) +
-    setuptools.find_namespace_packages(include=['paddlers', 'paddlers.*']),
-    python_requires='>=3.7',
-    setup_requires=['cython', 'numpy'],
-    install_requires=REQUIRED_PACKAGES,
-    classifiers=[
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "License :: OSI Approved :: Apache Software License",
-        "Operating System :: OS Independent",
-    ],
-    license='Apache 2.0', )
+    with open("paddlers/.version", 'r') as fv:
+        VERSION = fv.read().rstrip()
+
+    setuptools.setup(
+        name="paddlers",
+        version=VERSION.replace('-', ''),
+        author='PaddleRS Authors',
+        author_email="",
+        description=DESCRIPTION,
+        long_description=LONG_DESCRIPTION,
+        long_description_content_type="text/plain",
+        url="https://github.com/PaddlePaddle/PaddleRS",
+        packages=setuptools.find_packages(include=['paddlers', 'paddlers.*']) +
+        setuptools.find_namespace_packages(include=['paddlers', 'paddlers.*']),
+        python_requires='>=3.7',
+        setup_requires=['cython', 'numpy'],
+        install_requires=REQUIRED_PACKAGES,
+        classifiers=[
+            "Programming Language :: Python :: 3.7",
+            "Programming Language :: Python :: 3.8",
+            "Programming Language :: Python :: 3.9",
+            "License :: OSI Approved :: Apache Software License",
+            "Operating System :: OS Independent",
+        ],
+        license='Apache 2.0', )
