@@ -44,6 +44,8 @@ class CDDataset(BaseDataset):
             Defaults to False.
     """
 
+    _collate_trans_info = True
+
     def __init__(self,
                  data_dir,
                  file_list,
@@ -58,8 +60,6 @@ class CDDataset(BaseDataset):
 
         DELIMETER = ' '
 
-        # TODO: batch padding
-        self.batch_transforms = None
         self.file_list = list()
         self.labels = list()
         self.with_seg_labels = with_seg_labels
@@ -131,6 +131,7 @@ class CDDataset(BaseDataset):
 
     def __getitem__(self, idx):
         sample = copy.deepcopy(self.file_list[idx])
+        sample['trans_info'] = []
         sample = self.transforms.apply_transforms(sample)
 
         if self.binarize_labels:
@@ -142,7 +143,7 @@ class CDDataset(BaseDataset):
 
         outputs = self.transforms.arrange_outputs(sample)
 
-        return outputs
+        return outputs, sample['trans_info']
 
     def __len__(self):
         return len(self.file_list)

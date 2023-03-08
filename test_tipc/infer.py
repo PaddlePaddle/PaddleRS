@@ -143,45 +143,32 @@ class TIPCPredictor(object):
         return config
 
     def preprocess(self, images, transforms):
-        preprocessed_samples = self._model.preprocess(
+        preprocessed_samples, batch_trans_info = self._model.preprocess(
             images, transforms, to_tensor=False)
         if self._model.model_type == 'classifier':
-            preprocessed_samples = {'image': preprocessed_samples[0]}
+            preprocessed_samples = {'image': preprocessed_samples}
         elif self._model.model_type == 'segmenter':
-            preprocessed_samples = {
-                'image': preprocessed_samples[0],
-                'ori_shape': preprocessed_samples[1]
-            }
+            preprocessed_samples = {'image': preprocessed_samples}
         elif self._model.model_type == 'detector':
             pass
         elif self._model.model_type == 'change_detector':
             preprocessed_samples = {
                 'image': preprocessed_samples[0],
-                'image2': preprocessed_samples[1],
-                'ori_shape': preprocessed_samples[2]
+                'image2': preprocessed_samples[1]
             }
         elif self._model.model_type == 'restorer':
-            preprocessed_samples = {
-                'image': preprocessed_samples[0],
-                'tar_shape': preprocessed_samples[1]
-            }
+            preprocessed_samples = {'image': preprocessed_samples}
         else:
             logging.error(
-                "Invalid model type {}".format(self._model.model_type),
-                exit=True)
-        return preprocessed_samples
+                "Invalid model type {}".format(self.model_type), exit=True)
+        return preprocessed_samples, batch_trans_info
 
-    def postprocess(self,
-                    net_outputs,
-                    topk=1,
-                    ori_shape=None,
-                    tar_shape=None,
-                    transforms=None):
+    def postprocess(self, net_outputs, batch_restore_list, topk=1):
         if self._model.model_type == 'classifier':
             true_topk = min(self._model.num_classes, topk)
             if self._model.postprocess is None:
                 self._model.build_postprocess_from_labels(topk)
-            # XXX: Convert ndarray to tensor as self._model.postprocess requires
+            # XXX: Convert ndarray to tensor as `self._model.postprocess` requires
             assert len(net_outputs) == 1
             net_outputs = paddle.to_tensor(net_outputs[0])
             outputs = self._model.postprocess(net_outputs)
@@ -195,9 +182,7 @@ class TIPCPredictor(object):
             } for l, s, n in zip(class_ids, scores, label_names)]
         elif self._model.model_type in ('segmenter', 'change_detector'):
             label_map, score_map = self._model.postprocess(
-                net_outputs,
-                batch_origin_shape=ori_shape,
-                transforms=transforms.transforms)
+                net_outputs, batch_restore_list=batch_restore_list)
             preds = [{
                 'label_map': l,
                 'score_map': s
@@ -210,14 +195,11 @@ class TIPCPredictor(object):
             preds = self._model.postprocess(net_outputs)
         elif self._model.model_type == 'restorer':
             res_maps = self._model.postprocess(
-                net_outputs[0],
-                batch_tar_shape=tar_shape,
-                transforms=transforms.transforms)
+                net_outputs[0], batch_restore_list=batch_restore_list)
             preds = [{'res_map': res_map} for res_map in res_maps]
         else:
             logging.error(
-                "Invalid model type {}.".format(self._model.model_type),
-                exit=True)
+                "Invalid model type {}.".format(self.model_type), exit=True)
 
         return preds
 
@@ -225,7 +207,8 @@ class TIPCPredictor(object):
         if self.benchmark and time_it:
             self.autolog.times.start()
 
-        preprocessed_input = self.preprocess(images, transforms)
+        preprocessed_input, batch_trans_info = self.preprocess(images,
+                                                               transforms)
 
         input_names = self.predictor.get_input_names()
         for name in input_names:
@@ -247,11 +230,7 @@ class TIPCPredictor(object):
             self.autolog.times.stamp()
 
         res = self.postprocess(
-            net_outputs,
-            topk,
-            ori_shape=preprocessed_input.get('ori_shape', None),
-            tar_shape=preprocessed_input.get('tar_shape', None),
-            transforms=transforms)
+            net_outputs, batch_restore_list=batch_trans_info, topk=topk)
 
         if self.benchmark and time_it:
             self.autolog.times.end(stamp=True)

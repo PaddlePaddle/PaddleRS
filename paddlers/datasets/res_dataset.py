@@ -36,6 +36,8 @@ class ResDataset(BaseDataset):
             restoration tasks. Defaults to None.
     """
 
+    _collate_trans_info = True
+
     def __init__(self,
                  data_dir,
                  file_list,
@@ -45,7 +47,6 @@ class ResDataset(BaseDataset):
                  sr_factor=None):
         super(ResDataset, self).__init__(data_dir, None, transforms,
                                          num_workers, shuffle)
-        self.batch_transforms = None
         self.file_list = list()
 
         with open(file_list, encoding=get_encoding(file_list)) as f:

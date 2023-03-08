@@ -78,7 +78,6 @@ class COCODetDataset(BaseDataset):
                     self.num_max_boxes *= 2
                     break
 
-        self.batch_transforms = None
         self.allow_empty = allow_empty
         self.empty_ratio = empty_ratio
         self.file_list = list()
@@ -260,8 +259,9 @@ class COCODetDataset(BaseDataset):
                 DecodeImg(to_rgb=False)(sample),
                 DecodeImg(to_rgb=False)(sample_mix)
             ])
-        sample = self.transforms(sample)
-        return sample
+        sample['trans_info'] = []
+        sample, trans_info = self.transforms(sample)
+        return sample, trans_info
 
     def __len__(self):
         return self.num_samples

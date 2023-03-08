@@ -15,11 +15,14 @@
 from copy import deepcopy
 
 from paddle.io import Dataset
+from paddle.fluid.dataloader.collate import default_collate_fn
 
 from paddlers.utils import get_num_workers
 
 
 class BaseDataset(Dataset):
+    _collate_trans_info = False
+
     def __init__(self, data_dir, label_list, transforms, num_workers, shuffle):
         super(BaseDataset, self).__init__()
 
@@ -31,5 +34,14 @@ class BaseDataset(Dataset):
 
     def __getitem__(self, idx):
         sample = deepcopy(self.file_list[idx])
-        outputs = self.transforms(sample)
-        return outputs
+        # `trans_info` will be used to store meta info about image shape
+        sample['trans_info'] = []
+        outputs, trans_info = self.transforms(sample)
+        return outputs, trans_info
+
+    def collate_fn(self, batch):
+        if self._collate_trans_info:
+            return default_collate_fn(
+                [s[0] for s in batch]), [s[1] for s in batch]
+        else:
+            return default_collate_fn([s[0] for s in batch])
