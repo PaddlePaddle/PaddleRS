@@ -1,34 +1,33 @@
-# PaddleRS代码注释规范
+# PaddleRS Code comment specification
 
-## 1 注释规范
+## 1 Comment specifications
 
-函数的docstring由5个模块构成：
+The function docstring is made up of five modules:
 
-- 函数功能描述；
-- 函数参数；
-- （可选）函数返回值；
-- （可选）函数可能抛出的异常；
-- （可选）使用示例。
+- Function description;
+- Function arguments;
+- (optional) function return value;
+- (optional) exceptions that may be thrown by the function;
+- (optional) Usage examples.
 
-类的docstring也由5个模块构成：
+The class docstring is also made up of five modules:
 
-- 类功能描述；
-- 实例化类所需参数；
-- （可选）实例化类得到的对象；
-- （可选）实例化类时可能抛出的异常；
-- （可选）使用示例。
+- Class functionality description;
+- Parameters needed to instantiate a class;
+- (optional) an object resulting from the instantiation of the class;
+- (optional) exceptions that may be thrown when the class is instantiated;
+- (optional) Usage examples.
+The specification of each module is described in detail below.
 
-以下将详细叙述每个模块的规范。
+### 1.1 Function/Class Description
 
-### 1.1 函数/类功能描述
+The goal is for users to understand it quickly. The module can be divided into three parts, function description + calculation formula + annotation.
 
-目标是让用户能快速看懂。该模块又可以拆解为3个部分，功能叙述 + 计算公式 + 注解。
+- Functional narrative: Describes the specific functionality of the function or class. The user does not necessarily have background knowledge, so it is necessary to fill in the necessary details.
+- (Optional) Calculation formula: Give the calculation formula of the function if needed. Formulas are recommended to be written in LaTex syntax.
+- (Optional) Notes: if special instructions are required, they can be given in this section.
 
-- 功能叙述：描述该函数或类的具体功能。由于用户不一定具有相应背景知识，所以需要补充必要的细节。
-- （可选）计算公式：如有需要，给出函数的计算公式。公式建议以LaTex文法编写。
-- （可选）注解：如需要特殊说明，可以在该部分给出。
-
-示例：
+Examples:
 
 ```python
 """
@@ -41,21 +40,20 @@
 """
 ```
 
-### 1.2 函数参数/类构造参数
+### 1.2 Function arguments/class constructor arguments
 
-要解释清楚每个参数的**类型**、**含义**和**默认值**（如果有）。
+Explain the ** type **, ** meaning ** and ** default value ** (if any) of each parameter.
 
-注意事项：
+Notes:
 
-- 可选参数要备注`optional`，例如：`name (str|None, optinoal)`；
-- 若参数具有多种可选类型，用`|`分隔；
-- 参数名和类型之间需要空1格；
-- 可使用`list[{类型名}]`和`tuple[{类型名}]`的方式表示包含某种类型对象的列表或元组（注意大小写），例如`list[int]`表示包含`int`类型元素的列表，`tuple[int|float]`等价于`tuple[int] | tuple[float]`；
-- 使用`list[{类型名}]`和`tuple[{类型名}]`的描述时，默认假设列表或元组参数为同质的（即其中包含的所有元素具有相同的类型），若允许或需要列表、元组参数为异质的，需要在文字描述中说明；
-- 被分隔的类型如果是简单类型如`int`、`Tensor`等则`|`前后不需要添加空格，如果是多个复杂类型如`list[int]`和`tuple[float]`则需要在`|`前后添加空格；
-- 对于有默认值的参数，至少要讲清楚在取默认值时的逻辑，而不仅仅是介绍这个参数是什么以及默认值是什么。
-
-示例：
+- optional parameters to note ` optional `, for example: ` name (STR | None, optinoal) `;
+- if the parameter has a variety of optional type, use ` | ` space;
+- Empty 1 space between parameter name and type;
+- 'list[{type name}]' and 'tuple[{type name}]' can be used to represent a list or tuple containing objects of a certain type (be aware of case). For example, 'list[int]' is a list containing elements of type 'int'. ` tuple [int | float] ` equivalent to ` tuple (int) | tuple [float] `;
+- When using 'list[{type name}]' and 'tuple[{type name}]' descriptions, the default assumption is that the list or tuple parameters are homogeneous (i.e., all the elements it contains have the same type). If the list or tuple parameters are heterogeneous, it needs to be stated in the literal description;
+- separated type if it is a simple type such as ` int `, ` Tensor ` etc are ` | ` don't need to add a space before and after, if it is a more complex types such as ` list [int] ` and ` tuple ` requires float in ` | ` add a space before and after;
+- For a parameter with a default value, at least explain the logic for getting the default value, not just what the parameter is and what the default value is.
+Examples：
 
 ```python
 """
@@ -67,11 +65,11 @@
 """
 ```
 
-### 1.3 返回值/构造对象
+### 1.3 Return value/Constructor
 
-对于函数返回值，先描述返回值的类型（用`()`包围，语法与参数类型描述一致），然后说明返回值的含义。对于实例化类得到的对象，无需说明类型。
+For function return values, first describe the type of the return value (surrounded by a '('') 'syntax that matches the argument type description), and then explain what the return value means. You do not need to specify the type of an object that is instantiated from a class.
 
-示例1：
+Example 1:
 
 ```python
 """
@@ -80,7 +78,7 @@
 """
 ```
 
-示例2：
+Example2：
 
 ```python
 """
@@ -89,7 +87,7 @@
 """
 ```
 
-示例3（类定义中）：
+Example3（In class definition）：
 
 ```python
 """
@@ -98,11 +96,11 @@
 """
 ```
 
-### 1.4 可能抛出的异常
+### 1.4 Exceptions that might pop up
 
-需给出异常类型和抛出异常的条件。
+You need to specify the type of exception and the conditions under which the exception will pop.
 
-示例：
+Examples:
 
 ```python
 """
@@ -112,13 +110,13 @@
 """
 ```
 
-### 1.5 使用示例
+### 1.5 Usage Examples
 
-为函数或类的各种使用场景尽可能地提供示例，并在注释中给出执行代码预期得到的结果。
+Whenever possible, provide examples for various use cases of the function or class, and include the expected results of executing the code in the comments.
 
-要求：用户复制示例代码到脚本即可运行。注意需要加必要的`import`。
+Requirements: Users can copy the example code into the script to run. Note the need to add the necessary 'import'.
 
-单example示例：
+Single example example:
 
 ```python
 """
@@ -143,7 +141,7 @@
 """
 ```
 
-多examples示例：
+Multiple examples:
 
 ```python
 """
@@ -181,23 +179,21 @@
         # {'AlexNet': <class '__main__.AlexNet'>, 'ResNet': <class '__main__.ResNet'>}
 """
 ```
+### 1.6 Syntax
 
-### 1.6 语法
+- Phrasing accurately, using words and expressions common to the deep learning field.
+- Fluent sentences and English grammar.
+- Be consistent in how you describe the same thing in your document, e.g. avoid using label sometimes and ground truth sometimes.
+### 1.7 Other considerations
 
-- 措词准确，使用深度学习领域通用的词汇和说法。
-- 语句通顺，符合英文语法。
-- 文档中对同一事物的表述要做到前后一致，比如避免有时用label、有时用ground truth。
+- Modules are separated by **1** blank lines.
+- Capitalize the first letters and add punctuation marks (especially ** . **) to follow the rules of English grammar.
+- Use blank lines in code examples to create a sense of hierarchy.
+- Use backquotes' \ 'around ** input parameter names **, ** properties or methods for the input parameters **, and ** file paths ** that appear in comments.
+- Each module should have a newline and indentation between the title/subtitle and the actual content, and **1** blank line between the 'Examples:' title and the example code content.
+- Dangling indentation is required for descriptions that span multiple lines.
 
-### 1.7 其他注意事项
-
-- 不同模块间以**1**个空行分隔。
-- 注意首字母大写以及添加标点符号（尤其是**句号**），符合英语语法规则。
-- 在代码示例内容中可适当加空行以体现层次感。
-- 对于注释中出现的**输入参数名**、**输入参数的属性或方法**以及**文件路径**，使用反引号`\``包围。
-- 每个模块的标题/子标题和具体内容之间需要有换行和缩进，`Examples:`标题与示例代码内容之间插入**1**个空行。
-- 单段描述跨行时需要使用悬挂式缩进。
-
-## 2 完整docstring示例
+## 2 Full docstring example:
 
 ```python
 class Activation(nn.Layer):

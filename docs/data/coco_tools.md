@@ -1,61 +1,62 @@
-# coco_tools使用说明
+# Instructions for using coco_tools
 
-## 1 工具说明
+## 1 Tool Description
 
-coco_tools是PaddleRS提供的用于处理COCO格式标注文件的工具集，位于`tools/coco_tools/`目录。由于[pycocotools库](https://pypi.org/project/pycocotools/)在部分环境下无法安装，PaddleRS提供coco_tools作为替代，进行一些简单的文件处理工作。
+coco_tools is a set of tools provided by PaddleRS for handling COCO format annotation files, located in the 'tools/coco_tools/' directory. 
+Because [pycocotools library] (https://pypi.org/project/pycocotools/) can't install in some parts of the environment, provide coco_tools PaddleRS as an alternative, carry on some simple file processing work.
 
-*请注意，coco_tools目前为一项实验性功能，若您在使用过程中遇到问题，请及时向我们反馈。*
+*Please note that coco_tools is currently an experimental feature, if you encounter any problems during use, please let us know in time.*
 
-## 2 文件说明
+## 2 documents description
 
-目前coco_tools共有6个文件，各文件及其功能如下：
+There are currently six files in coco_tools, each with the following functions:
 
-- `json_InfoShow.py`:    打印json文件中各个字典的基本信息；
-- `json_ImgSta.py`:      统计json文件中的图像信息，生成统计表、统计图；
-- `json_AnnoSta.py`:     统计json文件中的标注信息，生成统计表、统计图；
-- `json_Img2Json.py`:    统计test集图像，生成json文件；
-- `json_Split.py`:       将json文件中的内容划分为train set和val set；
-- `json_Merge.py`:       将多个json文件合并为1个。
+- 'json_InfoShow.py' : Prints basic information about each dictionary in the json file;
+- 'json_ImgSta.py' : statistic the image information in the json file, generate statistical tables, statistical graphs;
+- 'json_AnnoSta.py' : statistic the annotation information in the json file, generate statistical tables, statistical graphs;
+- 'json_Img2Json.py' : generate json file with test set images;
+- 'json_Split.py' : splits the json file into a train set and a val set;
+- 'json_Merge.py' : Merges multiple json files into one.
 
-## 3 使用示例
+## 3 Use cases
 
-### 3.1 示例数据集
+### 3.1 Example dataset
 
-本文档以COCO 2017数据集作为示例数据进行演示。您可以在以下链接下载该数据集：
+This document uses the COCO 2017 dataset as the example data for demonstration. You can download the dataset at the following link:
 
-- [官方下载链接](https://cocodataset.org/#download)
-- [aistudio备份链接](https://aistudio.baidu.com/aistudio/datasetdetail/7122)
+- [Official download link](https://cocodataset.org/#download)
 
-下载完成后，为方便后续使用，您可以将`coco_tools`目录从PaddleRS项目中复制或链接到数据集目录中。完整的数据集目录结构如下：
+- [aistudio backup link] (https://aistudio.baidu.com/aistudio/datasetdetail/7122)
 
+Once the download is complete, you can copy or link the 'coco_tools' directory from the PaddleRS project into the dataset directory for subsequent use. The complete dataset directory structure is as follows:
 ```
-./COCO2017/      # 数据集根目录
-|--train2017     # 训练集原图目录
-|  |--...
-|  |--...
-|--val2017       # 验证集原图目录
-|  |--...
-|  |--...
-|--test2017      # 测试集原图目录
-|  |--...
-|  |--...
+/COCO2017/ # dataset root directory
+| - train2017 # training set original directory
+| | -...
+| | -...
+| - val2017 # validation set original directory
+| | -...
+| | -...
+| - test2017 # test sets the original directory
+| | -...
+| | -...
 |
-|--annotations   # 标注文件目录
-|  |--...
-|  |--...
+| - # annotations file directory
+| | -...
+| | -...
 |
-|--coco_tools    # coco_tools代码目录
-|  |--...
-|  |--...
-```
+| - # coco_tools  coco_tools code directory
+| | -...
+| | -...
+` ` `
 
-### 3.2 打印json信息
+### 3.2 Printing json information
 
-使用`json_InfoShow.py`可以打印json文件中的各个键值对的key， 并输出value中排列靠前的元素，从而帮助您快速了解标注信息。对于COCO格式标注数据而言，您应该特别留意`'image'`和`'annotation'`字段的内容。
+Use 'json_InfoShow.py' to print the key of each key-value pair in the json file and the top elements in value, which helps you quickly understand the annotation information. For COCO formatted annotation data, you should pay special attention to the contents of the "image" and "annotation" fields.
 
-#### 3.2.1 命令演示
+#### 3.2.1 Command demo
 
-执行如下命令，打印`instances_val2017.json`中的信息：
+Print the information from 'instances_val2017.json' by running the following command:
 
 ```
 python ./coco_tools/json_InfoShow.py \
@@ -63,18 +64,18 @@ python ./coco_tools/json_InfoShow.py \
        --show_num 5
 ```
 
-#### 3.2.2 参数说明
+#### 3.2.2 Parameter description
 
 
-| 参数名         | 含义                                 | 默认值    |
+| the parameter name|    meaning         |                default|
 | ------------- | ------------------------------------| -------- |
-| `--json_path` | 需要统计的json文件路径                 |          |
-| `--show_num`  | （可选）输出value中排列靠前的元素的个数   | `5`      |
-| `--Args_show` | （可选）是否打印输入参数信息             | `True`   |
+| ` - json_path ` | the json file path of statistical | |
+| ` - show_num ` | (optional) output value in the arrangement of the number of elements | ` 5 ` |
+| ` - Args_show ` | | (optional) whether to print the input parameter information ` True ` |
 
-#### 3.2.3 结果展示
+#### 3.2.3.Results
 
-执行上述命令后，输出结果如下：
+After executing the preceding command, the output is as follows:
 
 ```
 ------------------------------------------------Args------------------------------------------------
@@ -153,28 +154,28 @@ contributor : COCO Consortium
 
 ```
 
-#### 3.2.4 结果说明
+#### 3.2.4 Result description
 
-`instances_val2017.json`的key有5个，分别为：
+There are five keys in 'instances_val2017.json', which are:
 
-```
+` ` `
 'info', 'licenses', 'images', 'annotations', 'categories'
-```
-其中，
+` ` `
+Among them,
 
-- `info`键对应的值为字典，共有6个键值对，输出展示了前5对；
-- `licenses`键对应的值为列表，共有8个元素，输出展示了前5个；
-- `images`键对应的值为列表，共有5000个元素，输出展示了前5个；
-- `annotations`键对应的值为列表，共有36781个元素，输出展示了前5个；
-- `categories`键对应的值为列表，共有80个元素，输出展示了前5个。
+- The 'info' key is a dictionary. There are 6 key-value pairs. The output shows the first 5 pairs;
+- The 'licenses' key is a list of 8 elements, and the output shows the first 5;
+- The 'images' key is a list of 5000 elements. The output shows the first 5 elements;
+- The annotations key is a list of 36,781 elements, and the output shows the first five;
+- The 'categories' key is a list of 80 items, and the output shows the first 5 items.
 
-### 3.3 统计图像信息
+### 3.3 Image statistics
 
-使用`json_ImgSta.py`可以从`instances_val2017.json`中快速提取图像信息，生成csv表格，并生成统计图。
+Using 'json_ImgSta.py' we can quickly extract image information from 'instances_val2017.json', generate a csv table, and generate a statistical plot.
 
-#### 3.3.1 命令演示
+#### 3.3.1 Command demo
 
-执行如下命令，打印`instances_val2017.json`信息：
+To print the 'instances_val2017.json' message, run the following command:
 
 ```
 python ./coco_tools/json_ImgSta.py \
@@ -184,20 +185,20 @@ python ./coco_tools/json_ImgSta.py \
     --png_shapeRate_path=./img_sta/images_shapeRate.png
 ```
 
-#### 3.3.2 参数说明
+#### 3.3.2 Parameter description
 
-| 参数名                  | 含义                                                                   | 默认值    |
+|Parameter name | meaning | default value|
 | ---------------------- | --------------------------------------------------------------------- | -------- |
-| `--json_path`          | 需要统计的json文件路径                                                   |          |
-| `--csv_path`           | （可选）统计表格保存路径                                                  | `None`   |
-| `--png_shape_path`     | （可选）png图片保存路径，图片内容为所有图像shape的二维分布                     | `5`      |
-| `--png_shapeRate_path` | （可选）png图片保存路径，图片内容为所有图像shape比例(宽/高)的一维分布           | `5`      |
-| `--image_keyname`      | （可选）json文件中，图像所对应的key                                        |`'images'`|
-| `--Args_show`          | （可选）是否打印输入参数信息                                               |`True`    |
+| ` - json_path ` | the json file path of statistical |... ... |
+| ` - csv_path ` | statistical table (optional) save the path | ` None ` |
+| ` - png_shape_path ` | PNG image save the path (optional), image content for all 2 d image shape distribution | ` 5 ` |
+| ` - png_shapeRate_path ` | PNG image save the path (optional), image content for all image shape ratio (width/height) of the one dimensional distribution | ` 5 ` |
+| ` - image_keyname ` | (optional) json file, image corresponds to the key | ` 'images' ` |
+| ` - Args_show ` |  (optional) whether to print the input parameter information |` True ` |
 
-#### 3.3.3 结果展示
+#### 3.3.3.Results
 
-执行上述命令后，输出结果如下：
+The output is as follows:
 
 ```
 ------------------------------------------------Args------------------------------------------------
@@ -216,7 +217,7 @@ png save to ./img_sta/images_shapeRate.png
 csv save to ./img_sta/images.csv
 ```
 
-部分表格内容：
+Some table contents:
 
 
 |   | license | file_name        | coco_url                                               | height | width | date_captured       | flickr_url                                                     | id     | shape_rate |
@@ -226,21 +227,21 @@ csv save to ./img_sta/images.csv
 | 2 | 4       | 000000252219.jpg | http://images.cocodataset.org/val2017/000000252219.jpg | 428    | 640   | 2013-11-14 22:32:02 | http://farm4.staticflickr.com/3446/3232237447_13d84bd0a1_z.jpg | 252219 | 1.5        |
 | 3 | 1       | 000000087038.jpg | http://images.cocodataset.org/val2017/000000087038.jpg | 480    | 640   | 2013-11-14 23:11:37 | http://farm8.staticflickr.com/7355/8825114508_b0fa4d7168_z.jpg | 87038  | 1.3        |
 
-保存的图片内容：
+Saved image contents:
 
-所有图像shape的二维分布：
-![image.png](./assets/1650011491220-image.png)
+Two-dimensional distribution of all image shapes:
+! [image.png](./assets/1650011491220-image.png)
 
-所有图像shape比例(宽/高)的一维分布：
-![image.png](./assets/1650011634205-image.png)
+1D distribution of shape ratios (width/height) for all images:
+! [image.png](./assets/1650011634205-image.png)
 
-### 3.4 统计目标检测标注框信息
+### 3.4 Count object detection labels
 
-使用`json_AnnoSta.py`，可以从`instances_val2017.json`中快速提取标注信息，生成csv表格，并生成统计图。
+Using 'json_AnnoSta.py', you can quickly extract annotations from 'instances_val2017.json', generate a csv table, and generate a statistical plot.
 
-#### 3.4.1 命令演示
+#### 3.4.1 Command demo
 
-执行如下命令，打印`instances_val2017.json`信息：
+To print the 'instances_val2017.json' message, run the following command:
 
 ```
 python ./coco_tools/json_AnnoSta.py \
@@ -255,26 +256,27 @@ python ./coco_tools/json_AnnoSta.py \
     --get_relative=True
 ```
 
-#### 3.4.2 参数说明
+#### 3.4.2 Parameter Description
 
-| 参数名                  | 含义                                                                                                                       | 默认值         |
+| Parameter name                 | meaning                                                                                                                      | default        |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------- | ------------- |
-| `--json_path`          | （可选）需要统计的json文件路径                                                                                                 |               |
-| `--csv_path`           | （可选）统计表格保存路径                                                                                                       | `None`        |
-| `--png_shape_path`     | （可选）png图片保存路径，图片内容为所有目标检测框shape的二维分布                                                                    | `None`        |
-| `--png_shapeRate_path` | （可选）png图片保存路径，图片内容为所有目标检测框shape比例(宽/高)的一维分布                                                           | `None`        |
-| `--png_pos_path`       | （可选）png图片保存路径，图片内容为所有目标检测框左上角坐标的二维分布                                                                 | `None`        |
-| `--png_posEnd_path`    | （可选）png图片保存路径，图片内容为所有目标检测框右下角坐标的二维分布                                                                 | `None`        |
-| `--png_cat_path`       | （可选）png图片保存路径，图片内容为各个类别的对象数量分布                                                                           | `None`        |
-| `--png_objNum_path`    | （可选）png图片保存路径，图片内容为单个图像中含有标注对象的数量分布                                                                   | `None`        |
-| `--get_relative`       | （可选）是否生成图像目标检测框shape、目标检测框左上角坐标、右下角坐标的相对比例值<br />(横轴坐标/图片长，纵轴坐标/图片宽)                    | `None`        |
-| `--image_keyname`      | （可选）json文件中，图像所对应的key                                                                                             | `'images'`    |
-| `--anno_keyname`       | （可选）json文件中，标注所对应的key                                                                                             | `'annotations'`|
-| `--Args_show`          | （可选）是否打印输入参数信息                                                                                                    | `True`        |
+| `- json_path`          | (Optional) the json file path of statistical |`None`|
+| `- csv_path`           | save path (Optional) statistics form |`None` |
+| `- png_shape_path`     | (Optional) PNG image save path, image content for all target detection box shape distribution of 2d|`None`|
+| `- png_shapeRate_path` | (Optional) PNG image save path, image content for all target detection box shape ratio (width/height) of the one dimensional distribution |`None`|
+| `- png_pos_path`       | (Optional) PNG image save path, image content for all target detection coordinates, the two dimensional distribution of left upper corner of the box |`None`|
+| `--png_posEnd_path`    | (Optional)PNG image save path, image content for all target detection test box at the bottom right corner coordinates of two-dimensional distribution| `None`        |
+| `--png_cat_path`       | (Optional)png image to save the path, the image content is the number of objects in each category distribution                 | `None`        |
+| `--png_objNum_path`    | (Optional)png image save path, image content is the number of annotated objects in a single image distribution                 | `None`        |
+| `--get_relative`       | (Optional)Whether to generate the shape of the image object detection box, the relative proportion value of the upper-
+   -left corner coordinate and the lower right corner coordinate of the object detection box <br />(horizontal axis coordinate/picture length, vertical axis coordinate/picture width)|`None`|
+| `--image_keyname`      | (Optional)json file corresponding to the key of the image                                                                      | `'images'`    |
+| `--anno_keyname`       | (Optional)json file with the corresponding key                                                                                 | `'annotations'`|
+| `--Args_show`          | (Optional)Whether to print input parameter information                                                                         | `True`        |
 
-#### 3.4.3 结果展示
+#### 3.4.3 Results
 
-执行上述命令后，输出结果如下：
+After executing the preceding command, the output is as follows:
 
 ```
 ------------------------------------------------Args------------------------------------------------
@@ -306,53 +308,53 @@ png save to ./anno_sta/annos_objNum.png
 csv save to ./anno_sta/annos.csv
 ```
 
-部分表格内容：
+Some table contents:
 
-![image.png](./assets/1650025881244-image.png)
+! [image.png](./assets/1650025881244-image.png)
 
-所有目标检测框shape的二维分布：
+Two-dimensional distribution of all object detection box shapes:
 
-![image.png](./assets/1650025909461-image.png)
+! [image.png](./assets/1650025909461-image.png)
 
-所有目标检测框shape在图像中相对比例的二维分布：
+Two-dimensional distribution of the relative proportions of all object detection box shapes in the image:
 
-![image.png](./assets/1650026052596-image.png)
+! [image.png](./assets/1650026052596-image.png)
 
-所有目标检测框shape比例（宽/高）的一维分布：
+One-dimensional distribution of the shape ratio (width/height) of all object detection boxes:
 
-![image.png](./assets/1650026072233-image.png)
+! [image.png](./assets/1650026072233-image.png)
 
-所有目标检测框左上角坐标的二维分布：
+Two-dimensional distribution of the upper-left corner coordinates of all object detection boxes:
 
-![image.png](./assets/1650026247150-image.png)
+! [image.png](./assets/1650026247150-image.png)
 
-所有目标检测框左上角坐标的相对比例值的二维分布：
+Two-dimensional distribution of the relative scale values of the upper-left coordinates of all object detection boxes:
 
 ![image.png](./assets/1650026289987-image.png)
 
-所有目标检测框右下角坐标的二维分布：
+Two-dimensional distribution of the coordinates of the lower right corner of all object detection boxes:
 
-![image.png](./assets/1650026457254-image.png)
+! [image.png](./assets/1650026457254-image.png)
 
-所有目标检测框右下角坐标的相对比例值的二维分布：
+Two-dimensional distribution of the relative scale values of the lower right corner coordinates of all object detection boxes:
 
-![image.png](./assets/1650026487732-image.png)
+! [image.png](./assets/1650026487732-image.png)
 
-各个类别的对象数量分布：
+Distribution of the number of objects in each class:
 
-![image.png](./assets/1650026546304-image.png)
+! [image.png](./assets/1650026546304-image.png)
 
-单个图像中含有标注对象的数量分布：
+Distribution of the number of annotated objects in a single image:
 
-![image.png](./assets/1650026559309-image.png)
+! [image.png](./assets/1650026559309-image.png)
 
-### 3.5 统计图像信息生成json
+### 3.5 Generate json from image statistics
 
-使用`json_Test2Json.py`，可以根据`test2017`中的文件信息与训练集json文件快速提取图像信息，生成测试集json文件。
+Using 'json_Test2Json.py', we can quickly extract image information from the file information in 'test2017' and the training set json file to generate a test set json file.
 
-#### 3.5.1 命令演示
+#### 3.5.1 Command demo
 
-执行如下命令，统计并生成`test2017`信息：
+Run the following command to generate the statistics for 'test2017' :
 
 ```
 python ./coco_tools/json_Img2Json.py \
@@ -361,21 +363,21 @@ python ./coco_tools/json_Img2Json.py \
     --json_test_path=./test.json
 ```
 
-#### 3.5.2 参数说明
+#### 3.5.2 Parameter Description
 
 
-| 参数名               | 含义                                      | 默认值        |
+| Parameter name              | meaning                                     | default       |
 | ------------------- | ---------------------------------------- | ------------ |
-| `--test_image_path` | 需要统计的图像目录路径                       |              |
-| `--json_train_path` | 用于参考的训练集json文件路径                 |              |
-| `--json_test_path`  | 生成的测试集json文件路径                    |              |
-| `--image_keyname`   | （可选）json文件中，图像对应的key            | `'images'`    |
-| `--cat_keyname`     | （可选）json文件中，类别对应的key            | `'categories'`|
-| `--Args_show`       | （可选）是否打印输入参数信息                 | `True`        |
+| `--test_image_path` | Image directory path to be counted                      |              |
+| `--json_train_path` | Path to the training set json file for reference        |              |
+| `--json_test_path`  | Path to the generated test set json file                |              |
+| `--image_keyname`   | (Optional)The key corresponding to the image in the json file          | `'images'`    |
+| `--cat_keyname`     | (Optional)Keys for different classes in the json file                  | `'categories'`|
+| `--Args_show`       | (Optional)Whether to print input parameter information                 | `True`        |
 
-#### 3.5.3 结果展示
+#### 3.5.3 Results
 
-执行上述命令后，输出结果如下：
+The output is as follows:
 
 ```
 ------------------------------------------------Args------------------------------------------------
@@ -394,7 +396,7 @@ test image read...
  total test image: 40670
 ```
 
-生成的json文件信息：
+Generated json file information:
 
 ```
 ------------------------------------------------Args------------------------------------------------
@@ -433,13 +435,13 @@ json keys: dict_keys(['images', 'categories'])
 ...
 ```
 
-### 3.6 json文件拆分
+### 3.6 json file splitting
 
-使用`json_Split.py`，可以将`instances_val2017.json`文件拆分为2个子集。
+Using 'json_Split.py', we can split the 'instances_val2017.json' file into 2 subsets.
 
-#### 3.6.1 命令演示
+#### 3.6.1 Command demo
 
-执行如下命令，拆分`instances_val2017.json`文件：
+Run the following command to split the 'instances_val2017.json' file:
 
 ```
 python ./coco_tools/json_Split.py \
@@ -448,26 +450,27 @@ python ./coco_tools/json_Split.py \
     --json_val_path=./instances_val2017_val.json
 ```
 
-#### 3.6.2 参数说明
+#### 3.6.2 Parameter Description
 
 
-| 参数名                | 含义                                                                                   | 默认值        |
+| Parameter name               | meaning                                                                                  | default       |
 | -------------------- | ------------------------------------------------------------------------------------- | ------------ |
-| `--json_all_path`    | 需要拆分的json文件路径                                                                   |              |
-| `--json_train_path`  | 生成的train部分json文件                                                                 |              |
-| `--json_val_path`    | 生成的val部分json文件                                                                   |              |
-| `--val_split_rate`   | （可选）拆分过程中，val集文件的比例                                                        | `0.1`        |
-| `--val_split_num`    | （可选）拆分过程中，val集文件的数量，<br />如果设置了该参数，则`--val_split_rate`参数失效       | `None`       |
-| `--keep_val_inTrain` | （可选）拆分过程中，是否在train中仍然保留val部分                                            | `False`      |
-| `--image_keyname`    | （可选）json文件中，图像对应的key                                                         | `'images'`    |
-| `--cat_keyname`      | （可选）json文件中，类别对应的key                                                         | `'categories'`|
-| `--Args_show`        | （可选）是否打印输入参数信息                                                              | `'True'`      |
+|`- json_all_path` | need to split the json file path |            |
+|`- json_train_path` | generated "train" part of the json file |   |
+|`- json_val_path` | val part of generating json file |            |
+|`- val_split_rate` | (Optional) in the process of splitting, the proportion of val set file |`0.1`|
+|`- val_split_num` | (Optional) in the process of splitting, val set file number,If set this parameter, the ` - val_split_rate ` parameter failure |`None`|
+|`- keep_val_inTrain` | (Optional) separation process, whether you are in the train still keep val parts |`False`|
+|`- image_keyname` | (Optional) json file, image matching key |`'images'`|
+|`- cat_keyname` | (Optional) json file, corresponding key category |`'categories'` |
+|`- Args_show` |  (Optional) whether to print the input parameter information `|'True'|
 
-#### 3.6.3 结果展示
 
-执行上述命令后，输出结果如下：
+#### 3.6.3.Showing the results
 
+After executing the above command. The output is as follows:
 ```
+
 ------------------------------------------------Args------------------------------------------------
 json_all_path = ./annotations/instances_val2017.json
 json_train_path = ./instances_val2017_train.json
@@ -487,13 +490,13 @@ image total 5000, train 4500, val 500
 anno total 36781, train 33119, val 3662
 ```
 
-### 3.7 json文件合并
+### 3.7 json file concatenation
 
-使用`json_Merge.py`，可以合并2个json文件。
+Using 'json_Merge.py', we can merge 2 json files.
 
-#### 3.7.1 命令演示
+#### 3.7.1 Command demo
 
-执行如下命令，合并`instances_train2017.json`与`instances_val2017.json`：
+Run the following command to merge 'instances_train2017.json' and 'instances_val2017.json' :
 
 ```
 python ./coco_tools/json_Merge.py \
@@ -502,20 +505,20 @@ python ./coco_tools/json_Merge.py \
     --save_path=./instances_trainval2017.json
 ```
 
-#### 3.7.2 参数说明
+#### 3.7.2 Parameter Description
 
 
-| 参数名          | 含义                             | 默认值                       |
+| Parameter name         | meaning                            | default                      |
 | -------------- | ------------------------------- | --------------------------- |
-| `--json1_path` | 需要合并的json文件1路径            |                             |
-| `--json2_path` | 需要合并的json文件2路径            |                             |
-| `--save_path`  | 生成的json文件                    |                             |
-| `--merge_keys` | （可选）合并过程中需要合并的key      | `['images', 'annotations']` |
-| `--Args_show`  | （可选）是否打印输入参数信息         | `True`                      |
+| `--json1_path` | json file 1 path to be merged   |                             |
+| `--json2_path` | json file 2 path to be merged   |                             |
+| `--save_path`  | The generated json file         |                             |
+| `--merge_keys` | (Optional)Keys to be merged during the merge process          | `['images', 'annotations']` |
+| `--Args_show`  | (Optional)Whether to print input parameter information        | `True`                      |
 
-#### 3.7.3 结果展示
+#### 3.7.3 Results display
 
-执行上述命令后，输出结果如下：
+The output is as follows:
 
 ```
 ------------------------------------------------Args------------------------------------------------

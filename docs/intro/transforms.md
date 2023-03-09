@@ -1,35 +1,35 @@
-# 数据变换算子
+# data transformation operator
 
-## PaddleRS已支持的数据变换算子列表
+## List of transformations supported by PaddleRS
 
-PaddleRS对不同遥感任务需要的数据预处理/数据增强（合称为数据变换）策略进行了有机整合，设计统一的算子。考虑到遥感影像的多波段特性，PaddleRS的大部分数据处理算子均能够处理任意数量波段的输入。PaddleRS目前提供的所有数据变换算子如下表：
+PaddleRS integrates data preprocessing/data augmentation (collectively, data transformation) strategies required by different remote sensing tasks, and designs a unified operator. Considering the multi-band nature of remote sensing images, most of the data processing operators of PaddleRS are able to process input from any number of bands. PaddleRS currently provides all the data transformation operators as shown in the following table:
 
-| 数据变换算子名 | 用途                                                     | 任务     | ... |
+| Name of the data transformation operator | Use                                                 | Tasks     | ... |
 | -------------------- | ------------------------------------------------- | -------- | ---- |
-| AppendIndex          | 计算遥感指数并添加到输入影像中。 | 所有任务  | ... |  
-| CenterCrop           | 对输入影像进行中心裁剪。 | 所有任务 | ... |
-| Dehaze               | 对输入图像进行去雾。 | 所有任务 | ... |
-| MatchRadiance        | 对两个时相的输入影像进行相对辐射校正。 | 变化检测 | ... |
-| MixupImage           | 将两幅影像（及对应的目标检测标注）混合在一起作为新的样本。 | 目标检测 | ... |
-| Normalize            | 对输入影像应用标准化。 | 所有任务 | ... |
-| Pad                  | 将输入影像填充到指定的大小。 | 所有任务 | ... |
-| RandomBlur           | 对输入施加随机模糊。 | 所有任务 | ... |
-| RandomCrop           | 对输入影像进行随机中心裁剪。 | 所有任务 | ... |
-| RandomDistort        | 对输入施加随机色彩变换。 | 所有任务 | ... |
-| RandomExpand         | 根据随机偏移扩展输入影像。 | 所有任务 | ... |
-| RandomHorizontalFlip | 随机水平翻转输入影像。 | 所有任务 | ... |
-| RandomResize         | 随机调整输入影像大小。 | 所有任务 | ... |
-| RandomResizeByShort  | 随机调整输入影像大小，保持纵横比不变（根据短边计算缩放系数）。 | 所有任务 | ... |
-| RandomScaleAspect    | 裁剪输入影像并重新缩放到原始尺寸。 | 所有任务 | ... |
-| RandomSwap           | 随机交换两个时相的输入影像。 | 变化检测 | ... |
-| RandomVerticalFlip   | 随机竖直翻转输入影像。 | 所有任务 | ... |
-| ReduceDim            | 对输入图像进行波段降维。 | 所有任务 | ... |
-| Resize               | 调整输入影像大小。 | 所有任务 | ... |
-| ResizeByLong         | 调整输入影像大小，保持纵横比不变（根据长边计算缩放系数）。 | 所有任务 | ... |
-| ResizeByShort        | 调整输入影像大小，保持纵横比不变（根据短边计算缩放系数）。 | 所有任务 | ... |
-| SelectBand           | 对输入影像进行波段选择。 | 所有任务 | ... |
+| AppendIndex          | The remote sensing index is calculated and added to the input image. | Any tasks  | ... |  
+| CenterCrop           | Center crop the input image. | Any tasks | ... |
+| Dehaze               | The input image is dehazed. | Any tasks | ... |
+| MatchRadiance        | Relative radiometric correction is performed on the input image of the two phases.| Change-detection | ... |
+| MixupImage           | The two images (and their corresponding Object-Detection labels) are mixed together as a new sample. | Object-Detection | ... |
+| Normalize            | Normalization is applied to the input images. | Any tasks | ... |
+| Pad                  | Fill the input image to the specified size. | Any tasks | ... |
+| RandomBlur           | A random blur is applied to the input. | Any tasks | ... |
+| RandomCrop           | The input image is randomly center-cropped.| Any tasks | ... |
+| RandomDistort        | A random color transformation is applied to the input. | Any tasks | ... |
+| RandomExpand         | Expand the input image by random offset. | Any tasks | ... |
+| RandomHorizontalFlip | Randomly flip the input image horizontally. | Any tasks | ... |
+| RandomResize         | Resize the input image randomly. | Any tasks | ... |
+| RandomResizeByShort  | Resize the input image randomly, keeping the aspect ratio constant (calculate the scaling factor based on the short edges).| Any tasks | ... |
+| RandomScaleAspect    | Crop the input image and re-scale it to its original dimensions.| Any tasks | ... |
+| RandomSwap           | Random exchange two phase of the input image. | Change-detection | ... |
+| RandomVerticalFlip   | Flip the input image vertically at random. | Any tasks | ... |
+| ReduceDim            | Band dimensionality reduction is performed on the input image. | Any tasks | ... |
+| Resize               | Resize the input image. | Any tasks | ... |
+| ResizeByLong         | Resize the input image, keeping the aspect ratio constant (calculate the scaling factor based on the long side). | Any tasks | ... |
+| ResizeByShort        | Resize the input image, keeping the aspect ratio constant (calculate the scaling factor based on the short side).| Any tasks | ... |
+| SelectBand           | Band selection is performed on the input image. | Any tasks | ... |
 | ...                  | ... | ... | ... |
 
-## 组合算子
+## Composition operators
 
-在实际的模型训练过程中，常常需要组合多种数据预处理与数据增强策略。PaddleRS提供了`paddlers.transforms.Compose`以便捷地组合多个数据变换算子，使这些算子能够串行执行。关于`paddlers.transforms.Compose`的具体用法请参见[API说明](https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/data.md)。
+In the actual process of model training, it is often necessary to combine multiple data preprocessing and data augmentation strategies. PaddleRS provides`paddlers.transforms.Compose`operator to easily combine multiple data transformation, enables the operator to serial execution. The specific usage of the`paddlers.transforms.Compose`please see [API specification] (https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/data.md).

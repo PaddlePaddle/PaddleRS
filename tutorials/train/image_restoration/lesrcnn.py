@@ -1,37 +1,37 @@
 #!/usr/bin/env python
 
-# 图像复原模型LESRCNN训练示例脚本
-# 执行此脚本前，请确认已正确安装PaddleRS库
+# Image restoration model LESRCNN training example script
+# Make sure you have the PaddleRS library correctly installed before executing this script
 
 import paddlers as pdrs
 from paddlers import transforms as T
 
-# 数据集存放目录
+# dataset directory
 DATA_DIR = './data/rssr/'
-# 训练集`file_list`文件路径
+# Training set 'file_list' file path
 TRAIN_FILE_LIST_PATH = './data/rssr/train.txt'
-# 验证集`file_list`文件路径
+# Validation set 'file_list' file path
 EVAL_FILE_LIST_PATH = './data/rssr/val.txt'
-# 实验目录，保存输出的模型权重和结果
+# The experimental directory, which holds the output model weights and results
 EXP_DIR = './output/lesrcnn/'
 
-# 下载和解压遥感影像超分辨率数据集
+# Download and unpack the UC Merced dataset
 pdrs.utils.download_and_decompress(
     'https://paddlers.bj.bcebos.com/datasets/rssr.zip', path='./data/')
 
-# 定义训练和验证时使用的数据变换（数据增强、预处理等）
-# 使用Compose组合多种变换方式。Compose中包含的变换将按顺序串行执行
-# API说明：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/data.md
+# define transformations to use during training and validation (data augmentation, preprocessing, etc.)
+# Use Compose to compose multiple transformations. Transformations contained in Compose will be executed sequentially
+# API Description: https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/data.md
 train_transforms = T.Compose([
-    # 读取影像
+    # Read IMG
     T.DecodeImg(),
-    # 从输入影像中裁剪32x32大小的影像块
+    # Crop 96x96 patches from the input image
     T.RandomCrop(crop_size=32),
-    # 以50%的概率实施随机水平翻转
+    # Random horizontal flips are implemented with 50% probability
     T.RandomHorizontalFlip(prob=0.5),
-    # 以50%的概率实施随机垂直翻转
+    # A random vertical flip is implemented with 50% probability
     T.RandomVerticalFlip(prob=0.5),
-    # 将数据归一化到[0,1]
+    # Normalize the data to [0,1]
     T.Normalize(
         mean=[0.0, 0.0, 0.0], std=[1.0, 1.0, 1.0]),
     T.ArrangeRestorer('train')
@@ -39,51 +39,67 @@ train_transforms = T.Compose([
 
 eval_transforms = T.Compose([
     T.DecodeImg(),
-    # 将输入影像缩放到256x256大小
+    # Scale the input image to 256x256
     T.Resize(target_size=256),
-    # 验证阶段与训练阶段的数据归一化方式必须相同
+    # The validation data must be normalized in the same way as the training data
     T.Normalize(
         mean=[0.0, 0.0, 0.0], std=[1.0, 1.0, 1.0]),
     T.ArrangeRestorer('eval')
 ])
 
-# 分别构建训练和验证所用的数据集
+
+# Build training and validation datasets
 train_dataset = pdrs.datasets.ResDataset(
     data_dir=DATA_DIR,
+    # data directory path
     file_list=TRAIN_FILE_LIST_PATH,
+    # Train file list path
     transforms=train_transforms,
+    # Set the transformation form
     num_workers=0,
+    # The number of threads
     shuffle=True,
+    # Shuffle or not
     sr_factor=4)
+    # It specifies a magnification factor of 4 in the superresolution algorithm
 
 eval_dataset = pdrs.datasets.ResDataset(
     data_dir=DATA_DIR,
+    # data directory path
     file_list=EVAL_FILE_LIST_PATH,
+    # Train file list path
     transforms=eval_transforms,
+    # Set the transformation form
     num_workers=0,
+    # The number of threads
     shuffle=False,
+    # Shuffle or not
     sr_factor=4)
+    # It specifies a magnification factor of 4 in the superresolution algorithm
 
-# 使用默认参数构建LESRCNN模型
-# 目前已支持的模型请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/intro/model_zoo.md
-# 模型输入参数请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/restorer.py
+# Build ESRGAN model with default parameters
+# Currently supported models: https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/intro/model_zoo.md
+# Model input parameters: https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/restorer.py
 model = pdrs.tasks.res.LESRCNN()
 
-# 执行模型训练
+# perform model training
 model.train(
     num_epochs=10,
     train_dataset=train_dataset,
     train_batch_size=8,
+    # set the batchsize of training datasets
     eval_dataset=eval_dataset,
     save_interval_epochs=5,
-    # 每多少次迭代记录一次日志
+    # Log every number of iterations
     log_interval_steps=10,
+    # How many steps per iteration record log at a time
     save_dir=EXP_DIR,
-    # 初始学习率大小
+    # initial learning rate size
     learning_rate=0.001,
-    # 是否使用early stopping策略，当精度不再改善时提前终止训练
+    # Whether to use the early stopping strategy to stop training early when accuracy is no longer improving
     early_stop=False,
-    # 是否启用VisualDL日志功能
+    # Enable VisualDL logging
     use_vdl=True,
-    # 指定从某个检查点继续训练
+    # Specify that training should continue from a checkpoint
     resume_checkpoint=None)
+

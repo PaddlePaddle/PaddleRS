@@ -1,42 +1,42 @@
-# 模型库
+# Model base
 
-PaddleRS的基础模型库来自Paddle-CV系列套件：[PaddleClas](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/algorithm_introduction/ImageNet_models.md)、[PaddleSeg](https://github.com/PaddlePaddle/PaddleSeg/blob/release/2.4/docs/model_zoo_overview_cn.md)、[PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.3/README_cn.md#模型库)以及[PaddleGAN](https://github.com/PaddlePaddle/PaddleGAN/blob/develop/README_cn.md#模型库)。除此之外，PaddleRS也包含一系列遥感特色模型，可用于遥感影像分割、变化检测等。
+The base model library for PaddleRS comes from the Paddle-CV family of suites：[PaddleClas](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/algorithm_introduction/ImageNet_models.md)、[PaddleSeg](https://github.com/PaddlePaddle/PaddleSeg/blob/release/2.4/docs/model_zoo_overview_cn.md)、[PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.3/README_cn.md# model library) and [PaddleGAN] (https://github.com/Padd LePaddle/PaddleGAN/blob/develop/README_cn md# model library). In addition, PaddleRS also includes a series of remote sensing feature models, which can be used for remote sensing image segmentation and change detection.
 
-## PaddleRS已支持的模型列表
+## List of models supported by PaddleRS
 
-PaddleRS目前已支持的全部模型如下（标注\*的为遥感专用模型）：
+PaddleRS currently supports the following models (marked with \* for remote sensing specific models) :
 
-| 任务 | 模型 | 多波段支持 |
+| Tasks | Models | Multi-band support |
 |--------|---------|------|
-| 变化检测 | \*BIT | 是 |
-| 变化检测 | \*CDNet | 是 |
-| 变化检测 | \*ChangeFormer | 是 |
-| 变化检测 | \*ChangeStar | 否 |
-| 变化检测 | \*DSAMNet | 是 |
-| 变化检测 | \*DSIFN | 否 |
-| 变化检测 | \*FC-EF | 是 |
-| 变化检测 | \*FC-Siam-conc | 是 |
-| 变化检测 | \*FC-Siam-diff | 是 |
-| 变化检测 | \*FCCDN | 是 |
-| 变化检测 | \*P2V-CD | 是 |
-| 变化检测 | \*SNUNet | 是 |
-| 变化检测 | \*STANet | 是 |
-| 场景分类 | CondenseNet V2 | 是 |
-| 场景分类 | HRNet | 否 |
-| 场景分类 | MobileNetV3 | 否 |
-| 场景分类 | ResNet50-vd | 否 |
-| 图像复原 | DRN | 否 |
-| 图像复原 | ESRGAN | 是 |
-| 图像复原 | LESRCNN | 否 |
-| 目标检测 | Faster R-CNN | 否 |
-| 目标检测 | PP-YOLO | 否 |
-| 目标检测 | PP-YOLO Tiny | 否 |
-| 目标检测 | PP-YOLOv2 | 否 |
-| 目标检测 | YOLOv3 | 否 |
-| 图像分割 | BiSeNet V2 | 是 |
-| 图像分割 | DeepLab V3+ | 是 |
-| 图像分割 | \*FactSeg | 是 |
-| 图像分割 | \*FarSeg | 是 |
-| 图像分割 | Fast-SCNN | 是 |
-| 图像分割 | HRNet | 是 |
-| 图像分割 | UNet | 是 |
+| Change detection | \*BIT | Yes |
+| Change detection | \*CDNet | Yes |
+| Change detection | \*ChangeFormer | Yes |
+| Change detection | \*ChangeStar | No |
+| Change detection | \*DSAMNet | Yes |
+| Change detection | \*DSIFN | No |
+| Change detection | \*FC-EF | Yes |
+| Change detection | \*FC-Siam-conc | Yes |
+| Change detection | \*FC-Siam-diff | Yes |
+| Change detection | \*FCCDN | Yes |
+| Change detection | \*P2V-CD | Yes |
+| Change detection | \*SNUNet | Yes |
+| Change detection | \*STANet | Yes |
+| Scene classification | CondenseNet V2 | Yes |
+| Scene classification | HRNet | No |
+| Scene classification | MobileNetV3 | No |
+| Scene classification | ResNet50-vd | No |
+| Image restoration | DRN | No |
+| Image restoration | ESRGAN | Yes |
+| Image restoration | LESRCNN | No |
+| Object detection | Faster R-CNN | No |
+| Object detection | PP-YOLO | No |
+| Object detection | PP-YOLO Tiny | No |
+| Object detection | PP-YOLOv2 | No |
+| Object detection | YOLOv3 | No |
+| Image segmentation | BiSeNet V2 | Yes |
+| Image segmentation | DeepLab V3+ | Yes |
+| Image segmentation | \*FactSeg | Yes |
+| Image segmentation | \*FarSeg | Yes |
+| Image segmentation | Fast-SCNN | Yes |
+| Image segmentation | HRNet | Yes |
+| Image segmentation | UNet | Yes |

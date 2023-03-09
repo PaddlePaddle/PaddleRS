@@ -1,94 +1,101 @@
 #!/usr/bin/env python
 
-# 目标检测模型YOLOv3训练示例脚本
-# 执行此脚本前，请确认已正确安装PaddleRS库
-
+# Example script for training object detection model ppyolov3
+# Make sure the PaddleRS library is correctly installed before executing this script
 import os
 
 import paddlers as pdrs
 from paddlers import transforms as T
 
-# 数据集存放目录
+# dataset directory
 DATA_DIR = './data/sarship/'
-# 训练集`file_list`文件路径
+# path to the 'file_list' file of the training set
 TRAIN_FILE_LIST_PATH = './data/sarship/train.txt'
-# 验证集`file_list`文件路径
+# validation 'file_list' file path
 EVAL_FILE_LIST_PATH = './data/sarship/eval.txt'
-# 数据集类别信息文件路径
+# Data set category information file path
 LABEL_LIST_PATH = './data/sarship/labels.txt'
-# 实验目录，保存输出的模型权重和结果
+# Experiments directory to store the output model weights and results
 EXP_DIR = './output/yolov3/'
 
-# 下载和解压SAR影像舰船检测数据集
+# Download and unpack the SAR image ship detection dataset
 pdrs.utils.download_and_decompress(
     'https://paddlers.bj.bcebos.com/datasets/sarship.zip', path='./data/')
 
-# 定义训练和验证时使用的数据变换（数据增强、预处理等）
-# 使用Compose组合多种变换方式。Compose中包含的变换将按顺序串行执行
-# API说明：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/data.md
+# define transformations to use during training and validation (data augmentation, preprocessing, etc.)
+# Compose transformations. Transformations contained in Compose will be executed sequentially
+# API Description: https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/data.md
 train_transforms = T.Compose([
-    # 读取影像
+    # read the image
     T.DecodeImg(),
-    # 随机裁剪，裁块大小在一定范围内变动
+    # Random crop, the size of the crop varies within a certain range
     T.RandomCrop(),
-    # 随机水平翻转
+    # Random horizontal flip
     T.RandomHorizontalFlip(),
-    # 对batch进行随机缩放，随机选择插值方式
+    # Randomly scale the batch, randomly choose the interpolation
     T.BatchRandomResize(
         target_sizes=[512, 544, 576, 608], interp='RANDOM'),
-    # 影像归一化
+    # Image normalization
     T.Normalize(
         mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    # Normalize the data so that it has a fixed mean and standard deviation
     T.ArrangeDetector('train')
 ])
 
 eval_transforms = T.Compose([
     T.DecodeImg(),
-    # 使用双三次插值将输入影像缩放到固定大小
+    # Scale the input image to a fixed size using bicubic interpolation
     T.Resize(
         target_size=608, interp='CUBIC'),
-    # 验证阶段与训练阶段的归一化方式必须相同
+    # The validation phase must be normalized the same way as the training phase
     T.Normalize(
         mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     T.ArrangeDetector('eval')
 ])
 
-# 分别构建训练和验证所用的数据集
+
+# Build training and validation datasets
 train_dataset = pdrs.datasets.VOCDetDataset(
     data_dir=DATA_DIR,
     file_list=TRAIN_FILE_LIST_PATH,
     label_list=LABEL_LIST_PATH,
     transforms=train_transforms,
+    # Set the transformation form
     shuffle=True)
+# Shuffle or not
 
 eval_dataset = pdrs.datasets.VOCDetDataset(
     data_dir=DATA_DIR,
-    file_list=EVAL_FILE_LIST_PATH,
+    file_list=TRAIN_FILE_LIST_PATH,
     label_list=LABEL_LIST_PATH,
-    transforms=eval_transforms,
+    transforms=train_transforms,
+    # Set the transformation form
     shuffle=False)
+# Shuffle or not
 
-# 构建YOLOv3模型，使用DarkNet53作为backbone
-# 目前已支持的模型请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/intro/model_zoo.md
-# 模型输入参数请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/object_detector.py
+# Build YOLOv3 model using DarkNet53 as backbone
+# has support model refer to: https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/intro/model_zoo.md
+# Model input parameters: https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/object_detector.py
 model = pdrs.tasks.det.YOLOv3(
     num_classes=len(train_dataset.labels), backbone='DarkNet53')
 
-# 执行模型训练
+# perform model training
 model.train(
     num_epochs=10,
     train_dataset=train_dataset,
     train_batch_size=4,
     eval_dataset=eval_dataset,
-    # 每多少个epoch存储一次检查点
+    # How many epochs does one checkpoint store
     save_interval_epochs=5,
-    # 每多少次迭代记录一次日志
+    # Log every number of iterations
     log_interval_steps=4,
     save_dir=EXP_DIR,
-    # 初始学习率大小
+    # specify pre-trained weights
+    pretrain_weights='COCO',
+    # initial learning rate size
     learning_rate=0.0001,
-    # 学习率预热（learning rate warm-up）步数与初始值
+    # Number of learning rate warm-up steps and the starting value
     warmup_steps=0,
     warmup_start_lr=0.0,
-    # 是否启用VisualDL日志功能
+    # Enable VisualDL logging
     use_vdl=True)

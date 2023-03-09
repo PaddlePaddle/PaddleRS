@@ -1,107 +1,102 @@
-# 遥感数据介绍
+# Introduction to remote sensing data
 
-## 1 遥感与遥感影像的定义
+## 1 Definition of remote sensing and remote sensing imagery
 
-广义上，遥感指的是"遥远的感知"，即在不直接接触的情况下，对目标或自然现象进行远距离探测和感知。狭义上的遥感一般指电磁波遥感技术，即在某种平台（如飞机或卫星）上利用传感器探测电磁波的反射特性、并从中提取信息的过程。这个过程获取的影像数据被称作遥感影像，一般包括卫星和航空影像。遥感数据的用途广泛，在诸如空间分析等GIS任务中、或是包括场景分类、影像分割与目标检测在内的计算机视觉（Computer Vision, CV）领域都可以见到它们的身影。
+In a broad sense, remote sensing refers to "remote perception", that is, without direct contact, the target or natural phenomenon of long-distance detection and perception. Remote sensing in a narrow sense generally refers to electromagnetic wave remote sensing technology, that is, the process of using sensors on some platform (such as aircraft or satellite) to detect the reflection characteristics of electromagnetic waves and extract information from them.
+The images obtained during this process are called remote sensing images, which generally include satellite and aerial images. Remote sensing data are widely used in GIS tasks such as spatial analysis, and in Computer Vision (CV) fields such as scene classification, image segmentation, and object detection.
 
-相比航空影像，卫星影像的覆盖面积更广，因此得到了更加长足的应用。常见的卫星影像可能由商业卫星摄制，也可能来自NASA、ESA等机构的开放数据库。
+Compared with aerial imagery, satellite imagery covers a wider area, so it has been more widely used. Common satellite imagery may be captured by commercial satellites or may come from open databases held by agencies such as NASA and ESA.
 
-## 2 遥感影像的特点
+## 2 Features of remote sensing images
 
-遥感技术具有宏观性、多波段性、周期性和经济性的特点。其中，宏观性指的是遥感平台越高，视角就越广，可以同步探测到的地面范围就越广；多波段性指的是传感器可以从紫外、可见光、近红外到微波等各个不同波段进行探测和记录信息；周期性指的是遥感卫星具有以一定周期重复获取图像的特点，可以在短时间内对同一地区进行重复观测；经济性指的是遥感技术可以作为一种获取大面积地表信息的方式，而相对不需要花费太多人力物力。
+Remote sensing technology has the characteristics of macro, multi - band, periodicity and economy. Macro refers to that the higher the remote sensing platform is, the wider the perspective will be, and the wider the ground can be synchronously detected. The multi-band property means that the sensor can detect and record information in different bands such as ultraviolet, visible light, near infrared and microwave. Periodicity means that the remote sensing satellite has the characteristic of acquiring images repeatedly in a certain period, which can carry out repeated observation of the same area in a short time. Economic means that remote sensing technology can be used as a way to obtain large area of surface information without spending too much manpower and material resources.
 
-遥感技术的特点决定了遥感影像具有如下特性：
+The characteristics of remote sensing technology determine that remote sensing images have the following characteristics:
 
-1. 大尺度。一幅遥感影像能够覆盖广大的地表面积。
-2. 多光谱。相比自然图像，遥感影像往往具有较多的波段数。
-3. 来源丰富。不同传感器、不同卫星可以提供多样的数据源。
+1. Large scale. A remote sensing image can cover a wide area of the earth's surface.
+2. Multispectral. Compared with natural images, remote sensing images often have a larger number of bands.
+3. Rich sources. Different sensors and satellites can provide various data sources.
 
-## 3 栅格影像的定义与遥感影像成像原理
+## 3 Definition of raster image and principle of remote sensing image formation
 
-为介绍遥感影像的成像原理，首先需要引入栅格的概念。栅格是一种基于像素的数据格式，可以有效地表示连续表面。栅格中的信息存储在网格结构中，每个信息单元或像素具有相同的大小和形状，但值不同。数码照片、正射影像和卫星影像都可以这种格式存储。
+In order to introduce the imaging principle of remote sensing images, the concept of grid should be introduced first. Raster is a pixel-based data format that can efficiently represent continuous surfaces. The information in the raster is stored in a grid structure where each information unit or pixel has the same size and shape but different values. Digital photographs, orthophotos, and satellite images can all be stored in this format.
 
-栅格格式非常适合用于查看空间和时间变化的分析，因为每个数据值都有一个基于网格的可访问位置。这使我们能够访问两个或多个不同栅格中的相同地理位置并比较它们的值。
+The raster format is well suited for analysis that looks at spatial and temporal variations because each data value has a grid-based accessible location. This enables us to access the same geographical location in two or more different rasters and compare their values.
 
-当地球观测卫星拍摄照片时，传感器会记录不同波长电磁波在栅格像元中的DN值（Digital Number）。通过DN值，可以反求地物的辐照率和反射率。它们之间的关系如以下公式所示，其中$gain$和$bias$分别指传感器的增益和偏移；$L$是辐射率，也称为辐射亮度值；$\rho$是地物反射率；$d_{s}$、$E_{0}$和$\theta$分别表示日地天文单位距离、太阳辐照度以及太阳天顶角。
+When the Earth observation satellite takes a picture, the sensor records the DN value (Digital Number) of electromagnetic waves of different wavelengths in the grid pixel. Through the DN value, the irradiance and reflectance of the ground object can be inverted. The relationship between them is shown in the following formula, where $gain$and $bias$refer to the gain and offset of the sensor, respectively; $L$is the radiance, also known as the radiance value; $\rho$is the ground cover reflectance; $d_{s}$, $E_{0}$, and $\theta$represent the sun-Earth astronomical unit distance, solar irradiance, and solar zenith Angle, respectively.
 
 $$
 L = gain * DN + bias \\
 \rho = \pi Ld^{2}_{s}/(E_{0}\cos{\theta})
 $$
 
-电磁波谱是人类根据电磁波的波长或频率、波数、能量等的大小顺序进行排列的成果。在电磁波谱中人眼只能感受到一个很小的波段范围，这个范围被称为可见光，波长范围在0.38-0.76μm。这是因为我们的视觉进化为在太阳发出最多光的地方最敏感，并且广泛地局限于构成我们所谓的红色、绿色和蓝色的波长。但卫星传感器可以感知范围更广的电磁频谱，这使得我们能够与借助传感器感知更多的频谱范围。
+The electromagnetic spectrum is the result of human arrangement of electromagnetic waves according to their wavelength or frequency, wave number, and energy. In the electromagnetic spectrum, the human eye can only perceive a small band, which is called visible light, with wavelengths ranging from 0.38 to 0.76μm. That's because our vision evolved to be most sensitive where the sun emits the most light, and is broadly limited to the wavelengths that make up what we call red, green, and blue. But satellite sensors can sense a wider range of the electromagnetic spectrum, which allows us to sense more spectrum range with the help of sensors.
 
 ![band](../images/band.jpg)
 
-电磁波谱范围很广，使用一个传感器同时收集所有波长的信息是不切实际的。在实际中，不同的传感器优先考虑从不同波长的光谱收集信息。由传感器捕获和分类的频谱的每个部分都被归类为一个信息带。信息带的大小各不相同，可以编译成不同类型的合成影像，每幅合成影像都强调不同的物理特性。同时，大多数遥感影像都为16位的图像，与传统的8位图像不同，它能表示更精细的光谱信息。
+The electromagnetic spectrum is so wide that it is impractical to use a single sensor to collect information at all wavelengths at once. In practice, different sensors give priority to collecting information from different wavelengths of the spectrum. Each part of the spectrum captured and classified by the sensor is classified as an information strip. The tape varies in size and can be compiled into different types of composite images, each emphasizing different physical properties. At the same time, most remote sensing images are 16-bit images, different from the traditional 8-bit images, which can represent finer spectral information.
 
-## 4 遥感影像的分类
+## 4 Classification of Remote sensing images
 
-遥感影像具有覆盖面积广、波段数多、来源丰富等特点，其分类方式也十分多样。例如，根据空间分辨率，可将遥感影像分为低分辨率遥感影像、中分辨率遥感影像、高分辨率遥感影像等；根据波段数，又可分为多光谱影像、高光谱影像、全色影像等类型。本文档旨在为不具备遥感专业背景的开发者提供快速了解的途径，因此仅介绍几种常见的遥感影像类型。
+Remote sensing image has the characteristics of wide coverage area, large number of bands and rich sources, and its classification is also very diverse. For example, remote sensing image can be divided into low resolution remote sensing image, medium resolution remote sensing image and high resolution remote sensing image according to spatial resolution. According to the number of bands, it can be divided into multi-spectral image, hyperspectral image, panchromatic image and other types. This document is intended to provide a quick guide for developers who do not have a background in remote sensing. Therefore, only a few common types of remote sensing images are described.
+### 4.1 RGB image
 
-### 4.1 RGB影像
-
-RGB影像与生活中常见的自然图像类似，其中显示的地物特征也符合人类的视觉常识（如树是绿色的、水泥是灰色的等），三个通道分别表示红、绿和蓝。下图展示了一幅RGB遥感影像：
+RGB images are similar to common natural images in daily life. The features displayed in RGB images are also in line with human visual common sense (for example, trees are green, cement is gray, etc.), and the three channels represent red, green and blue respectively. The figure below shows an RGB remote sensing image:
 
 ![rgb](../images/rgb.jpg)
 
-由于当前大多数CV任务的处理流程都是基于自然图像设计的，因此RGB类型的遥感数据集在CV领域使用较多。
+Since most of the current CV task processing processes are designed based on natural images, remote sensing data sets of RGB type are widely used in CV field.
 
-### 4.2 MSI/HSI影像
+MSI (Multispectral Image) and HSI (Hyperspectral Image) usually consist of several to hundreds of bands, The two are distinguished by different spectral resolution (* spectral resolution refers to the value of a specific wavelength range in the electromagnetic spectrum that can be recorded by the sensor; the wider the wavelength range, the lower the spectral resolution *). Usually the spectral resolution in the order of 1/10 of the wavelength is called multispectral. Compared with HSI, MSI has less band number, wider band and higher spatial resolution. However, HSI has more bands, narrower bands and higher spectral resolution.
 
-MSI（Multispectral Image，多光谱影像）和HSI（Hyperspectral Image，高光谱影像）通常包括数个到数百个不等的波段，二者以不同的光谱分辨率（*光谱分辨率是指传感器所能记录的电磁波谱中某一特定的波长范围值，波长范围值越宽，则光谱分辨率越低*）进行区分。通常光谱分辨率在波长的1/10数量级范围内称为多光谱。MSI的波段数相对HSI较少，谱带较宽，空间分辨率较高；而HSI的波段数较多，谱带较窄，光谱分辨率较高。
+In practice, some specific bands of MSI/HSI are often selected according to application requirements: for example, the transmittance of mid-infrared band is 60%-70%, including ground object reflection and emission spectrum, which can be used to detect high temperature targets such as fire. The red-edge band (* the point where the reflectance of green plants increases fastest between 0.67 and 0.76μm, and is also the inflection point of the first derivative spectrum in this region *) is a sensitive band indicating the growth status of green plants. It can effectively monitor the growth status of vegetation and be used to study plant nutrients, health monitoring, vegetation identification, physiological and biochemical parameters and other information.
+The following takes the image of Beijing Daxing Airport taken by Tiangong-1 hyperspectral imager as an example to briefly introduce the concepts of band combination, spectral curve and band selection commonly used in MSI/HSI processing. In the hyperspectral data set of Tiangong-1, bands with low signal-to-noise ratio and information entropy were eliminated based on the evaluation results of band signal-to-noise ratio and information entropy, and some bands were eliminated based on the actual visual results of the image. A total of 54 visible near-infrared spectrum segments, 52 short-wave infrared spectrum segments and the whole chromatographic segment data were retained.
 
-在实际中常常根据应用需求选取MSI/HSI的一些特定波段：例如中红外波段的透射率在60%-70%，包含地物反射及发射光谱，可以用来探测火灾等高温目标；红边波段（*绿色植物在0.67-0.76μm之间反射率增高最快的点，也是一阶导数光谱在该区间内的拐点*）是指示绿色植物生长状况的敏感性波段，可以有效地监测植被的生长状况，用于研究植物养分、健康状态监测、植被识别和生理生化参数等信息等。
+** Band combination **
 
-下面以天宫一号高光谱成像仪拍摄的北京大兴机场为例，简单介绍一下MSI/HSI处理中常见的波段组合、光谱曲线和波段选择的概念。天宫一号高光谱数据集根据波段信噪比和信息熵评价结果剔除信噪比和信息熵较低的波段，并结合影像实际目视结果剔除部分波段，共保留可见近红外谱段54个、短波红外谱段52个以及全色谱段数据。
+Band combination refers to the result obtained by selecting three band data in MSI/HSI to combine and replace the three RGB channels, which is called the color graph (* The result synthesized using the real RGB three bands is called the true color graph, otherwise it is called the false color graph *). The combination of different bands can highlight different features of ground objects. The following figure shows the visual effects of several different combinations:
+![image 3](../images/band_combination.jpg)
 
-**波段组合**
+** Spectral curve interpretation **
 
-波段组合是指在MSI/HSI中选择三个波段数据进行组合、代替RGB三个通道所得到的结果，称为彩色图（*使用真实的RGB三波段合成的结果称为真彩色图，否则称为假彩色图*）。不同波段的组合能够突出不同的地物特征，下图展示了几种不同组合的目视效果：
-
-![图片3](../images/band_combination.jpg)
-
-**光谱曲线解读**
-
-光谱信息往往能够反映地物特征，不同的波段反映的地物特征也不尽相同。以电磁波的波长或频率为横轴，反射率为纵轴，可以绘制光谱曲线。以植被的光谱曲线为例，如下图所示，植被在0.8μm波段反射率大于40%，相比在0.6μm波段10%左右的反射率明显更大，因此在成像时反射回更多的辐射能量。体现在图中，植被部分在0.8μm的影像中看起来更加明亮。
+Spectral information can often reflect the features of ground objects, and different bands reflect different features of ground objects. Spectral curves can be drawn by taking the wavelength or frequency of electromagnetic wave as the horizontal axis and the reflectance as the vertical axis. Taking the spectral curve of vegetation as an example, as shown in the figure below, the reflectance of vegetation is greater than 40% in the band of 0.8μm, which is significantly greater than that of about 10% in the band of 0.6μm, so more radiation energy is reflected back during imaging. Reflected in the image, the vegetation appears brighter in the 0.8μm image.
 
 ![band_mean](../images/band_mean.jpg)
 
-**波段选择**
+** Band select **
 
-MSI/HSI包含的波段数量可能较多。一方面，并不是所有波段都适用于待处理的任务；另一方面，过多的波段数可能带来沉重的资源负担。在实际应用中，可以根据需求选用MSI/HSI的部分波段完成任务，也可以使用如PCA、小波变换等方法对MSI/HSI进行降维处理，以减少冗余，节省计算资源。
+MSI/HSI may contain a larger number of bands. For one thing, not all bands are suitable for the task at hand; On the other hand, too many bands may bring heavy resource burden. In practical applications, partial bands of MSI/HSI can be selected according to the requirements to complete the task, and methods such as PCA and wavelet transform can also be used to reduce the dimension of MSI/HSI, so as to reduce redundancy and save computing resources.
 
-### 4.3 SAR影像
+### 4.3 SAR image
 
-SAR（Synthetic Aperture Radar）指的是主动式侧视雷达系统。SAR的成像几何属于斜距投影类型，因此SAR影像与光学影像在成像机理、几何特征、辐射特征等方面都有较大的区别。
+Synthetic Aperture Radar (SAR) refers to active side-looking radar systems. The imaging geometry of SAR belongs to the slant projection type, so SAR image and optical image have great differences in imaging mechanism, geometric features, radiation features and other aspects.
 
-光学影像中不同波段的信息来自于不同波长电磁波的反射能量，而SAR影像则以二进制复数形式记录了不同极化（*即电磁波发射和接收的振动方向*）的回波信息。基于记录的复数数据，可将原始的SAR影像通过变换提取相应的振幅和相位信息。人类无法直接分辨相位信息，但可以直观地感知振幅信息，利用振幅信息可以得到强度图像，如下图所示：
-
+The information of different bands in optical imagery comes from the reflected energy of electromagnetic waves with different wavelengths, while SAR imagery records the echo information of different polarizations (* the vibration directions of electromagnetic waves transmitted and received *) in binary complex form. Based on the recorded complex data, the original SAR image can be transformed to extract the corresponding amplitude and phase information. Humans cannot directly distinguish the phase information, but they can intuitively perceive the amplitude information, and the intensity image can be obtained by using the amplitude information, as shown in the following figure:
 ![sar](../images/sar.jpg)
 
-由于SAR影像的特殊成像机理，其分辨率相对较低，信噪比也较低，所以SAR影像中所包含的振幅信息远达不到光学影像的成像水平。这也是为什么SAR影像在CV领域中的应用较少。目前，SAR影像被主要用于基于相位信息的沉降检测反演、三维重建等。值得一提的是，由于SAR的波长较长，具有一定的云层和地表穿透能力，因此在部分应用场景中有其独特的优势。
+Due to the special imaging mechanism of SAR imagery, its resolution is relatively low and the signal-to-noise ratio is also low, so the amplitude information contained in SAR imagery is far from the level of optical imagery. This is also why SAR imagery is less used in the CV field. At present, SAR images are mainly used for settlement detection and inversion based on phase information, 3D reconstruction, etc. It is worth mentioning that SAR has its unique advantages in some application scenarios due to its long wavelength and certain cloud and surface penetration ability.
 
-### 4.4 RGBD影像
+### 4.4 RGBD images
 
-RGBD影像与RGB影像的区别在于多了一个D通道，即深度（depth）。深度影像类似于灰度图像，只是其中的每个像素值代表的是传感器距离物体的实际距离。通常RGBD影像中的RGB数据和深度数据是相互配准的。深度影像提供了RGB影像所不具有的高度信息，能够在某些下游任务中对一些光谱特征相似的地物起到一定的区分作用。
+The difference between RGBD images and RGB images is that there is an additional D channel, which is called depth. A depth image is similar to a gray-scale image, except that each pixel value represents the actual distance of the sensor from the object. Usually, RGB data and depth data in RGBD images are registered with each other. Depth images provide height information that RGB images do not have, and can play a certain role in distinguishing some ground objects with similar spectral characteristics in some downstream tasks.
 
-## 5 遥感影像的预处理
+## 5 Preprocessing remote sensing images
 
-相比自然图像，遥感影像的预处理过程十分繁琐。具体而言，主要可分为以下步骤：
+Compared with natural images, the preprocessing process of remote sensing images is very complicated. Specifically, it can be divided into the following steps:
 
-1. **辐射定标**：将DN值转化为辐射亮度值或者反射率等物理量。
-2. **大气校正**：消除由大气影响所造成的辐射误差，反演地物真实的表面反射率。该步骤与辐射定标合称为**辐射校正**。
-3. **正射校正**：对影像同时进行倾斜改正和投影差改正，将影像重采样为正射影像。
-4. **影像配准**：将不同时间、不同传感器（成像设备）或不同条件下（天候、照度、摄像位置和角度等）获取的两幅或多幅影像进行匹配、叠加。
-5. **影像融合**：将多源信道所采集到的关于同一目标的影像数据综合成高质量影像。
-6. **影像裁剪**：将大幅遥感影像裁剪为小块，提取感兴趣区域。
-7. **定义投影**：对数据定义投影信息（地理坐标系）。
+1. ** Radiation scaling ** : convert DN value into radiation brightness value or reflectivity and other physical quantities.
+2. ** atmospheric correction ** : eliminate the radiation error caused by atmospheric influence, and invert the true surface reflectance of ground objects. This step together with radiometric calibration is called ** radiometric correction **.
+3. ** orthophoto correction ** : The image is simultaneously corrected for tilt and projection difference, and the image is resampling into orthophoto.
+4. ** Image registration ** : Match and overlay two or more images acquired at different times, by different sensors (imaging equipment) or under different conditions (weather, illumination, camera position and Angle, etc.).
+5. ** Image fusion ** : synthesizes the image data of the same target collected by multiple source channels into high-quality images.
+6. ** Image clipping ** : large remote sensing images are clipped into small pieces to extract areas of interest.
+7. ** Define projection ** : Define projection information for data (geographic coordinate system).
 
-需要说明的是，在实际应用中，上述的步骤并不都是必须的，可根据需要选择性地执行其中某些步骤。
+It should be noted that in practice, not all of the above steps are necessary, and some of them can be performed selectively as needed.
 
-## 参考资料
+## references
 
 - [Remote sensing in Wikipedia](https://en.wikipedia.org/wiki/Remote_sensing)
-- [宁津生等 《测绘学概论》](https://book.douban.com/subject/3116967/)
-- [孙家抦 《遥感原理与应用》](https://book.douban.com/subject/3826668/)
-- [遥感影像预处理步骤](https://blog.csdn.net/qq_35093027/article/details/119808941)
+- [JinNing including introduction of the surveying and mapping science] (https://book.douban.com/subject/3116967/)
+- [JiabingSun  "remote sensing principle and application"] (https://book.douban.com/subject/3826668/)
+- [remote sensing image preprocessing steps](https://blog.csdn.net/qq_35093027/article/details/119808941)

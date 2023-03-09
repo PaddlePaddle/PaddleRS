@@ -53,13 +53,6 @@ pip install -r requirements.txt
 python setup.py install
 ```
 
-若在使用`python setup.py install`时下载依赖缓慢或超时，可以在`setup.py`相同目录下新建`setup.cfg`，并输入以下内容，则可通过清华源进行加速下载：
-
-```
-[easy_install]
-index-url=https://pypi.tuna.tsinghua.edu.cn/simple
-```
-
 + （可选）GDAL安装
 
 PaddleRS支持对多种类型卫星数据的读取。完整使用PaddleRS的遥感数据读取功能需要安装GDAL，安装方式如下：

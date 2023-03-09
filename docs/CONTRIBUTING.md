@@ -1,31 +1,31 @@
-# PaddleRS贡献指南
+# PaddleRS Contribution Guide
 
-## 贡献代码
+## Contributing code
 
-本指南首先阐述为PaddleRS贡献代码的必要步骤，然后对新增文件自查、代码风格规范和测试相关步骤三个方面进行详细说明。
+This guide first explains the steps necessary to contribute code to PaddleRS, and then goes into detail on self-review of new files, code style guidelines, and testing steps.
 
-### 1 代码贡献步骤
+### 1 Code Contribution steps
 
-PaddleRS使用[git](https://git-scm.com/doc)作为版本控制工具，并托管在GitHub平台。这意味着，在贡献代码前，您需要熟悉git相关操作，并且对以[pull request (PR)](https://docs.github.com/cn/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests)为基础的GitHub工作流有所了解。
+PaddleRS uses [git](https://git-scm.com/doc) as a version control tool and is hosted on the GitHub platform. This means that you need to be familiar with git before contributing, And to [pull request (PR)](https://docs.github.com/cn/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull -requests/about-pull-requests) based GitHub workflows.
 
-为PaddleRS贡献代码的具体步骤如下：
+Here are the steps to contribute to PaddleRS:
 
-1. 在GitHub上fork PaddleRS官方仓库，将代码克隆到本地，并拉取develop分支的最新版本。
-2. 根据[《开发指南》](dev/dev_guide.md)编写代码（建议在新建的功能分支上开发）。
-3. 安装pre-commit钩子以便在每次commit前执行代码风格方面的检查。详见[代码风格规范](#3-代码风格规范)。
-4. 为新增的代码编写单元测试，并保证所有测试能够跑通。详见[测试相关步骤](#4-测试相关步骤)。
-5. 为您的分支新建一个PR，确保CLA协议签署且CI/CE通过。在这之后，会有PaddleRS团队人员对您贡献的代码进行review。
-6. 根据review意见修改代码，并重新提交，直到PR合入或关闭。
+1. fork PaddleRS official repository on GitHub, clone the code locally, and pull the latest version from develop branch.
+2. Write code according to [dev Guide](dev/dev_guide.md) (it is recommended to develop on the newly created feature branch).
+3. Install a "pre-commit" hook to perform style checks before each commit. See [Code Style Guidelines](# 3-code-style guidelines) for more details.
+4. Write unit tests for the new code, and make sure all the tests work. See [Test-relevant steps](# 4-test-relevant steps) for more details.
+5. Create a PR for your branch, make sure CLA is signed and CI/CE passes. After that, your contributions will be reviewed by the PaddleRS team.
+6. Change the code based on the review and resubmit it until the PR is closed or closed.
 
-如果您贡献的代码需要用到PaddleRS目前不依赖的第三方库，请在提交PR时说明，并阐述需要用到该第三方库的必要性。
+If you are contributing code that uses a third-party library that PaddleRS does not currently rely on, please mention it in the PR submission and explain why it is needed.
 
-### 2 新增文件自查
+### 2 Add file self-inspection
 
-与代码风格规范不同，pre-commit钩子并不对本小节所阐述的规则做强制要求，因此需要开发者自行检查。
+Unlike style guidelines, the pre-commit hooks do not enforce the rules described in this section, so it is up to the developer to check them.
 
-#### 2.1 版权信息
+#### 2.1 Copyright Information
 
-PaddleRS中每个新增的文件都需要添加版权信息，如下所示：
+Each new file in PaddleRS needs to add copyright information, like this:
 
 ```python
 # Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
@@ -43,17 +43,17 @@ PaddleRS中每个新增的文件都需要添加版权信息，如下所示：
 # limitations under the License.
 ```
 
-*注：版权信息中的年份需要按照当前自然年改写。*
+* Note: The year in copyright information needs to be rewritten according to the current natural year. *
 
-#### 2.2 模块导入顺序
+#### 2.2 Module import sequence
 
-所有的全局导入语句都必须位于模块开头处、版权信息之后。按照如下顺序导入包或模块：
+All global import statements must be at the beginning of the module, after the copyright information. Import packages or modules in the following order:
 
-1. Python标准库；
-2. 通过`pip`等包管理器安装的第三方库（注意`paddle`为第三方库，但`paddlers`本身不算第三方库）；
-3. `paddlers`及`paddlers`下属的包和模块。
+1. The Python standard library;
+2. Third-party libraries installed via package managers like 'pip' (note that 'paddle' is a third-party library, but 'paddlers' itself is not);
+3. 'paddlers' and their packages and modules.
 
-不同类型的导入语句之间空1行。文件中不应该包含未使用的包或模块的导入语句。此外，当导入语句的长度相差较大时，建议按照长度递增顺序排列。如下显示了一个例子：
+There is a blank line between different types of import statements. The file should not contain import statements for unused packages or modules. In addition, when the length of the import statements differs greatly, it is recommended to arrange them in increasing length order. An example is shown below:
 
 ```python
 import os
@@ -66,64 +66,63 @@ import paddlers.transforms as T
 from paddlers.transforms import DecodeImg
 ```
 
-### 3 代码风格规范
+### 3 Code Style Guidelines
 
-PaddleRS对代码风格的规范基本与[Google Python风格规范](https://zh-google-styleguide.readthedocs.io/en/latest/google-python-styleguide/python_style_rules/)一致，但PaddleRS对类型注解（即type hints，参见[PEP 483](https://peps.python.org/pep-0483/)与[PEP 484](https://peps.python.org/pep-0484/)）不做强制要求。较为重要的代码风格规范如下：
+PaddleRS code style guidelines are basically the same as [Google Python style specification] (https://zh-google-styleguide.readthedocs.io/en/latest/google-python-styleguide/python_style_rules/), PaddleRS, however, do not support type annotations (i.e. type hints, See [PEP 483] (https://peps.python.org/pep-0483/) and [PEP 484] (https://peps.python.org/pep-0484/)) don't be mandatory. Important code style guidelines are as follows:
 
-- 空行：顶层定义（例如顶层的函数或者类的定义）之间空2行。类内部不同方法的定义之间、以及类名与第一个方法定义之间空1行。在函数内部需要注意在逻辑上有间断的地方添加1个空行。
+- Blank lines: Two blank lines between top-level definitions (e.g., top-level function or class definitions). There is a blank line between the different method definitions within a class and between the class name and the first method definition. Inside the function, be careful to add a blank line where there is a logical break.
 
-- 行长度：每行（无论是代码行还是注释行）不超过80个字符，对于docstring中的行尤其要注意这一点。
+- Line length: No more than 80 characters per line (either code or comment), especially for lines in a docstring.
 
-- 括号：括号可以用于行连接，但是不要在`if`判断中使用没有必要的括号。
+- Parentheses: Parentheses can be used for line concatenation, but don't use unnecessary parentheses in 'if' judgments.
 
-- 异常：抛出和捕获异常时使用尽可能具体的异常类型，几乎永远不要使用基类`Exception`（除非目的是捕获不限类型的任何异常）。
+- Exceptions: Throw and catch exceptions with as specific an Exception type as possible, and almost never use the base class 'Exception' (unless the purpose is to catch any exception of any type).
 
-- 注释：所有注释使用英文书写。所有提供给用户的API都必须添加docstring，且至少具有“API功能描述”和“API参数”两个部分。使用三双引号`"""`包围一个docstring。docstring书写的具体细节可参考[《代码注释规范》](dev/docstring.md)。
+- Comments: All comments are written in English. All apis provided to the user must add a docstring and have at least two sections: "API functional description" and "API parameters". Use triple quotes' """ 'around a docstring. See [Code Comments Guidelines] for details on writing docstrings.(dev/docstring.md)。
 
-- 命名：不同类型的变量名适用的大小写规则如下：模块名：`module_name`；包名：`package_name`；类名：`ClassName`；方法名：`method_name`；函数名：`function_name`；全局常量（指程序运行期间值不发生改变的变量）名：`GLOBAL_CONSTANT_NAME`；全局变量名：`global_var_name`；实例名：`instance_var_name`；函数参数名：`function_param_name`；局部变量名：`local_var_name`。
+- Naming: The following capitalization rules apply to different types of variable names: 'module_name'; Package name: 'package_name'; Class name: 'ClassName'; Method name: 'method_name'; Function name: 'function_name'; Name of a global constant (a variable whose value does not change while the program is running) : 'GLOBAL_CONSTANT_NAME' Global variable name: 'global_var_name'; Instance name: 'instance_var_name'; Function parameter name: 'function_param_name'; Local variable name: 'local_var_name'.
 
-### 4 测试相关步骤
+### 4 Test the steps
 
-为了保证代码质量，您需要为新增的功能组件编写单元测试脚本。请根据您贡献的内容阅读相应的单测编写步骤。
+To ensure code quality, you need to write unit test scripts for new functionality components. Read the corresponding single-test writing steps for your contributions.
 
-#### 4.1 模型单测
+#### 4.1 Model single test
 
-1. 在`tests/rs_models/`中找到模型所属任务对应的测试用例定义文件，例如变化检测任务对应`tests/rs_models/test_cd_models.py`。
-2. 仿照文件中已有的例子，为新增的模型定义一个继承自`Test{任务名}Model`的测试类，将其`MODEL_CLASS`属性设置为新增的模型。
-3. 重写新的测试类的`test_specs()`方法。该方法将`self.specs`设置为一个列表，列表中的每一项为一个字典，字典中的键值对被用作构造模型的配置项。也即，`self.specs`中每一项对应一组测试用例，每组用例用来测试以某种特定参数构造的模型。
+1. Find the test case definition file in 'tests/rs_models/', for example 'tests/rs_models/test_cd_models.py' for change detection.
+2. Define a Test class for the new Model that inherits from 'Test{task name}Model' and sets its' MODEL_CLASS 'property to the new model, following the example already in the file.
+3. Override the 'test_specs()' method of the new test class. This method sets' self.specs' as a list, each item in the list is a dictionary, and the key-value pairs in the dictionary are used as configuration items to construct the model. That is, each entry in 'self.specs' corresponds to a set of test cases, and each test case is used to test a model constructed with certain parameters.
 
-#### 4.2 数据预处理/数据增强单测
+#### 4.2 Data Preprocessing/data enhancement single test
 
-- 如果您编写的是数据预处理/数据增强算子（继承自`paddlers.transforms.operators.Transform`），构造该算子所需的所有输入参数都具有默认值，且算子能够处理任意任务、任意波段的数据，则您需要仿照`test_Resize()`或`test_RandomFlipOrRotate()`方法，在`tests/transforms/test_operators.py`中为`TestTransform`类添加新的方法。
-- 如果您编写的算子只支持对特定任务的处理或是对输入数据的波段数目有要求，请在编写完测试逻辑后，在`OP2FILTER`全局变量中为算子绑定`_InputFilter`。
-- 如果您编写的是数据预处理/数据增强函数（即`paddlers/transforms/functions.py`中的内容），请在`tests/transforms/test_functions.py`中仿造已有的例子添加测试类。
+- if you write the data preprocessing/enhancement operator (inherited from ` paddlers, transforms the operators. The Transform `), all the necessary to construct the operator input parameters have default values, and the operator can handle any task, arbitrary band data, You need to add a new method to the TestTransform class in the tests/transforms/test_operators.py 'modulated on the' test_Resize() 'or' test_RandomFlipOrRotate() 'methods.
+- If the operator you write only supports the processing of a specific task or requires the number of bands of input data, bind the operator '_InputFilter' in the 'OP2FILTER' global variable after writing the test logic.
+- If you're writing a data preprocessing/data enhancement function (i.e., in 'paddlers/transforms/functions.py'), add a test class in 'tests/transforms/test_functions.py' that mimics an existing example.
+#### 4.3 Tool single test
 
-#### 4.3 工具单测
+1. Create a new file in the 'tests/tools/' directory called 'test_{tool name}.py'.
+2. Write the test case in the newly created script.
 
-1. 在`tests/tools/`目录中新建文件，命名为`test_{工具名}.py`。
-2. 在新建的脚本中编写测试用例。
+#### 4.4 Run the test
 
-#### 4.4 执行测试
-
-添加完测试用例后，您需要完整执行所有的测试（因为新增的代码可能影响了项目原有的代码，使部分功能不能正常使用）。输入如下指令：
+After adding the test cases, you need to execute all the tests in full (because the new code may affect the existing code of the project and break some functionality). Type the following:
 
 ```bash
 cd tests
 bash run_tests.sh
+
 ```
+This process can be time-consuming and requires patience. If some of the test cases fail, modify them according to the error message until all of them pass.
 
-这一过程可能较为费时，需要耐心等待。如果其中某些测试用例没有通过，请根据报错信息修改，直到所有用例都通过。
-
-执行以下脚本可以获取覆盖率相关信息：
+To get coverage information, execute the following script:
 
 ```bash
 bash check_coverage.sh
 ```
 
-#### 4.5 TIPC
+#### 4.5TIPC
 
-如果您贡献的内容包含TIPC，请在提交PR时附上TIPC基础训推链条执行成功的日志信息。
+If your contribution includes TIPC, please submit the PR with a log of the success of the TIPC base training chain.
 
-## 贡献案例
+## Contributing examples
 
 tbd

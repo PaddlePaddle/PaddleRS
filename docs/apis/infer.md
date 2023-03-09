@@ -1,153 +1,153 @@
-# PaddleRS推理API说明
+# PaddleRS Inference API illustration
 
-PaddleRS的动态图推理和静态图推理能力分别由训练器（[`BaseModel`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/base.py)及其子类）和**预测器**（`paddlers.deploy.Predictor`）提供。
+PaddleRS and the static and dynamic figure reasoning figure reasoning respectively by the trainer ([` BaseModel `] (https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/base.py) And its subclasses) And **Predictor** (`paddlers.deploy.predictor`) to provide.
 
-## 动态图推理API
+## Dynamic graph inference API
 
-### 整图推理
+### Whole graph inference
 
 #### `BaseChangeDetector.predict()`
 
-接口形式：
+Interface form：
 
 ```python
 def predict(self, img_file, transforms=None):
 ```
 
-输入参数：
+Input parameters:
 
-|参数名称|类型|参数说明|默认值|
+|parameter names|type|parameter description|default|
 |-------|----|--------|-----|
-|`img_file`|`list[tuple]` \| `tuple[str\|np.ndarray]`|输入影像对数据（NumPy数组形式）或输入影像对路径。若仅预测一个影像对，使用一个元组顺序包含第一时相影像数据/路径以及第二时相影像数据/路径。若需要一次性预测一组影像对，以列表包含这些影像对的数据或路径（每个影像对对应列表中的一个元组）。||
-|`transforms`|`paddlers.transforms.Compose` \| `None`|对输入数据应用的数据变换算子。若为`None`，则使用训练器在验证阶段使用的数据变换算子。|`None`|
+|`img_file`|`list[tuple]` \| `tuple[str\|np.ndarray]`|Input image pair data (in NumPy array form) or input image pair path.If only one image pair is predicted, a tuple is used to sequentially contain the first phase image data/path and the second phase image data/path. 
 
-返回格式：
+If you need to predict a group of image pairs at once, the list contains the data or paths of those image pairs (one tuple from the list for each image pair).||
 
-若`img_file`是一个元组，则返回对象为包含下列键值对的字典：
+|`transforms`|`paddlers.transforms.Compose` \| `None`|There is a data transformation operator applied to input data. If it is 'None', then the data transformation operator used by the trainer during the validation phase is used.|`None`|
+
+Return format：
+
+If 'img_file' is a tuple, the returned object is a dictionary with the following key-value pairs:
 
 ```
-{"label_map": 输出类别标签（以[h, w]格式排布），"score_map": 模型输出的各类别概率（以[h, w, c]格式排布）}
+{"label_map": output class labels (in [h, w] format), "score_map": the class probabilities of the model output (in [h, w, c] format)}
 ```
 
-若`img_file`是一个列表，则返回对象为与`img_file`等长的列表，其中的每一项为一个字典（键值对如上所示），顺序对应`img_file`中的每个元素。
+If 'img_file' is a list, then the returned object is a list of the same length as' img_file ', where each item is a dictionary (key/value pair as shown above), in the order corresponding to each item in 'img_file'.
 
 #### `BaseClassifier.predict()`
 
-接口形式：
+Interface form：
 
 ```python
 def predict(self, img_file, transforms=None):
 ```
 
-输入参数：
+Input parameters:
 
-|参数名称|类型|参数说明|默认值|
+|parameter names|type|parameter description|default|
 |-------|----|--------|-----|
-|`img_file`|`list[str\|np.ndarray]` \| `str` \| `np.ndarray`|输入影像数据（NumPy数组形式）或输入影像路径。若需要一次性预测一组影像，以列表包含这些影像的数据或路径（每幅影像对应列表中的一个元素）。||
-|`transforms`|`paddlers.transforms.Compose` \| `None`|对输入数据应用的数据变换算子。若为`None`，则使用训练器在验证阶段使用的数据变换算子。|`None`|
+|`img_file`|`list[str\|np.ndarray]` \| `str` \| `np.ndarray`|Input image data (NumPy array) or input image path. If we need to predict a group of images at once, we can create a list that contains the data or paths for the images (one element for each image).||
+|`transforms`|`paddlers.transforms.Compose` \| `None`|There are data transformation operators applied to the input data.If it is' None ', then the data transformation operator used by the trainer during the validation phase is used.|`None`|
 
-返回格式：
+Return format：
 
-若`img_file`是一个字符串或NumPy数组，则返回对象为包含下列键值对的字典：
+If'img_file'is a string or NumPy array, the returned object is a dictionary with the following key-value pairs:
 
 ```
-{"class_ids_map": 输出类别标签,
- "scores_map": 输出类别概率,
- "label_names_map": 输出类别名称}
+{"class_ids_map": Output class labels,
+ "scores_map": Output class probability,
+ "label_names_map": Output class name}
 ```
 
-若`img_file`是一个列表，则返回对象为与`img_file`等长的列表，其中的每一项为一个字典（键值对如上所示），顺序对应`img_file`中的每个元素。
+If 'img_file' is a list, then the returned object is a list of the same length as' img_file ', where each item is a dictionary (key/value pair as shown above), in the order corresponding to each item in 'img_file'.
 
 #### `BaseDetector.predict()`
 
-接口形式：
+Interface form：
 
 ```python
 def predict(self, img_file, transforms=None):
 ```
 
-输入参数：
+Input parameters:
 
-|参数名称|类型|参数说明|默认值|
+|parameter names|type|parameter description|default|
 |-------|----|--------|-----|
-|`img_file`|`list[str\|np.ndarray]` \| `str` \| `np.ndarray`|输入影像数据（NumPy数组形式）或输入影像路径。若需要一次性预测一组影像，以列表包含这些影像的数据或路径（每幅影像对应列表中的一个元素）。||
-|`transforms`|`paddlers.transforms.Compose` \| `None`|对输入数据应用的数据变换算子。若为`None`，则使用训练器在验证阶段使用的数据变换算子。|`None`|
+|`img_file`|`list[str\|np.ndarray]` \| `str` \| `np.ndarray`|Enter the image data (in the form of NumPy array) or enter the image path. If you need to predict a group of images at once, the list contains the data or paths for those images (one element in the list for each image).||
+|`transforms`|`paddlers.transforms.Compose` \| `None`|There are data transformation operators applied to the input data.If it is' None ', then the data transformation operator used by the trainer during the validation phase is used.|`None`|
 
-返回格式：
+Return format：
 
-若`img_file`是一个字符串或NumPy数组，则返回对象为一个列表，列表中每个元素对应一个预测的目标框。列表中的元素为包含下列键值对的字典：
+If 'img_file' is a string or NumPy array, the returned object is a list with one element for each predicted target box. The elements in the list will be dictionaries containing the following key-value pairs:
 
 ```
-{"category_id": 类别ID,
- "category": 类别名称,
- "bbox": 目标框位置信息，依次包含目标框左上角的横、纵坐标以及目标框的宽度和长度,  
- "score": 类别置信度,
- "mask": [RLE格式](https://baike.baidu.com/item/rle/366352)的掩模图（mask），仅实例分割模型预测结果包含此键值对}
+{"category_id": class ID,
+ "category": class name,
+ "bbox": The target box position information, in turn, contains the horizontal and vertical coordinates of the top left corner of the target box, and the width and length of the target box.
+ "score": Class confidence,
+ "mask": [RLE format](https://baike.baidu.com/item/rle/366352)'s mask graph，Only instance segmentation model prediction results contain this key-value pair}
 ```
 
-若`img_file`是一个列表，则返回对象为与`img_file`等长的列表，其中的每一项为一个由字典（键值对如上所示）构成的列表，顺序对应`img_file`中的每个元素。
+If 'img_file' is a list, then the returned object is a list of the same length as'img_file', where each item is a list of dictionaries (key/value pairs as shown above), in the order corresponding to each item in 'img_file'.
 
 #### `BaseRestorer.predict()`
 
-接口形式：
+Interface form：
 
 ```python
 def predict(self, img_file, transforms=None):
 ```
 
-输入参数：
+Input parameters:
 
-|参数名称|类型|参数说明|默认值|
+|parameter names|type|parameter description|default|
 |-------|----|--------|-----|
-|`img_file`|`list[str\|np.ndarray]` \| `str` \| `np.ndarray`|输入影像数据（NumPy数组形式）或输入影像路径。若需要一次性预测一组影像，以列表包含这些影像的数据或路径（每幅影像对应列表中的一个元素）。||
-|`transforms`|`paddlers.transforms.Compose` \| `None`|对输入数据应用的数据变换算子。若为`None`，则使用训练器在验证阶段使用的数据变换算子。|`None`|
+|`img_file`|`list[str\|np.ndarray]` \| `str` \| `np.ndarray`|Input image data (NumPy array) or input image path. If we need to predict a group of images at once, we can create a list that contains the data or paths for the images (one element for each image).||
+|`transforms`|`paddlers.transforms.Compose` \| `None`|There are data transformation operators applied to the input data.If it is' None ', then the data transformation operator used by the trainer during the validation phase is used.|`None`|
 
-返回格式：
+Return format：
 
-若`img_file`是一个字符串或NumPy数组，则返回对象为包含下列键值对的字典：
-
+If 'img_file' is a string or NumPy array, the returned object is a dictionary with the following key-value pairs:
 ```
-{"res_map": 模型输出的复原或重建影像（以[h, w, c]格式排布）}
+{"res_map": Restored or reconstructed images (arranged in [h, w, c] format) output by the model）}
 ```
 
-若`img_file`是一个列表，则返回对象为与`img_file`等长的列表，其中的每一项为一个字典（键值对如上所示），顺序对应`img_file`中的每个元素。
+If 'img_file' is a list, then the returned object is a list of the same length as' img_file ', where each item is a dictionary (key/value pair as shown above), in the order corresponding to each item in 'img_file'.
 
 #### `BaseSegmenter.predict()`
 
-接口形式：
+Interface form：
 
 ```python
 def predict(self, img_file, transforms=None):
 ```
 
-输入参数：
+Input parameters:
 
-|参数名称|类型|参数说明|默认值|
+|parameter names|type|parameter description|default|
 |-------|----|--------|-----|
-|`img_file`|`list[str\|np.ndarray]` \| `str` \| `np.ndarray`|输入影像数据（NumPy数组形式）或输入影像路径。若需要一次性预测一组影像，以列表包含这些影像的数据或路径（每幅影像对应列表中的一个元素）。||
-|`transforms`|`paddlers.transforms.Compose` \| `None`|对输入数据应用的数据变换算子。若为`None`，则使用训练器在验证阶段使用的数据变换算子。|`None`|
+|`img_file`|`list[str\|np.ndarray]` \| `str` \| `np.ndarray`|Input image data (NumPy array) or input image path. If we need to predict a group of images at once, we can create a list that contains the data or paths for the images (one element for each image).||
+|`transforms`|`paddlers.transforms.Compose` \| `None`|There are data transformation operators applied to the input data.If it is' None ', then the data transformation operator used by the trainer during the validation phase is used.|`None`|
 
-返回格式：
+Return format：
 
-若`img_file`是一个字符串或NumPy数组，则返回对象为包含下列键值对的字典：
+If 'img_file' is a string or NumPy array, the returned object is a dictionary with the following key-value pairs:
 
 ```
-{"label_map": 输出类别标签（以[h, w]格式排布），"score_map": 模型输出的各类别概率（以[h, w, c]格式排布）}
+{"label_map": Output class labels(in [h, w] format), "score_map": The class probabilities of the model output (in [h, w, c] format)}
 ```
 
-若`img_file`是一个列表，则返回对象为与`img_file`等长的列表，其中的每一项为一个字典（键值对如上所示），顺序对应`img_file`中的每个元素。
+If 'img_file' is a list, then the returned object is a list of the same length as' img_file ', where each item is a dictionary (key/value pair as shown above), in the order corresponding to each item in 'img_file'.
+### Sliding window reasoning
 
-### 滑窗推理
+Considering the large format nature of remote sensing images, PaddleRS provides sliding window inference support for some tasks. PaddleRS 'sliding window reasoning features include:
+1. To solve the problem of memory shortage caused by reading the entire detail image at once, PaddleRS uses lazy memory loading technology, which only reads and processes image blocks in one window at a time.
+2. The user can customize the size and step of the sliding window. Sliding window overlap is supported, and PaddleRS will automatically fuse the model prediction results for the overlapping parts between Windows.
+3. It supports saving the reasoning results to GeoTiff format, and supports reading and writing geographic transformation information and geographic projection information.
 
-考虑到遥感影像的大幅面性质，PaddleRS为部分任务提供了滑窗推理支持。PaddleRS的滑窗推理功能具有如下特色：
+At present, the image segmentation trainers：（[`BaseSegmenter`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/segmenter.py) and its subclasses) with change detection trainers（[`BaseChangeDetector`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/change_detector.py) and its subclasses) have dynamic graph sliding window reasoning API, taking the API of image segmentation task as an example, the description is as follows:
 
-1. 为了解决一次读入整张大图直接导致内存不足的问题，PaddleRS采用延迟载入内存的技术，一次仅读取并处理一个窗口内的影像块。
-2. 用户可自定义滑窗的大小和步长。支持滑窗重叠，对于窗口之间重叠的部分，PaddleRS将自动对模型预测结果进行融合。
-3. 支持将推理结果保存为GeoTiff格式，支持对地理变换信息、地理投影信息的读取与写入。
-
-目前，图像分割训练器（[`BaseSegmenter`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/segmenter.py)及其子类）与变化检测训练器（[`BaseChangeDetector`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/change_detector.py)及其子类）具有动态图滑窗推理API，以图像分割任务的API为例，说明如下：
-
-接口形式：
+Interface form：
 
 ```python
 def slider_predict(self,
@@ -163,50 +163,52 @@ def slider_predict(self,
                    quiet=False):
 ```
 
-输入参数列表：
+Enter a list of parameters:
 
-|参数名称|类型|参数说明|默认值|
+|parameter names|type|parameter description|default|
 |-------|----|--------|-----|
-|`img_file`|`str`|输入影像路径。||
-|`save_dir`|`str`|预测结果输出路径。||
-|`block_size`|`list[int]` \| `tuple[int]` \| `int`|滑窗的窗口大小（以列表或元组指定宽度、高度或以一个整数指定相同的宽高）。||
-|`overlap`|`list[int]` \| `tuple[int]` \| `int`|滑窗的滑动步长（以列表或元组指定宽度、高度或以一个整数指定相同的宽高）。|`36`|
-|`transforms`|`paddlers.transforms.Compose` \| `None`|对输入数据应用的数据变换算子。若为`None`，则使用训练器在验证阶段使用的数据变换算子。|`None`|
-|`invalid_value`|`int`|输出影像中用于标记无效像素的数值。|`255`|
-|`merge_strategy`|`str`|合并滑窗重叠区域使用的策略。`'keep_first'`表示保留遍历顺序（从左至右，从上往下，列优先）最靠前的窗口的预测类别；`'keep_last'`表示保留遍历顺序最靠后的窗口的预测类别；`'accum'`表示通过将各窗口在重叠区域给出的预测概率累加，计算最终预测类别。需要注意的是，在对大尺寸影像进行`overlap`较大的密集推理时，使用`'accum'`策略可能导致较长的推理时间，但一般能够在窗口交界部分取得更好的表现。|`'keep_last'`|
-|`batch_size`|`int`|预测时使用的mini-batch大小。|`1`|
-|`eager_load`|`bool`|若为`True`，则不使用延迟内存载入，而是在预测开始时一次性将整幅影像载入到内存。|`False`|
-|`quiet`|`bool`|若为`True`，不显示预测进度。|`False`|
+|`img_file`|`str`|Input image path.||
+|`save_dir`|`str`|The output path of the prediction result||
+|`block_size`|`list[int]` \| `tuple[int]` \| `int`|The window size of the sliding window（Specifies width and height as a list or tuple, or the same width and height as an integer）||
+|`overlap`|`list[int]` \| `tuple[int]` \| `int`|The sliding step of the window (width and height specified as a list or tuple, or the same width and height as an integer)|`36`|
+|`transforms`|`paddlers.transforms.Compose` \| `None`|There are data transformation operators applied to the input data.If it is' None ', then the data transformation operator used by the trainer during the validation phase is used.|`None`|
+|`invalid_value`|`int`|The value used to mark invalid pixels in the output image.|`255`|
+|`merge_strategy`|`str`|Which is the strategy used to merge the overlapping regions of sliding Windows. "'keep_first' 'means keep the predicted class of the window with the highest traversal order (left to right, top to bottom, column first);
+'keep_last' keeps the predicted class of the window with the lowest traversal order; 'accum' means that the final prediction class is calculated by summing the predicted probabilities given by each window in the overlapping region.
+It should be noted that when performing dense inference on large images with large 'overlap', using the 'accum' 'strategy may lead to longer inference time, but generally achieves better performance on the window boundary.|`'keep_last'`|
+|`batch_size`|`int`|The mini-batch size to use for prediction.|`1`|
+|`eager_load`|`bool`|If it is' True ', then instead of using lazy memory loading, the whole image is loaded into memory at the beginning of prediction.|`False`|
+|`quiet`|`bool`|If 'True', no progress will be shown.|`False`|
 
-变化检测任务的滑窗推理API与图像分割任务类似，但需要注意的是输出结果中存储的地理变换、投影等信息以从第一时相影像中读取的信息为准，存储滑窗推理结果的文件名也与第一时相影像文件相同。
+The sliding window inference API for the change detection task is similar to the image segmentation task, but it should be noted that the information stored in the output is based on the information read from the first phase image, and the file name of the sliding window inference result is the same as the first phase image file.
 
-## 静态图推理API
+## Static graph reasoning API
 
 ### Python API
 
-[将模型导出为部署格式](https://github.com/PaddlePaddle/PaddleRS/blob/develop/deploy/export/README.md)或执行模型量化后，PaddleRS提供`paddlers.deploy.Predictor`用于加载部署或量化格式模型以及执行基于[Paddle Inference](https://www.paddlepaddle.org.cn/tutorials/projectdetail/3952715)的推理。
+[Export models to deployment format](https://github.com/PaddlePaddle/PaddleRS/blob/develop/deploy/export/README.md)Or perform model quantization,PaddleRS provides 'Paddlers.deploy.predictor' for loading deployment or quantization format models and executing based on [Paddle Inference]] Reasoning (https://www.paddlepaddle.org.cn/tutorials/projectdetail/3952715).
 
-#### 初始化`Predictor`对象
+#### Initializes the 'Predictor' object
 
-`Predictor.__init__()`接受如下参数：
+`Predictor.__init__()` takes the following arguments：
 
-|参数名称|类型|参数说明|默认值|
+|parameter names|type|parameter description|default|
 |-------|----|--------|-----|
-|`model_dir`|`str`|模型路径（必须是导出的部署或量化模型）。||
-|`use_gpu`|`bool`|是否使用GPU。|`False`|
-|`gpu_id`|`int`|使用GPU的ID。|`0`|
-|`cpu_thread_num`|`int`|使用CPU执行推理时的线程数。|`1`|
-|`use_mkl`|`bool`|是否使用MKL-DNN计算库（此选项仅在使用CPU执行推理时生效）。|`False`|
-|`mkl_thread_num`|`int`|MKL-DNN计算线程数。|`4`|
-|`use_trt`|`bool`|是否使用TensorRT。|`False`|
-|`use_glog`|`bool`|是否启用glog日志。|`False`|
-|`memory_optimize`|`bool`|是否启用内存优化。|`True`|
-|`max_trt_batch_size`|`int`|在使用TensorRT时配置的最大batch size。|`1`|
-|`trt_precision_mode`|`str`|在使用TensorRT时采用的精度，可选值为`'float32'`或`'float16'`。|`'float32'`|
+|`model_dir`|`str`|Model path (must be the exported deployment or quantization model).||
+|`use_gpu`|`bool`|Weather to use GPU|`False`|
+|`gpu_id`|`int`|Weather to use the ID of the GPU.|`0`|
+|`cpu_thread_num`|`int`|Number of threads when performing inference using the CPU.|`1`|
+|`use_mkl`|`bool`|Whether to use the MKL-DNN computation library (this option only works if the inference is performed using the CPU).|`False`|
+|`mkl_thread_num`|`int`|Use MKL-DNN to counts the number of threads.|`4`|
+|`use_trt`|`bool`|Whether to use TensorRT.|`False`|
+|`use_glog`|`bool`|Whether glog logging is enabled.|`False`|
+|`memory_optimize`|`bool`| whether to enable memory optimization.|`True`|
+|`max_trt_batch_size`|`int`|Maximum batch size configured when using TensorRT.|`1`|
+|`trt_precision_mode`|`str`|Precision to use with TensorRT, optionally "float32' 'or" float16''.|`'float32'`|
 
 #### `Predictor.predict()`
 
-接口形式：
+Interface form：
 
 ```python
 def predict(self,
@@ -217,19 +219,19 @@ def predict(self,
             repeats=1):
 ```
 
-输入参数列表：
-
-|参数名称|类型|参数说明|默认值|
+Enter a list of parameters:
+|parameter names|type|parameter description|default|
 |-------|----|--------|-----|
-|`img_file`|`list[str\|tuple\|np.ndarray]` \| `str` \| `tuple` \| `np.ndarray`|对于场景分类、目标检测、图像复原和图像分割任务来说，该参数可为单一图像路径，或是解码后的、排列格式为[h, w, c]且具有float32类型的图像数据（表示为NumPy数组形式），或者是一组图像路径或np.ndarray对象构成的列表；对于变化检测任务来说，该参数可以为图像路径二元组（分别表示前后两个时相影像路径），或是解码后的两幅图像组成的二元组，或者是上述两种二元组之一构成的列表。||
-|`topk`|`int`|场景分类模型预测时使用，表示选取模型输出概率大小排名前`topk`的类别作为最终结果。|`1`|
-|`transforms`|`paddlers.transforms.Compose`\|`None`|对输入数据应用的数据变换算子。若为`None`，则使用从`model.yml`中读取的算子。|`None`|
-|`warmup_iters`|`int`|预热轮数，用于评估模型推理以及前后处理速度。若大于1，将预先重复执行`warmup_iters`次推理，而后才开始正式的预测及其速度评估。|`0`|
-|`repeats`|`int`|重复次数，用于评估模型推理以及前后处理速度。若大于1，将执行`repeats`次预测并取时间平均值。|`1`|
-|`quiet`|`bool`|若为`True`，不打印计时信息。|`False`|
+|`img_file`|`list[str\|tuple\|np.ndarray]` \| `str` \| `tuple` \| `np.ndarray`|For scene classification, object detection, image restoration, and image segmentation tasks, this can be a single image path or the decoded [h, w, c] float32type image data (represented as a NumPy array).
+Or a list of image paths or np.ndarray objects. For change detection, this can be a tuple of image paths (one for each temporal path), a tuple of two decoded images, or a list of one of these two tuples.||
+|`topk`|`int`|When used in scene classification model prediction, it means that the top 'topk' categories of model output probability are selected as the final result.|`1`|
+|`transforms`|`paddlers.transforms.Compose`\|`None`|There are data transformation operators applied to the input data.For 'None', the operator read from 'model.yml' is used.|`None`|
+|`warmup_iters`|`int`|Number of warm-up rounds to evaluate model inference as well as pre and post processing speed. If it is greater than 1, the 'warmup_iters' inference is repeated before the formal prediction and speed evaluation begins.|`0`|
+|`repeats`|`int`|Number of repetitions to evaluate model inference and pre - and post-processing speed. If it is greater than 1, 'repeats' are performed and the time average is taken.|`1`|
+|`quiet`|`bool`|If 'True', no timing information will be printed.|`False`|
 
-`Predictor.predict()`的返回格式与相应的动态图推理API的返回格式完全相同，详情请参考[动态图推理API](#动态图推理api)。
+`Predictor.predict()`Its return format is exactly the same as that of the corresponding graph inference API. For details, see Graph Inference API (# Graph Inference api).
 
 ### `Predictor.slider_predict()`
 
-实现滑窗推理功能。用法与`BaseSegmenter`和`BaseChangeDetector`的`slider_predict()`方法相同。
+It can realize sliding window reasoning function. The usage is the same as the 'slider_predict()' method of 'BaseSegmenter' and 'BaseChangeDetector'.
