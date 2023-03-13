@@ -19,7 +19,7 @@ paddleslim >= 2.2.1,< 2.3.5
 pandas
 pycocotools
 # pydensecrf
-scikit-learn == 0.23.2
+scikit-learn == 1.2.2
 scikit-image >= 0.14.0
 scipy
 shapely
