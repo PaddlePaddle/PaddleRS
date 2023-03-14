@@ -18,6 +18,7 @@ import random
 from numbers import Number
 from functools import partial
 from operator import methodcaller
+from collections import OrderedDict
 from collections.abc import Sequence
 
 import numpy as np
@@ -32,6 +33,8 @@ import paddlers.transforms.indices as indices
 import paddlers.transforms.satellites as satellites
 
 __all__ = [
+    "construct_sample",
+    "construct_sample_from_dict",
     "Compose",
     "DecodeImg",
     "Resize",
@@ -74,6 +77,19 @@ interp_dict = {
 }
 
 
+def construct_sample(**kwargs):
+    sample = OrderedDict()
+    for k, v in kwargs.items():
+        sample[k] = v
+    if 'trans_info' not in sample:
+        sample['trans_info'] = []
+    return sample
+
+
+def construct_sample_from_dict(dict_like_obj):
+    return construct_sample(**dict_like_obj)
+
+
 class Compose(object):
     """
     Apply a series of data augmentation strategies to the input.
@@ -107,17 +123,17 @@ class Compose(object):
         This is equivalent to sequentially calling compose_obj.apply_transforms() 
             and compose_obj.arrange_outputs().
         """
-
+        if 'trans_info' not in sample:
+            sample['trans_info'] = []
         sample = self.apply_transforms(sample)
+        trans_info = sample['trans_info']
         sample = self.arrange_outputs(sample)
-        return sample
+        return sample, trans_info
 
     def apply_transforms(self, sample):
         for op in self.transforms:
-            # Skip batch transforms amd mixup
-            if isinstance(op, (paddlers.transforms.BatchRandomResize,
-                               paddlers.transforms.BatchRandomResizeByShort,
-                               MixupImage)):
+            # Skip batch transforms
+            if getattr(op, 'is_batch_transform', False):
                 continue
             sample = op(sample)
         return sample
@@ -372,11 +388,6 @@ class DecodeImg(Transform):
                 sample['geo_info_dict_tar'] = geo_info_dict
             else:
                 sample['target'] = self.apply_im(sample['target'])
-
-        # the `trans_info` will save the process of image shape,
-        # and will be used in evaluation and prediction.
-        if 'trans_info' not in sample:
-            sample['trans_info'] = []
 
         sample['im_shape'] = np.array(
             sample['image'].shape[:2], dtype=np.float32)
@@ -1474,6 +1485,8 @@ class Pad(Transform):
 
 
 class MixupImage(Transform):
+    is_batch_transform = True
+
     def __init__(self, alpha=1.5, beta=1.5, mixup_epoch=-1):
         """
         Mixup two images and their gt_bbbox/gt_score.
@@ -2073,13 +2086,12 @@ class ArrangeSegmenter(Arrange):
             mask = sample['mask']
             mask = mask.astype('int64')
         image = F.permute(sample['image'], False)
-        trans_info = sample['trans_info']
         if self.mode == 'train':
             return image, mask
         if self.mode == 'eval':
-            return image, mask, trans_info
+            return image, mask
         if self.mode == 'test':
-            return image, trans_info,
+            return image,
 
 
 class ArrangeChangeDetector(Arrange):
@@ -2089,7 +2101,6 @@ class ArrangeChangeDetector(Arrange):
             mask = mask.astype('int64')
         image_t1 = F.permute(sample['image'], False)
         image_t2 = F.permute(sample['image2'], False)
-        trans_info = sample['trans_info']
         if self.mode == 'train':
             masks = [mask]
             if 'aux_masks' in sample:
@@ -2099,9 +2110,9 @@ class ArrangeChangeDetector(Arrange):
                 image_t1,
                 image_t2, ) + tuple(masks)
         if self.mode == 'eval':
-            return image_t1, image_t2, mask, trans_info
+            return image_t1, image_t2, mask
         if self.mode == 'test':
-            return image_t1, image_t2, trans_info
+            return image_t1, image_t2
 
 
 class ArrangeClassifier(Arrange):
@@ -2110,7 +2121,7 @@ class ArrangeClassifier(Arrange):
         if self.mode in ['train', 'eval']:
             return image, sample['label']
         else:
-            return image
+            return image,
 
 
 class ArrangeDetector(Arrange):

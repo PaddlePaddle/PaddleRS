@@ -24,7 +24,7 @@ from paddle.static import InputSpec
 import paddlers
 import paddlers.models.ppdet as ppdet
 from paddlers.models.ppdet.modeling.proposal_generator.target_layer import BBoxAssigner, MaskAssigner
-from paddlers.transforms import decode_image
+from paddlers.transforms import decode_image, construct_sample
 from paddlers.transforms.operators import _NormalizeBox, _PadBox, _BboxXYXY2XYWH, Resize, Pad
 from paddlers.transforms.batch_operators import BatchCompose, BatchRandomResize, BatchRandomResizeByShort, \
     _BatchPad, _Gt2YoloTarget
@@ -37,6 +37,8 @@ from .utils.det_metrics import VOCMetric, COCOMetric
 __all__ = [
     "YOLOv3", "FasterRCNN", "PPYOLO", "PPYOLOTiny", "PPYOLOv2", "MaskRCNN"
 ]
+
+# TODO: Prune and decoupling
 
 
 class BaseDetector(BaseModel):
@@ -307,6 +309,8 @@ class BaseDetector(BaseModel):
         self.num_max_boxes = train_dataset.num_max_boxes
         train_dataset.batch_transforms = self._compose_batch_transform(
             train_dataset.transforms, mode='train')
+        train_dataset.collate_fn = self._build_collate_fn(
+            train_dataset.batch_transforms)
 
         # Build optimizer if not defined
         if optimizer is None:
@@ -371,6 +375,17 @@ class BaseDetector(BaseModel):
             early_stop=early_stop,
             early_stop_patience=early_stop_patience,
             use_vdl=use_vdl)
+
+    def _build_collate_fn(self, compose):
+        def _collate_fn(batch):
+            # We drop `trans_info` as it is not required in detection tasks
+            samples = [s[0] for s in batch]
+            return compose(samples)
+
+        return _collate_fn
+
+    def _compose_batch_transform(self, transforms, mode):
+        raise NotImplementedError
 
     def quant_aware_train(self,
                           num_epochs,
@@ -534,9 +549,13 @@ class BaseDetector(BaseModel):
 
         if nranks < 2 or local_rank == 0:
             self.eval_data_loader = self.build_data_loader(
-                eval_dataset, batch_size=batch_size, mode='eval')
+                eval_dataset,
+                batch_size=batch_size,
+                mode='eval',
+                collate_fn=self._build_collate_fn(
+                    eval_dataset.batch_transforms))
             is_bbox_normalized = False
-            if eval_dataset.batch_transforms is not None:
+            if hasattr(eval_dataset, 'batch_transforms'):
                 is_bbox_normalized = any(
                     isinstance(t, _NormalizeBox)
                     for t in eval_dataset.batch_transforms.batch_transforms)
@@ -604,7 +623,7 @@ class BaseDetector(BaseModel):
         else:
             images = img_file
 
-        batch_samples = self.preprocess(images, transforms)
+        batch_samples, _ = self.preprocess(images, transforms)
         self.net.eval()
         outputs = self.run(self.net, batch_samples, 'test')
         prediction = self.postprocess(outputs)
@@ -619,16 +638,17 @@ class BaseDetector(BaseModel):
         for im in images:
             if isinstance(im, str):
                 im = decode_image(im, read_raw=True)
-            sample = {'image': im}
+            sample = construct_sample(image=im)
             sample = transforms(sample)
-            batch_samples.append(sample)
+            data = sample[0]
+            batch_samples.append(data)
         batch_transforms = self._compose_batch_transform(transforms, 'test')
         batch_samples = batch_transforms(batch_samples)
         if to_tensor:
             for k in batch_samples:
                 batch_samples[k] = paddle.to_tensor(batch_samples[k])
 
-        return batch_samples
+        return batch_samples, None
 
     def postprocess(self, batch_pred):
         infer_result = {}
@@ -704,6 +724,14 @@ class BaseDetector(BaseModel):
                           paddlers.transforms.ArrangeDetector):
             raise TypeError(
                 "`transforms.arrange` must be an ArrangeDetector object.")
+
+    def get_pruning_info(self):
+        info = super().get_pruning_info()
+        info['pruner_inputs'] = {
+            k: v.tolist()
+            for k, v in info['pruner_inputs'][0].items()
+        }
+        return info
 
 
 class PicoDet(BaseDetector):
@@ -920,7 +948,11 @@ class PicoDet(BaseDetector):
             in_args['optimizer'] = optimizer
         return in_args
 
-    def build_data_loader(self, dataset, batch_size, mode='train'):
+    def build_data_loader(self,
+                          dataset,
+                          batch_size,
+                          mode='train',
+                          collate_fn=None):
         if dataset.num_samples < batch_size:
             raise ValueError(
                 'The volume of dataset({}) must be larger than batch size({}).'
@@ -932,13 +964,14 @@ class PicoDet(BaseDetector):
                 batch_size=batch_size,
                 shuffle=dataset.shuffle,
                 drop_last=False,
-                collate_fn=dataset.batch_transforms,
+                collate_fn=dataset.collate_fn
+                if collate_fn is None else collate_fn,
                 num_workers=dataset.num_workers,
                 return_list=True,
                 use_shared_memory=False)
         else:
-            return super(BaseDetector, self).build_data_loader(dataset,
-                                                               batch_size, mode)
+            return super(BaseDetector, self).build_data_loader(
+                dataset, batch_size, mode, collate_fn)
 
 
 class YOLOv3(BaseDetector):

@@ -22,7 +22,6 @@ import hashlib
 import tarfile
 import zipfile
 
-import filelock
 import paddle
 
 from . import logging

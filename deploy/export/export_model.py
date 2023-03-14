@@ -73,5 +73,4 @@ if __name__ == '__main__':
     model = load_model(args.model_dir)
 
     # Do dynamic-to-static cast
-    # XXX: Invoke a protected (single underscore) method outside of subclasses.
-    model._export_inference_model(args.save_dir, fixed_input_shape)
+    model.export_inference_model(args.save_dir, fixed_input_shape)
