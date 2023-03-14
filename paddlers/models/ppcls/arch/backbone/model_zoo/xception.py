@@ -1,3 +1,19 @@
+# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# reference: https://arxiv.org/abs/1610.02357
+
 import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
@@ -8,7 +24,7 @@ from paddle.nn.initializer import Uniform
 import math
 import sys
 
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "Xception41":
@@ -201,14 +217,22 @@ class MiddleFlow(nn.Layer):
         super(MiddleFlow, self).__init__()
 
         self.block_num = block_num
-        self._conv_0 = MiddleFlowBottleneckBlock(728, 728, name="middle_flow_0")
-        self._conv_1 = MiddleFlowBottleneckBlock(728, 728, name="middle_flow_1")
-        self._conv_2 = MiddleFlowBottleneckBlock(728, 728, name="middle_flow_2")
-        self._conv_3 = MiddleFlowBottleneckBlock(728, 728, name="middle_flow_3")
-        self._conv_4 = MiddleFlowBottleneckBlock(728, 728, name="middle_flow_4")
-        self._conv_5 = MiddleFlowBottleneckBlock(728, 728, name="middle_flow_5")
-        self._conv_6 = MiddleFlowBottleneckBlock(728, 728, name="middle_flow_6")
-        self._conv_7 = MiddleFlowBottleneckBlock(728, 728, name="middle_flow_7")
+        self._conv_0 = MiddleFlowBottleneckBlock(
+            728, 728, name="middle_flow_0")
+        self._conv_1 = MiddleFlowBottleneckBlock(
+            728, 728, name="middle_flow_1")
+        self._conv_2 = MiddleFlowBottleneckBlock(
+            728, 728, name="middle_flow_2")
+        self._conv_3 = MiddleFlowBottleneckBlock(
+            728, 728, name="middle_flow_3")
+        self._conv_4 = MiddleFlowBottleneckBlock(
+            728, 728, name="middle_flow_4")
+        self._conv_5 = MiddleFlowBottleneckBlock(
+            728, 728, name="middle_flow_5")
+        self._conv_6 = MiddleFlowBottleneckBlock(
+            728, 728, name="middle_flow_6")
+        self._conv_7 = MiddleFlowBottleneckBlock(
+            728, 728, name="middle_flow_7")
         if block_num == 16:
             self._conv_8 = MiddleFlowBottleneckBlock(
                 728, 728, name="middle_flow_8")
@@ -289,7 +313,8 @@ class ExitFlow(nn.Layer):
 
         name = "exit_flow"
 
-        self._conv_0 = ExitFlowBottleneckBlock(728, 728, 1024, name=name + "_1")
+        self._conv_0 = ExitFlowBottleneckBlock(
+            728, 728, 1024, name=name + "_1")
         self._conv_1 = SeparableConv(1024, 1536, stride=1, name=name + "_2")
         self._conv_2 = SeparableConv(1536, 2048, stride=1, name=name + "_3")
         self._pool = AdaptiveAvgPool2D(1)
@@ -353,14 +378,16 @@ def Xception41(pretrained=False, use_ssld=False, **kwargs):
 
 
 def Xception65(pretrained=False, use_ssld=False, **kwargs):
-    model = Xception(entry_flow_block_num=3, middle_flow_block_num=16, **kwargs)
+    model = Xception(
+        entry_flow_block_num=3, middle_flow_block_num=16, **kwargs)
     _load_pretrained(
         pretrained, model, MODEL_URLS["Xception65"], use_ssld=use_ssld)
     return model
 
 
 def Xception71(pretrained=False, use_ssld=False, **kwargs):
-    model = Xception(entry_flow_block_num=5, middle_flow_block_num=16, **kwargs)
+    model = Xception(
+        entry_flow_block_num=5, middle_flow_block_num=16, **kwargs)
     _load_pretrained(
         pretrained, model, MODEL_URLS["Xception71"], use_ssld=use_ssld)
     return model

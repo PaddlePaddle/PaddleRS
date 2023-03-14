@@ -34,7 +34,6 @@ class UGATITModel(BaseModel):
 
     UGATIT paper: https://arxiv.org/pdf/1907.10830.pdf
     """
-
     def __init__(self,
                  generator,
                  discriminator_g=None,
@@ -155,7 +154,6 @@ class UGATITModel(BaseModel):
 
     def train_iter(self, optimizers=None):
         """Calculate losses, gradients, and update network weights; called in every training iteration"""
-
         def _criterion(loss_func, logit, is_real):
             if is_real:
                 target = paddle.ones_like(logit)
@@ -179,42 +177,42 @@ class UGATITModel(BaseModel):
         fake_GB_logit, fake_GB_cam_logit, _ = self.nets['disGB'](self.fake_A2B)
         fake_LB_logit, fake_LB_cam_logit, _ = self.nets['disLB'](self.fake_A2B)
 
-        D_ad_loss_GA = _criterion(self.MSE_loss, real_GA_logit,
-                                  True) + _criterion(self.MSE_loss,
-                                                     fake_GA_logit, False)
+        D_ad_loss_GA = _criterion(self.MSE_loss,
+                                  real_GA_logit, True) + _criterion(
+                                      self.MSE_loss, fake_GA_logit, False)
 
         D_ad_cam_loss_GA = _criterion(
             self.MSE_loss, real_GA_cam_logit, True) + _criterion(
                 self.MSE_loss, fake_GA_cam_logit, False)
 
-        D_ad_loss_LA = _criterion(self.MSE_loss, real_LA_logit,
-                                  True) + _criterion(self.MSE_loss,
-                                                     fake_LA_logit, False)
+        D_ad_loss_LA = _criterion(self.MSE_loss,
+                                  real_LA_logit, True) + _criterion(
+                                      self.MSE_loss, fake_LA_logit, False)
 
         D_ad_cam_loss_LA = _criterion(
             self.MSE_loss, real_LA_cam_logit, True) + _criterion(
                 self.MSE_loss, fake_LA_cam_logit, False)
 
-        D_ad_loss_GB = _criterion(self.MSE_loss, real_GB_logit,
-                                  True) + _criterion(self.MSE_loss,
-                                                     fake_GB_logit, False)
+        D_ad_loss_GB = _criterion(self.MSE_loss,
+                                  real_GB_logit, True) + _criterion(
+                                      self.MSE_loss, fake_GB_logit, False)
 
         D_ad_cam_loss_GB = _criterion(
             self.MSE_loss, real_GB_cam_logit, True) + _criterion(
                 self.MSE_loss, fake_GB_cam_logit, False)
 
-        D_ad_loss_LB = _criterion(self.MSE_loss, real_LB_logit,
-                                  True) + _criterion(self.MSE_loss,
-                                                     fake_LB_logit, False)
+        D_ad_loss_LB = _criterion(self.MSE_loss,
+                                  real_LB_logit, True) + _criterion(
+                                      self.MSE_loss, fake_LB_logit, False)
 
         D_ad_cam_loss_LB = _criterion(
             self.MSE_loss, real_LB_cam_logit, True) + _criterion(
                 self.MSE_loss, fake_LB_cam_logit, False)
 
-        D_loss_A = self.adv_weight * (
-            D_ad_loss_GA + D_ad_cam_loss_GA + D_ad_loss_LA + D_ad_cam_loss_LA)
-        D_loss_B = self.adv_weight * (
-            D_ad_loss_GB + D_ad_cam_loss_GB + D_ad_loss_LB + D_ad_cam_loss_LB)
+        D_loss_A = self.adv_weight * (D_ad_loss_GA + D_ad_cam_loss_GA +
+                                      D_ad_loss_LA + D_ad_cam_loss_LA)
+        D_loss_B = self.adv_weight * (D_ad_loss_GB + D_ad_cam_loss_GB +
+                                      D_ad_loss_LB + D_ad_cam_loss_LB)
 
         Discriminator_loss = D_loss_A + D_loss_B
         Discriminator_loss.backward()
@@ -252,13 +250,13 @@ class UGATITModel(BaseModel):
         G_identity_loss_A = self.L1_loss(fake_A2A, self.real_A)
         G_identity_loss_B = self.L1_loss(fake_B2B, self.real_B)
 
-        G_cam_loss_A = _criterion(self.BCE_loss, fake_B2A_cam_logit,
-                                  True) + _criterion(self.BCE_loss,
-                                                     fake_A2A_cam_logit, False)
+        G_cam_loss_A = _criterion(self.BCE_loss,
+                                  fake_B2A_cam_logit, True) + _criterion(
+                                      self.BCE_loss, fake_A2A_cam_logit, False)
 
-        G_cam_loss_B = _criterion(self.BCE_loss, fake_A2B_cam_logit,
-                                  True) + _criterion(self.BCE_loss,
-                                                     fake_B2B_cam_logit, False)
+        G_cam_loss_B = _criterion(self.BCE_loss,
+                                  fake_A2B_cam_logit, True) + _criterion(
+                                      self.BCE_loss, fake_B2B_cam_logit, False)
 
         G_loss_A = self.adv_weight * (
             G_ad_loss_GA + G_ad_cam_loss_GA + G_ad_loss_LA + G_ad_cam_loss_LA

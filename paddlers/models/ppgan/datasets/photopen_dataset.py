@@ -27,20 +27,14 @@ from .builder import DATASETS
 logger = logging.getLogger(__name__)
 
 
-def data_transform(img,
-                   resize_w,
-                   resize_h,
-                   load_size=286,
-                   pos=[0, 0, 256, 256],
-                   flip=True,
-                   is_image=True):
+def data_transform(img, resize_w, resize_h, load_size=286, pos=[0, 0, 256, 256], flip=True, is_image=True):
     if is_image:
         resized = img.resize((resize_w, resize_h), Image.BICUBIC)
     else:
         resized = img.resize((resize_w, resize_h), Image.NEAREST)
     croped = resized.crop((pos[0], pos[1], pos[2], pos[3]))
     fliped = ImageOps.mirror(croped) if flip else croped
-    fliped = np.array(fliped)  # transform to numpy array
+    fliped = np.array(fliped) # transform to numpy array
     expanded = np.expand_dims(fliped, 2) if len(fliped.shape) < 3 else fliped
     transposed = np.transpose(expanded, (2, 0, 1)).astype('float32')
     if is_image:
@@ -62,11 +56,8 @@ class PhotoPenDataset(Dataset):
         self.crop_size = crop_size
 
     def __getitem__(self, idx):
-        ins = Image.open(
-            os.path.join(self.content_root, 'train_inst', self.inst_list[idx]))
-        img = Image.open(
-            os.path.join(self.content_root, 'train_img', self.inst_list[idx]
-                         .replace(".png", ".jpg")))
+        ins = Image.open(os.path.join(self.content_root, 'train_inst', self.inst_list[idx]))
+        img = Image.open(os.path.join(self.content_root, 'train_img', self.inst_list[idx].replace(".png", ".jpg")))
         img = img.convert('RGB')
 
         w, h = img.size
@@ -78,31 +69,18 @@ class PhotoPenDataset(Dataset):
         left = random.randint(0, resize_w - self.crop_size)
         top = random.randint(0, resize_h - self.crop_size)
         flip = False
-
-        img = data_transform(
-            img,
-            resize_w,
-            resize_h,
-            load_size=self.load_size,
-            pos=[left, top, left + self.crop_size, top + self.crop_size],
-            flip=flip,
-            is_image=True)
-        ins = data_transform(
-            ins,
-            resize_w,
-            resize_h,
-            load_size=self.load_size,
-            pos=[left, top, left + self.crop_size, top + self.crop_size],
-            flip=flip,
-            is_image=False)
+        
+        img = data_transform(img, resize_w, resize_h, load_size=self.load_size, 
+            pos=[left, top, left + self.crop_size, top + self.crop_size], flip=flip, is_image=True)
+        ins = data_transform(ins, resize_w, resize_h, load_size=self.load_size, 
+            pos=[left, top, left + self.crop_size, top + self.crop_size], flip=flip, is_image=False)
         return {'img': img, 'ins': ins, 'img_path': self.inst_list[idx]}
 
     def __len__(self):
         return len(self.inst_list)
-
+    
     def name(self):
         return 'PhotoPenDataset'
-
 
 @DATASETS.register()
 class PhotoPenDataset_test(Dataset):
@@ -116,8 +94,7 @@ class PhotoPenDataset_test(Dataset):
         self.crop_size = crop_size
 
     def __getitem__(self, idx):
-        ins = Image.open(
-            os.path.join(self.content_root, 'test_inst', self.inst_list[idx]))
+        ins = Image.open(os.path.join(self.content_root, 'test_inst', self.inst_list[idx]))
 
         w, h = ins.size
         resize_w, resize_h = 0, 0
@@ -128,19 +105,13 @@ class PhotoPenDataset_test(Dataset):
         left = random.randint(0, resize_w - self.crop_size)
         top = random.randint(0, resize_h - self.crop_size)
         flip = False
-
-        ins = data_transform(
-            ins,
-            resize_w,
-            resize_h,
-            load_size=self.load_size,
-            pos=[left, top, left + self.crop_size, top + self.crop_size],
-            flip=flip,
-            is_image=False)
+        
+        ins = data_transform(ins, resize_w, resize_h, load_size=self.load_size, 
+            pos=[left, top, left + self.crop_size, top + self.crop_size], flip=flip, is_image=False)
         return {'ins': ins, 'img_path': self.inst_list[idx]}
 
     def __len__(self):
         return len(self.inst_list)
-
+    
     def name(self):
         return 'PhotoPenDataset'

@@ -1,4 +1,4 @@
-#   Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
+#   Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -88,21 +88,17 @@ class RoIAlign(object):
             k_min = self.start_level + offset
             k_max = self.end_level + offset
             if hasattr(paddle.vision.ops, "distribute_fpn_proposals"):
-                rois_dist, restore_index, rois_num_dist = paddle.vision.ops.distribute_fpn_proposals(
-                    roi,
-                    k_min,
-                    k_max,
-                    self.canconical_level,
-                    self.canonical_size,
-                    rois_num=rois_num)
+                distribute_fpn_proposals = getattr(paddle.vision.ops,
+                                                   "distribute_fpn_proposals")
             else:
-                rois_dist, restore_index, rois_num_dist = ops.distribute_fpn_proposals(
-                    roi,
-                    k_min,
-                    k_max,
-                    self.canconical_level,
-                    self.canonical_size,
-                    rois_num=rois_num)
+                distribute_fpn_proposals = ops.distribute_fpn_proposals
+            rois_dist, restore_index, rois_num_dist = distribute_fpn_proposals(
+                roi,
+                k_min,
+                k_max,
+                self.canconical_level,
+                self.canonical_size,
+                rois_num=rois_num)
 
             rois_feat_list = []
             for lvl in range(self.start_level, self.end_level + 1):

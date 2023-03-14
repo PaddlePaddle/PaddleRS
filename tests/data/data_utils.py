@@ -20,6 +20,8 @@ from functools import partial, wraps
 
 import numpy as np
 
+from paddlers.transforms import construct_sample
+
 __all__ = ['build_input_from_file']
 
 
@@ -78,19 +80,17 @@ class ConstrSample(object):
 
 class ConstrSegSample(ConstrSample):
     def __call__(self, im_path, mask_path):
-        return {
-            'image': self.get_full_path(im_path),
-            'mask': self.get_full_path(mask_path)
-        }
+        return construct_sample(
+            image=self.get_full_path(im_path),
+            mask=self.get_full_path(mask_path))
 
 
 class ConstrCdSample(ConstrSample):
     def __call__(self, im1_path, im2_path, mask_path, *aux_mask_paths):
-        sample = {
-            'image_t1': self.get_full_path(im1_path),
-            'image_t2': self.get_full_path(im2_path),
-            'mask': self.get_full_path(mask_path)
-        }
+        sample = construct_sample(
+            image_t1=self.get_full_path(im1_path),
+            image_t2=self.get_full_path(im2_path),
+            mask=self.get_full_path(mask_path))
         if len(aux_mask_paths) > 0:
             sample['aux_masks'] = [
                 self.get_full_path(p) for p in aux_mask_paths
@@ -100,7 +100,8 @@ class ConstrCdSample(ConstrSample):
 
 class ConstrClasSample(ConstrSample):
     def __call__(self, im_path, label):
-        return {'image': self.get_full_path(im_path), 'label': int(label)}
+        return construct_sample(
+            image=self.get_full_path(im_path), label=int(label))
 
 
 class ConstrDetSample(ConstrSample):
@@ -234,7 +235,7 @@ class ConstrDetSample(ConstrSample):
         }
 
         self.ct += 1
-        return {'image': im_path, ** im_info, ** label_info}
+        return construct_sample(image=im_path, **im_info, **label_info)
 
     @silent
     def _parse_coco_files(self, im_dir, ann_path):
@@ -303,7 +304,7 @@ class ConstrDetSample(ConstrSample):
                 'difficult': np.array(difficults),
             }
 
-            samples.append({ ** im_info, ** label_info})
+            samples.append(construct_sample(**im_info, **label_info))
 
         return samples
 
@@ -314,10 +315,9 @@ class ConstrResSample(ConstrSample):
         self.sr_factor = sr_factor
 
     def __call__(self, src_path, tar_path):
-        sample = {
-            'image': self.get_full_path(src_path),
-            'target': self.get_full_path(tar_path)
-        }
+        sample = construct_sample(
+            image=self.get_full_path(src_path),
+            target=self.get_full_path(tar_path))
         if self.sr_factor is not None:
             sample['sr_factor'] = self.sr_factor
         return sample

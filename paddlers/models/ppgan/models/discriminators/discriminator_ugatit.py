@@ -13,61 +13,63 @@ class UGATITDiscriminator(nn.Layer):
     def __init__(self, input_nc, ndf=64, n_layers=5):
         super(UGATITDiscriminator, self).__init__()
         model = [
-            nn.Pad2D(
-                padding=[1, 1, 1, 1], mode="reflect"), spectral_norm(
-                    nn.Conv2D(
-                        input_nc,
-                        ndf,
-                        kernel_size=4,
-                        stride=2,
-                        padding=0,
-                        bias_attr=True)), nn.LeakyReLU(0.2)
+            nn.Pad2D(padding=[1, 1, 1, 1], mode="reflect"),
+            spectral_norm(
+                nn.Conv2D(input_nc,
+                          ndf,
+                          kernel_size=4,
+                          stride=2,
+                          padding=0,
+                          bias_attr=True)),
+            nn.LeakyReLU(0.2)
         ]
 
         for i in range(1, n_layers - 2):
             mult = 2**(i - 1)
             model += [
-                nn.Pad2D(
-                    padding=[1, 1, 1, 1], mode="reflect"), spectral_norm(
-                        nn.Conv2D(
-                            ndf * mult,
-                            ndf * mult * 2,
-                            kernel_size=4,
-                            stride=2,
-                            padding=0,
-                            bias_attr=True)), nn.LeakyReLU(0.2)
+                nn.Pad2D(padding=[1, 1, 1, 1], mode="reflect"),
+                spectral_norm(
+                    nn.Conv2D(ndf * mult,
+                              ndf * mult * 2,
+                              kernel_size=4,
+                              stride=2,
+                              padding=0,
+                              bias_attr=True)),
+                nn.LeakyReLU(0.2)
             ]
 
         mult = 2**(n_layers - 2 - 1)
         model += [
-            nn.Pad2D(
-                padding=[1, 1, 1, 1], mode="reflect"), spectral_norm(
-                    nn.Conv2D(
-                        ndf * mult,
-                        ndf * mult * 2,
-                        kernel_size=4,
-                        stride=1,
-                        padding=0,
-                        bias_attr=True)), nn.LeakyReLU(0.2)
+            nn.Pad2D(padding=[1, 1, 1, 1], mode="reflect"),
+            spectral_norm(
+                nn.Conv2D(ndf * mult,
+                          ndf * mult * 2,
+                          kernel_size=4,
+                          stride=1,
+                          padding=0,
+                          bias_attr=True)),
+            nn.LeakyReLU(0.2)
         ]
 
         # Class Activation Map
         mult = 2**(n_layers - 2)
         self.gap_fc = spectral_norm(nn.Linear(ndf * mult, 1, bias_attr=False))
         self.gmp_fc = spectral_norm(nn.Linear(ndf * mult, 1, bias_attr=False))
-        self.conv1x1 = nn.Conv2D(
-            ndf * mult * 2, ndf * mult, kernel_size=1, stride=1, bias_attr=True)
+        self.conv1x1 = nn.Conv2D(ndf * mult * 2,
+                                 ndf * mult,
+                                 kernel_size=1,
+                                 stride=1,
+                                 bias_attr=True)
         self.leaky_relu = nn.LeakyReLU(0.2)
 
         self.pad = nn.Pad2D(padding=[1, 1, 1, 1], mode="reflect")
         self.conv = spectral_norm(
-            nn.Conv2D(
-                ndf * mult,
-                1,
-                kernel_size=4,
-                stride=1,
-                padding=0,
-                bias_attr=False))
+            nn.Conv2D(ndf * mult,
+                      1,
+                      kernel_size=4,
+                      stride=1,
+                      padding=0,
+                      bias_attr=False))
 
         self.model = nn.Sequential(*model)
 

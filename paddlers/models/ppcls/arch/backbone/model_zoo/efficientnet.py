@@ -1,4 +1,4 @@
-# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # Code was based on https://github.com/lukemelas/EfficientNet-PyTorch
+# reference: https://arxiv.org/abs/1905.11946
 
 import paddle
 from paddle import ParamAttr
@@ -25,7 +26,7 @@ import collections
 import re
 import copy
 
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "EfficientNetB0_small":
@@ -316,8 +317,10 @@ class Conv2ds(nn.Layer):
             model_name][cur_stage]
         self.need_crop = False
         if padding_type == "SAME":
-            top_padding, bottom_padding = cal_padding(inps, stride, filter_size)
-            left_padding, right_padding = cal_padding(inps, stride, filter_size)
+            top_padding, bottom_padding = cal_padding(inps, stride,
+                                                      filter_size)
+            left_padding, right_padding = cal_padding(inps, stride,
+                                                      filter_size)
             height_padding = bottom_padding
             width_padding = right_padding
             if top_padding != bottom_padding or left_padding != right_padding:
@@ -693,7 +696,8 @@ class ExtractFeatures(nn.Layer):
                                             _global_params),
                 output_filters=round_filters(block_args.output_filters,
                                              _global_params),
-                num_repeat=round_repeats(block_args.num_repeat, _global_params))
+                num_repeat=round_repeats(block_args.num_repeat,
+                                         _global_params))
 
             drop_connect_rate = self._global_params.drop_connect_rate
             if drop_connect_rate:

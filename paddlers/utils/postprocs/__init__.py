@@ -23,5 +23,5 @@ try:
     from .crf import conditional_random_field
 except ImportError:
     print(
-        "Can not use `conditional_random_field`. Please install pydensecrf first!"
+        "Can not use `conditional_random_field`. Please install pydensecrf first."
     )

@@ -18,7 +18,6 @@ class ImagePyramide(nn.Layer):
     """
     Create image pyramide for computing pyramide perceptual loss. See Sec 3.3
     """
-
     def __init__(self, scales, num_channels):
         super(ImagePyramide, self).__init__()
         self.downs = paddle.nn.LayerList()
@@ -32,8 +31,8 @@ class ImagePyramide(nn.Layer):
     def forward(self, x):
         out_dict = {}
         for scale, down_module in zip(self.name_list, self.downs):
-            out_dict['prediction_' + str(scale).replace('-',
-                                                        '.')] = down_module(x)
+            out_dict['prediction_' +
+                     str(scale).replace('-', '.')] = down_module(x)
         return out_dict
 
 
@@ -88,19 +87,16 @@ class ResBlock2d(nn.Layer):
     """
     Res block, preserve spatial resolution.
     """
-
     def __init__(self, in_features, kernel_size, padding):
         super(ResBlock2d, self).__init__()
-        self.conv1 = nn.Conv2D(
-            in_channels=in_features,
-            out_channels=in_features,
-            kernel_size=kernel_size,
-            padding=padding)
-        self.conv2 = nn.Conv2D(
-            in_channels=in_features,
-            out_channels=in_features,
-            kernel_size=kernel_size,
-            padding=padding)
+        self.conv1 = nn.Conv2D(in_channels=in_features,
+                               out_channels=in_features,
+                               kernel_size=kernel_size,
+                               padding=padding)
+        self.conv2 = nn.Conv2D(in_channels=in_features,
+                               out_channels=in_features,
+                               kernel_size=kernel_size,
+                               padding=padding)
         self.norm1 = SyncBatchNorm(in_features)
         self.norm2 = SyncBatchNorm(in_features)
 
@@ -119,29 +115,25 @@ class MobileResBlock2d(nn.Layer):
     """
     Res block, preserve spatial resolution.
     """
-
     def __init__(self, in_features, kernel_size, padding):
         super(MobileResBlock2d, self).__init__()
         out_features = in_features * 2
-        self.conv_pw = nn.Conv2D(
-            in_channels=in_features,
-            out_channels=out_features,
-            kernel_size=1,
-            padding=0,
-            bias_attr=False)
-        self.conv_dw = nn.Conv2D(
-            in_channels=out_features,
-            out_channels=out_features,
-            kernel_size=kernel_size,
-            padding=padding,
-            groups=out_features,
-            bias_attr=False)
-        self.conv_pw_linear = nn.Conv2D(
-            in_channels=out_features,
-            out_channels=in_features,
-            kernel_size=1,
-            padding=0,
-            bias_attr=False)
+        self.conv_pw = nn.Conv2D(in_channels=in_features,
+                                 out_channels=out_features,
+                                 kernel_size=1,
+                                 padding=0,
+                                 bias_attr=False)
+        self.conv_dw = nn.Conv2D(in_channels=out_features,
+                                 out_channels=out_features,
+                                 kernel_size=kernel_size,
+                                 padding=padding,
+                                 groups=out_features,
+                                 bias_attr=False)
+        self.conv_pw_linear = nn.Conv2D(in_channels=out_features,
+                                        out_channels=in_features,
+                                        kernel_size=1,
+                                        padding=0,
+                                        bias_attr=False)
         self.norm1 = SyncBatchNorm(in_features)
         self.norm_pw = SyncBatchNorm(out_features)
         self.norm_dw = SyncBatchNorm(out_features)
@@ -167,7 +159,6 @@ class UpBlock2d(nn.Layer):
     """
     Upsampling block for use in decoder.
     """
-
     def __init__(self,
                  in_features,
                  out_features,
@@ -176,12 +167,11 @@ class UpBlock2d(nn.Layer):
                  groups=1):
         super(UpBlock2d, self).__init__()
 
-        self.conv = nn.Conv2D(
-            in_channels=in_features,
-            out_channels=out_features,
-            kernel_size=kernel_size,
-            padding=padding,
-            groups=groups)
+        self.conv = nn.Conv2D(in_channels=in_features,
+                              out_channels=out_features,
+                              kernel_size=kernel_size,
+                              padding=padding,
+                              groups=groups)
         self.norm = SyncBatchNorm(out_features)
 
     def forward(self, x):
@@ -196,7 +186,6 @@ class MobileUpBlock2d(nn.Layer):
     """
     Upsampling block for use in decoder.
     """
-
     def __init__(self,
                  in_features,
                  out_features,
@@ -205,19 +194,17 @@ class MobileUpBlock2d(nn.Layer):
                  groups=1):
         super(MobileUpBlock2d, self).__init__()
 
-        self.conv = nn.Conv2D(
-            in_channels=in_features,
-            out_channels=in_features,
-            kernel_size=kernel_size,
-            padding=padding,
-            groups=in_features,
-            bias_attr=False)
-        self.conv1 = nn.Conv2D(
-            in_channels=in_features,
-            out_channels=out_features,
-            kernel_size=1,
-            padding=0,
-            bias_attr=False)
+        self.conv = nn.Conv2D(in_channels=in_features,
+                              out_channels=in_features,
+                              kernel_size=kernel_size,
+                              padding=padding,
+                              groups=in_features,
+                              bias_attr=False)
+        self.conv1 = nn.Conv2D(in_channels=in_features,
+                               out_channels=out_features,
+                               kernel_size=1,
+                               padding=0,
+                               bias_attr=False)
         self.norm = SyncBatchNorm(in_features)
         self.norm1 = SyncBatchNorm(out_features)
 
@@ -236,7 +223,6 @@ class DownBlock2d(nn.Layer):
     """
     Downsampling block for use in encoder.
     """
-
     def __init__(self,
                  in_features,
                  out_features,
@@ -244,12 +230,11 @@ class DownBlock2d(nn.Layer):
                  padding=1,
                  groups=1):
         super(DownBlock2d, self).__init__()
-        self.conv = nn.Conv2D(
-            in_channels=in_features,
-            out_channels=out_features,
-            kernel_size=kernel_size,
-            padding=padding,
-            groups=groups)
+        self.conv = nn.Conv2D(in_channels=in_features,
+                              out_channels=out_features,
+                              kernel_size=kernel_size,
+                              padding=padding,
+                              groups=groups)
         self.norm = SyncBatchNorm(out_features)
         self.pool = nn.AvgPool2D(kernel_size=(2, 2))
 
@@ -265,7 +250,6 @@ class MobileDownBlock2d(nn.Layer):
     """
     Downsampling block for use in encoder.
     """
-
     def __init__(self,
                  in_features,
                  out_features,
@@ -273,23 +257,21 @@ class MobileDownBlock2d(nn.Layer):
                  padding=1,
                  groups=1):
         super(MobileDownBlock2d, self).__init__()
-        self.conv = nn.Conv2D(
-            in_channels=in_features,
-            out_channels=in_features,
-            kernel_size=kernel_size,
-            padding=padding,
-            groups=in_features,
-            bias_attr=False)
+        self.conv = nn.Conv2D(in_channels=in_features,
+                              out_channels=in_features,
+                              kernel_size=kernel_size,
+                              padding=padding,
+                              groups=in_features,
+                              bias_attr=False)
         self.norm = SyncBatchNorm(in_features)
         self.pool = nn.AvgPool2D(kernel_size=(2, 2))
 
-        self.conv1 = nn.Conv2D(
-            in_features,
-            out_features,
-            kernel_size=1,
-            padding=0,
-            stride=1,
-            bias_attr=False)
+        self.conv1 = nn.Conv2D(in_features,
+                               out_features,
+                               kernel_size=1,
+                               padding=0,
+                               stride=1,
+                               bias_attr=False)
         self.norm1 = SyncBatchNorm(out_features)
 
     def forward(self, x):
@@ -307,7 +289,6 @@ class SameBlock2d(nn.Layer):
     """
     Simple block, preserve spatial resolution.
     """
-
     def __init__(self,
                  in_features,
                  out_features,
@@ -316,14 +297,13 @@ class SameBlock2d(nn.Layer):
                  padding=1,
                  mobile_net=False):
         super(SameBlock2d, self).__init__()
-        self.conv = nn.Conv2D(
-            in_channels=in_features,
-            out_channels=out_features,
-            kernel_size=kernel_size,
-            padding=padding,
-            groups=groups,
-            bias_attr=(mobile_net == False),
-            weight_attr=nn.initializer.KaimingUniform())
+        self.conv = nn.Conv2D(in_channels=in_features,
+                              out_channels=out_features,
+                              kernel_size=kernel_size,
+                              padding=padding,
+                              groups=groups,
+                              bias_attr=(mobile_net == False),
+                              weight_attr=nn.initializer.KaimingUniform())
         self.norm = SyncBatchNorm(out_features)
 
     def forward(self, x):
@@ -337,7 +317,6 @@ class Encoder(nn.Layer):
     """
     Hourglass Encoder
     """
-
     def __init__(self,
                  block_expansion,
                  in_features,
@@ -350,20 +329,20 @@ class Encoder(nn.Layer):
         for i in range(num_blocks):
             if mobile_net:
                 down_blocks.append(
-                    MobileDownBlock2d(
-                        in_features if i == 0 else min(
-                            max_features, block_expansion * (2**i)),
-                        min(max_features, block_expansion * (2**(i + 1))),
-                        kernel_size=3,
-                        padding=1))
+                    MobileDownBlock2d(in_features if i == 0 else min(
+                        max_features, block_expansion * (2**i)),
+                                      min(max_features,
+                                          block_expansion * (2**(i + 1))),
+                                      kernel_size=3,
+                                      padding=1))
             else:
                 down_blocks.append(
-                    DownBlock2d(
-                        in_features if i == 0 else min(
-                            max_features, block_expansion * (2**i)),
-                        min(max_features, block_expansion * (2**(i + 1))),
-                        kernel_size=3,
-                        padding=1))
+                    DownBlock2d(in_features if i == 0 else min(
+                        max_features, block_expansion * (2**i)),
+                                min(max_features,
+                                    block_expansion * (2**(i + 1))),
+                                kernel_size=3,
+                                padding=1))
         self.down_blocks = nn.LayerList(down_blocks)
 
     def forward(self, x):
@@ -377,7 +356,6 @@ class Decoder(nn.Layer):
     """
     Hourglass Decoder
     """
-
     def __init__(self,
                  block_expansion,
                  in_features,
@@ -394,14 +372,16 @@ class Decoder(nn.Layer):
                 in_filters = (1 if i == num_blocks - 1 else 2) * min(
                     max_features, block_expansion * (2**(i + 1)))
                 up_blocks.append(
-                    MobileUpBlock2d(
-                        in_filters, out_filters, kernel_size=3, padding=1))
+                    MobileUpBlock2d(in_filters,
+                                    out_filters,
+                                    kernel_size=3,
+                                    padding=1))
             else:
                 in_filters = (1 if i == num_blocks - 1 else 2) * min(
                     max_features, block_expansion * (2**(i + 1)))
                 up_blocks.append(
-                    UpBlock2d(
-                        in_filters, out_filters, kernel_size=3, padding=1))
+                    UpBlock2d(in_filters, out_filters, kernel_size=3,
+                              padding=1))
 
         self.up_blocks = nn.LayerList(up_blocks)
         self.out_filters = block_expansion + in_features
@@ -419,7 +399,6 @@ class Hourglass(nn.Layer):
     """
     Hourglass architecture.
     """
-
     def __init__(self,
                  block_expansion,
                  in_features,
@@ -427,18 +406,16 @@ class Hourglass(nn.Layer):
                  max_features=256,
                  mobile_net=False):
         super(Hourglass, self).__init__()
-        self.encoder = Encoder(
-            block_expansion,
-            in_features,
-            num_blocks,
-            max_features,
-            mobile_net=mobile_net)
-        self.decoder = Decoder(
-            block_expansion,
-            in_features,
-            num_blocks,
-            max_features,
-            mobile_net=mobile_net)
+        self.encoder = Encoder(block_expansion,
+                               in_features,
+                               num_blocks,
+                               max_features,
+                               mobile_net=mobile_net)
+        self.decoder = Decoder(block_expansion,
+                               in_features,
+                               num_blocks,
+                               max_features,
+                               mobile_net=mobile_net)
         self.out_filters = self.decoder.out_filters
 
     def forward(self, x):
@@ -449,7 +426,6 @@ class AntiAliasInterpolation2d(nn.Layer):
     """
     Band-limited downsampling, for better preservation of the input signal.
     """
-
     def __init__(self, channels, scale, mobile_net=False):
         super(AntiAliasInterpolation2d, self).__init__()
         if mobile_net:
@@ -467,8 +443,7 @@ class AntiAliasInterpolation2d(nn.Layer):
         # gaussian function of each dimension.
         kernel = 1
         meshgrids = paddle.meshgrid(
-            [paddle.arange(
-                size, dtype='float32') for size in kernel_size])
+            [paddle.arange(size, dtype='float32') for size in kernel_size])
         for size, std, mgrid in zip(kernel_size, sigma, meshgrids):
             mean = (size - 1) / 2
             kernel *= paddle.exp(-(mgrid - mean)**2 / (2 * std**2 + 1e-9))
@@ -477,7 +452,7 @@ class AntiAliasInterpolation2d(nn.Layer):
         kernel = kernel / paddle.sum(kernel)
         # Reshape to depthwise convolutional weight
         kernel = kernel.reshape([1, 1, *kernel.shape])
-        kernel = paddle.tile(kernel, [channels, * [1] * (kernel.dim() - 1)])
+        kernel = paddle.tile(kernel, [channels, *[1] * (kernel.dim() - 1)])
 
         self.register_buffer('weight', kernel)
         self.groups = channels
@@ -493,7 +468,8 @@ class AntiAliasInterpolation2d(nn.Layer):
         inv_scale = 1 / self.scale
         int_inv_scale = int(inv_scale)
         assert (inv_scale == int_inv_scale)
-        #out = out[:, :, ::int_inv_scale, ::int_inv_scale]
+        # lite: fluid resize_nearest
+        # out = paddle.fluid.layers.resize_nearest(out, scale=self.scale)
+        out = out[:, :, ::int_inv_scale, ::int_inv_scale]
         # patch end
-        out = paddle.fluid.layers.resize_nearest(out, scale=self.scale)
         return out

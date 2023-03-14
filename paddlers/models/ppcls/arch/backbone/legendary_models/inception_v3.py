@@ -1,4 +1,4 @@
-# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# reference: https://arxiv.org/abs/1512.00567v3
+
 from __future__ import absolute_import, division, print_function
 import math
 import paddle
@@ -21,8 +23,8 @@ from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
 from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 
-from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ..base.theseus_layer import TheseusLayer
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "InceptionV3":
@@ -86,7 +88,11 @@ class InceptionStem(TheseusLayer):
     def __init__(self):
         super().__init__()
         self.conv_1a_3x3 = ConvBNLayer(
-            num_channels=3, num_filters=32, filter_size=3, stride=2, act="relu")
+            num_channels=3,
+            num_filters=32,
+            filter_size=3,
+            stride=2,
+            act="relu")
         self.conv_2a_3x3 = ConvBNLayer(
             num_channels=32,
             num_filters=32,

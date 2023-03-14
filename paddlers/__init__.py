@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__version__ = '0.0.0.dev0'
+import os
 
 from paddlers.utils.env import get_environ_info, init_parallel_env
-init_parallel_env()
+from . import tasks, datasets, transforms, utils, tools, models, deploy
 
+init_parallel_env()
 env_info = get_environ_info()
 
-log_level = 2
-
-from . import tasks, datasets, transforms, utils, tools, models, deploy
+with open(os.path.join(os.path.dirname(__file__), ".version"), 'r') as fv:
+    __version__ = fv.read().rstrip()

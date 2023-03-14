@@ -53,7 +53,6 @@ class PixelShufflePack(nn.Layer):
     Returns:
         Upsampled feature map.
     """
-
     def __init__(self, in_channels, out_channels, scale_factor,
                  upsample_kernel):
         super().__init__()
@@ -61,11 +60,11 @@ class PixelShufflePack(nn.Layer):
         self.out_channels = out_channels
         self.scale_factor = scale_factor
         self.upsample_kernel = upsample_kernel
-        self.upsample_conv = nn.Conv2D(
-            self.in_channels,
-            self.out_channels * scale_factor * scale_factor,
-            self.upsample_kernel,
-            padding=(self.upsample_kernel - 1) // 2)
+        self.upsample_conv = nn.Conv2D(self.in_channels,
+                                       self.out_channels * scale_factor *
+                                       scale_factor,
+                                       self.upsample_kernel,
+                                       padding=(self.upsample_kernel - 1) // 2)
         self.pixel_shuffle = nn.PixelShuffle(self.scale_factor)
         self.init_weights()
 
@@ -116,7 +115,6 @@ class ResidualBlockNoBN(nn.Layer):
             Default: 64.
         res_scale (float): Residual scale. Default: 1.0.
     """
-
     def __init__(self, nf=64, res_scale=1.0):
         super(ResidualBlockNoBN, self).__init__()
         self.nf = nf
@@ -179,12 +177,11 @@ def flow_warp(x,
     grid_flow_x = 2.0 * grid_flow[:, :, :, 0] / max(w - 1, 1) - 1.0
     grid_flow_y = 2.0 * grid_flow[:, :, :, 1] / max(h - 1, 1) - 1.0
     grid_flow = paddle.stack((grid_flow_x, grid_flow_y), axis=3)
-    output = F.grid_sample(
-        x,
-        grid_flow,
-        mode=interpolation,
-        padding_mode=padding_mode,
-        align_corners=align_corners)
+    output = F.grid_sample(x,
+                           grid_flow,
+                           mode=interpolation,
+                           padding_mode=padding_mode,
+                           align_corners=align_corners)
     return output
 
 
@@ -194,20 +191,34 @@ class SPyNetBasicModule(nn.Layer):
     Paper:
         Optical Flow Estimation using a Spatial Pyramid Network, CVPR, 2017
     """
-
     def __init__(self):
         super().__init__()
 
-        self.conv1 = nn.Conv2D(
-            in_channels=8, out_channels=32, kernel_size=7, stride=1, padding=3)
-        self.conv2 = nn.Conv2D(
-            in_channels=32, out_channels=64, kernel_size=7, stride=1, padding=3)
-        self.conv3 = nn.Conv2D(
-            in_channels=64, out_channels=32, kernel_size=7, stride=1, padding=3)
-        self.conv4 = nn.Conv2D(
-            in_channels=32, out_channels=16, kernel_size=7, stride=1, padding=3)
-        self.conv5 = nn.Conv2D(
-            in_channels=16, out_channels=2, kernel_size=7, stride=1, padding=3)
+        self.conv1 = nn.Conv2D(in_channels=8,
+                               out_channels=32,
+                               kernel_size=7,
+                               stride=1,
+                               padding=3)
+        self.conv2 = nn.Conv2D(in_channels=32,
+                               out_channels=64,
+                               kernel_size=7,
+                               stride=1,
+                               padding=3)
+        self.conv3 = nn.Conv2D(in_channels=64,
+                               out_channels=32,
+                               kernel_size=7,
+                               stride=1,
+                               padding=3)
+        self.conv4 = nn.Conv2D(in_channels=32,
+                               out_channels=16,
+                               kernel_size=7,
+                               stride=1,
+                               padding=3)
+        self.conv5 = nn.Conv2D(in_channels=16,
+                               out_channels=2,
+                               kernel_size=7,
+                               stride=1,
+                               padding=3)
         self.relu = nn.ReLU()
 
     def forward(self, tensor_input):
@@ -239,7 +250,6 @@ class SPyNet(nn.Layer):
         Optical Flow Estimation using a Spatial Pyramid Network, CVPR, 2017
 
     """
-
     def __init__(self):
         super().__init__()
 
@@ -290,79 +300,67 @@ class SPyNet(nn.Layer):
         # level=0
         flow_up = flow
         flow = flow_up + self.basic_module0(
-            paddle.concat(
-                [
-                    ref[0], flow_warp(
-                        supp[0],
-                        flow_up.transpose([0, 2, 3, 1]),
-                        padding_mode='border'), flow_up
-                ],
-                1))
+            paddle.concat([
+                ref[0],
+                flow_warp(supp[0],
+                          flow_up.transpose([0, 2, 3, 1]),
+                          padding_mode='border'), flow_up
+            ], 1))
 
         # level=1
         flow_up = F.interpolate(
             flow, scale_factor=2, mode='bilinear', align_corners=True) * 2.0
         flow = flow_up + self.basic_module1(
-            paddle.concat(
-                [
-                    ref[1], flow_warp(
-                        supp[1],
-                        flow_up.transpose([0, 2, 3, 1]),
-                        padding_mode='border'), flow_up
-                ],
-                1))
+            paddle.concat([
+                ref[1],
+                flow_warp(supp[1],
+                          flow_up.transpose([0, 2, 3, 1]),
+                          padding_mode='border'), flow_up
+            ], 1))
 
         # level=2
         flow_up = F.interpolate(
             flow, scale_factor=2, mode='bilinear', align_corners=True) * 2.0
         flow = flow_up + self.basic_module2(
-            paddle.concat(
-                [
-                    ref[2], flow_warp(
-                        supp[2],
-                        flow_up.transpose([0, 2, 3, 1]),
-                        padding_mode='border'), flow_up
-                ],
-                1))
+            paddle.concat([
+                ref[2],
+                flow_warp(supp[2],
+                          flow_up.transpose([0, 2, 3, 1]),
+                          padding_mode='border'), flow_up
+            ], 1))
 
         # level=3
         flow_up = F.interpolate(
             flow, scale_factor=2, mode='bilinear', align_corners=True) * 2.0
         flow = flow_up + self.basic_module3(
-            paddle.concat(
-                [
-                    ref[3], flow_warp(
-                        supp[3],
-                        flow_up.transpose([0, 2, 3, 1]),
-                        padding_mode='border'), flow_up
-                ],
-                1))
+            paddle.concat([
+                ref[3],
+                flow_warp(supp[3],
+                          flow_up.transpose([0, 2, 3, 1]),
+                          padding_mode='border'), flow_up
+            ], 1))
 
         # level=4
         flow_up = F.interpolate(
             flow, scale_factor=2, mode='bilinear', align_corners=True) * 2.0
         flow = flow_up + self.basic_module4(
-            paddle.concat(
-                [
-                    ref[4], flow_warp(
-                        supp[4],
-                        flow_up.transpose([0, 2, 3, 1]),
-                        padding_mode='border'), flow_up
-                ],
-                1))
+            paddle.concat([
+                ref[4],
+                flow_warp(supp[4],
+                          flow_up.transpose([0, 2, 3, 1]),
+                          padding_mode='border'), flow_up
+            ], 1))
 
         # level=5
         flow_up = F.interpolate(
             flow, scale_factor=2, mode='bilinear', align_corners=True) * 2.0
         flow = flow_up + self.basic_module5(
-            paddle.concat(
-                [
-                    ref[5], flow_warp(
-                        supp[5],
-                        flow_up.transpose([0, 2, 3, 1]),
-                        padding_mode='border'), flow_up
-                ],
-                1))
+            paddle.concat([
+                ref[5],
+                flow_warp(supp[5],
+                          flow_up.transpose([0, 2, 3, 1]),
+                          padding_mode='border'), flow_up
+            ], 1))
 
         return flow
 
@@ -383,16 +381,22 @@ class SPyNet(nn.Layer):
         h, w = ref.shape[2:4]
         w_up = w if (w % 32) == 0 else 32 * (w // 32 + 1)
         h_up = h if (h % 32) == 0 else 32 * (h // 32 + 1)
-        ref = F.interpolate(
-            ref, size=(h_up, w_up), mode='bilinear', align_corners=False)
-        supp = F.interpolate(
-            supp, size=(h_up, w_up), mode='bilinear', align_corners=False)
+        ref = F.interpolate(ref,
+                            size=(h_up, w_up),
+                            mode='bilinear',
+                            align_corners=False)
+        supp = F.interpolate(supp,
+                             size=(h_up, w_up),
+                             mode='bilinear',
+                             align_corners=False)
         ref.stop_gradient = False
         supp.stop_gradient = False
         # compute flow, and resize back to the original resolution
         flow_up = self.compute_flow(ref, supp)
-        flow = F.interpolate(
-            flow_up, size=(h, w), mode='bilinear', align_corners=False)
+        flow = F.interpolate(flow_up,
+                             size=(h, w),
+                             mode='bilinear',
+                             align_corners=False)
 
         # adjust the flow values
         # todo: grad bug
@@ -415,7 +419,6 @@ class ResidualBlocksWithInputConv(nn.Layer):
             Default: 64.
         num_blocks (int): Number of residual blocks. Default: 30.
     """
-
     def __init__(self, in_channels, out_channels=64, num_blocks=30):
         super().__init__()
 
@@ -424,8 +427,9 @@ class ResidualBlocksWithInputConv(nn.Layer):
         self.Leaky_relu = nn.LeakyReLU(negative_slope=0.1)
 
         # residual blocks
-        self.ResidualBlocks = MakeMultiBlocks(
-            ResidualBlockNoBN, num_blocks, nf=out_channels)
+        self.ResidualBlocks = MakeMultiBlocks(ResidualBlockNoBN,
+                                              num_blocks,
+                                              nf=out_channels)
 
     def forward(self, feat):
         """
@@ -457,7 +461,6 @@ class BasicVSRNet(nn.Layer):
         num_blocks (int): Number of residual blocks in each propagation branch.
             Default: 30.
     """
-
     def __init__(self, mid_channels=64, num_blocks=30):
 
         super().__init__()
@@ -478,14 +481,19 @@ class BasicVSRNet(nn.Layer):
 
         # upsample
         self.fusion = nn.Conv2D(mid_channels * 2, mid_channels, 1, 1, 0)
-        self.upsample1 = PixelShufflePack(
-            mid_channels, mid_channels, 2, upsample_kernel=3)
-        self.upsample2 = PixelShufflePack(
-            mid_channels, 64, 2, upsample_kernel=3)
+        self.upsample1 = PixelShufflePack(mid_channels,
+                                          mid_channels,
+                                          2,
+                                          upsample_kernel=3)
+        self.upsample2 = PixelShufflePack(mid_channels,
+                                          64,
+                                          2,
+                                          upsample_kernel=3)
         self.conv_hr = nn.Conv2D(64, 64, 3, 1, 1)
         self.conv_last = nn.Conv2D(64, 3, 3, 1, 1)
-        self.img_upsample = nn.Upsample(
-            scale_factor=4, mode='bilinear', align_corners=False)
+        self.img_upsample = nn.Upsample(scale_factor=4,
+                                        mode='bilinear',
+                                        align_corners=False)
 
         # activation function
         self.lrelu = nn.LeakyReLU(negative_slope=0.1)
@@ -538,6 +546,22 @@ class BasicVSRNet(nn.Layer):
 
         return flows_forward, flows_backward
 
+    def compute_flow_export(self, lrs):
+        """export version of compute_flow
+        """
+
+        n, t, c, h, w = lrs.shape
+
+        lrs_1 = lrs[:, :-1, :, :, :].reshape([-1, c, h, w])
+        lrs_2 = lrs[:, 1:, :, :, :].reshape([-1, c, h, w])
+
+        flows_backward = self.spynet(lrs_1, lrs_2).reshape([n, t - 1, 2, h, w])
+
+        flows_forward = self.spynet(lrs_2,
+                                    lrs_1).reshape([n, t - 1, 2, h, w])
+
+        return flows_forward, flows_backward
+
     def forward(self, lrs):
         """Forward function for BasicVSR.
 
@@ -558,7 +582,10 @@ class BasicVSRNet(nn.Layer):
         self.check_if_mirror_extended(lrs)
 
         # compute optical flow
-        flows_forward, flows_backward = self.compute_flow(lrs)
+        if hasattr(self, 'export_mode') and self.export_mode is True:
+            flows_forward, flows_backward = self.compute_flow_export(lrs)
+        else:
+            flows_forward, flows_backward = self.compute_flow(lrs)
 
         # backward-time propgation
         outputs = []
@@ -573,7 +600,7 @@ class BasicVSRNet(nn.Layer):
 
             outputs.append(feat_prop)
         outputs = outputs[::-1]
-
+        
         # forward-time propagation and upsampling
         feat_prop = paddle.zeros_like(feat_prop)
         for i in range(0, t):
@@ -615,7 +642,6 @@ class SecondOrderDeformableAlignment(nn.Layer):
         groups (int): Same as nn.Conv2d.
         deformable_groups (int).
     """
-
     def __init__(self,
                  in_channels=128,
                  out_channels=64,
@@ -634,15 +660,15 @@ class SecondOrderDeformableAlignment(nn.Layer):
             nn.LeakyReLU(negative_slope=0.1),
             nn.Conv2D(out_channels, out_channels, 3, 1, 1),
             nn.LeakyReLU(negative_slope=0.1),
-            nn.Conv2D(out_channels, 27 * deformable_groups, 3, 1, 1), )
-        self.dcn = DeformConv2D(
-            in_channels,
-            out_channels,
-            kernel_size=kernel_size,
-            stride=stride,
-            padding=padding,
-            dilation=dilation,
-            deformable_groups=deformable_groups)
+            nn.Conv2D(out_channels, 27 * deformable_groups, 3, 1, 1),
+        )
+        self.dcn = DeformConv2D(in_channels,
+                                out_channels,
+                                kernel_size=kernel_size,
+                                stride=stride,
+                                padding=padding,
+                                dilation=dilation,
+                                deformable_groups=deformable_groups)
         self.init_offset()
 
     def init_offset(self):

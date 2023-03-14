@@ -81,7 +81,7 @@ class LCPAN(nn.Layer):
         self.top_down_blocks = nn.LayerList()
         for idx in range(len(in_channels) - 1, 0, -1):
             self.top_down_blocks.append(
-                nn.Sequential(*[
+                nn.Sequential(* [
                     DepthwiseSeparable(
                         num_channels=in_c,
                         num_filters=out_c,
@@ -104,7 +104,7 @@ class LCPAN(nn.Layer):
                     stride=2,
                     act=act))
             self.bottom_up_blocks.append(
-                nn.Sequential(*[
+                nn.Sequential(* [
                     DepthwiseSeparable(
                         num_channels=in_c,
                         num_filters=out_c,

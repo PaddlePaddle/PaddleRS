@@ -27,7 +27,11 @@ from .box_utils import jaccard_overlap
 from paddlers.utils import logging
 
 
-class BatchCompose(Transform):
+class BatchTransform(Transform):
+    is_batch_transform = True
+
+
+class BatchCompose(BatchTransform):
     def __init__(self, batch_transforms=None, collate_batch=True):
         super(BatchCompose, self).__init__()
         self.batch_transforms = batch_transforms
@@ -40,14 +44,14 @@ class BatchCompose(Transform):
                     samples = op(samples)
                 except Exception as e:
                     stack_info = traceback.format_exc()
-                    logging.warning("fail to map batch transform [{}] "
+                    logging.warning("Fail to map batch transform [{}] "
                                     "with error: {} and stack:\n{}".format(
                                         op, e, str(stack_info)))
                     raise e
 
         samples = _Permute()(samples)
 
-        extra_key = ['h', 'w', 'flipped']
+        extra_key = ['h', 'w', 'flipped', 'trans_info']
         for k in extra_key:
             for sample in samples:
                 if k in sample:
@@ -70,7 +74,7 @@ class BatchCompose(Transform):
         return batch_data
 
 
-class BatchRandomResize(Transform):
+class BatchRandomResize(BatchTransform):
     """
     Resize a batch of inputs to random sizes.
 
@@ -111,7 +115,7 @@ class BatchRandomResize(Transform):
         return samples
 
 
-class BatchRandomResizeByShort(Transform):
+class BatchRandomResizeByShort(BatchTransform):
     """
     Resize a batch of inputs to random sizes while keeping the aspect ratio.
 
@@ -157,7 +161,7 @@ class BatchRandomResizeByShort(Transform):
         return samples
 
 
-class _BatchPad(Transform):
+class _BatchPad(BatchTransform):
     def __init__(self, pad_to_stride=0):
         super(_BatchPad, self).__init__()
         self.pad_to_stride = pad_to_stride
@@ -182,7 +186,7 @@ class _BatchPad(Transform):
         return samples
 
 
-class _Gt2YoloTarget(Transform):
+class _Gt2YoloTarget(BatchTransform):
     """
     Generate YOLOv3 targets by groud truth data, this operator is only used in
         fine grained YOLOv3 loss mode.

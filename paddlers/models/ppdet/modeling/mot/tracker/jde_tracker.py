@@ -1,4 +1,4 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
+# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -167,9 +167,8 @@ class JDETracker(object):
                     detections = [
                         STrack(
                             STrack.tlbr_to_tlwh(tlbrs[2:6]), tlbrs[1], cls_id,
-                            30, temp_feat)
-                        for (tlbrs, temp_feat
-                             ) in zip(pred_dets_cls, pred_embs_cls)
+                            30, temp_feat) for (tlbrs, temp_feat) in
+                        zip(pred_dets_cls, pred_embs_cls)
                     ]
             else:
                 detections = []
@@ -249,9 +248,8 @@ class JDETracker(object):
                         detections_second = [
                             STrack(
                                 STrack.tlbr_to_tlwh(tlbrs[2:6]), tlbrs[1],
-                                cls_id, 30, temp_feat)
-                            for (tlbrs, temp_feat) in zip(pred_dets_cls_second,
-                                                          pred_embs_cls_second)
+                                cls_id, 30, temp_feat) for (tlbrs, temp_feat) in
+                            zip(pred_dets_cls_second, pred_embs_cls_second)
                         ]
                 else:
                     detections_second = []

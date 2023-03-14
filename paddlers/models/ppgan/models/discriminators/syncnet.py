@@ -17,70 +17,126 @@ class SyncNetColor(nn.Layer):
         super(SyncNetColor, self).__init__()
 
         self.face_encoder = nn.Sequential(
-            ConvBNRelu(
-                15, 32, kernel_size=(7, 7), stride=1, padding=3),
-            ConvBNRelu(
-                32, 64, kernel_size=5, stride=(1, 2), padding=1),
-            ConvBNRelu(
-                64, 64, kernel_size=3, stride=1, padding=1, residual=True),
-            ConvBNRelu(
-                64, 64, kernel_size=3, stride=1, padding=1, residual=True),
-            ConvBNRelu(
-                64, 128, kernel_size=3, stride=2, padding=1),
-            ConvBNRelu(
-                128, 128, kernel_size=3, stride=1, padding=1, residual=True),
-            ConvBNRelu(
-                128, 128, kernel_size=3, stride=1, padding=1, residual=True),
-            ConvBNRelu(
-                128, 128, kernel_size=3, stride=1, padding=1, residual=True),
-            ConvBNRelu(
-                128, 256, kernel_size=3, stride=2, padding=1),
-            ConvBNRelu(
-                256, 256, kernel_size=3, stride=1, padding=1, residual=True),
-            ConvBNRelu(
-                256, 256, kernel_size=3, stride=1, padding=1, residual=True),
-            ConvBNRelu(
-                256, 512, kernel_size=3, stride=2, padding=1),
-            ConvBNRelu(
-                512, 512, kernel_size=3, stride=1, padding=1, residual=True),
-            ConvBNRelu(
-                512, 512, kernel_size=3, stride=1, padding=1, residual=True),
-            ConvBNRelu(
-                512, 512, kernel_size=3, stride=2, padding=1),
-            ConvBNRelu(
-                512, 512, kernel_size=3, stride=1, padding=0),
-            ConvBNRelu(
-                512, 512, kernel_size=1, stride=1, padding=0), )
+            ConvBNRelu(15, 32, kernel_size=(7, 7), stride=1, padding=3),
+            ConvBNRelu(32, 64, kernel_size=5, stride=(1, 2), padding=1),
+            ConvBNRelu(64,
+                       64,
+                       kernel_size=3,
+                       stride=1,
+                       padding=1,
+                       residual=True),
+            ConvBNRelu(64,
+                       64,
+                       kernel_size=3,
+                       stride=1,
+                       padding=1,
+                       residual=True),
+            ConvBNRelu(64, 128, kernel_size=3, stride=2, padding=1),
+            ConvBNRelu(128,
+                       128,
+                       kernel_size=3,
+                       stride=1,
+                       padding=1,
+                       residual=True),
+            ConvBNRelu(128,
+                       128,
+                       kernel_size=3,
+                       stride=1,
+                       padding=1,
+                       residual=True),
+            ConvBNRelu(128,
+                       128,
+                       kernel_size=3,
+                       stride=1,
+                       padding=1,
+                       residual=True),
+            ConvBNRelu(128, 256, kernel_size=3, stride=2, padding=1),
+            ConvBNRelu(256,
+                       256,
+                       kernel_size=3,
+                       stride=1,
+                       padding=1,
+                       residual=True),
+            ConvBNRelu(256,
+                       256,
+                       kernel_size=3,
+                       stride=1,
+                       padding=1,
+                       residual=True),
+            ConvBNRelu(256, 512, kernel_size=3, stride=2, padding=1),
+            ConvBNRelu(512,
+                       512,
+                       kernel_size=3,
+                       stride=1,
+                       padding=1,
+                       residual=True),
+            ConvBNRelu(512,
+                       512,
+                       kernel_size=3,
+                       stride=1,
+                       padding=1,
+                       residual=True),
+            ConvBNRelu(512, 512, kernel_size=3, stride=2, padding=1),
+            ConvBNRelu(512, 512, kernel_size=3, stride=1, padding=0),
+            ConvBNRelu(512, 512, kernel_size=1, stride=1, padding=0),
+        )
 
         self.audio_encoder = nn.Sequential(
-            ConvBNRelu(
-                1, 32, kernel_size=3, stride=1, padding=1),
-            ConvBNRelu(
-                32, 32, kernel_size=3, stride=1, padding=1, residual=True),
-            ConvBNRelu(
-                32, 32, kernel_size=3, stride=1, padding=1, residual=True),
-            ConvBNRelu(
-                32, 64, kernel_size=3, stride=(3, 1), padding=1),
-            ConvBNRelu(
-                64, 64, kernel_size=3, stride=1, padding=1, residual=True),
-            ConvBNRelu(
-                64, 64, kernel_size=3, stride=1, padding=1, residual=True),
-            ConvBNRelu(
-                64, 128, kernel_size=3, stride=3, padding=1),
-            ConvBNRelu(
-                128, 128, kernel_size=3, stride=1, padding=1, residual=True),
-            ConvBNRelu(
-                128, 128, kernel_size=3, stride=1, padding=1, residual=True),
-            ConvBNRelu(
-                128, 256, kernel_size=3, stride=(3, 2), padding=1),
-            ConvBNRelu(
-                256, 256, kernel_size=3, stride=1, padding=1, residual=True),
-            ConvBNRelu(
-                256, 256, kernel_size=3, stride=1, padding=1, residual=True),
-            ConvBNRelu(
-                256, 512, kernel_size=3, stride=1, padding=0),
-            ConvBNRelu(
-                512, 512, kernel_size=1, stride=1, padding=0), )
+            ConvBNRelu(1, 32, kernel_size=3, stride=1, padding=1),
+            ConvBNRelu(32,
+                       32,
+                       kernel_size=3,
+                       stride=1,
+                       padding=1,
+                       residual=True),
+            ConvBNRelu(32,
+                       32,
+                       kernel_size=3,
+                       stride=1,
+                       padding=1,
+                       residual=True),
+            ConvBNRelu(32, 64, kernel_size=3, stride=(3, 1), padding=1),
+            ConvBNRelu(64,
+                       64,
+                       kernel_size=3,
+                       stride=1,
+                       padding=1,
+                       residual=True),
+            ConvBNRelu(64,
+                       64,
+                       kernel_size=3,
+                       stride=1,
+                       padding=1,
+                       residual=True),
+            ConvBNRelu(64, 128, kernel_size=3, stride=3, padding=1),
+            ConvBNRelu(128,
+                       128,
+                       kernel_size=3,
+                       stride=1,
+                       padding=1,
+                       residual=True),
+            ConvBNRelu(128,
+                       128,
+                       kernel_size=3,
+                       stride=1,
+                       padding=1,
+                       residual=True),
+            ConvBNRelu(128, 256, kernel_size=3, stride=(3, 2), padding=1),
+            ConvBNRelu(256,
+                       256,
+                       kernel_size=3,
+                       stride=1,
+                       padding=1,
+                       residual=True),
+            ConvBNRelu(256,
+                       256,
+                       kernel_size=3,
+                       stride=1,
+                       padding=1,
+                       residual=True),
+            ConvBNRelu(256, 512, kernel_size=3, stride=1, padding=0),
+            ConvBNRelu(512, 512, kernel_size=1, stride=1, padding=0),
+        )
 
     def forward(self, audio_sequences,
                 face_sequences):  # audio_sequences := (B, dim, T)

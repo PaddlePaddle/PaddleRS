@@ -18,6 +18,7 @@ import paddle.nn.functional as F
 class GoogLeNetLoss(nn.Layer):
     """
     Cross entropy loss used after googlenet
+    reference paper: [https://arxiv.org/pdf/1409.4842v1.pdf](Going Deeper with Convolutions)
     """
 
     def __init__(self, epsilon=None):

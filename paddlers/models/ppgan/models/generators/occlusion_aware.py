@@ -17,7 +17,6 @@ class OcclusionAwareGenerator(nn.Layer):
     Generator that given source image and and keypoints try to transform image according to movement trajectories
     induced by keypoints. Generator follows Johnson architecture.
     """
-
     def __init__(self,
                  num_channels,
                  num_kp,
@@ -44,31 +43,28 @@ class OcclusionAwareGenerator(nn.Layer):
 
         if mobile_net:
             self.first = nn.Sequential(
-                SameBlock2d(
-                    num_channels,
-                    num_channels,
-                    kernel_size=3,
-                    padding=1,
-                    mobile_net=mobile_net),
-                SameBlock2d(
-                    num_channels,
-                    num_channels,
-                    kernel_size=3,
-                    padding=1,
-                    mobile_net=mobile_net),
-                SameBlock2d(
-                    num_channels,
-                    block_expansion,
-                    kernel_size=3,
-                    padding=1,
-                    mobile_net=mobile_net))
+                    SameBlock2d(num_channels,
+                                    num_channels,
+                                    kernel_size=3,
+                                    padding=1,
+                                    mobile_net=mobile_net),
+                    SameBlock2d(num_channels,
+                                    num_channels,
+                                    kernel_size=3,
+                                    padding=1,
+                                    mobile_net=mobile_net),
+                    SameBlock2d(num_channels,
+                                    block_expansion,
+                                    kernel_size=3,
+                                    padding=1,
+                                    mobile_net=mobile_net)
+                )
         else:
-            self.first = SameBlock2d(
-                num_channels,
-                block_expansion,
-                kernel_size=(7, 7),
-                padding=(3, 3),
-                mobile_net=mobile_net)
+            self.first = SameBlock2d(num_channels,
+                                 block_expansion,
+                                 kernel_size=(7, 7),
+                                 padding=(3, 3),
+                                 mobile_net=mobile_net)
 
         down_blocks = []
         if mobile_net:
@@ -76,21 +72,19 @@ class OcclusionAwareGenerator(nn.Layer):
                 in_features = min(max_features, block_expansion * (2**i))
                 out_features = min(max_features, block_expansion * (2**(i + 1)))
                 down_blocks.append(
-                    MobileDownBlock2d(
-                        in_features,
-                        out_features,
-                        kernel_size=(3, 3),
-                        padding=(1, 1)))
+                    MobileDownBlock2d(in_features,
+                                      out_features,
+                                      kernel_size=(3, 3),
+                                      padding=(1, 1)))
         else:
             for i in range(num_down_blocks):
                 in_features = min(max_features, block_expansion * (2**i))
                 out_features = min(max_features, block_expansion * (2**(i + 1)))
                 down_blocks.append(
-                    DownBlock2d(
-                        in_features,
-                        out_features,
-                        kernel_size=(3, 3),
-                        padding=(1, 1)))
+                    DownBlock2d(in_features,
+                                out_features,
+                                kernel_size=(3, 3),
+                                padding=(1, 1)))
         self.down_blocks = nn.LayerList(down_blocks)
 
         up_blocks = []
@@ -98,26 +92,26 @@ class OcclusionAwareGenerator(nn.Layer):
             for i in range(num_down_blocks):
                 in_features = min(max_features,
                                   block_expansion * (2**(num_down_blocks - i)))
-                out_features = min(max_features, block_expansion *
-                                   (2**(num_down_blocks - i - 1)))
+                out_features = min(
+                    max_features,
+                    block_expansion * (2**(num_down_blocks - i - 1)))
                 up_blocks.append(
-                    MobileUpBlock2d(
-                        in_features,
-                        out_features,
-                        kernel_size=(3, 3),
-                        padding=(1, 1)))
+                    MobileUpBlock2d(in_features,
+                                    out_features,
+                                    kernel_size=(3, 3),
+                                    padding=(1, 1)))
         else:
             for i in range(num_down_blocks):
                 in_features = min(max_features,
                                   block_expansion * (2**(num_down_blocks - i)))
-                out_features = min(max_features, block_expansion *
-                                   (2**(num_down_blocks - i - 1)))
+                out_features = min(
+                    max_features,
+                    block_expansion * (2**(num_down_blocks - i - 1)))
                 up_blocks.append(
-                    UpBlock2d(
-                        in_features,
-                        out_features,
-                        kernel_size=(3, 3),
-                        padding=(1, 1)))
+                    UpBlock2d(in_features,
+                              out_features,
+                              kernel_size=(3, 3),
+                              padding=(1, 1)))
         self.up_blocks = nn.LayerList(up_blocks)
 
         self.bottleneck = paddle.nn.Sequential()
@@ -126,42 +120,39 @@ class OcclusionAwareGenerator(nn.Layer):
             for i in range(num_bottleneck_blocks):
                 self.bottleneck.add_sublayer(
                     'r' + str(i),
-                    MobileResBlock2d(
-                        in_features, kernel_size=(3, 3), padding=(1, 1)))
+                    MobileResBlock2d(in_features,
+                                     kernel_size=(3, 3),
+                                     padding=(1, 1)))
         else:
             for i in range(num_bottleneck_blocks):
                 self.bottleneck.add_sublayer(
                     'r' + str(i),
-                    ResBlock2d(
-                        in_features, kernel_size=(3, 3), padding=(1, 1)))
+                    ResBlock2d(in_features, kernel_size=(3, 3), padding=(1, 1)))
         if mobile_net:
             self.final = nn.Sequential(
-                nn.Conv2D(
-                    block_expansion,
-                    block_expansion,
-                    kernel_size=3,
-                    weight_attr=nn.initializer.KaimingUniform(),
-                    padding=1),
-                nn.ReLU(),
-                nn.Conv2D(
-                    block_expansion,
-                    block_expansion,
-                    kernel_size=3,
-                    weight_attr=nn.initializer.KaimingUniform(),
-                    padding=1),
-                nn.ReLU(),
-                nn.Conv2D(
-                    block_expansion,
-                    num_channels,
-                    kernel_size=3,
-                    weight_attr=nn.initializer.KaimingUniform(),
-                    padding=1))
+                    nn.Conv2D(block_expansion,
+                                block_expansion,
+                                kernel_size=3,
+                                weight_attr=nn.initializer.KaimingUniform(),
+                                padding=1),
+                    nn.ReLU(),
+                    nn.Conv2D(block_expansion,
+                                block_expansion,
+                                kernel_size=3,
+                                weight_attr=nn.initializer.KaimingUniform(),
+                                padding=1),
+                    nn.ReLU(),
+                    nn.Conv2D(block_expansion,
+                                num_channels,
+                                kernel_size=3,
+                                weight_attr=nn.initializer.KaimingUniform(),
+                                padding=1)
+                )
         else:
-            self.final = nn.Conv2D(
-                block_expansion,
-                num_channels,
-                kernel_size=(7, 7),
-                padding=(3, 3))
+            self.final = nn.Conv2D(block_expansion,
+                               num_channels,
+                               kernel_size=(7, 7),
+                               padding=(3, 3))
         self.estimate_occlusion_map = estimate_occlusion_map
         self.num_channels = num_channels
         self.inference = inference
@@ -173,30 +164,30 @@ class OcclusionAwareGenerator(nn.Layer):
         _, _, h, w = inp.shape
         if h_old != h or w_old != w:
             deformation = deformation.transpose([0, 3, 1, 2])
-            deformation = F.interpolate(
-                deformation, size=(h, w), mode='bilinear', align_corners=False)
+            deformation = F.interpolate(deformation,
+                                        size=(h, w),
+                                        mode='bilinear',
+                                        align_corners=False)
             deformation = deformation.transpose([0, 2, 3, 1])
         if self.inference:
             identity_grid = make_coordinate_grid((h, w), type=inp.dtype)
             identity_grid = identity_grid.reshape([1, h, w, 2])
             visualization_matrix = np.zeros((h, w)).astype("float32")
-            visualization_matrix[self.pad:h - self.pad, self.pad:w -
-                                 self.pad] = 1.0
+            visualization_matrix[self.pad:h - self.pad,
+                                 self.pad:w - self.pad] = 1.0
             gauss_kernel = paddle.to_tensor(
-                cv2.GaussianBlur(
-                    visualization_matrix, (9, 9),
-                    0.0,
-                    borderType=cv2.BORDER_ISOLATED))
+                cv2.GaussianBlur(visualization_matrix, (9, 9),
+                                 0.0,
+                                 borderType=cv2.BORDER_ISOLATED))
             gauss_kernel = gauss_kernel.unsqueeze(0).unsqueeze(-1)
-            deformation = gauss_kernel * deformation + (1 - gauss_kernel
-                                                        ) * identity_grid
+            deformation = gauss_kernel * deformation + (
+                1 - gauss_kernel) * identity_grid
 
-        return F.grid_sample(
-            inp,
-            deformation,
-            mode='bilinear',
-            padding_mode='zeros',
-            align_corners=True)
+        return F.grid_sample(inp,
+                             deformation,
+                             mode='bilinear',
+                             padding_mode='zeros',
+                             align_corners=True)
 
     def forward(self, source_image, kp_driving, kp_source):
         # Encoding (downsampling) part
@@ -207,10 +198,9 @@ class OcclusionAwareGenerator(nn.Layer):
         # Transforming feature representation according to deformation and occlusion
         output_dict = {}
         if self.dense_motion_network is not None:
-            dense_motion = self.dense_motion_network(
-                source_image=source_image,
-                kp_driving=kp_driving,
-                kp_source=kp_source)
+            dense_motion = self.dense_motion_network(source_image=source_image,
+                                                     kp_driving=kp_driving,
+                                                     kp_source=kp_source)
             output_dict['mask'] = dense_motion['mask']
             output_dict['sparse_deformed'] = dense_motion['sparse_deformed']
 
@@ -225,11 +215,10 @@ class OcclusionAwareGenerator(nn.Layer):
             if occlusion_map is not None:
                 if out.shape[2] != occlusion_map.shape[2] or out.shape[
                         3] != occlusion_map.shape[3]:
-                    occlusion_map = F.interpolate(
-                        occlusion_map,
-                        size=out.shape[2:],
-                        mode='bilinear',
-                        align_corners=False)
+                    occlusion_map = F.interpolate(occlusion_map,
+                                                  size=out.shape[2:],
+                                                  mode='bilinear',
+                                                  align_corners=False)
                 if self.inference and not self.mobile_net:
                     h, w = occlusion_map.shape[2:]
                     occlusion_map[:, :, 0:self.pad, :] = 1.0

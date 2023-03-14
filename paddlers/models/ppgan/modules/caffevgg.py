@@ -1,7 +1,7 @@
 import paddle
 import paddle.nn as nn
 import numpy as np
-from ppgan.utils.download import get_path_from_url
+from paddlers.models.ppgan.utils.download import get_path_from_url
 
 model_urls = {
     'caffevgg19': ('https://paddlegan.bj.bcebos.com/models/vgg19_no_fc.npy',
@@ -15,13 +15,14 @@ class CaffeVGG19(nn.Layer):
         'M', 512, 512, 512, 512, 'M'
     ]
 
-    def __init__(self, output_index: int=26) -> None:
+    def __init__(self, output_index: int = 26) -> None:
         super().__init__()
         arch = 'caffevgg19'
         weights_path = get_path_from_url(model_urls[arch][0],
                                          model_urls[arch][1])
-        data_dict: dict = np.load(
-            weights_path, encoding='latin1', allow_pickle=True).item()
+        data_dict: dict = np.load(weights_path,
+                                  encoding='latin1',
+                                  allow_pickle=True).item()
         self.features = self.make_layers(self.cfg, data_dict)
         del data_dict
         self.features = nn.Sequential(*self.features.sublayers()[:output_index])

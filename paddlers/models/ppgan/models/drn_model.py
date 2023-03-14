@@ -32,7 +32,6 @@ class DRN(BaseSRModel):
 
     DRN paper: https://arxiv.org/pdf/1809.00219.pdf
     """
-
     def __init__(self,
                  generator,
                  lq_loss_weight=0.1,
@@ -83,8 +82,8 @@ class DRN(BaseSRModel):
         self.lq = paddle.to_tensor(input['lq'])
         self.visual_items['lq'] = self.lq
 
-        if isinstance(self.scale, (
-                list, tuple)) and len(self.scale) == 2 and 'lqx2' in input:
+        if isinstance(self.scale, (list, tuple)) and len(
+                self.scale) == 2 and 'lqx2' in input:
             self.lqx2 = input['lqx2']
 
         if 'gt' in input:

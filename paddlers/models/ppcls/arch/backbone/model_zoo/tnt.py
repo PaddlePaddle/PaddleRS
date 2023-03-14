@@ -1,4 +1,4 @@
-# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # Code was based on https://github.com/huawei-noah/CV-Backbones/tree/master/tnt_pytorch
+# reference: https://arxiv.org/abs/2103.00112
 
 import math
 import numpy as np
@@ -22,8 +23,8 @@ import paddle.nn as nn
 
 from paddle.nn.initializer import TruncatedNormal, Constant
 
-from ppcls.arch.backbone.base.theseus_layer import Identity
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ..base.theseus_layer import Identity
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "TNT_small":
@@ -44,7 +45,7 @@ def drop_path(x, drop_prob=0., training=False):
     """
     if drop_prob == 0. or not training:
         return x
-    keep_prob = paddle.to_tensor(1 - drop_prob)
+    keep_prob = paddle.to_tensor(1 - drop_prob, dtype=x.dtype)
     shape = (paddle.shape(x)[0], ) + (1, ) * (x.ndim - 1)
     random_tensor = paddle.add(keep_prob, paddle.rand(shape, dtype=x.dtype))
     random_tensor = paddle.floor(random_tensor)  # binarize
@@ -112,7 +113,8 @@ class Attention(nn.Layer):
     def forward(self, x):
         B, N, C = x.shape
         qk = self.qk(x).reshape(
-            (B, N, 2, self.num_heads, self.head_dim)).transpose((2, 0, 3, 1, 4))
+            (B, N, 2, self.num_heads, self.head_dim)).transpose(
+                (2, 0, 3, 1, 4))
 
         q, k = qk[0], qk[1]
         v = self.v(x).reshape(
@@ -124,7 +126,8 @@ class Attention(nn.Layer):
         attn = self.attn_drop(attn)
 
         x = paddle.matmul(attn, v)
-        x = x.transpose((0, 2, 1, 3)).reshape((B, N, x.shape[-1] * x.shape[-3]))
+        x = x.transpose((0, 2, 1, 3)).reshape(
+            (B, N, x.shape[-1] * x.shape[-3]))
         x = self.proj(x)
         x = self.proj_drop(x)
         return x
@@ -370,7 +373,7 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
         )
 
 
-def TNT_small(pretrained=False, **kwargs):
+def TNT_small(pretrained=False, use_ssld=False, **kwargs):
     model = TNT(patch_size=16,
                 embed_dim=384,
                 in_dim=24,
@@ -379,5 +382,6 @@ def TNT_small(pretrained=False, **kwargs):
                 in_num_head=4,
                 qkv_bias=False,
                 **kwargs)
-    _load_pretrained(pretrained, model, MODEL_URLS["TNT_small"])
+    _load_pretrained(
+        pretrained, model, MODEL_URLS["TNT_small"], use_ssld=use_ssld)
     return model

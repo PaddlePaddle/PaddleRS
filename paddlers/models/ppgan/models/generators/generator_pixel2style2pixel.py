@@ -52,27 +52,24 @@ def get_block(in_channel, depth, num_units, stride=2):
 def get_blocks(num_layers):
     if num_layers == 50:
         blocks = [
-            get_block(
-                in_channel=64, depth=64, num_units=3), get_block(
-                    in_channel=64, depth=128, num_units=4), get_block(
-                        in_channel=128, depth=256, num_units=14), get_block(
-                            in_channel=256, depth=512, num_units=3)
+            get_block(in_channel=64, depth=64, num_units=3),
+            get_block(in_channel=64, depth=128, num_units=4),
+            get_block(in_channel=128, depth=256, num_units=14),
+            get_block(in_channel=256, depth=512, num_units=3)
         ]
     elif num_layers == 100:
         blocks = [
-            get_block(
-                in_channel=64, depth=64, num_units=3), get_block(
-                    in_channel=64, depth=128, num_units=13), get_block(
-                        in_channel=128, depth=256, num_units=30), get_block(
-                            in_channel=256, depth=512, num_units=3)
+            get_block(in_channel=64, depth=64, num_units=3),
+            get_block(in_channel=64, depth=128, num_units=13),
+            get_block(in_channel=128, depth=256, num_units=30),
+            get_block(in_channel=256, depth=512, num_units=3)
         ]
     elif num_layers == 152:
         blocks = [
-            get_block(
-                in_channel=64, depth=64, num_units=3), get_block(
-                    in_channel=64, depth=128, num_units=8), get_block(
-                        in_channel=128, depth=256, num_units=36), get_block(
-                            in_channel=256, depth=512, num_units=3)
+            get_block(in_channel=64, depth=64, num_units=3),
+            get_block(in_channel=64, depth=128, num_units=8),
+            get_block(in_channel=128, depth=256, num_units=36),
+            get_block(in_channel=256, depth=512, num_units=3)
         ]
     else:
         raise ValueError(
@@ -85,19 +82,17 @@ class SEModule(nn.Layer):
     def __init__(self, channels, reduction):
         super(SEModule, self).__init__()
         self.avg_pool = nn.AdaptiveAvgPool2D(1)
-        self.fc1 = nn.Conv2D(
-            channels,
-            channels // reduction,
-            kernel_size=1,
-            padding=0,
-            bias_attr=False)
+        self.fc1 = nn.Conv2D(channels,
+                             channels // reduction,
+                             kernel_size=1,
+                             padding=0,
+                             bias_attr=False)
         self.relu = nn.ReLU()
-        self.fc2 = nn.Conv2D(
-            channels // reduction,
-            channels,
-            kernel_size=1,
-            padding=0,
-            bias_attr=False)
+        self.fc2 = nn.Conv2D(channels // reduction,
+                             channels,
+                             kernel_size=1,
+                             padding=0,
+                             bias_attr=False)
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
@@ -117,16 +112,13 @@ class BottleneckIR(nn.Layer):
             self.shortcut_layer = nn.MaxPool2D(1, stride)
         else:
             self.shortcut_layer = nn.Sequential(
-                nn.Conv2D(
-                    in_channel, depth, (1, 1), stride, bias_attr=False),
+                nn.Conv2D(in_channel, depth, (1, 1), stride, bias_attr=False),
                 nn.BatchNorm2D(depth))
         self.res_layer = nn.Sequential(
             nn.BatchNorm2D(in_channel),
-            nn.Conv2D(
-                in_channel, depth, (3, 3), (1, 1), 1, bias_attr=False),
+            nn.Conv2D(in_channel, depth, (3, 3), (1, 1), 1, bias_attr=False),
             nn.PReLU(depth),
-            nn.Conv2D(
-                depth, depth, (3, 3), stride, 1, bias_attr=False),
+            nn.Conv2D(depth, depth, (3, 3), stride, 1, bias_attr=False),
             nn.BatchNorm2D(depth))
 
     def forward(self, x):
@@ -142,18 +134,14 @@ class BottleneckIRSE(nn.Layer):
             self.shortcut_layer = nn.MaxPool2D(1, stride)
         else:
             self.shortcut_layer = nn.Sequential(
-                nn.Conv2D(
-                    in_channel, depth, (1, 1), stride, bias_attr=False),
+                nn.Conv2D(in_channel, depth, (1, 1), stride, bias_attr=False),
                 nn.BatchNorm2D(depth))
         self.res_layer = nn.Sequential(
             nn.BatchNorm2D(in_channel),
-            nn.Conv2D(
-                in_channel, depth, (3, 3), (1, 1), 1, bias_attr=False),
+            nn.Conv2D(in_channel, depth, (3, 3), (1, 1), 1, bias_attr=False),
             nn.PReLU(depth),
-            nn.Conv2D(
-                depth, depth, (3, 3), stride, 1, bias_attr=False),
-            nn.BatchNorm2D(depth),
-            SEModule(depth, 16))
+            nn.Conv2D(depth, depth, (3, 3), stride, 1, bias_attr=False),
+            nn.BatchNorm2D(depth), SEModule(depth, 16))
 
     def forward(self, x):
         shortcut = self.shortcut_layer(x)
@@ -169,13 +157,12 @@ class GradualStyleBlock(nn.Layer):
         num_pools = int(np.log2(spatial))
         modules = []
         modules += [
-            nn.Conv2D(
-                in_c, out_c, kernel_size=3, stride=2, padding=1), nn.LeakyReLU()
+            nn.Conv2D(in_c, out_c, kernel_size=3, stride=2, padding=1),
+            nn.LeakyReLU()
         ]
         for i in range(num_pools - 1):
             modules += [
-                nn.Conv2D(
-                    out_c, out_c, kernel_size=3, stride=2, padding=1),
+                nn.Conv2D(out_c, out_c, kernel_size=3, stride=2, padding=1),
                 nn.LeakyReLU()
             ]
         self.convs = nn.Sequential(*modules)
@@ -191,8 +178,8 @@ class GradualStyleBlock(nn.Layer):
 class GradualStyleEncoder(nn.Layer):
     def __init__(self, num_layers, mode='ir', opts=None):
         super(GradualStyleEncoder, self).__init__()
-        assert num_layers in [50, 100, 152
-                              ], 'num_layers should be 50,100, or 152'
+        assert num_layers in [50, 100,
+                              152], 'num_layers should be 50,100, or 152'
         assert mode in ['ir', 'ir_se'], 'mode should be ir or ir_se'
         blocks = get_blocks(num_layers)
         if mode == 'ir':
@@ -200,10 +187,8 @@ class GradualStyleEncoder(nn.Layer):
         elif mode == 'ir_se':
             unit_module = BottleneckIRSE
         self.input_layer = nn.Sequential(
-            nn.Conv2D(
-                opts.input_nc, 64, (3, 3), 1, 1, bias_attr=False),
-            nn.BatchNorm2D(64),
-            nn.PReLU(64))
+            nn.Conv2D(opts.input_nc, 64, (3, 3), 1, 1, bias_attr=False),
+            nn.BatchNorm2D(64), nn.PReLU(64))
         modules = []
         for block in blocks:
             for bottleneck in block:
@@ -280,8 +265,8 @@ class BackboneEncoderUsingLastLayerIntoW(nn.Layer):
     def __init__(self, num_layers, mode='ir', opts=None):
         super(BackboneEncoderUsingLastLayerIntoW, self).__init__()
         print('Using BackboneEncoderUsingLastLayerIntoW')
-        assert num_layers in [50, 100, 152
-                              ], 'num_layers should be 50,100, or 152'
+        assert num_layers in [50, 100,
+                              152], 'num_layers should be 50,100, or 152'
         assert mode in ['ir', 'ir_se'], 'mode should be ir or ir_se'
         blocks = get_blocks(num_layers)
         if mode == 'ir':
@@ -289,10 +274,8 @@ class BackboneEncoderUsingLastLayerIntoW(nn.Layer):
         elif mode == 'ir_se':
             unit_module = BottleneckIRSE
         self.input_layer = nn.Sequential(
-            nn.Conv2D(
-                opts.input_nc, 64, (3, 3), 1, 1, bias_attr=False),
-            nn.BatchNorm2D(64),
-            nn.PReLU(64))
+            nn.Conv2D(opts.input_nc, 64, (3, 3), 1, 1, bias_attr=False),
+            nn.BatchNorm2D(64), nn.PReLU(64))
         self.output_pool = nn.AdaptiveAvgPool2D((1, 1))
         self.linear = EqualLinear(512, 512, lr_mul=1)
         modules = []
@@ -316,8 +299,8 @@ class BackboneEncoderUsingLastLayerIntoWPlus(nn.Layer):
     def __init__(self, num_layers, mode='ir', opts=None):
         super(BackboneEncoderUsingLastLayerIntoWPlus, self).__init__()
         print('Using BackboneEncoderUsingLastLayerIntoWPlus')
-        assert num_layers in [50, 100, 152
-                              ], 'num_layers should be 50,100, or 152'
+        assert num_layers in [50, 100,
+                              152], 'num_layers should be 50,100, or 152'
         assert mode in ['ir', 'ir_se'], 'mode should be ir or ir_se'
         blocks = get_blocks(num_layers)
         if mode == 'ir':
@@ -325,14 +308,12 @@ class BackboneEncoderUsingLastLayerIntoWPlus(nn.Layer):
         elif mode == 'ir_se':
             unit_module = BottleneckIRSE
         self.input_layer = nn.Sequential(
-            nn.Conv2D(
-                opts.input_nc, 64, (3, 3), 1, 1, bias_attr=False),
-            nn.BatchNorm2D(64),
-            nn.PReLU(64))
-        self.output_layer_2 = nn.Sequential(
-            nn.BatchNorm2D(512),
-            nn.AdaptiveAvgPool2D((7, 7)),
-            Flatten(), nn.Linear(512 * 7 * 7, 512))
+            nn.Conv2D(opts.input_nc, 64, (3, 3), 1, 1, bias_attr=False),
+            nn.BatchNorm2D(64), nn.PReLU(64))
+        self.output_layer_2 = nn.Sequential(nn.BatchNorm2D(512),
+                                            nn.AdaptiveAvgPool2D((7, 7)),
+                                            Flatten(),
+                                            nn.Linear(512 * 7 * 7, 512))
         self.linear = EqualLinear(512, 512 * 18, lr_mul=1)
         modules = []
         for block in blocks:
@@ -378,8 +359,8 @@ class Pixel2Style2Pixel(nn.Layer):
         elif self.opts.encoder_type == 'BackboneEncoderUsingLastLayerIntoW':
             encoder = BackboneEncoderUsingLastLayerIntoW(50, 'ir_se', self.opts)
         elif self.opts.encoder_type == 'BackboneEncoderUsingLastLayerIntoWPlus':
-            encoder = BackboneEncoderUsingLastLayerIntoWPlus(50, 'ir_se',
-                                                             self.opts)
+            encoder = BackboneEncoderUsingLastLayerIntoWPlus(
+                50, 'ir_se', self.opts)
         else:
             raise Exception('{} is not a valid encoders'.format(
                 self.opts.encoder_type))
@@ -417,11 +398,10 @@ class Pixel2Style2Pixel(nn.Layer):
                     codes[:, i] = 0
 
         input_is_latent = not input_code
-        images, result_latent = self.decoder(
-            [codes],
-            input_is_latent=input_is_latent,
-            randomize_noise=randomize_noise,
-            return_latents=return_latents)
+        images, result_latent = self.decoder([codes],
+                                             input_is_latent=input_is_latent,
+                                             randomize_noise=randomize_noise,
+                                             return_latents=return_latents)
 
         if resize:
             images = self.face_pool(images)

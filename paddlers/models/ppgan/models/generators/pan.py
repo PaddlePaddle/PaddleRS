@@ -1,4 +1,5 @@
 #   Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -10,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-# code was based on https://github.com/zhaohengyuan1/PAN
 
 import functools
 import numpy as np
@@ -41,7 +40,6 @@ def make_multi_blocks(func, num_layers):
 
 class PA(nn.Layer):
     '''PA is pixel attention'''
-
     def __init__(self, nf):
 
         super(PA, self).__init__()
@@ -63,18 +61,16 @@ class PAConv(nn.Layer):
         super(PAConv, self).__init__()
         self.k2 = nn.Conv2D(nf, nf, 1)  # 1x1 convolution nf->nf
         self.sigmoid = nn.Sigmoid()
-        self.k3 = nn.Conv2D(
-            nf,
-            nf,
-            kernel_size=k_size,
-            padding=(k_size - 1) // 2,
-            bias_attr=False)  # 3x3 convolution
-        self.k4 = nn.Conv2D(
-            nf,
-            nf,
-            kernel_size=k_size,
-            padding=(k_size - 1) // 2,
-            bias_attr=False)  # 3x3 convolution
+        self.k3 = nn.Conv2D(nf,
+                            nf,
+                            kernel_size=k_size,
+                            padding=(k_size - 1) // 2,
+                            bias_attr=False)  # 3x3 convolution
+        self.k4 = nn.Conv2D(nf,
+                            nf,
+                            kernel_size=k_size,
+                            padding=(k_size - 1) // 2,
+                            bias_attr=False)  # 3x3 convolution
 
     def forward(self, x):
 
@@ -91,30 +87,34 @@ class SCPA(nn.Layer):
     """
     SCPA is modified from SCNet (Jiang-Jiang Liu et al. Improving Convolutional Networks with Self-Calibrated Convolutions. In CVPR, 2020)
     """
-
     def __init__(self, nf, reduction=2, stride=1, dilation=1):
         super(SCPA, self).__init__()
         group_width = nf // reduction
 
-        self.conv1_a = nn.Conv2D(
-            nf, group_width, kernel_size=1, bias_attr=False)
-        self.conv1_b = nn.Conv2D(
-            nf, group_width, kernel_size=1, bias_attr=False)
+        self.conv1_a = nn.Conv2D(nf,
+                                 group_width,
+                                 kernel_size=1,
+                                 bias_attr=False)
+        self.conv1_b = nn.Conv2D(nf,
+                                 group_width,
+                                 kernel_size=1,
+                                 bias_attr=False)
 
         self.k1 = nn.Sequential(
-            nn.Conv2D(
-                group_width,
-                group_width,
-                kernel_size=3,
-                stride=stride,
-                padding=dilation,
-                dilation=dilation,
-                bias_attr=False))
+            nn.Conv2D(group_width,
+                      group_width,
+                      kernel_size=3,
+                      stride=stride,
+                      padding=dilation,
+                      dilation=dilation,
+                      bias_attr=False))
 
         self.PAConv = PAConv(group_width)
 
-        self.conv3 = nn.Conv2D(
-            group_width * reduction, nf, kernel_size=1, bias_attr=False)
+        self.conv3 = nn.Conv2D(group_width * reduction,
+                               nf,
+                               kernel_size=1,
+                               bias_attr=False)
 
         self.lrelu = nn.LeakyReLU(negative_slope=0.2)
 
@@ -173,25 +173,24 @@ class PAN(nn.Layer):
 
         if self.scale == 2 or self.scale == 3:
             fea = self.upconv1(
-                F.interpolate(
-                    fea, scale_factor=self.scale, mode='nearest'))
+                F.interpolate(fea, scale_factor=self.scale, mode='nearest'))
             fea = self.lrelu(self.att1(fea))
             fea = self.lrelu(self.HRconv1(fea))
         elif self.scale == 4:
             fea = self.upconv1(
-                F.interpolate(
-                    fea, scale_factor=2, mode='nearest'))
+                F.interpolate(fea, scale_factor=2, mode='nearest'))
             fea = self.lrelu(self.att1(fea))
             fea = self.lrelu(self.HRconv1(fea))
             fea = self.upconv2(
-                F.interpolate(
-                    fea, scale_factor=2, mode='nearest'))
+                F.interpolate(fea, scale_factor=2, mode='nearest'))
             fea = self.lrelu(self.att2(fea))
             fea = self.lrelu(self.HRconv2(fea))
 
         out = self.conv_last(fea)
 
-        ILR = F.interpolate(
-            x, scale_factor=self.scale, mode='bilinear', align_corners=False)
+        ILR = F.interpolate(x,
+                            scale_factor=self.scale,
+                            mode='bilinear',
+                            align_corners=False)
         out = out + ILR
         return out

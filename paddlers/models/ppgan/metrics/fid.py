@@ -2,6 +2,7 @@
 # This implementation is licensed under the Apache License 2.0.
 # Copyright (c) mseitzer
 
+
 import os
 import fnmatch
 import numpy as np
@@ -104,8 +105,8 @@ def _calculate_frechet_distance(mu1, sigma1, mu2, sigma2, eps=1e-6):
         covmean = covmean.real
     tr_covmean = np.trace(covmean)
 
-    return (
-        diff.dot(diff) + np.trace(sigma1) + np.trace(sigma2) - 2 * tr_covmean)
+    return (diff.dot(diff) + np.trace(sigma1) + np.trace(sigma2) -
+            2 * tr_covmean)
 
 
 def _get_activations_from_ims(img, model, batch_size, dims, use_gpu):
@@ -266,8 +267,9 @@ def _compute_statistics_of_path(path,
             for filename in fnmatch.filter(
                     filenames, '*.jpg') or fnmatch.filter(filenames, '*.png'):
                 files.append(os.path.join(root, filename))
-        m, s = _calculate_activation_statistics(
-            files, model, premodel_path, batch_size, dims, use_gpu, style)
+        m, s = _calculate_activation_statistics(files, model, premodel_path,
+                                                batch_size, dims, use_gpu,
+                                                style)
     return m, s
 
 

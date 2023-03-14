@@ -66,6 +66,8 @@ class BaseModel(metaclass=ModelMeta):
     # subclasses need to be set
     _ARRANGE: Optional[Arrange] = None
 
+    find_unused_parameters = False
+
     def __init__(self, model_type):
         self.model_type = model_type
         self.in_channels = None
@@ -103,6 +105,7 @@ class BaseModel(metaclass=ModelMeta):
                 if osp.exists(save_dir):
                     os.remove(save_dir)
                 os.makedirs(save_dir)
+            # XXX: Hard-coding
             if self.model_type == 'classifier':
                 pretrain_weights = get_pretrain_weights(
                     pretrain_weights, self.model_name, save_dir)
@@ -219,10 +222,7 @@ class BaseModel(metaclass=ModelMeta):
         info = dict()
         info['pruner'] = self.pruner.__class__.__name__
         info['pruning_ratios'] = self.pruning_ratios
-        pruner_inputs = self.pruner.inputs
-        if self.model_type == 'detector':
-            pruner_inputs = {k: v.tolist() for k, v in pruner_inputs[0].items()}
-        info['pruner_inputs'] = pruner_inputs
+        info['pruner_inputs'] = self.pruner.inputs
 
         return info
 
@@ -271,17 +271,21 @@ class BaseModel(metaclass=ModelMeta):
         open(osp.join(save_dir, '.success'), 'w').close()
         logging.info("Model saved in {}.".format(save_dir))
 
-    def build_data_loader(self, dataset, batch_size, mode='train'):
-        # back_push arrange in transforms
-        if not isinstance(self._ARRANGE, Arrange):
-            raise ValueError('There are no base class `_ARRANGE` overrides.')
-        dataset.transforms.transforms.append(self._ARRANGE(mode))
-
+    def build_data_loader(self,
+                          dataset,
+                          batch_size,
+                          mode='train',
+                          collate_fn=None):
         if dataset.num_samples < batch_size:
             raise ValueError(
                 'The volume of dataset({}) must be larger than batch size({}).'
                 .format(dataset.num_samples, batch_size))
         batch_size_each_card = get_single_card_bs(batch_size=batch_size)
+
+        # back_push arrange in transforms
+        if not isinstance(self._ARRANGE, Arrange):
+            raise ValueError('There are no base class `_ARRANGE` overrides.')
+        dataset.transforms.transforms.append(self._ARRANGE(mode))
 
         batch_sampler = DistributedBatchSampler(
             dataset,
@@ -301,7 +305,7 @@ class BaseModel(metaclass=ModelMeta):
         loader = DataLoader(
             dataset,
             batch_sampler=batch_sampler,
-            collate_fn=dataset.batch_transforms,
+            collate_fn=dataset.collate_fn if collate_fn is None else collate_fn,
             num_workers=dataset.num_workers,
             return_list=True,
             use_shared_memory=use_shared_memory)
@@ -322,6 +326,7 @@ class BaseModel(metaclass=ModelMeta):
                    use_vdl=True):
         self._check_transforms(train_dataset.transforms, 'train')
 
+        # XXX: Hard-coding
         if self.model_type == 'detector' and 'RCNN' in self.__class__.__name__ and train_dataset.pos_num < len(
                 train_dataset.file_list):
             nranks = 1
@@ -329,17 +334,17 @@ class BaseModel(metaclass=ModelMeta):
             nranks = paddle.distributed.get_world_size()
         local_rank = paddle.distributed.get_rank()
         if nranks > 1:
-            find_unused_parameters = getattr(self, 'find_unused_parameters',
-                                             False)
             # Initialize parallel environment if not done.
             if not paddle.distributed.parallel.parallel_helper._is_parallel_ctx_initialized(
             ):
                 paddle.distributed.init_parallel_env()
                 ddp_net = to_data_parallel(
-                    self.net, find_unused_parameters=find_unused_parameters)
+                    self.net,
+                    find_unused_parameters=self.find_unused_parameters)
             else:
                 ddp_net = to_data_parallel(
-                    self.net, find_unused_parameters=find_unused_parameters)
+                    self.net,
+                    find_unused_parameters=self.find_unused_parameters)
 
         if use_vdl:
             from visualdl import LogWriter
@@ -498,12 +503,13 @@ class BaseModel(metaclass=ModelMeta):
         assert criterion in {'l1_norm', 'fpgm'}, \
             "Pruning criterion {} is not supported. Please choose from {'l1_norm', 'fpgm'}."
         self._check_transforms(dataset.transforms, 'eval')
+        # XXX: Hard-coding
         if self.model_type == 'detector':
             self.net.eval()
         else:
             self.net.train()
         inputs = _pruner_template_input(
-            sample=dataset[0], model_type=self.model_type)
+            sample=dataset[0][0], model_type=self.model_type)
         if criterion == 'l1_norm':
             self.pruner = L1NormFilterPruner(self.net, inputs=inputs)
         else:
@@ -628,7 +634,10 @@ class BaseModel(metaclass=ModelMeta):
     def _build_inference_net(self):
         raise NotImplementedError
 
-    def _export_inference_model(self, save_dir, image_shape=None):
+    def _get_test_inputs(self, image_shape):
+        raise NotImplementedError
+
+    def export_inference_model(self, save_dir, image_shape=None):
         self.test_inputs = self._get_test_inputs(image_shape)
         infer_net = self._build_inference_net()
 

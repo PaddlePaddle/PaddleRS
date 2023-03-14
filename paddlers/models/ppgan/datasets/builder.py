@@ -48,24 +48,21 @@ def build_dataloader(cfg, is_train=True, distributed=True):
     dataset = build_dataset(cfg_)
 
     if distributed:
-        sampler = DistributedBatchSampler(
-            dataset,
-            batch_size=batch_size,
-            shuffle=True if is_train else False,
-            drop_last=True if is_train else False)
+        sampler = DistributedBatchSampler(dataset,
+                                          batch_size=batch_size,
+                                          shuffle=True if is_train else False,
+                                          drop_last=True if is_train else False)
 
-        dataloader = paddle.io.DataLoader(
-            dataset,
-            batch_sampler=sampler,
-            num_workers=num_workers,
-            use_shared_memory=use_shared_memory)
+        dataloader = paddle.io.DataLoader(dataset,
+                                          batch_sampler=sampler,
+                                          num_workers=num_workers,
+                                          use_shared_memory=use_shared_memory)
     else:
-        dataloader = paddle.io.DataLoader(
-            dataset,
-            batch_size=batch_size,
-            shuffle=True if is_train else False,
-            drop_last=True if is_train else False,
-            use_shared_memory=use_shared_memory,
-            num_workers=num_workers)
+        dataloader = paddle.io.DataLoader(dataset,
+                                          batch_size=batch_size,
+                                          shuffle=True if is_train else False,
+                                          drop_last=True if is_train else False,
+                                          use_shared_memory=use_shared_memory,
+                                          num_workers=num_workers)
 
     return dataloader

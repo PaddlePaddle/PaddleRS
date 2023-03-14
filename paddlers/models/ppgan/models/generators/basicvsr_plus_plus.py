@@ -45,7 +45,6 @@ class BasicVSRPlusPlus(nn.Layer):
             or not. If False, the output resolution is equal to the input
             resolution. Default: True.
     """
-
     def __init__(self, mid_channels=64, num_blocks=7, is_low_res_input=True):
 
         super().__init__()
@@ -89,16 +88,21 @@ class BasicVSRPlusPlus(nn.Layer):
             5 * mid_channels, mid_channels, num_blocks)
 
         # upsampling module
-        self.reconstruction = ResidualBlocksWithInputConv(5 * mid_channels,
-                                                          mid_channels, 5)
-        self.upsample1 = PixelShufflePack(
-            mid_channels, mid_channels, 2, upsample_kernel=3)
-        self.upsample2 = PixelShufflePack(
-            mid_channels, 64, 2, upsample_kernel=3)
+        self.reconstruction = ResidualBlocksWithInputConv(
+            5 * mid_channels, mid_channels, 5)
+        self.upsample1 = PixelShufflePack(mid_channels,
+                                          mid_channels,
+                                          2,
+                                          upsample_kernel=3)
+        self.upsample2 = PixelShufflePack(mid_channels,
+                                          64,
+                                          2,
+                                          upsample_kernel=3)
         self.conv_hr = nn.Conv2D(64, 64, 3, 1, 1)
         self.conv_last = nn.Conv2D(64, 3, 3, 1, 1)
-        self.img_upsample = nn.Upsample(
-            scale_factor=4, mode='bilinear', align_corners=False)
+        self.img_upsample = nn.Upsample(scale_factor=4,
+                                        mode='bilinear',
+                                        align_corners=False)
 
         # activation function
         self.lrelu = nn.LeakyReLU(negative_slope=0.1)
@@ -194,9 +198,10 @@ class BasicVSRPlusPlus(nn.Layer):
         if self.is_low_res_input:
             lqs_downsample = lqs
         else:
-            lqs_downsample = F.interpolate(
-                lqs.reshape([-1, c, h, w]), scale_factor=0.25,
-                mode='bicubic').reshape([n, t, c, h // 4, w // 4])
+            lqs_downsample = F.interpolate(lqs.reshape([-1, c, h, w]),
+                                           scale_factor=0.25,
+                                           mode='bicubic').reshape(
+                                               [n, t, c, h // 4, w // 4])
 
         # check whether the input is an extended sequence
         self.check_if_mirror_extended(lqs)
@@ -208,10 +213,9 @@ class BasicVSRPlusPlus(nn.Layer):
         feats['spatial'] = [feats_[:, i, :, :, :] for i in range(0, t)]
 
         # compute optical flow using the low-res inputs
-        assert lqs_downsample.shape[3] >= 64 and lqs_downsample.shape[
-            4] >= 64, (
-                'The height and width of low-res inputs must be at least 64, '
-                f'but got {h} and {w}.')
+        assert lqs_downsample.shape[3] >= 64 and lqs_downsample.shape[4] >= 64, (
+            'The height and width of low-res inputs must be at least 64, '
+            f'but got {h} and {w}.')
         flows_forward, flows_backward = self.compute_flow(lqs_downsample)
 
         # feature propgation
@@ -249,20 +253,20 @@ class BasicVSRPlusPlus(nn.Layer):
                     flow_n2 = flow_n1 + flow_warp(
                         flow_n2, flow_n1.transpose([0, 2, 3, 1]))
 
-                    cond_n2 = flow_warp(feat_n2,
-                                        flow_n2.transpose([0, 2, 3, 1]))
+                    cond_n2 = flow_warp(feat_n2, flow_n2.transpose([0, 2, 3,
+                                                                    1]))
 
                 # flow-guided deformable convolution
                 cond = paddle.concat([cond_n1, feat_current, cond_n2], axis=1)
                 feat_prop = paddle.concat([feat_prop, feat_n2], axis=1)
 
-                feat_prop = self.deform_align_backward_1(feat_prop, cond,
-                                                         flow_n1, flow_n2)
+                feat_prop = self.deform_align_backward_1(
+                    feat_prop, cond, flow_n1, flow_n2)
 
             # concatenate and residual blocks
             feat = [feat_current] + [
-                feats[k][idx] for k in feats
-                if k not in ['spatial', 'backward_1']
+                feats[k][idx]
+                for k in feats if k not in ['spatial', 'backward_1']
             ] + [feat_prop]
 
             feat = paddle.concat(feat, axis=1)
@@ -304,8 +308,8 @@ class BasicVSRPlusPlus(nn.Layer):
                     flow_n2 = flow_n1 + flow_warp(
                         flow_n2, flow_n1.transpose([0, 2, 3, 1]))
 
-                    cond_n2 = flow_warp(feat_n2,
-                                        flow_n2.transpose([0, 2, 3, 1]))
+                    cond_n2 = flow_warp(feat_n2, flow_n2.transpose([0, 2, 3,
+                                                                    1]))
 
                 # flow-guided deformable convolution
                 cond = paddle.concat([cond_n1, feat_current, cond_n2], axis=1)
@@ -316,8 +320,8 @@ class BasicVSRPlusPlus(nn.Layer):
 
             # concatenate and residual blocks
             feat = [feat_current] + [
-                feats[k][idx] for k in feats
-                if k not in ['spatial', 'forward_1']
+                feats[k][idx]
+                for k in feats if k not in ['spatial', 'forward_1']
             ] + [feat_prop]
 
             feat = paddle.concat(feat, axis=1)
@@ -357,20 +361,20 @@ class BasicVSRPlusPlus(nn.Layer):
                     flow_n2 = flow_n1 + flow_warp(
                         flow_n2, flow_n1.transpose([0, 2, 3, 1]))
 
-                    cond_n2 = flow_warp(feat_n2,
-                                        flow_n2.transpose([0, 2, 3, 1]))
+                    cond_n2 = flow_warp(feat_n2, flow_n2.transpose([0, 2, 3,
+                                                                    1]))
 
                 # flow-guided deformable convolution
                 cond = paddle.concat([cond_n1, feat_current, cond_n2], axis=1)
                 feat_prop = paddle.concat([feat_prop, feat_n2], axis=1)
 
-                feat_prop = self.deform_align_backward_2(feat_prop, cond,
-                                                         flow_n1, flow_n2)
+                feat_prop = self.deform_align_backward_2(
+                    feat_prop, cond, flow_n1, flow_n2)
 
             # concatenate and residual blocks
             feat = [feat_current] + [
-                feats[k][idx] for k in feats
-                if k not in ['spatial', 'backward_2']
+                feats[k][idx]
+                for k in feats if k not in ['spatial', 'backward_2']
             ] + [feat_prop]
 
             feat = paddle.concat(feat, axis=1)
@@ -412,8 +416,8 @@ class BasicVSRPlusPlus(nn.Layer):
                     flow_n2 = flow_n1 + flow_warp(
                         flow_n2, flow_n1.transpose([0, 2, 3, 1]))
 
-                    cond_n2 = flow_warp(feat_n2,
-                                        flow_n2.transpose([0, 2, 3, 1]))
+                    cond_n2 = flow_warp(feat_n2, flow_n2.transpose([0, 2, 3,
+                                                                    1]))
 
                 # flow-guided deformable convolution
                 cond = paddle.concat([cond_n1, feat_current, cond_n2], axis=1)
@@ -424,8 +428,8 @@ class BasicVSRPlusPlus(nn.Layer):
 
             # concatenate and residual blocks
             feat = [feat_current] + [
-                feats[k][idx] for k in feats
-                if k not in ['spatial', 'forward_2']
+                feats[k][idx]
+                for k in feats if k not in ['spatial', 'forward_2']
             ] + [feat_prop]
 
             feat = paddle.concat(feat, axis=1)

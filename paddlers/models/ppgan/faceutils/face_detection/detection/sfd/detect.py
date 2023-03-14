@@ -95,8 +95,8 @@ def batch_detect(net, imgs):
             box = batch_decode(paddle.to_tensor(loc), priors, variances)
             box = box[:, 0] * 1.0
             bboxlist.append(
-                paddle.concat([box, paddle.to_tensor(score).unsqueeze(1)], 1)
-                .numpy())
+                paddle.concat([box, paddle.to_tensor(score).unsqueeze(1)],
+                              1).numpy())
     bboxlist = np.array(bboxlist)
     if 0 == len(bboxlist):
         bboxlist = np.zeros((1, BB, 5))

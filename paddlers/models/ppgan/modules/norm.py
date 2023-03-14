@@ -47,10 +47,9 @@ def build_norm_layer(norm_type='instance'):
                 initializer=nn.initializer.Constant(1.0),
                 learning_rate=0.0,
                 trainable=False),
-            bias_attr=paddle.ParamAttr(
-                initializer=nn.initializer.Constant(0.0),
-                learning_rate=0.0,
-                trainable=False))
+            bias_attr=paddle.ParamAttr(initializer=nn.initializer.Constant(0.0),
+                                       learning_rate=0.0,
+                                       trainable=False))
     elif norm_type == 'spectral':
         norm_layer = functools.partial(Spectralnorm)
     elif norm_type == 'none':

@@ -43,8 +43,6 @@ class ClasDataset(BaseDataset):
                  shuffle=False):
         super(ClasDataset, self).__init__(data_dir, label_list, transforms,
                                           num_workers, shuffle)
-        # TODO batch padding
-        self.batch_transforms = None
         self.file_list = list()
         self.labels = list()
 

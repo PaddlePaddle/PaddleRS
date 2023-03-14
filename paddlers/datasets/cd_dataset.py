@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import copy
 from enum import IntEnum
 import os.path as osp
 
 from .base import BaseDataset
 from paddlers.utils import logging, get_encoding, norm_path, is_pic
+from paddlers.transforms import construct_sample_from_dict
 
 
 class CDDataset(BaseDataset):
@@ -44,6 +44,8 @@ class CDDataset(BaseDataset):
             Defaults to False.
     """
 
+    _collate_trans_info = True
+
     def __init__(self,
                  data_dir,
                  file_list,
@@ -58,8 +60,6 @@ class CDDataset(BaseDataset):
 
         DELIMETER = ' '
 
-        # TODO: batch padding
-        self.batch_transforms = None
         self.file_list = list()
         self.labels = list()
         self.with_seg_labels = with_seg_labels
@@ -130,7 +130,8 @@ class CDDataset(BaseDataset):
             len(self.file_list), file_list))
 
     def __getitem__(self, idx):
-        sample = copy.deepcopy(self.file_list[idx])
+        sample = construct_sample_from_dict(self.file_list[idx])
+        sample['trans_info'] = []
         sample = self.transforms.apply_transforms(sample)
 
         if self.binarize_labels:
@@ -142,7 +143,7 @@ class CDDataset(BaseDataset):
 
         outputs = self.transforms.arrange_outputs(sample)
 
-        return outputs
+        return outputs, sample['trans_info']
 
     def __len__(self):
         return len(self.file_list)

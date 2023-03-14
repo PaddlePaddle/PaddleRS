@@ -1,4 +1,4 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
+# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ class SniperCOCODataSet(COCODataSet):
                  empty_ratio=1.,
                  is_trainset=True,
                  image_target_sizes=[2000, 1000],
-                 valid_box_ratio_ranges=[[-1, 0.1], [0.08, -1]],
+                 valid_box_ratio_ranges=[[-1, 0.1],[0.08, -1]],
                  chip_target_size=500,
                  chip_target_stride=200,
                  use_neg_chip=False,
@@ -64,7 +64,8 @@ class SniperCOCODataSet(COCODataSet):
             sample_num=sample_num,
             load_crowd=load_crowd,
             allow_empty=allow_empty,
-            empty_ratio=empty_ratio)
+            empty_ratio=empty_ratio
+        )
         self.proposals_file = proposals_file
         self.proposals = None
         self.anno_cropper = None
@@ -77,6 +78,7 @@ class SniperCOCODataSet(COCODataSet):
         self.max_neg_num_per_im = max_neg_num_per_im
         self.max_per_img = max_per_img
         self.nms_thresh = nms_thresh
+
 
     def parse_dataset(self):
         if not hasattr(self, "roidbs"):
@@ -101,7 +103,8 @@ class SniperCOCODataSet(COCODataSet):
             use_neg_chip=self.use_neg_chip,
             max_neg_num_per_im=self.max_neg_num_per_im,
             max_per_img=self.max_per_img,
-            nms_thresh=self.nms_thresh)
+            nms_thresh=self.nms_thresh
+        )
 
     def generate_chips_roidbs(self, roidbs, is_trainset):
         if is_trainset:
@@ -131,8 +134,7 @@ class SniperCOCODataSet(COCODataSet):
                 image_id = int(record["im_id"])
                 if image_id not in self.proposals.keys():
                     logger.info("image id :{} no proposals".format(image_id))
-                record["proposals"] = np.array(
-                    self.proposals.get(image_id, []), dtype=np.float32)
+                record["proposals"] = np.array(self.proposals.get(image_id, []), dtype=np.float32)
                 self.roidbs[id] = record
 
     def get_ori_roidbs(self):
@@ -189,3 +191,4 @@ class SniperCOCODataSet(COCODataSet):
         self._imid2path = {}
         self.image_dir = images
         self.roidbs = self._load_images()
+

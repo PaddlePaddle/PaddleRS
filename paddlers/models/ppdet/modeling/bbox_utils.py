@@ -1,4 +1,4 @@
-#   Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
+#   Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -548,7 +548,7 @@ def bbox2delta_v2(src_boxes,
                   means=(0.0, 0.0, 0.0, 0.0),
                   stds=(1.0, 1.0, 1.0, 1.0)):
     """Encode bboxes to deltas.
-    Modified from paddlers.models.ppdet.modeling.bbox_utils.bbox2delta.
+    Modified from ppdet.modeling.bbox_utils.bbox2delta.
     Args:
         src_boxes (Tensor[..., 4]): base bboxes
         tgt_boxes (Tensor[..., 4]): target bboxes

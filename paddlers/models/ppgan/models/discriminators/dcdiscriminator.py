@@ -31,7 +31,6 @@ from .builder import DISCRIMINATORS
 @DISCRIMINATORS.register()
 class DCDiscriminator(nn.Layer):
     """Defines a DCGAN discriminator"""
-
     def __init__(self, input_nc, ndf=64, norm_type='instance'):
         """Construct a DCGAN discriminator
 
@@ -52,13 +51,13 @@ class DCDiscriminator(nn.Layer):
         padw = 1
 
         sequence = [
-            nn.Conv2D(
-                input_nc,
-                ndf,
-                kernel_size=kw,
-                stride=2,
-                padding=padw,
-                bias_attr=use_bias), nn.LeakyReLU(0.2)
+            nn.Conv2D(input_nc,
+                      ndf,
+                      kernel_size=kw,
+                      stride=2,
+                      padding=padw,
+                      bias_attr=use_bias),
+            nn.LeakyReLU(0.2)
         ]
 
         nf_mult = 1
@@ -71,23 +70,23 @@ class DCDiscriminator(nn.Layer):
             nf_mult = min(2**n, 8)
             if norm_type == 'batch':
                 sequence += [
-                    nn.Conv2D(
-                        ndf * nf_mult_prev,
-                        ndf * nf_mult,
-                        kernel_size=kw,
-                        stride=2,
-                        padding=padw), BatchNorm2D(ndf * nf_mult),
+                    nn.Conv2D(ndf * nf_mult_prev,
+                              ndf * nf_mult,
+                              kernel_size=kw,
+                              stride=2,
+                              padding=padw),
+                    BatchNorm2D(ndf * nf_mult),
                     nn.LeakyReLU(0.2)
                 ]
             else:
                 sequence += [
-                    nn.Conv2D(
-                        ndf * nf_mult_prev,
-                        ndf * nf_mult,
-                        kernel_size=kw,
-                        stride=2,
-                        padding=padw,
-                        bias_attr=use_bias), norm_layer(ndf * nf_mult),
+                    nn.Conv2D(ndf * nf_mult_prev,
+                              ndf * nf_mult,
+                              kernel_size=kw,
+                              stride=2,
+                              padding=padw,
+                              bias_attr=use_bias),
+                    norm_layer(ndf * nf_mult),
                     nn.LeakyReLU(0.2)
                 ]
 
@@ -95,8 +94,11 @@ class DCDiscriminator(nn.Layer):
 
         # output 1 channel prediction map
         sequence += [
-            nn.Conv2D(
-                ndf * nf_mult_prev, 1, kernel_size=kw, stride=1, padding=0)
+            nn.Conv2D(ndf * nf_mult_prev,
+                      1,
+                      kernel_size=kw,
+                      stride=1,
+                      padding=0)
         ]
 
         self.model = nn.Sequential(*sequence)

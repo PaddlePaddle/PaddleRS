@@ -92,8 +92,8 @@ def matched_rbox_overlaps(anchors, gt_bboxes, use_cv2=False):
         try:
             iou[i] = intersection(gt_bboxes_ploy[i], anchors_ploy[i])
         except Exception as e:
-            print('cur gt_bboxes_ploy[i]', gt_bboxes_ploy[i], 'anchors_ploy[j]',
-                  anchors_ploy[i], e)
+            print('cur gt_bboxes_ploy[i]', gt_bboxes_ploy[i],
+                  'anchors_ploy[j]', anchors_ploy[i], e)
     return iou
 
 

@@ -48,13 +48,13 @@ class FirstOrderDataset(Dataset):
             file_idx_set = list(file_idx_set)
             if len(file_idx_set) != 0:
                 if POOL_SIZE == 0:
-                    for idx in tqdm.tqdm(
-                            file_idx_set, desc='Extracting frames'):
+                    for idx in tqdm.tqdm(file_idx_set,
+                                         desc='Extracting frames'):
                         _ = self.frameDataset[idx]
                 else:
                     # multiprocessing
-                    bar = tqdm.tqdm(
-                        total=len(file_idx_set), desc='Extracting frames')
+                    bar = tqdm.tqdm(total=len(file_idx_set),
+                                    desc='Extracting frames')
                     with Pool(POOL_SIZE) as pl:
                         _p = 0
                         while _p <= len(file_idx_set) - 1:
@@ -90,10 +90,10 @@ def read_video(name: Path, frame_shape=tuple([256, 256, 3]), saveto='folder'):
       - folder with videos
     """
     if name.is_dir():
-        frames = sorted(
-            name.iterdir(), key=lambda x: int(x.with_suffix('').name))
-        video_array = np.array(
-            [imread(path) for path in frames], dtype='float32')
+        frames = sorted(name.iterdir(),
+                        key=lambda x: int(x.with_suffix('').name))
+        video_array = np.array([imread(path) for path in frames],
+                               dtype='float32')
         return video_array
     elif name.suffix.lower() in ['.gif', '.mp4', '.mov']:
         try:
@@ -123,8 +123,7 @@ def read_video(name: Path, frame_shape=tuple([256, 256, 3]), saveto='folder'):
             except FileExistsError:
                 pass
             for idx, img in enumerate(video_array_reshape):
-                cv2.imwrite(
-                    str(sub_dir.joinpath('%i.png' % idx)), img[:, :, [2, 1, 0]])
+                cv2.imwrite(str(sub_dir.joinpath('%i.png' % idx)), img[:,:,[2,1,0]])
             name.unlink()
         return video_array_reshape
     else:
@@ -139,7 +138,6 @@ class FramesDataset(Dataset):
       - folder with all frames
     FramesDataset[i]: obtain sample from i-th video in self.videos
     """
-
     def __init__(self, cfg):
         self.root_dir = Path(cfg['dataroot'])
         self.videos = None
@@ -163,8 +161,8 @@ class FramesDataset(Dataset):
         else:
             train_videos = list(self.root_dir.joinpath('train').iterdir())
         test_videos = list(self.root_dir.joinpath('test').iterdir())
-        self.root_dir = self.root_dir.joinpath('train'
-                                               if self.is_train else 'test')
+        self.root_dir = self.root_dir.joinpath(
+            'train' if self.is_train else 'test')
 
         if self.is_train:
             self.videos = train_videos
@@ -186,22 +184,23 @@ class FramesDataset(Dataset):
             path = self.videos[idx]
         video_name = path.name
         if self.is_train and path.is_dir():
-            frames = sorted(
-                path.iterdir(), key=lambda x: int(x.with_suffix('').name))
+            frames = sorted(path.iterdir(),
+                            key=lambda x: int(x.with_suffix('').name))
             num_frames = len(frames)
             frame_idx = np.sort(
-                np.random.choice(
-                    num_frames, replace=True, size=2))
+                np.random.choice(num_frames, replace=True, size=2))
             video_array = [imread(str(frames[idx])) for idx in frame_idx]
         else:
             if self.create_frames_folder:
-                video_array = read_video(
-                    path, frame_shape=self.frame_shape, saveto='folder')
+                video_array = read_video(path,
+                                         frame_shape=self.frame_shape,
+                                         saveto='folder')
                 self.videos[idx] = path.with_suffix(
                     '')  # rename /xx/xx/xx.gif -> /xx/xx/xx
             else:
-                video_array = read_video(
-                    path, frame_shape=self.frame_shape, saveto=None)
+                video_array = read_video(path,
+                                         frame_shape=self.frame_shape,
+                                         saveto=None)
             num_frames = len(video_array)
             frame_idx = np.sort(
                 np.random.choice(
@@ -221,14 +220,13 @@ class FramesDataset(Dataset):
         if self.is_train:
             if self.transform is not None:  #modify
                 t = self.transform(tuple(video_array))
-                out['driving'] = t[0].transpose(2, 0,
-                                                1).astype(np.float32) / 255.0
-                out['source'] = t[1].transpose(2, 0,
-                                               1).astype(np.float32) / 255.0
+                out['driving'] = t[0].transpose(2, 0, 1).astype(
+                    np.float32) / 255.0
+                out['source'] = t[1].transpose(2, 0, 1).astype(
+                    np.float32) / 255.0
             else:
-                source = np.array(
-                    video_array[0],
-                    dtype='float32') / 255.0  # shape is [H, W, C]
+                source = np.array(video_array[0],
+                                  dtype='float32') / 255.0  # shape is [H, W, C]
                 driving = np.array(
                     video_array[1],
                     dtype='float32') / 255.0  # shape is [H, W, C]
@@ -252,7 +250,6 @@ class DatasetRepeater(Dataset):
     """
     Pass several times over the same dataset for better i/o performance
     """
-
     def __init__(self, dataset, num_repeats=100):
         self.dataset = dataset
         self.num_repeats = num_repeats

@@ -27,7 +27,6 @@ from .preprocess.builder import build_transforms
 class AnimeGANV2Dataset(paddle.io.Dataset):
     """
     """
-
     def __init__(self,
                  dataroot,
                  style,
@@ -51,14 +50,18 @@ class AnimeGANV2Dataset(paddle.io.Dataset):
         self.anime_root = os.path.join(self.root, f'{self.style}', 'style')
         self.smooth_root = os.path.join(self.root, f'{self.style}', 'smooth')
 
-        self.real = ImageFolder(
-            self.real_root, transform=self.transform_real, loader=self.loader)
-        self.anime = ImageFolder(
-            self.anime_root, transform=self.transform_anime, loader=self.loader)
-        self.anime_gray = ImageFolder(
-            self.anime_root, transform=self.transform_gray, loader=self.loader)
-        self.smooth_gray = ImageFolder(
-            self.smooth_root, transform=self.transform_gray, loader=self.loader)
+        self.real = ImageFolder(self.real_root,
+                                transform=self.transform_real,
+                                loader=self.loader)
+        self.anime = ImageFolder(self.anime_root,
+                                 transform=self.transform_anime,
+                                 loader=self.loader)
+        self.anime_gray = ImageFolder(self.anime_root,
+                                      transform=self.transform_gray,
+                                      loader=self.loader)
+        self.smooth_gray = ImageFolder(self.smooth_root,
+                                       transform=self.transform_gray,
+                                       loader=self.loader)
         self.sizes = [
             len(fold) for fold in [self.real, self.anime, self.smooth_gray]
         ]
@@ -67,9 +70,8 @@ class AnimeGANV2Dataset(paddle.io.Dataset):
 
     @staticmethod
     def loader(path):
-        return cv2.cvtColor(
-            cv2.imread(
-                path, flags=cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGB)
+        return cv2.cvtColor(cv2.imread(path, flags=cv2.IMREAD_COLOR),
+                            cv2.COLOR_BGR2RGB)
 
     def reshuffle(self):
         indexs = []

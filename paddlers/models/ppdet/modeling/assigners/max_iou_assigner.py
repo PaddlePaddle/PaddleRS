@@ -1,4 +1,4 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
+# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ from paddlers.models.ppdet.modeling.proposal_generator.target import label_box
 
 __all__ = ['MaxIoUAssigner']
 
-
 @register
 class MaxIoUAssigner(object):
     """a standard bbox assigner based on max IoU, use ppdet's label_box 
@@ -32,7 +31,6 @@ class MaxIoUAssigner(object):
         allow_low_quality (bool): whether to lower IoU thr if a GT poorly
             overlaps with candidate bboxes
     """
-
     def __init__(self,
                  positive_overlap,
                  negative_overlap,

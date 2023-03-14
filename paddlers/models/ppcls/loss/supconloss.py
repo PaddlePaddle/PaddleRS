@@ -4,6 +4,7 @@ from paddle import nn
 
 class SupConLoss(nn.Layer):
     """Supervised Contrastive Learning: https://arxiv.org/pdf/2004.11362.pdf.
+    code reference: https://github.com/HobbitLong/SupContrast/blob/master/losses.py
     It also supports the unsupervised contrastive loss in SimCLR"""
 
     def __init__(self,
@@ -58,7 +59,8 @@ class SupConLoss(nn.Layer):
         elif labels is not None:
             labels = labels.reshape([-1, 1])
             if labels.shape[0] != batch_size:
-                raise ValueError('Num of labels does not match num of features')
+                raise ValueError(
+                    'Num of labels does not match num of features')
             mask = paddle.cast(
                 paddle.equal(labels, paddle.t(labels)), 'float32')
         else:

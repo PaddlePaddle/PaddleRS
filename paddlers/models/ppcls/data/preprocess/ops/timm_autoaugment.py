@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Code was heavily based on  https://github.com/rwightman/pytorch-image-models
+# This code is heavily based on  https://github.com/rwightman/pytorch-image-models
+# reference: https://arxiv.org/abs/1805.09501
 
 import random
 import math
@@ -864,7 +865,8 @@ class RawTimmAutoAugment(object):
             self.augment_func = rand_augment_transform(config_str, aa_params)
         elif config_str.startswith('augmix'):
             aa_params['translate_pct'] = 0.3
-            self.augment_func = augment_and_mix_transform(config_str, aa_params)
+            self.augment_func = augment_and_mix_transform(config_str,
+                                                          aa_params)
         elif config_str.startswith('auto'):
             self.augment_func = auto_augment_transform(config_str, aa_params)
         else:

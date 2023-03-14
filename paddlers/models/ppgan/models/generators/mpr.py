@@ -14,13 +14,12 @@ from .builder import GENERATORS
 
 
 def conv(in_channels, out_channels, kernel_size, bias_attr=False, stride=1):
-    return nn.Conv2D(
-        in_channels,
-        out_channels,
-        kernel_size,
-        padding=(kernel_size // 2),
-        bias_attr=bias_attr,
-        stride=stride)
+    return nn.Conv2D(in_channels,
+                     out_channels,
+                     kernel_size,
+                     padding=(kernel_size // 2),
+                     bias_attr=bias_attr,
+                     stride=stride)
 
 
 ## Channel Attention Layer
@@ -31,20 +30,16 @@ class CALayer(nn.Layer):
         self.avg_pool = nn.AdaptiveAvgPool2D(1)
         # feature channel downscale and upscale --> channel weight
         self.conv_du = nn.Sequential(
-            nn.Conv2D(
-                channel,
-                channel // reduction,
-                1,
-                padding=0,
-                bias_attr=bias_attr),
-            nn.ReLU(),
-            nn.Conv2D(
-                channel // reduction,
-                channel,
-                1,
-                padding=0,
-                bias_attr=bias_attr),
-            nn.Sigmoid())
+            nn.Conv2D(channel,
+                      channel // reduction,
+                      1,
+                      padding=0,
+                      bias_attr=bias_attr), nn.ReLU(),
+            nn.Conv2D(channel // reduction,
+                      channel,
+                      1,
+                      padding=0,
+                      bias_attr=bias_attr), nn.Sigmoid())
 
     def forward(self, x):
         y = self.avg_pool(x)
@@ -58,12 +53,10 @@ class CAB(nn.Layer):
         super(CAB, self).__init__()
         modules_body = []
         modules_body.append(
-            conv(
-                n_feat, n_feat, kernel_size, bias_attr=bias_attr))
+            conv(n_feat, n_feat, kernel_size, bias_attr=bias_attr))
         modules_body.append(act)
         modules_body.append(
-            conv(
-                n_feat, n_feat, kernel_size, bias_attr=bias_attr))
+            conv(n_feat, n_feat, kernel_size, bias_attr=bias_attr))
 
         self.CA = CALayer(n_feat, reduction, bias_attr=bias_attr)
         self.body = nn.Sequential(*modules_body)
@@ -80,15 +73,13 @@ class DownSample(nn.Layer):
     def __init__(self, in_channels, s_factor):
         super(DownSample, self).__init__()
         self.down = nn.Sequential(
-            nn.Upsample(
-                scale_factor=0.5, mode='bilinear', align_corners=False),
-            nn.Conv2D(
-                in_channels,
-                in_channels + s_factor,
-                1,
-                stride=1,
-                padding=0,
-                bias_attr=False))
+            nn.Upsample(scale_factor=0.5, mode='bilinear', align_corners=False),
+            nn.Conv2D(in_channels,
+                      in_channels + s_factor,
+                      1,
+                      stride=1,
+                      padding=0,
+                      bias_attr=False))
 
     def forward(self, x):
         x = self.down(x)
@@ -99,15 +90,13 @@ class UpSample(nn.Layer):
     def __init__(self, in_channels, s_factor):
         super(UpSample, self).__init__()
         self.up = nn.Sequential(
-            nn.Upsample(
-                scale_factor=2, mode='bilinear', align_corners=False),
-            nn.Conv2D(
-                in_channels + s_factor,
-                in_channels,
-                1,
-                stride=1,
-                padding=0,
-                bias_attr=False))
+            nn.Upsample(scale_factor=2, mode='bilinear', align_corners=False),
+            nn.Conv2D(in_channels + s_factor,
+                      in_channels,
+                      1,
+                      stride=1,
+                      padding=0,
+                      bias_attr=False))
 
     def forward(self, x):
         x = self.up(x)
@@ -118,15 +107,13 @@ class SkipUpSample(nn.Layer):
     def __init__(self, in_channels, s_factor):
         super(SkipUpSample, self).__init__()
         self.up = nn.Sequential(
-            nn.Upsample(
-                scale_factor=2, mode='bilinear', align_corners=False),
-            nn.Conv2D(
-                in_channels + s_factor,
-                in_channels,
-                1,
-                stride=1,
-                padding=0,
-                bias_attr=False))
+            nn.Upsample(scale_factor=2, mode='bilinear', align_corners=False),
+            nn.Conv2D(in_channels + s_factor,
+                      in_channels,
+                      1,
+                      stride=1,
+                      padding=0,
+                      bias_attr=False))
 
     def forward(self, x, y):
         x = self.up(x)
@@ -169,31 +156,31 @@ class Encoder(nn.Layer):
 
         # Cross Stage Feature Fusion (CSFF)
         if csff:
-            self.csff_enc1 = nn.Conv2D(
-                n_feat, n_feat, kernel_size=1, bias_attr=bias_attr)
-            self.csff_enc2 = nn.Conv2D(
-                n_feat + scale_unetfeats,
-                n_feat + scale_unetfeats,
-                kernel_size=1,
-                bias_attr=bias_attr)
-            self.csff_enc3 = nn.Conv2D(
-                n_feat + (scale_unetfeats * 2),
-                n_feat + (scale_unetfeats * 2),
-                kernel_size=1,
-                bias_attr=bias_attr)
+            self.csff_enc1 = nn.Conv2D(n_feat,
+                                       n_feat,
+                                       kernel_size=1,
+                                       bias_attr=bias_attr)
+            self.csff_enc2 = nn.Conv2D(n_feat + scale_unetfeats,
+                                       n_feat + scale_unetfeats,
+                                       kernel_size=1,
+                                       bias_attr=bias_attr)
+            self.csff_enc3 = nn.Conv2D(n_feat + (scale_unetfeats * 2),
+                                       n_feat + (scale_unetfeats * 2),
+                                       kernel_size=1,
+                                       bias_attr=bias_attr)
 
-            self.csff_dec1 = nn.Conv2D(
-                n_feat, n_feat, kernel_size=1, bias_attr=bias_attr)
-            self.csff_dec2 = nn.Conv2D(
-                n_feat + scale_unetfeats,
-                n_feat + scale_unetfeats,
-                kernel_size=1,
-                bias_attr=bias_attr)
-            self.csff_dec3 = nn.Conv2D(
-                n_feat + (scale_unetfeats * 2),
-                n_feat + (scale_unetfeats * 2),
-                kernel_size=1,
-                bias_attr=bias_attr)
+            self.csff_dec1 = nn.Conv2D(n_feat,
+                                       n_feat,
+                                       kernel_size=1,
+                                       bias_attr=bias_attr)
+            self.csff_dec2 = nn.Conv2D(n_feat + scale_unetfeats,
+                                       n_feat + scale_unetfeats,
+                                       kernel_size=1,
+                                       bias_attr=bias_attr)
+            self.csff_dec3 = nn.Conv2D(n_feat + (scale_unetfeats * 2),
+                                       n_feat + (scale_unetfeats * 2),
+                                       kernel_size=1,
+                                       bias_attr=bias_attr)
 
     def forward(self, x, encoder_outs=None, decoder_outs=None):
         enc1 = self.encoder_level1(x)
@@ -313,42 +300,36 @@ class ORSNet(nn.Layer):
             UpSample(n_feat + scale_unetfeats, scale_unetfeats),
             UpSample(n_feat, scale_unetfeats))
 
-        self.conv_enc1 = nn.Conv2D(
-            n_feat,
-            n_feat + scale_orsnetfeats,
-            kernel_size=1,
-            bias_attr=bias_attr)
-        self.conv_enc2 = nn.Conv2D(
-            n_feat,
-            n_feat + scale_orsnetfeats,
-            kernel_size=1,
-            bias_attr=bias_attr)
-        self.conv_enc3 = nn.Conv2D(
-            n_feat,
-            n_feat + scale_orsnetfeats,
-            kernel_size=1,
-            bias_attr=bias_attr)
+        self.conv_enc1 = nn.Conv2D(n_feat,
+                                   n_feat + scale_orsnetfeats,
+                                   kernel_size=1,
+                                   bias_attr=bias_attr)
+        self.conv_enc2 = nn.Conv2D(n_feat,
+                                   n_feat + scale_orsnetfeats,
+                                   kernel_size=1,
+                                   bias_attr=bias_attr)
+        self.conv_enc3 = nn.Conv2D(n_feat,
+                                   n_feat + scale_orsnetfeats,
+                                   kernel_size=1,
+                                   bias_attr=bias_attr)
 
-        self.conv_dec1 = nn.Conv2D(
-            n_feat,
-            n_feat + scale_orsnetfeats,
-            kernel_size=1,
-            bias_attr=bias_attr)
-        self.conv_dec2 = nn.Conv2D(
-            n_feat,
-            n_feat + scale_orsnetfeats,
-            kernel_size=1,
-            bias_attr=bias_attr)
-        self.conv_dec3 = nn.Conv2D(
-            n_feat,
-            n_feat + scale_orsnetfeats,
-            kernel_size=1,
-            bias_attr=bias_attr)
+        self.conv_dec1 = nn.Conv2D(n_feat,
+                                   n_feat + scale_orsnetfeats,
+                                   kernel_size=1,
+                                   bias_attr=bias_attr)
+        self.conv_dec2 = nn.Conv2D(n_feat,
+                                   n_feat + scale_orsnetfeats,
+                                   kernel_size=1,
+                                   bias_attr=bias_attr)
+        self.conv_dec3 = nn.Conv2D(n_feat,
+                                   n_feat + scale_orsnetfeats,
+                                   kernel_size=1,
+                                   bias_attr=bias_attr)
 
     def forward(self, x, encoder_outs, decoder_outs):
         x = self.orb1(x)
-        x = x + self.conv_enc1(encoder_outs[0]) + self.conv_dec1(decoder_outs[
-            0])
+        x = x + self.conv_enc1(encoder_outs[0]) + self.conv_dec1(
+            decoder_outs[0])
 
         x = self.orb2(x)
         x = x + self.conv_enc2(self.up_enc1(encoder_outs[1])) + self.conv_dec2(
@@ -393,38 +374,33 @@ class MPRNet(nn.Layer):
         super(MPRNet, self).__init__()
         act = nn.PReLU()
         self.shallow_feat1 = nn.Sequential(
-            conv(
-                in_c, n_feat, kernel_size, bias_attr=bias_attr),
+            conv(in_c, n_feat, kernel_size, bias_attr=bias_attr),
             CAB(n_feat, kernel_size, reduction, bias_attr=bias_attr, act=act))
         self.shallow_feat2 = nn.Sequential(
-            conv(
-                in_c, n_feat, kernel_size, bias_attr=bias_attr),
+            conv(in_c, n_feat, kernel_size, bias_attr=bias_attr),
             CAB(n_feat, kernel_size, reduction, bias_attr=bias_attr, act=act))
         self.shallow_feat3 = nn.Sequential(
-            conv(
-                in_c, n_feat, kernel_size, bias_attr=bias_attr),
+            conv(in_c, n_feat, kernel_size, bias_attr=bias_attr),
             CAB(n_feat, kernel_size, reduction, bias_attr=bias_attr, act=act))
 
         # Cross Stage Feature Fusion (CSFF)
-        self.stage1_encoder = Encoder(
-            n_feat,
-            kernel_size,
-            reduction,
-            act,
-            bias_attr,
-            scale_unetfeats,
-            csff=False)
+        self.stage1_encoder = Encoder(n_feat,
+                                      kernel_size,
+                                      reduction,
+                                      act,
+                                      bias_attr,
+                                      scale_unetfeats,
+                                      csff=False)
         self.stage1_decoder = Decoder(n_feat, kernel_size, reduction, act,
                                       bias_attr, scale_unetfeats)
 
-        self.stage2_encoder = Encoder(
-            n_feat,
-            kernel_size,
-            reduction,
-            act,
-            bias_attr,
-            scale_unetfeats,
-            csff=True)
+        self.stage2_encoder = Encoder(n_feat,
+                                      kernel_size,
+                                      reduction,
+                                      act,
+                                      bias_attr,
+                                      scale_unetfeats,
+                                      csff=True)
         self.stage2_decoder = Decoder(n_feat, kernel_size, reduction, act,
                                       bias_attr, scale_unetfeats)
 
@@ -435,15 +411,18 @@ class MPRNet(nn.Layer):
         self.sam12 = SAM(n_feat, kernel_size=1, bias_attr=bias_attr)
         self.sam23 = SAM(n_feat, kernel_size=1, bias_attr=bias_attr)
 
-        self.concat12 = conv(
-            n_feat * 2, n_feat, kernel_size, bias_attr=bias_attr)
-        self.concat23 = conv(
-            n_feat * 2,
-            n_feat + scale_orsnetfeats,
-            kernel_size,
-            bias_attr=bias_attr)
-        self.tail = conv(
-            n_feat + scale_orsnetfeats, out_c, kernel_size, bias_attr=bias_attr)
+        self.concat12 = conv(n_feat * 2,
+                             n_feat,
+                             kernel_size,
+                             bias_attr=bias_attr)
+        self.concat23 = conv(n_feat * 2,
+                             n_feat + scale_orsnetfeats,
+                             kernel_size,
+                             bias_attr=bias_attr)
+        self.tail = conv(n_feat + scale_orsnetfeats,
+                         out_c,
+                         kernel_size,
+                         bias_attr=bias_attr)
 
     def forward(self, x3_img):
         # Original-resolution Image for Stage 3
