@@ -55,11 +55,11 @@ def crop(image, center, scale, resolution=256.0):
     br = transform([resolution, resolution], center, scale, resolution, True)
     br = br.numpy()
     if image.ndim > 2:
-        newDim = np.array(
-            [br[1] - ul[1], br[0] - ul[0], image.shape[2]], dtype=np.int32)
+        newDim = np.array([br[1] - ul[1], br[0] - ul[0], image.shape[2]],
+                          dtype=np.int32)
         newImg = np.zeros(newDim, dtype=np.uint8)
     else:
-        newDim = np.array([br[1] - ul[1], br[0] - ul[0]], dtype=np.int)
+        newDim = np.array([br[1] - ul[1], br[0] - ul[0]], dtype=np.int_)
         newImg = np.zeros(newDim, dtype=np.uint8)
     ht = image.shape[0]
     wd = image.shape[1]
@@ -69,10 +69,10 @@ def crop(image, center, scale, resolution=256.0):
         [max(1, -ul[1] + 1), min(br[1], ht) - ul[1]], dtype=np.int32)
     oldX = np.array([max(1, ul[0] + 1), min(br[0], wd)], dtype=np.int32)
     oldY = np.array([max(1, ul[1] + 1), min(br[1], ht)], dtype=np.int32)
-    newImg[newY[0] - 1:newY[1], newX[0] - 1:newX[1]] = image[oldY[0] - 1:oldY[
-        1], oldX[0] - 1:oldX[1], :]
-    newImg = cv2.resize(
-        newImg,
-        dsize=(int(resolution), int(resolution)),
-        interpolation=cv2.INTER_LINEAR)
+    newImg[newY[0] - 1:newY[1],
+           newX[0] - 1:newX[1]] = image[oldY[0] - 1:oldY[1],
+                                        oldX[0] - 1:oldX[1], :]
+    newImg = cv2.resize(newImg,
+                        dsize=(int(resolution), int(resolution)),
+                        interpolation=cv2.INTER_LINEAR)
     return newImg

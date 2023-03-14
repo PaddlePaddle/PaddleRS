@@ -25,7 +25,6 @@ class ImagePool():
     Args:
         pool_size (int) -- the size of image buffer, if pool_size=0, no buffer will be created
     """
-
     def __init__(self, pool_size, prob=0.5):
         self.pool_size = pool_size
         self.prob = prob

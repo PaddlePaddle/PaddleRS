@@ -29,7 +29,6 @@ class BasicVSRModel(BaseSRModel):
 
     Paper: BasicVSR: The Search for Essential Components in Video Super-Resolution and Beyond, CVPR, 2021
     """
-
     def __init__(self, generator, fix_iter, lr_mult, pixel_criterion=None):
         """Initialize the BasicVSR class.
 

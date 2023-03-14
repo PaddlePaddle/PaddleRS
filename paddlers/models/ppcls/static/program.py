@@ -1,4 +1,4 @@
-# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,17 +28,17 @@ import paddle.nn.functional as F
 from paddle.distributed import fleet
 from paddle.distributed.fleet import DistributedStrategy
 
-# from ppcls.optimizer import OptimizerBuilder
-# from ppcls.optimizer.learning_rate import LearningRateBuilder
+# from paddlers.models.ppcls.optimizer import OptimizerBuilder
+# from paddlers.models.ppcls.optimizer.learning_rate import LearningRateBuilder
 
-from ppcls.arch import build_model
-from ppcls.loss import build_loss
-from ppcls.metric import build_metrics
-from ppcls.optimizer import build_optimizer
-from ppcls.optimizer import build_lr_scheduler
+from paddlers.models.ppcls.arch import build_model
+from paddlers.models.ppcls.loss import build_loss
+from paddlers.models.ppcls.metric import build_metrics
+from paddlers.models.ppcls.optimizer import build_optimizer
+from paddlers.models.ppcls.optimizer import build_lr_scheduler
 
-from ppcls.utils.misc import AverageMeter
-from ppcls.utils import logger, profiler
+from paddlers.models.ppcls.utils.misc import AverageMeter
+from paddlers.models.ppcls.utils import logger, profiler
 
 
 def create_feeds(image_shape, use_mix=False, class_num=None, dtype="float32"):
@@ -344,7 +344,8 @@ def run(dataloader,
     for k in fetchs:
         metric_dict[k] = fetchs[k][1]
 
-    metric_dict["batch_time"] = AverageMeter('batch_cost', '.5f', postfix=" s,")
+    metric_dict["batch_time"] = AverageMeter(
+        'batch_cost', '.5f', postfix=" s,")
     metric_dict["reader_time"] = AverageMeter(
         'reader_cost', '.5f', postfix=" s,")
 
@@ -368,6 +369,11 @@ def run(dataloader,
         except RuntimeError:
             logger.warning(
                 "Except RuntimeError when reading data from dataloader, try to read once again..."
+            )
+            continue
+        except IndexError:
+            logger.warning(
+                "Except IndexError when reading data from dataloader, try to read once again..."
             )
             continue
         idx += 1
@@ -405,7 +411,7 @@ def run(dataloader,
             if "time" in key else str(metric_dict[key].value)
             for key in metric_dict
         ])
-        ips_info = " ips: {:.5f} images/sec.".format(
+        ips_info = " ips: {:.5f} samples/sec.".format(
             batch_size / metric_dict["batch_time"].avg)
         fetchs_str += ips_info
 
@@ -432,14 +438,13 @@ def run(dataloader,
 
     end_str = ' '.join([str(m.mean) for m in metric_dict.values()] +
                        [metric_dict["batch_time"].total])
-    ips_info = "ips: {:.5f} images/sec.".format(batch_size /
-                                                metric_dict["batch_time"].avg)
+    ips_info = "ips: {:.5f} samples/sec.".format(batch_size /
+                                                 metric_dict["batch_time"].avg)
     if mode == 'eval':
         logger.info("END {:s} {:s} {:s}".format(mode, end_str, ips_info))
     else:
         end_epoch_str = "END epoch:{:<3d}".format(epoch)
-        logger.info("{:s} {:s} {:s} {:s}".format(end_epoch_str, mode, end_str,
-                                                 ips_info))
+        logger.info("{:s} {:s} {:s}".format(end_epoch_str, mode, end_str))
     if use_dali:
         dataloader.reset()
 

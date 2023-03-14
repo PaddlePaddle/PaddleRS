@@ -23,7 +23,6 @@ from .builder import DATASETS
 @DATASETS.register()
 class SRDataset(BaseDataset):
     """Base super resulotion dataset for image restoration."""
-
     def __init__(self,
                  lq_folder,
                  gt_folder,

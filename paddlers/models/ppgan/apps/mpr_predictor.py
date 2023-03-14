@@ -21,10 +21,10 @@ import cv2
 from PIL import Image
 import paddle
 from .base_predictor import BasePredictor
-from ppgan.models.generators import MPRNet
-from ppgan.utils.download import get_path_from_url
-from ppgan.utils.visual import make_grid, tensor2img, save_image
-from ppgan.datasets.mpr_dataset import to_tensor
+from paddlers.models.ppgan.models.generators import MPRNet
+from paddlers.models.ppgan.utils.download import get_path_from_url
+from paddlers.models.ppgan.utils.visual import make_grid, tensor2img, save_image
+from paddlers.models.ppgan.datasets.mpr_dataset import to_tensor
 from paddle.vision.transforms import Pad
 from tqdm import tqdm
 
@@ -55,13 +55,11 @@ model_cfgs = {
 
 class MPRPredictor(BasePredictor):
     def __init__(self,
-                 images_path=None,
                  output_path='output_dir',
                  weight_path=None,
                  seed=None,
                  task=None):
         self.output_path = output_path
-        self.images_path = images_path
         self.task = task
         self.max_size = 640
         self.img_multiple_of = 8
@@ -91,10 +89,11 @@ class MPRPredictor(BasePredictor):
     def get_images(self, images_path):
         if os.path.isdir(images_path):
             return natsorted(
-                glob(os.path.join(images_path, '*.jpg')) + glob(
-                    os.path.join(images_path, '*.JPG')) + glob(
-                        os.path.join(images_path, '*.png')) + glob(
-                            os.path.join(images_path, '*.PNG')))
+                glob(os.path.join(images_path, '*.jpeg')) +
+                glob(os.path.join(images_path, '*.jpg')) +
+                glob(os.path.join(images_path, '*.JPG')) +
+                glob(os.path.join(images_path, '*.png')) +
+                glob(os.path.join(images_path, '*.PNG')))
         else:
             return [images_path]
 
@@ -108,15 +107,15 @@ class MPRPredictor(BasePredictor):
             img = img.resize((dw, dh))
         return img
 
-    def run(self):
+    def run(self, images_path=None):
         os.makedirs(self.output_path, exist_ok=True)
         task_path = os.path.join(self.output_path, self.task)
         os.makedirs(task_path, exist_ok=True)
-        image_files = self.get_images(self.images_path)
+        image_files = self.get_images(images_path)
         for image_file in tqdm(image_files):
             img = self.read_image(image_file)
             image_name = os.path.basename(image_file)
-            # img.save(os.path.join(task_path, image_name))
+            img.save(os.path.join(task_path, image_name))
             tmps = image_name.split('.')
             assert len(
                 tmps) == 2, f'Invalid image name: {image_name}, too much "."'

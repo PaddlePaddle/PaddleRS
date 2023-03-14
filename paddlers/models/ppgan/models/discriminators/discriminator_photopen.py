@@ -21,51 +21,48 @@ import paddle.nn as nn
 import paddle.nn.functional as F
 from paddle.nn.utils import spectral_norm
 
-from ppgan.utils.photopen import build_norm_layer, simam, Dict
+from paddlers.models.ppgan.utils.photopen import build_norm_layer, simam, Dict
 from .builder import DISCRIMINATORS
+
 
 
 class NLayersDiscriminator(nn.Layer):
     def __init__(self, opt):
         super(NLayersDiscriminator, self).__init__()
-
+        
         kw = 4
         padw = int(np.ceil((kw - 1.0) / 2))
         nf = opt.ndf
         input_nc = self.compute_D_input_nc(opt)
         layer_count = 0
 
-        layer = nn.Sequential(nn.Conv2D(input_nc, nf, kw, 2, padw), nn.GELU())
-        self.add_sublayer('block_' + str(layer_count), layer)
+        layer = nn.Sequential(
+            nn.Conv2D(input_nc, nf, kw, 2, padw),
+            nn.GELU()
+        )
+        self.add_sublayer('block_'+str(layer_count), layer)
         layer_count += 1
 
-        feat_size_prev = np.floor(
-            (opt.crop_size + padw * 2 - (kw - 2)) / 2).astype('int64')
+        feat_size_prev = np.floor((opt.crop_size + padw * 2 - (kw - 2)) / 2).astype('int64')
         InstanceNorm = build_norm_layer('instance')
         for n in range(1, opt.n_layers_D):
             nf_prev = nf
             nf = min(nf * 2, 512)
             stride = 1 if n == opt.n_layers_D - 1 else 2
-            feat_size = np.floor((feat_size_prev + padw * 2 - (kw - stride)) /
-                                 stride).astype('int64')
+            feat_size = np.floor((feat_size_prev + padw * 2 - (kw - stride)) / stride).astype('int64')
             feat_size_prev = feat_size
             layer = nn.Sequential(
-                spectral_norm(
-                    nn.Conv2D(
-                        nf_prev,
-                        nf,
-                        kw,
-                        stride,
-                        padw,
-                        weight_attr=None,
-                        bias_attr=None)),
+                spectral_norm(nn.Conv2D(nf_prev, nf, kw, stride, padw, 
+                    weight_attr=None,
+                    bias_attr=None)),
                 InstanceNorm(nf),
-                nn.GELU())
-            self.add_sublayer('block_' + str(layer_count), layer)
+                nn.GELU()
+            )
+            self.add_sublayer('block_'+str(layer_count), layer)
             layer_count += 1
 
         layer = nn.Conv2D(nf, 1, kw, 1, padw)
-        self.add_sublayer('block_' + str(layer_count), layer)
+        self.add_sublayer('block_'+str(layer_count), layer)
         layer_count += 1
 
     def forward(self, input):
@@ -83,22 +80,22 @@ class NLayersDiscriminator(nn.Layer):
         if not opt.no_instance:
             input_nc += 1
         return input_nc
-
-
+    
 @DISCRIMINATORS.register()
 class MultiscaleDiscriminator(nn.Layer):
-    def __init__(
-            self,
-            ndf,
-            num_D,
-            crop_size,
-            label_nc,
-            output_nc,
-            contain_dontcare_label,
-            no_instance,
-            n_layers_D, ):
+    def __init__(self,
+                 ndf,
+                 num_D,
+                 crop_size,
+                 label_nc,
+                 output_nc,
+                 contain_dontcare_label,
+                 no_instance,
+                 n_layers_D,
+                 
+                ):
         super(MultiscaleDiscriminator, self).__init__()
-
+        
         opt = {
             'ndf': ndf,
             'num_D': num_D,
@@ -108,6 +105,7 @@ class MultiscaleDiscriminator(nn.Layer):
             'contain_dontcare_label': contain_dontcare_label,
             'no_instance': no_instance,
             'n_layers_D': n_layers_D,
+
         }
         opt = Dict(opt)
 
@@ -117,16 +115,16 @@ class MultiscaleDiscriminator(nn.Layer):
             feat_size = opt.crop_size
             for j in range(i):
                 sequence += [nn.AvgPool2D(3, 2, 1)]
-                feat_size = np.floor(
-                    (feat_size + 1 * 2 - (3 - 2)) / 2).astype('int64')
+                feat_size = np.floor((feat_size + 1 * 2 - (3 - 2)) / 2).astype('int64')
             opt.crop_size = feat_size
             sequence += [NLayersDiscriminator(opt)]
             opt.crop_size = crop_size_bkp
             sequence = nn.Sequential(*sequence)
-            self.add_sublayer('nld_' + str(i), sequence)
+            self.add_sublayer('nld_'+str(i), sequence)
 
     def forward(self, input):
         output = []
         for layer in self._sub_layers.values():
             output.append(layer(input))
         return output
+

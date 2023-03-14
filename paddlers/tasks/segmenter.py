@@ -23,11 +23,11 @@ import paddle.nn.functional as F
 from paddle.static import InputSpec
 
 import paddlers
-import paddlers.models.ppseg as ppseg
+import paddlers.models.paddleseg as ppseg
 import paddlers.rs_models.seg as cmseg
 import paddlers.utils.logging as logging
 from paddlers.models import seg_losses
-from paddlers.transforms import Resize, decode_image
+from paddlers.transforms import Resize, decode_image, construct_sample
 from paddlers.utils import get_single_card_bs, DisablePrint
 from paddlers.utils.checkpoint import seg_pretrain_weights_dict
 from .base import BaseModel
@@ -64,7 +64,6 @@ class BaseSegmenter(BaseModel):
         if params.get('with_net', True):
             params.pop('with_net', None)
             self.net = self.build_net(**params)
-        self.find_unused_parameters = True
 
     def build_net(self, **params):
         # TODO: when using paddle.utils.unique_name.guard,
@@ -114,11 +113,11 @@ class BaseSegmenter(BaseModel):
         return input_spec
 
     def run(self, net, inputs, mode):
+        inputs, batch_restore_list = inputs
         net_out = net(inputs[0])
         logit = net_out[0]
         outputs = OrderedDict()
         if mode == 'test':
-            batch_restore_list = inputs[-1]
             if self.status == 'Infer':
                 label_map_list, score_map_list = self.postprocess(
                     net_out, batch_restore_list)
@@ -139,7 +138,6 @@ class BaseSegmenter(BaseModel):
             outputs['score_map'] = score_map_list
 
         if mode == 'eval':
-            batch_restore_list = inputs[-1]
             if self.status == 'Infer':
                 pred = paddle.unsqueeze(net_out[0], axis=1)  # NCHW
             else:
@@ -526,10 +524,8 @@ class BaseSegmenter(BaseModel):
             images = [img_file]
         else:
             images = img_file
-        batch_im, batch_trans_info = self.preprocess(images, transforms,
-                                                     self.model_type)
+        data = self.preprocess(images, transforms, self.model_type)
         self.net.eval()
-        data = (batch_im, batch_trans_info)
         outputs = self.run(self.net, data, 'test')
         label_map_list = outputs['label_map']
         score_map_list = outputs['score_map']
@@ -595,10 +591,10 @@ class BaseSegmenter(BaseModel):
         for im in images:
             if isinstance(im, str):
                 im = decode_image(im, read_raw=True)
-            sample = {'image': im}
+            sample = construct_sample(image=im)
             data = transforms(sample)
-            im = data[0]
-            trans_info = data[-1]
+            im = data[0][0]
+            trans_info = data[1]
             batch_im.append(im)
             batch_trans_info.append(trans_info)
         if to_tensor:
@@ -606,7 +602,7 @@ class BaseSegmenter(BaseModel):
         else:
             batch_im = np.asarray(batch_im)
 
-        return batch_im, batch_trans_info
+        return (batch_im, ), batch_trans_info
 
     def postprocess(self, batch_pred, batch_restore_list):
         if isinstance(batch_pred, (tuple, list)) and self.status == 'Infer':
@@ -630,7 +626,7 @@ class BaseSegmenter(BaseModel):
                     x, y = item[2]
                     pred = pred[:, :, y:y + h, x:x + w]
                 else:
-                    pass
+                    raise RuntimeError
             results.append(pred)
         return results
 
@@ -669,7 +665,7 @@ class BaseSegmenter(BaseModel):
                         label_map = label_map[:, y:y + h, x:x + w, :]
                         score_map = score_map[:, y:y + h, x:x + w, :]
                 else:
-                    pass
+                    raise RuntimeError
             label_map = label_map.squeeze()
             score_map = score_map.squeeze()
             if not isinstance(label_map, np.ndarray):
@@ -921,13 +917,13 @@ class C2FNet(BaseSegmenter):
             **params)
 
     def run(self, net, inputs, mode):
+        inputs, batch_restore_list = inputs
         with paddle.no_grad():
             pre_coarse = self.coarse_model(inputs[0])
             pre_coarse = pre_coarse[0]
             heatmaps = pre_coarse
 
         if mode == 'test':
-            batch_restore_list = inputs[-1]
             net_out = net(inputs[0], heatmaps)
             logit = net_out[0]
             outputs = OrderedDict()
@@ -952,7 +948,6 @@ class C2FNet(BaseSegmenter):
             outputs['score_map'] = score_map_list
 
         if mode == 'eval':
-            batch_restore_list = inputs[-1]
             net_out = net(inputs[0], heatmaps)
             logit = net_out[0]
             outputs = OrderedDict()

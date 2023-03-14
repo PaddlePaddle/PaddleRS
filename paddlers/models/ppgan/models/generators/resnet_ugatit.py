@@ -34,14 +34,15 @@ class ResnetUGATITGenerator(nn.Layer):
         norm_layer = build_norm_layer(norm_type)
         DownBlock = []
         DownBlock += [
-            nn.Pad2D(
-                padding=[3, 3, 3, 3], mode="reflect"), nn.Conv2D(
-                    input_nc,
-                    ngf,
-                    kernel_size=7,
-                    stride=1,
-                    padding=0,
-                    bias_attr=False), norm_layer(ngf), nn.ReLU()
+            nn.Pad2D(padding=[3, 3, 3, 3], mode="reflect"),
+            nn.Conv2D(input_nc,
+                      ngf,
+                      kernel_size=7,
+                      stride=1,
+                      padding=0,
+                      bias_attr=False),
+            norm_layer(ngf),
+            nn.ReLU()
         ]
 
         # Down-Sampling
@@ -49,84 +50,85 @@ class ResnetUGATITGenerator(nn.Layer):
         for i in range(n_downsampling):
             mult = 2**i
             DownBlock += [
-                nn.Pad2D(
-                    padding=[1, 1, 1, 1], mode="reflect"), nn.Conv2D(
-                        ngf * mult,
-                        ngf * mult * 2,
-                        kernel_size=3,
-                        stride=2,
-                        padding=0,
-                        bias_attr=False), norm_layer(ngf * mult * 2), nn.ReLU()
+                nn.Pad2D(padding=[1, 1, 1, 1], mode="reflect"),
+                nn.Conv2D(ngf * mult,
+                          ngf * mult * 2,
+                          kernel_size=3,
+                          stride=2,
+                          padding=0,
+                          bias_attr=False),
+                norm_layer(ngf * mult * 2),
+                nn.ReLU()
             ]
 
         # Down-Sampling Bottleneck
         mult = 2**n_downsampling
         for i in range(n_blocks):
             DownBlock += [
-                ResnetBlock(
-                    ngf * mult, use_bias=False, norm_layer=norm_layer)
+                ResnetBlock(ngf * mult, use_bias=False, norm_layer=norm_layer)
             ]
 
         # Class Activation Map
         self.gap_fc = nn.Linear(ngf * mult, 1, bias_attr=False)
         self.gmp_fc = nn.Linear(ngf * mult, 1, bias_attr=False)
-        self.conv1x1 = nn.Conv2D(
-            ngf * mult * 2, ngf * mult, kernel_size=1, stride=1, bias_attr=True)
+        self.conv1x1 = nn.Conv2D(ngf * mult * 2,
+                                 ngf * mult,
+                                 kernel_size=1,
+                                 stride=1,
+                                 bias_attr=True)
         self.relu = nn.ReLU()
 
         # Gamma, Beta block
         if self.light:
             FC = [
-                nn.Linear(
-                    ngf * mult, ngf * mult, bias_attr=False), nn.ReLU(),
-                nn.Linear(
-                    ngf * mult, ngf * mult, bias_attr=False), nn.ReLU()
+                nn.Linear(ngf * mult, ngf * mult, bias_attr=False),
+                nn.ReLU(),
+                nn.Linear(ngf * mult, ngf * mult, bias_attr=False),
+                nn.ReLU()
             ]
         else:
             FC = [
-                nn.Linear(
-                    img_size // mult * img_size // mult * ngf * mult,
-                    ngf * mult,
-                    bias_attr=False), nn.ReLU(), nn.Linear(
-                        ngf * mult, ngf * mult, bias_attr=False), nn.ReLU()
+                nn.Linear(img_size // mult * img_size // mult * ngf * mult,
+                          ngf * mult,
+                          bias_attr=False),
+                nn.ReLU(),
+                nn.Linear(ngf * mult, ngf * mult, bias_attr=False),
+                nn.ReLU()
             ]
         self.gamma = nn.Linear(ngf * mult, ngf * mult, bias_attr=False)
         self.beta = nn.Linear(ngf * mult, ngf * mult, bias_attr=False)
 
         # Up-Sampling Bottleneck
         for i in range(n_blocks):
-            setattr(
-                self,
-                'UpBlock1_' + str(i + 1),
-                ResnetAdaILNBlock(
-                    ngf * mult, use_bias=False))
+            setattr(self, 'UpBlock1_' + str(i + 1),
+                    ResnetAdaILNBlock(ngf * mult, use_bias=False))
 
         # Up-Sampling
         UpBlock2 = []
         for i in range(n_downsampling):
             mult = 2**(n_downsampling - i)
             UpBlock2 += [
-                nn.Upsample(
-                    scale_factor=2, mode='nearest'), nn.Pad2D(
-                        padding=[1, 1, 1, 1], mode="reflect"), nn.Conv2D(
-                            ngf * mult,
-                            int(ngf * mult / 2),
-                            kernel_size=3,
-                            stride=1,
-                            padding=0,
-                            bias_attr=False), ILN(int(ngf * mult / 2)),
+                nn.Upsample(scale_factor=2, mode='nearest'),
+                nn.Pad2D(padding=[1, 1, 1, 1], mode="reflect"),
+                nn.Conv2D(ngf * mult,
+                          int(ngf * mult / 2),
+                          kernel_size=3,
+                          stride=1,
+                          padding=0,
+                          bias_attr=False),
+                ILN(int(ngf * mult / 2)),
                 nn.ReLU()
             ]
 
         UpBlock2 += [
-            nn.Pad2D(
-                padding=[3, 3, 3, 3], mode="reflect"), nn.Conv2D(
-                    ngf,
-                    output_nc,
-                    kernel_size=7,
-                    stride=1,
-                    padding=0,
-                    bias_attr=False), nn.Tanh()
+            nn.Pad2D(padding=[3, 3, 3, 3], mode="reflect"),
+            nn.Conv2D(ngf,
+                      output_nc,
+                      kernel_size=7,
+                      stride=1,
+                      padding=0,
+                      bias_attr=False),
+            nn.Tanh()
         ]
 
         self.DownBlock = nn.Sequential(*DownBlock)
@@ -171,25 +173,26 @@ class ResnetBlock(nn.Layer):
         super(ResnetBlock, self).__init__()
         conv_block = []
         conv_block += [
-            nn.Pad2D(
-                padding=[1, 1, 1, 1], mode="reflect"), nn.Conv2D(
-                    dim,
-                    dim,
-                    kernel_size=3,
-                    stride=1,
-                    padding=0,
-                    bias_attr=use_bias), norm_layer(dim), nn.ReLU()
+            nn.Pad2D(padding=[1, 1, 1, 1], mode="reflect"),
+            nn.Conv2D(dim,
+                      dim,
+                      kernel_size=3,
+                      stride=1,
+                      padding=0,
+                      bias_attr=use_bias),
+            norm_layer(dim),
+            nn.ReLU()
         ]
 
         conv_block += [
-            nn.Pad2D(
-                padding=[1, 1, 1, 1], mode="reflect"), nn.Conv2D(
-                    dim,
-                    dim,
-                    kernel_size=3,
-                    stride=1,
-                    padding=0,
-                    bias_attr=use_bias), norm_layer(dim)
+            nn.Pad2D(padding=[1, 1, 1, 1], mode="reflect"),
+            nn.Conv2D(dim,
+                      dim,
+                      kernel_size=3,
+                      stride=1,
+                      padding=0,
+                      bias_attr=use_bias),
+            norm_layer(dim)
         ]
 
         self.conv_block = nn.Sequential(*conv_block)
@@ -203,14 +206,22 @@ class ResnetAdaILNBlock(nn.Layer):
     def __init__(self, dim, use_bias):
         super(ResnetAdaILNBlock, self).__init__()
         self.pad1 = nn.Pad2D(padding=[1, 1, 1, 1], mode="reflect")
-        self.conv1 = nn.Conv2D(
-            dim, dim, kernel_size=3, stride=1, padding=0, bias_attr=use_bias)
+        self.conv1 = nn.Conv2D(dim,
+                               dim,
+                               kernel_size=3,
+                               stride=1,
+                               padding=0,
+                               bias_attr=use_bias)
         self.norm1 = AdaILN(dim)
         self.relu1 = nn.ReLU()
 
         self.pad2 = nn.Pad2D(padding=[1, 1, 1, 1], mode="reflect")
-        self.conv2 = nn.Conv2D(
-            dim, dim, kernel_size=3, stride=1, padding=0, bias_attr=use_bias)
+        self.conv2 = nn.Conv2D(dim,
+                               dim,
+                               kernel_size=3,
+                               stride=1,
+                               padding=0,
+                               bias_attr=use_bias)
         self.norm2 = AdaILN(dim)
 
     def forward(self, x, gamma, beta):
@@ -235,13 +246,14 @@ class AdaILN(nn.Layer):
         self.rho.set_value(paddle.full(shape, 0.9))
 
     def forward(self, input, gamma, beta):
-        in_mean, in_var = paddle.mean(
-            input, [2, 3], keepdim=True), paddle.var(input, [2, 3],
-                                                     keepdim=True)
+        in_mean, in_var = paddle.mean(input, [2, 3],
+                                      keepdim=True), paddle.var(input, [2, 3],
+                                                                keepdim=True)
         out_in = (input - in_mean) / paddle.sqrt(in_var + self.eps)
-        ln_mean, ln_var = paddle.mean(
-            input, [1, 2, 3], keepdim=True), paddle.var(input, [1, 2, 3],
-                                                        keepdim=True)
+        ln_mean, ln_var = paddle.mean(input, [1, 2, 3],
+                                      keepdim=True), paddle.var(input,
+                                                                [1, 2, 3],
+                                                                keepdim=True)
         out_ln = (input - ln_mean) / paddle.sqrt(ln_var + self.eps)
 
         out = self.rho.expand([input.shape[0], -1, -1, -1]) * out_in + (
@@ -265,18 +277,19 @@ class ILN(nn.Layer):
         self.beta.set_value(paddle.full(shape, 0.0))
 
     def forward(self, input):
-        in_mean, in_var = paddle.mean(
-            input, [2, 3], keepdim=True), paddle.var(input, [2, 3],
-                                                     keepdim=True)
+        in_mean, in_var = paddle.mean(input, [2, 3],
+                                      keepdim=True), paddle.var(input, [2, 3],
+                                                                keepdim=True)
         out_in = (input - in_mean) / paddle.sqrt(in_var + self.eps)
-        ln_mean, ln_var = paddle.mean(
-            input, [1, 2, 3], keepdim=True), paddle.var(input, [1, 2, 3],
-                                                        keepdim=True)
+        ln_mean, ln_var = paddle.mean(input, [1, 2, 3],
+                                      keepdim=True), paddle.var(input,
+                                                                [1, 2, 3],
+                                                                keepdim=True)
         out_ln = (input - ln_mean) / paddle.sqrt(ln_var + self.eps)
         out = self.rho.expand([input.shape[0], -1, -1, -1]) * out_in + (
             1 - self.rho.expand([input.shape[0], -1, -1, -1])) * out_ln
-        out = out * self.gamma.expand([
-            input.shape[0], -1, -1, -1
-        ]) + self.beta.expand([input.shape[0], -1, -1, -1])
+        out = out * self.gamma.expand([input.shape[0], -1, -1, -1
+                                       ]) + self.beta.expand(
+                                           [input.shape[0], -1, -1, -1])
 
         return out

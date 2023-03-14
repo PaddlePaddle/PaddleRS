@@ -1,4 +1,4 @@
-# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # Code was based on https://github.com/ucbdrive/dla
+# reference: https://arxiv.org/abs/1707.06484
 
 import math
 
@@ -22,8 +23,8 @@ import paddle.nn.functional as F
 
 from paddle.nn.initializer import Normal, Constant
 
-from ppcls.arch.backbone.base.theseus_layer import Identity
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ..base.theseus_layer import Identity
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "DLA34":
@@ -291,7 +292,8 @@ class DLA(nn.Layer):
             nn.BatchNorm2D(channels[0]),
             nn.ReLU())
 
-        self.level0 = self._make_conv_level(channels[0], channels[0], levels[0])
+        self.level0 = self._make_conv_level(channels[0], channels[0],
+                                            levels[0])
         self.level1 = self._make_conv_level(
             channels[0], channels[1], levels[1], stride=2)
 

@@ -1,4 +1,4 @@
-# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 import math
 
-from ppcls.arch.backbone.base.theseus_layer import TheseusLayer
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from paddlers.models.ppcls.arch.backbone.base.theseus_layer import TheseusLayer
+from paddlers.models.ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "ResNet18":
@@ -298,7 +298,7 @@ class ResNet(TheseusLayer):
             [[input_image_channel, 32, 3, 2], [32, 32, 3, 1], [32, 64, 3, 1]]
         }
 
-        self.stem = nn.Sequential(*[
+        self.stem = nn.Sequential(* [
             ConvBNLayer(
                 num_channels=in_c,
                 num_filters=out_c,

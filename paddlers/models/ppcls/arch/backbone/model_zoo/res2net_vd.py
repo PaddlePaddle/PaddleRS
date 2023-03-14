@@ -1,4 +1,4 @@
-# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+# reference: https://arxiv.org/abs/1904.01169 & https://arxiv.org/abs/1812.01187
 
 from __future__ import absolute_import
 from __future__ import division
@@ -27,7 +29,7 @@ from paddle.nn.initializer import Uniform
 
 import math
 
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "Res2Net50_vd_26w_4s":
@@ -163,7 +165,8 @@ class BottleneckBlock(nn.Layer):
 
 
 class Res2Net_vd(nn.Layer):
-    def __init__(self, layers=50, scales=4, width=26, class_num=1000):
+    def __init__(self, layers=50, scales=4, width=26, class_num=1000,
+                 **kwargs):
         super(Res2Net_vd, self).__init__()
 
         self.layers = layers
@@ -278,7 +281,10 @@ def _load_pretrained(pretrained, model, model_url, use_ssld=False):
 def Res2Net50_vd_26w_4s(pretrained=False, use_ssld=False, **kwargs):
     model = Res2Net_vd(layers=50, scales=4, width=26, **kwargs)
     _load_pretrained(
-        pretrained, model, MODEL_URLS["Res2Net50_vd_26w_4s"], use_ssld=use_ssld)
+        pretrained,
+        model,
+        MODEL_URLS["Res2Net50_vd_26w_4s"],
+        use_ssld=use_ssld)
     return model
 
 

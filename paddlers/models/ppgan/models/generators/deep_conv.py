@@ -24,7 +24,6 @@ class DeepConvGenerator(nn.Layer):
     """Create a Deep Convolutional generator
        Refer to https://arxiv.org/abs/1511.06434
     """
-
     def __init__(self, latent_dim, output_nc, size=64, ngf=64):
         """Construct a Deep Convolutional generator
         Args:
@@ -44,18 +43,16 @@ class DeepConvGenerator(nn.Layer):
         self.conv_blocks = nn.Sequential(
             nn.BatchNorm2D(ngf * 2),
             nn.Upsample(scale_factor=2),
-            nn.Conv2D(
-                ngf * 2, ngf * 2, 3, stride=1, padding=1),
+            nn.Conv2D(ngf * 2, ngf * 2, 3, stride=1, padding=1),
             nn.BatchNorm2D(ngf * 2, 0.2),
             nn.LeakyReLU(0.2),
             nn.Upsample(scale_factor=2),
-            nn.Conv2D(
-                ngf * 2, ngf, 3, stride=1, padding=1),
+            nn.Conv2D(ngf * 2, ngf, 3, stride=1, padding=1),
             nn.BatchNorm2D(ngf, 0.2),
             nn.LeakyReLU(0.2),
-            nn.Conv2D(
-                ngf, output_nc, 3, stride=1, padding=1),
-            nn.Tanh(), )
+            nn.Conv2D(ngf, output_nc, 3, stride=1, padding=1),
+            nn.Tanh(),
+        )
 
     def random_inputs(self, batch_size):
         return paddle.randn([batch_size, self.latent_dim])
@@ -72,7 +69,6 @@ class DeepConvGenerator(nn.Layer):
 class ConditionalDeepConvGenerator(DeepConvGenerator):
     """Create a Conditional Deep Convolutional generator
     """
-
     def __init__(self, latent_dim, output_nc, n_class=10, **kwargs):
         """Construct a Conditional Deep Convolutional generator
         Args:

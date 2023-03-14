@@ -23,8 +23,8 @@ class L2Norm(nn.Layer):
         self.n_channels = n_channels
         self.scale = scale
         self.eps = 1e-10
-        self.weight = paddle.create_parameter(
-            shape=[self.n_channels], dtype='float32')
+        self.weight = paddle.create_parameter(shape=[self.n_channels],
+                                              dtype='float32')
         self.weight.set_value(paddle.zeros([self.n_channels]) + self.scale)
 
     def forward(self, x):
@@ -67,31 +67,67 @@ class s3fd(nn.Layer):
         self.conv4_3_norm = L2Norm(512, scale=8)
         self.conv5_3_norm = L2Norm(512, scale=5)
 
-        self.conv3_3_norm_mbox_conf = nn.Conv2D(
-            256, 4, kernel_size=3, stride=1, padding=1)
-        self.conv3_3_norm_mbox_loc = nn.Conv2D(
-            256, 4, kernel_size=3, stride=1, padding=1)
-        self.conv4_3_norm_mbox_conf = nn.Conv2D(
-            512, 2, kernel_size=3, stride=1, padding=1)
-        self.conv4_3_norm_mbox_loc = nn.Conv2D(
-            512, 4, kernel_size=3, stride=1, padding=1)
-        self.conv5_3_norm_mbox_conf = nn.Conv2D(
-            512, 2, kernel_size=3, stride=1, padding=1)
-        self.conv5_3_norm_mbox_loc = nn.Conv2D(
-            512, 4, kernel_size=3, stride=1, padding=1)
+        self.conv3_3_norm_mbox_conf = nn.Conv2D(256,
+                                                4,
+                                                kernel_size=3,
+                                                stride=1,
+                                                padding=1)
+        self.conv3_3_norm_mbox_loc = nn.Conv2D(256,
+                                               4,
+                                               kernel_size=3,
+                                               stride=1,
+                                               padding=1)
+        self.conv4_3_norm_mbox_conf = nn.Conv2D(512,
+                                                2,
+                                                kernel_size=3,
+                                                stride=1,
+                                                padding=1)
+        self.conv4_3_norm_mbox_loc = nn.Conv2D(512,
+                                               4,
+                                               kernel_size=3,
+                                               stride=1,
+                                               padding=1)
+        self.conv5_3_norm_mbox_conf = nn.Conv2D(512,
+                                                2,
+                                                kernel_size=3,
+                                                stride=1,
+                                                padding=1)
+        self.conv5_3_norm_mbox_loc = nn.Conv2D(512,
+                                               4,
+                                               kernel_size=3,
+                                               stride=1,
+                                               padding=1)
 
-        self.fc7_mbox_conf = nn.Conv2D(
-            1024, 2, kernel_size=3, stride=1, padding=1)
-        self.fc7_mbox_loc = nn.Conv2D(
-            1024, 4, kernel_size=3, stride=1, padding=1)
-        self.conv6_2_mbox_conf = nn.Conv2D(
-            512, 2, kernel_size=3, stride=1, padding=1)
-        self.conv6_2_mbox_loc = nn.Conv2D(
-            512, 4, kernel_size=3, stride=1, padding=1)
-        self.conv7_2_mbox_conf = nn.Conv2D(
-            256, 2, kernel_size=3, stride=1, padding=1)
-        self.conv7_2_mbox_loc = nn.Conv2D(
-            256, 4, kernel_size=3, stride=1, padding=1)
+        self.fc7_mbox_conf = nn.Conv2D(1024,
+                                       2,
+                                       kernel_size=3,
+                                       stride=1,
+                                       padding=1)
+        self.fc7_mbox_loc = nn.Conv2D(1024,
+                                      4,
+                                      kernel_size=3,
+                                      stride=1,
+                                      padding=1)
+        self.conv6_2_mbox_conf = nn.Conv2D(512,
+                                           2,
+                                           kernel_size=3,
+                                           stride=1,
+                                           padding=1)
+        self.conv6_2_mbox_loc = nn.Conv2D(512,
+                                          4,
+                                          kernel_size=3,
+                                          stride=1,
+                                          padding=1)
+        self.conv7_2_mbox_conf = nn.Conv2D(256,
+                                           2,
+                                           kernel_size=3,
+                                           stride=1,
+                                           padding=1)
+        self.conv7_2_mbox_loc = nn.Conv2D(256,
+                                          4,
+                                          kernel_size=3,
+                                          stride=1,
+                                          padding=1)
 
     def forward(self, x):
         h = F.relu(self.conv1_1(x))

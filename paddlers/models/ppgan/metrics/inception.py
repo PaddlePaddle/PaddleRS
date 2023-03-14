@@ -2,6 +2,7 @@
 # BSD 3-Clause License
 # Copyright (c) Soumith Chintala 2016
 
+
 import math
 import paddle
 import paddle.nn as nn
@@ -36,11 +37,17 @@ class InceptionV3(nn.Layer):
         assert self.last_needed_block <= 3, 'Last possible output block index is 3'
         self.blocks = []
 
-        self.Conv2d_1a_3x3 = ConvBNLayer(
-            3, 32, 3, stride=2, name='Conv2d_1a_3x3')
+        self.Conv2d_1a_3x3 = ConvBNLayer(3,
+                                         32,
+                                         3,
+                                         stride=2,
+                                         name='Conv2d_1a_3x3')
         self.Conv2d_2a_3x3 = ConvBNLayer(32, 32, 3, name='Conv2d_2a_3x3')
-        self.Conv2d_2b_3x3 = ConvBNLayer(
-            32, 64, 3, padding=1, name='Conv2d_2b_3x3')
+        self.Conv2d_2b_3x3 = ConvBNLayer(32,
+                                         64,
+                                         3,
+                                         padding=1,
+                                         name='Conv2d_2b_3x3')
         self.maxpool1 = MaxPool2D(kernel_size=3, stride=2)
 
         block0 = [
@@ -60,12 +67,15 @@ class InceptionV3(nn.Layer):
         ### block2
         ### Mixed_5b 5c 5d
         if self.last_needed_block >= 2:
-            self.Mixed_5b = Fid_inceptionA(
-                192, pool_features=32, name='Mixed_5b')
-            self.Mixed_5c = Fid_inceptionA(
-                256, pool_features=64, name='Mixed_5c')
-            self.Mixed_5d = Fid_inceptionA(
-                288, pool_features=64, name='Mixed_5d')
+            self.Mixed_5b = Fid_inceptionA(192,
+                                           pool_features=32,
+                                           name='Mixed_5b')
+            self.Mixed_5c = Fid_inceptionA(256,
+                                           pool_features=64,
+                                           name='Mixed_5c')
+            self.Mixed_5d = Fid_inceptionA(288,
+                                           pool_features=64,
+                                           name='Mixed_5d')
 
             ### Mixed_6
             self.Mixed_6a = InceptionB(288, name='Mixed_6a')
@@ -97,12 +107,11 @@ class InceptionV3(nn.Layer):
         out = []
         aux = None
         if self.resize_input:
-            x = nn.functional.interpolate(
-                x,
-                size=[299, 299],
-                mode='bilinear',
-                align_corners=False,
-                align_mode=0)
+            x = nn.functional.interpolate(x, 
+                                          size=[299, 299], 
+                                          mode='bilinear', 
+                                          align_corners=False, 
+                                          align_mode=0)
 
         if self.normalize_input:
             x = x * 2 - 1
@@ -122,25 +131,44 @@ class InceptionV3(nn.Layer):
 class InceptionA(nn.Layer):
     def __init__(self, in_channels, pool_features, name=None):
         super(InceptionA, self).__init__()
-        self.branch1x1 = ConvBNLayer(
-            in_channels, 64, 1, name=name + '.branch1x1')
+        self.branch1x1 = ConvBNLayer(in_channels,
+                                     64,
+                                     1,
+                                     name=name + '.branch1x1')
 
-        self.branch5x5_1 = ConvBNLayer(
-            in_channels, 48, 1, name=name + '.branch5x5_1')
-        self.branch5x5_2 = ConvBNLayer(
-            48, 64, 5, padding=2, name=name + '.branch5x5_2')
+        self.branch5x5_1 = ConvBNLayer(in_channels,
+                                       48,
+                                       1,
+                                       name=name + '.branch5x5_1')
+        self.branch5x5_2 = ConvBNLayer(48,
+                                       64,
+                                       5,
+                                       padding=2,
+                                       name=name + '.branch5x5_2')
 
-        self.branch3x3dbl_1 = ConvBNLayer(
-            in_channels, 64, 1, name=name + '.branch3x3dbl_1')
-        self.branch3x3dbl_2 = ConvBNLayer(
-            64, 96, 3, padding=1, name=name + '.branch3x3dbl_2')
-        self.branch3x3dbl_3 = ConvBNLayer(
-            96, 96, 3, padding=1, name=name + '.branch3x3dbl_3')
+        self.branch3x3dbl_1 = ConvBNLayer(in_channels,
+                                          64,
+                                          1,
+                                          name=name + '.branch3x3dbl_1')
+        self.branch3x3dbl_2 = ConvBNLayer(64,
+                                          96,
+                                          3,
+                                          padding=1,
+                                          name=name + '.branch3x3dbl_2')
+        self.branch3x3dbl_3 = ConvBNLayer(96,
+                                          96,
+                                          3,
+                                          padding=1,
+                                          name=name + '.branch3x3dbl_3')
 
-        self.branch_pool0 = AvgPool2D(
-            kernel_size=3, stride=1, padding=1, exclusive=True)
-        self.branch_pool = ConvBNLayer(
-            in_channels, pool_features, 1, name=name + '.branch_pool')
+        self.branch_pool0 = AvgPool2D(kernel_size=3,
+                                   stride=1,
+                                   padding=1,
+                                   exclusive=True)
+        self.branch_pool = ConvBNLayer(in_channels,
+                                       pool_features,
+                                       1,
+                                       name=name + '.branch_pool')
 
     def forward(self, x):
         branch1x1 = self.branch1x1(x)
@@ -161,15 +189,26 @@ class InceptionA(nn.Layer):
 class InceptionB(nn.Layer):
     def __init__(self, in_channels, name=None):
         super(InceptionB, self).__init__()
-        self.branch3x3 = ConvBNLayer(
-            in_channels, 384, 3, stride=2, name=name + '.branch3x3')
+        self.branch3x3 = ConvBNLayer(in_channels,
+                                     384,
+                                     3,
+                                     stride=2,
+                                     name=name + '.branch3x3')
 
-        self.branch3x3dbl_1 = ConvBNLayer(
-            in_channels, 64, 1, name=name + '.branch3x3dbl_1')
-        self.branch3x3dbl_2 = ConvBNLayer(
-            64, 96, 3, padding=1, name=name + '.branch3x3dbl_2')
-        self.branch3x3dbl_3 = ConvBNLayer(
-            96, 96, 3, stride=2, name=name + '.branch3x3dbl_3')
+        self.branch3x3dbl_1 = ConvBNLayer(in_channels,
+                                          64,
+                                          1,
+                                          name=name + '.branch3x3dbl_1')
+        self.branch3x3dbl_2 = ConvBNLayer(64,
+                                          96,
+                                          3,
+                                          padding=1,
+                                          name=name + '.branch3x3dbl_2')
+        self.branch3x3dbl_3 = ConvBNLayer(96,
+                                          96,
+                                          3,
+                                          stride=2,
+                                          name=name + '.branch3x3dbl_3')
 
         self.branch_pool = MaxPool2D(kernel_size=3, stride=2)
 
@@ -181,37 +220,60 @@ class InceptionB(nn.Layer):
         branch3x3dbl = self.branch3x3dbl_3(branch3x3dbl)
 
         branch_pool = self.branch_pool(x)
-        return paddle.concat([branch3x3, branch3x3dbl, branch_pool], axis=1)
+        return paddle.concat([branch3x3, branch3x3dbl, branch_pool],
+                                   axis=1)
 
 
 class InceptionC(nn.Layer):
     def __init__(self, in_channels, c7, name=None):
         super(InceptionC, self).__init__()
-        self.branch1x1 = ConvBNLayer(
-            in_channels, 192, 1, name=name + '.branch1x1')
+        self.branch1x1 = ConvBNLayer(in_channels,
+                                     192,
+                                     1,
+                                     name=name + '.branch1x1')
 
-        self.branch7x7_1 = ConvBNLayer(
-            in_channels, c7, 1, name=name + '.branch7x7_1')
-        self.branch7x7_2 = ConvBNLayer(
-            c7, c7, (1, 7), padding=(0, 3), name=name + '.branch7x7_2')
-        self.branch7x7_3 = ConvBNLayer(
-            c7, 192, (7, 1), padding=(3, 0), name=name + '.branch7x7_3')
+        self.branch7x7_1 = ConvBNLayer(in_channels,
+                                       c7,
+                                       1,
+                                       name=name + '.branch7x7_1')
+        self.branch7x7_2 = ConvBNLayer(c7,
+                                       c7, (1, 7),
+                                       padding=(0, 3),
+                                       name=name + '.branch7x7_2')
+        self.branch7x7_3 = ConvBNLayer(c7,
+                                       192, (7, 1),
+                                       padding=(3, 0),
+                                       name=name + '.branch7x7_3')
 
-        self.branch7x7dbl_1 = ConvBNLayer(
-            in_channels, c7, 1, name=name + '.branch7x7dbl_1')
-        self.branch7x7dbl_2 = ConvBNLayer(
-            c7, c7, (7, 1), padding=(3, 0), name=name + '.branch7x7dbl_2')
-        self.branch7x7dbl_3 = ConvBNLayer(
-            c7, c7, (1, 7), padding=(0, 3), name=name + '.branch7x7dbl_3')
-        self.branch7x7dbl_4 = ConvBNLayer(
-            c7, c7, (7, 1), padding=(3, 0), name=name + '.branch7x7dbl_4')
-        self.branch7x7dbl_5 = ConvBNLayer(
-            c7, 192, (1, 7), padding=(0, 3), name=name + '.branch7x7dbl_5')
+        self.branch7x7dbl_1 = ConvBNLayer(in_channels,
+                                          c7,
+                                          1,
+                                          name=name + '.branch7x7dbl_1')
+        self.branch7x7dbl_2 = ConvBNLayer(c7,
+                                          c7, (7, 1),
+                                          padding=(3, 0),
+                                          name=name + '.branch7x7dbl_2')
+        self.branch7x7dbl_3 = ConvBNLayer(c7,
+                                          c7, (1, 7),
+                                          padding=(0, 3),
+                                          name=name + '.branch7x7dbl_3')
+        self.branch7x7dbl_4 = ConvBNLayer(c7,
+                                          c7, (7, 1),
+                                          padding=(3, 0),
+                                          name=name + '.branch7x7dbl_4')
+        self.branch7x7dbl_5 = ConvBNLayer(c7,
+                                          192, (1, 7),
+                                          padding=(0, 3),
+                                          name=name + '.branch7x7dbl_5')
 
-        self.branch_pool0 = AvgPool2D(
-            kernel_size=3, stride=1, padding=1, exclusive=True)
-        self.branch_pool = ConvBNLayer(
-            in_channels, 192, 1, name=name + '.branch_pool')
+        self.branch_pool0 = AvgPool2D(kernel_size=3,
+                                   stride=1,
+                                   padding=1,
+                                   exclusive=True)
+        self.branch_pool = ConvBNLayer(in_channels,
+                                       192,
+                                       1,
+                                       name=name + '.branch_pool')
 
     def forward(self, x):
         branch1x1 = self.branch1x1(x)
@@ -236,19 +298,33 @@ class InceptionC(nn.Layer):
 class InceptionD(nn.Layer):
     def __init__(self, in_channels, name=None):
         super(InceptionD, self).__init__()
-        self.branch3x3_1 = ConvBNLayer(
-            in_channels, 192, 1, name=name + '.branch3x3_1')
-        self.branch3x3_2 = ConvBNLayer(
-            192, 320, 3, stride=2, name=name + '.branch3x3_2')
+        self.branch3x3_1 = ConvBNLayer(in_channels,
+                                       192,
+                                       1,
+                                       name=name + '.branch3x3_1')
+        self.branch3x3_2 = ConvBNLayer(192,
+                                       320,
+                                       3,
+                                       stride=2,
+                                       name=name + '.branch3x3_2')
 
-        self.branch7x7x3_1 = ConvBNLayer(
-            in_channels, 192, 1, name=name + '.branch7x7x3_1')
-        self.branch7x7x3_2 = ConvBNLayer(
-            192, 192, (1, 7), padding=(0, 3), name=name + '.branch7x7x3_2')
-        self.branch7x7x3_3 = ConvBNLayer(
-            192, 192, (7, 1), padding=(3, 0), name=name + '.branch7x7x3_3')
-        self.branch7x7x3_4 = ConvBNLayer(
-            192, 192, 3, stride=2, name=name + '.branch7x7x3_4')
+        self.branch7x7x3_1 = ConvBNLayer(in_channels,
+                                         192,
+                                         1,
+                                         name=name + '.branch7x7x3_1')
+        self.branch7x7x3_2 = ConvBNLayer(192,
+                                         192, (1, 7),
+                                         padding=(0, 3),
+                                         name=name + '.branch7x7x3_2')
+        self.branch7x7x3_3 = ConvBNLayer(192,
+                                         192, (7, 1),
+                                         padding=(3, 0),
+                                         name=name + '.branch7x7x3_3')
+        self.branch7x7x3_4 = ConvBNLayer(192,
+                                         192,
+                                         3,
+                                         stride=2,
+                                         name=name + '.branch7x7x3_4')
 
         self.branch_pool = MaxPool2D(kernel_size=3, stride=2)
 
@@ -263,35 +339,57 @@ class InceptionD(nn.Layer):
 
         branch_pool = self.branch_pool(x)
 
-        return paddle.concat([branch3x3, branch7x7x3, branch_pool], axis=1)
+        return paddle.concat([branch3x3, branch7x7x3, branch_pool],
+                                   axis=1)
 
 
 class InceptionE(nn.Layer):
     def __init__(self, in_channels, name=None):
         super(InceptionE, self).__init__()
-        self.branch1x1 = ConvBNLayer(
-            in_channels, 320, 1, name=name + '.branch1x1')
+        self.branch1x1 = ConvBNLayer(in_channels,
+                                     320,
+                                     1,
+                                     name=name + '.branch1x1')
 
-        self.branch3x3_1 = ConvBNLayer(
-            in_channels, 384, 1, name=name + '.branch3x3_1')
-        self.branch3x3_2a = ConvBNLayer(
-            384, 384, (1, 3), padding=(0, 1), name=name + '.branch3x3_2a')
-        self.branch3x3_2b = ConvBNLayer(
-            384, 384, (3, 1), padding=(1, 0), name=name + '.branch3x3_2b')
+        self.branch3x3_1 = ConvBNLayer(in_channels,
+                                       384,
+                                       1,
+                                       name=name + '.branch3x3_1')
+        self.branch3x3_2a = ConvBNLayer(384,
+                                        384, (1, 3),
+                                        padding=(0, 1),
+                                        name=name + '.branch3x3_2a')
+        self.branch3x3_2b = ConvBNLayer(384,
+                                        384, (3, 1),
+                                        padding=(1, 0),
+                                        name=name + '.branch3x3_2b')
 
-        self.branch3x3dbl_1 = ConvBNLayer(
-            in_channels, 448, 1, name=name + '.branch3x3dbl_1')
-        self.branch3x3dbl_2 = ConvBNLayer(
-            448, 384, 3, padding=1, name=name + '.branch3x3dbl_2')
-        self.branch3x3dbl_3a = ConvBNLayer(
-            384, 384, (1, 3), padding=(0, 1), name=name + '.branch3x3dbl_3a')
-        self.branch3x3dbl_3b = ConvBNLayer(
-            384, 384, (3, 1), padding=(1, 0), name=name + '.branch3x3dbl_3b')
+        self.branch3x3dbl_1 = ConvBNLayer(in_channels,
+                                          448,
+                                          1,
+                                          name=name + '.branch3x3dbl_1')
+        self.branch3x3dbl_2 = ConvBNLayer(448,
+                                          384,
+                                          3,
+                                          padding=1,
+                                          name=name + '.branch3x3dbl_2')
+        self.branch3x3dbl_3a = ConvBNLayer(384,
+                                           384, (1, 3),
+                                           padding=(0, 1),
+                                           name=name + '.branch3x3dbl_3a')
+        self.branch3x3dbl_3b = ConvBNLayer(384,
+                                           384, (3, 1),
+                                           padding=(1, 0),
+                                           name=name + '.branch3x3dbl_3b')
 
-        self.branch_pool0 = AvgPool2D(
-            kernel_size=3, stride=1, padding=1, exclusive=True)
-        self.branch_pool = ConvBNLayer(
-            in_channels, 192, 1, name=name + '.branch_pool')
+        self.branch_pool0 = AvgPool2D(kernel_size=3,
+                                   stride=1,
+                                   padding=1,
+                                   exclusive=True)
+        self.branch_pool = ConvBNLayer(in_channels,
+                                       192,
+                                       1,
+                                       name=name + '.branch_pool')
 
     def forward(self, x):
         branch1x1 = self.branch1x1(x)
@@ -304,7 +402,8 @@ class InceptionE(nn.Layer):
         branch3x3dbl = self.branch3x3dbl_2(branch3x3dbl)
         branch3x3dbl_3a = self.branch3x3dbl_3a(branch3x3dbl)
         branch3x3dbl_3b = self.branch3x3dbl_3b(branch3x3dbl)
-        branch3x3dbl = paddle.concat([branch3x3dbl_3a, branch3x3dbl_3b], axis=1)
+        branch3x3dbl = paddle.concat([branch3x3dbl_3a, branch3x3dbl_3b],
+                                           axis=1)
 
         branch_pool = self.branch_pool0(x)
         branch_pool = self.branch_pool(branch_pool)
@@ -335,28 +434,46 @@ class InceptionAux(nn.Layer):
 class Fid_inceptionA(nn.Layer):
     """ FID block in inception v3
     """
-
     def __init__(self, in_channels, pool_features, name=None):
         super(Fid_inceptionA, self).__init__()
-        self.branch1x1 = ConvBNLayer(
-            in_channels, 64, 1, name=name + '.branch1x1')
+        self.branch1x1 = ConvBNLayer(in_channels,
+                                     64,
+                                     1,
+                                     name=name + '.branch1x1')
 
-        self.branch5x5_1 = ConvBNLayer(
-            in_channels, 48, 1, name=name + '.branch5x5_1')
-        self.branch5x5_2 = ConvBNLayer(
-            48, 64, 5, padding=2, name=name + '.branch5x5_2')
+        self.branch5x5_1 = ConvBNLayer(in_channels,
+                                       48,
+                                       1,
+                                       name=name + '.branch5x5_1')
+        self.branch5x5_2 = ConvBNLayer(48,
+                                       64,
+                                       5,
+                                       padding=2,
+                                       name=name + '.branch5x5_2')
 
-        self.branch3x3dbl_1 = ConvBNLayer(
-            in_channels, 64, 1, name=name + '.branch3x3dbl_1')
-        self.branch3x3dbl_2 = ConvBNLayer(
-            64, 96, 3, padding=1, name=name + '.branch3x3dbl_2')
-        self.branch3x3dbl_3 = ConvBNLayer(
-            96, 96, 3, padding=1, name=name + '.branch3x3dbl_3')
+        self.branch3x3dbl_1 = ConvBNLayer(in_channels,
+                                          64,
+                                          1,
+                                          name=name + '.branch3x3dbl_1')
+        self.branch3x3dbl_2 = ConvBNLayer(64,
+                                          96,
+                                          3,
+                                          padding=1,
+                                          name=name + '.branch3x3dbl_2')
+        self.branch3x3dbl_3 = ConvBNLayer(96,
+                                          96,
+                                          3,
+                                          padding=1,
+                                          name=name + '.branch3x3dbl_3')
 
-        self.branch_pool0 = AvgPool2D(
-            kernel_size=3, stride=1, padding=1, exclusive=True)
-        self.branch_pool = ConvBNLayer(
-            in_channels, pool_features, 1, name=name + '.branch_pool')
+        self.branch_pool0 = AvgPool2D(kernel_size=3,
+                                   stride=1,
+                                   padding=1,
+                                   exclusive=True)
+        self.branch_pool = ConvBNLayer(in_channels,
+                                       pool_features,
+                                       1,
+                                       name=name + '.branch_pool')
 
     def forward(self, x):
         branch1x1 = self.branch1x1(x)
@@ -377,34 +494,55 @@ class Fid_inceptionA(nn.Layer):
 class Fid_inceptionC(nn.Layer):
     """ FID block in inception v3
     """
-
     def __init__(self, in_channels, c7, name=None):
         super(Fid_inceptionC, self).__init__()
-        self.branch1x1 = ConvBNLayer(
-            in_channels, 192, 1, name=name + '.branch1x1')
+        self.branch1x1 = ConvBNLayer(in_channels,
+                                     192,
+                                     1,
+                                     name=name + '.branch1x1')
 
-        self.branch7x7_1 = ConvBNLayer(
-            in_channels, c7, 1, name=name + '.branch7x7_1')
-        self.branch7x7_2 = ConvBNLayer(
-            c7, c7, (1, 7), padding=(0, 3), name=name + '.branch7x7_2')
-        self.branch7x7_3 = ConvBNLayer(
-            c7, 192, (7, 1), padding=(3, 0), name=name + '.branch7x7_3')
+        self.branch7x7_1 = ConvBNLayer(in_channels,
+                                       c7,
+                                       1,
+                                       name=name + '.branch7x7_1')
+        self.branch7x7_2 = ConvBNLayer(c7,
+                                       c7, (1, 7),
+                                       padding=(0, 3),
+                                       name=name + '.branch7x7_2')
+        self.branch7x7_3 = ConvBNLayer(c7,
+                                       192, (7, 1),
+                                       padding=(3, 0),
+                                       name=name + '.branch7x7_3')
 
-        self.branch7x7dbl_1 = ConvBNLayer(
-            in_channels, c7, 1, name=name + '.branch7x7dbl_1')
-        self.branch7x7dbl_2 = ConvBNLayer(
-            c7, c7, (7, 1), padding=(3, 0), name=name + '.branch7x7dbl_2')
-        self.branch7x7dbl_3 = ConvBNLayer(
-            c7, c7, (1, 7), padding=(0, 3), name=name + '.branch7x7dbl_3')
-        self.branch7x7dbl_4 = ConvBNLayer(
-            c7, c7, (7, 1), padding=(3, 0), name=name + '.branch7x7dbl_4')
-        self.branch7x7dbl_5 = ConvBNLayer(
-            c7, 192, (1, 7), padding=(0, 3), name=name + '.branch7x7dbl_5')
+        self.branch7x7dbl_1 = ConvBNLayer(in_channels,
+                                          c7,
+                                          1,
+                                          name=name + '.branch7x7dbl_1')
+        self.branch7x7dbl_2 = ConvBNLayer(c7,
+                                          c7, (7, 1),
+                                          padding=(3, 0),
+                                          name=name + '.branch7x7dbl_2')
+        self.branch7x7dbl_3 = ConvBNLayer(c7,
+                                          c7, (1, 7),
+                                          padding=(0, 3),
+                                          name=name + '.branch7x7dbl_3')
+        self.branch7x7dbl_4 = ConvBNLayer(c7,
+                                          c7, (7, 1),
+                                          padding=(3, 0),
+                                          name=name + '.branch7x7dbl_4')
+        self.branch7x7dbl_5 = ConvBNLayer(c7,
+                                          192, (1, 7),
+                                          padding=(0, 3),
+                                          name=name + '.branch7x7dbl_5')
 
-        self.branch_pool0 = AvgPool2D(
-            kernel_size=3, stride=1, padding=1, exclusive=True)
-        self.branch_pool = ConvBNLayer(
-            in_channels, 192, 1, name=name + '.branch_pool')
+        self.branch_pool0 = AvgPool2D(kernel_size=3,
+                                   stride=1,
+                                   padding=1,
+                                   exclusive=True)
+        self.branch_pool = ConvBNLayer(in_channels,
+                                       192,
+                                       1,
+                                       name=name + '.branch_pool')
 
     def forward(self, x):
         branch1x1 = self.branch1x1(x)
@@ -429,32 +567,52 @@ class Fid_inceptionC(nn.Layer):
 class Fid_inceptionE_1(nn.Layer):
     """ FID block in inception v3
         """
-
     def __init__(self, in_channels, name=None):
         super(Fid_inceptionE_1, self).__init__()
-        self.branch1x1 = ConvBNLayer(
-            in_channels, 320, 1, name=name + '.branch1x1')
+        self.branch1x1 = ConvBNLayer(in_channels,
+                                     320,
+                                     1,
+                                     name=name + '.branch1x1')
 
-        self.branch3x3_1 = ConvBNLayer(
-            in_channels, 384, 1, name=name + '.branch3x3_1')
-        self.branch3x3_2a = ConvBNLayer(
-            384, 384, (1, 3), padding=(0, 1), name=name + '.branch3x3_2a')
-        self.branch3x3_2b = ConvBNLayer(
-            384, 384, (3, 1), padding=(1, 0), name=name + '.branch3x3_2b')
+        self.branch3x3_1 = ConvBNLayer(in_channels,
+                                       384,
+                                       1,
+                                       name=name + '.branch3x3_1')
+        self.branch3x3_2a = ConvBNLayer(384,
+                                        384, (1, 3),
+                                        padding=(0, 1),
+                                        name=name + '.branch3x3_2a')
+        self.branch3x3_2b = ConvBNLayer(384,
+                                        384, (3, 1),
+                                        padding=(1, 0),
+                                        name=name + '.branch3x3_2b')
 
-        self.branch3x3dbl_1 = ConvBNLayer(
-            in_channels, 448, 1, name=name + '.branch3x3dbl_1')
-        self.branch3x3dbl_2 = ConvBNLayer(
-            448, 384, 3, padding=1, name=name + '.branch3x3dbl_2')
-        self.branch3x3dbl_3a = ConvBNLayer(
-            384, 384, (1, 3), padding=(0, 1), name=name + '.branch3x3dbl_3a')
-        self.branch3x3dbl_3b = ConvBNLayer(
-            384, 384, (3, 1), padding=(1, 0), name=name + '.branch3x3dbl_3b')
+        self.branch3x3dbl_1 = ConvBNLayer(in_channels,
+                                          448,
+                                          1,
+                                          name=name + '.branch3x3dbl_1')
+        self.branch3x3dbl_2 = ConvBNLayer(448,
+                                          384,
+                                          3,
+                                          padding=1,
+                                          name=name + '.branch3x3dbl_2')
+        self.branch3x3dbl_3a = ConvBNLayer(384,
+                                           384, (1, 3),
+                                           padding=(0, 1),
+                                           name=name + '.branch3x3dbl_3a')
+        self.branch3x3dbl_3b = ConvBNLayer(384,
+                                           384, (3, 1),
+                                           padding=(1, 0),
+                                           name=name + '.branch3x3dbl_3b')
 
-        self.branch_pool0 = AvgPool2D(
-            kernel_size=3, stride=1, padding=1, exclusive=True)
-        self.branch_pool = ConvBNLayer(
-            in_channels, 192, 1, name=name + '.branch_pool')
+        self.branch_pool0 = AvgPool2D(kernel_size=3,
+                                   stride=1,
+                                   padding=1,
+                                   exclusive=True)
+        self.branch_pool = ConvBNLayer(in_channels,
+                                       192,
+                                       1,
+                                       name=name + '.branch_pool')
 
     def forward(self, x):
         branch1x1 = self.branch1x1(x)
@@ -467,7 +625,8 @@ class Fid_inceptionE_1(nn.Layer):
         branch3x3dbl = self.branch3x3dbl_2(branch3x3dbl)
         branch3x3dbl_3a = self.branch3x3dbl_3a(branch3x3dbl)
         branch3x3dbl_3b = self.branch3x3dbl_3b(branch3x3dbl)
-        branch3x3dbl = paddle.concat([branch3x3dbl_3a, branch3x3dbl_3b], axis=1)
+        branch3x3dbl = paddle.concat([branch3x3dbl_3a, branch3x3dbl_3b],
+                                           axis=1)
 
         branch_pool = self.branch_pool0(x)
         branch_pool = self.branch_pool(branch_pool)
@@ -479,31 +638,51 @@ class Fid_inceptionE_1(nn.Layer):
 class Fid_inceptionE_2(nn.Layer):
     """ FID block in inception v3
     """
-
     def __init__(self, in_channels, name=None):
         super(Fid_inceptionE_2, self).__init__()
-        self.branch1x1 = ConvBNLayer(
-            in_channels, 320, 1, name=name + '.branch1x1')
+        self.branch1x1 = ConvBNLayer(in_channels,
+                                     320,
+                                     1,
+                                     name=name + '.branch1x1')
 
-        self.branch3x3_1 = ConvBNLayer(
-            in_channels, 384, 1, name=name + '.branch3x3_1')
-        self.branch3x3_2a = ConvBNLayer(
-            384, 384, (1, 3), padding=(0, 1), name=name + '.branch3x3_2a')
-        self.branch3x3_2b = ConvBNLayer(
-            384, 384, (3, 1), padding=(1, 0), name=name + '.branch3x3_2b')
+        self.branch3x3_1 = ConvBNLayer(in_channels,
+                                       384,
+                                       1,
+                                       name=name + '.branch3x3_1')
+        self.branch3x3_2a = ConvBNLayer(384,
+                                        384, (1, 3),
+                                        padding=(0, 1),
+                                        name=name + '.branch3x3_2a')
+        self.branch3x3_2b = ConvBNLayer(384,
+                                        384, (3, 1),
+                                        padding=(1, 0),
+                                        name=name + '.branch3x3_2b')
 
-        self.branch3x3dbl_1 = ConvBNLayer(
-            in_channels, 448, 1, name=name + '.branch3x3dbl_1')
-        self.branch3x3dbl_2 = ConvBNLayer(
-            448, 384, 3, padding=1, name=name + '.branch3x3dbl_2')
-        self.branch3x3dbl_3a = ConvBNLayer(
-            384, 384, (1, 3), padding=(0, 1), name=name + '.branch3x3dbl_3a')
-        self.branch3x3dbl_3b = ConvBNLayer(
-            384, 384, (3, 1), padding=(1, 0), name=name + '.branch3x3dbl_3b')
+        self.branch3x3dbl_1 = ConvBNLayer(in_channels,
+                                          448,
+                                          1,
+                                          name=name + '.branch3x3dbl_1')
+        self.branch3x3dbl_2 = ConvBNLayer(448,
+                                          384,
+                                          3,
+                                          padding=1,
+                                          name=name + '.branch3x3dbl_2')
+        self.branch3x3dbl_3a = ConvBNLayer(384,
+                                           384, (1, 3),
+                                           padding=(0, 1),
+                                           name=name + '.branch3x3dbl_3a')
+        self.branch3x3dbl_3b = ConvBNLayer(384,
+                                           384, (3, 1),
+                                           padding=(1, 0),
+                                           name=name + '.branch3x3dbl_3b')
         ### same with paper
-        self.branch_pool0 = MaxPool2D(kernel_size=3, stride=1, padding=1)
-        self.branch_pool = ConvBNLayer(
-            in_channels, 192, 1, name=name + '.branch_pool')
+        self.branch_pool0 = MaxPool2D(kernel_size=3,
+                                   stride=1,
+                                   padding=1)
+        self.branch_pool = ConvBNLayer(in_channels,
+                                       192,
+                                       1,
+                                       name=name + '.branch_pool')
 
     def forward(self, x):
         branch1x1 = self.branch1x1(x)
@@ -516,7 +695,8 @@ class Fid_inceptionE_2(nn.Layer):
         branch3x3dbl = self.branch3x3dbl_2(branch3x3dbl)
         branch3x3dbl_3a = self.branch3x3dbl_3a(branch3x3dbl)
         branch3x3dbl_3b = self.branch3x3dbl_3b(branch3x3dbl)
-        branch3x3dbl = paddle.concat([branch3x3dbl_3a, branch3x3dbl_3b], axis=1)
+        branch3x3dbl = paddle.concat([branch3x3dbl_3a, branch3x3dbl_3b],
+                                           axis=1)
 
         branch_pool = self.branch_pool0(x)
         branch_pool = self.branch_pool(branch_pool)
@@ -536,23 +716,21 @@ class ConvBNLayer(nn.Layer):
                  act='relu',
                  name=None):
         super(ConvBNLayer, self).__init__()
-        self.conv = Conv2D(
-            in_channels=in_channels,
-            out_channels=num_filters,
-            kernel_size=filter_size,
-            stride=stride,
-            padding=padding,
-            groups=groups,
-            weight_attr=paddle.ParamAttr(name=name + ".conv.weight"),
-            bias_attr=False)
-        self.bn = BatchNorm(
-            num_filters,
-            act=act,
-            epsilon=0.001,
-            param_attr=paddle.ParamAttr(name=name + ".bn.weight"),
-            bias_attr=paddle.ParamAttr(name=name + ".bn.bias"),
-            moving_mean_name=name + '.bn.running_mean',
-            moving_variance_name=name + '.bn.running_var')
+        self.conv = Conv2D(in_channels=in_channels,
+                           out_channels=num_filters,
+                           kernel_size=filter_size,
+                           stride=stride,
+                           padding=padding,
+                           groups=groups,
+                           weight_attr=paddle.ParamAttr(name=name + ".conv.weight"),
+                           bias_attr=False)
+        self.bn = BatchNorm(num_filters,
+                            act=act,
+                            epsilon=0.001,
+                            param_attr=paddle.ParamAttr(name=name + ".bn.weight"),
+                            bias_attr=paddle.ParamAttr(name=name + ".bn.bias"),
+                            moving_mean_name=name + '.bn.running_mean',
+                            moving_variance_name=name + '.bn.running_var')
 
     def forward(self, inputs):
         y = self.conv(inputs)

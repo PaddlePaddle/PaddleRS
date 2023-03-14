@@ -56,8 +56,7 @@ def align(image, lms):
     # rotation angle
     left_eye_corner = lms[36]
     right_eye_corner = lms[45]
-    radian = np.arctan((left_eye_corner[1] - right_eye_corner[1]) /
-                       (left_eye_corner[0] - right_eye_corner[0]))
+    radian = np.arctan((left_eye_corner[1] - right_eye_corner[1]) / (left_eye_corner[0] - right_eye_corner[0]))
 
     # image size after rotating
     height, width, _ = image.shape
@@ -74,8 +73,7 @@ def align(image, lms):
     M = np.array([[cos, sin, (1 - cos) * width / 2. - sin * height / 2. + Tx],
                   [-sin, cos, sin * width / 2. + (1 - cos) * height / 2. + Ty]])
 
-    image_rotate = cv2.warpAffine(
-        image, M, (new_w, new_h), borderValue=(255, 255, 255))
+    image_rotate = cv2.warpAffine(image, M, (new_w, new_h), borderValue=(255, 255, 255))
 
     landmarks = np.concatenate([lms, np.ones((lms.shape[0], 1))], axis=1)
     landmarks_rotate = np.dot(M, landmarks.T).T
@@ -101,8 +99,7 @@ def crop(image, lms):
         top -= ((right - left) - (bottom - top)) // 2
         bottom = top + (right - left)
 
-    image_crop = np.ones((bottom - top + 1, right - left + 1, 3),
-                         np.uint8) * 255
+    image_crop = np.ones((bottom - top + 1, right - left + 1, 3), np.uint8) * 255
 
     h, w = image.shape[:2]
     left_white = max(0, -left)
@@ -114,6 +111,5 @@ def crop(image, lms):
     bottom = min(bottom, h - 1)
     bottom_white = top_white + (bottom - top)
 
-    image_crop[top_white:bottom_white + 1, left_white:right_white + 1] = image[
-        top:bottom + 1, left:right + 1].copy()
+    image_crop[top_white:bottom_white+1, left_white:right_white+1] = image[top:bottom+1, left:right+1].copy()
     return image_crop

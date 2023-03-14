@@ -37,7 +37,6 @@ class Wav2LipModelHq(BaseModel):
     By default, it uses a '--netG Wav2lip' generator,
     a '--netD SyncNetColor' discriminator.
     """
-
     def __init__(self,
                  generator,
                  discriminator_sync=None,
@@ -62,8 +61,9 @@ class Wav2LipModelHq(BaseModel):
         self.eval_perceptual_losses = []
         # define networks (both generator and discriminator)
         self.nets['netG'] = build_generator(generator)
-        init_weights(
-            self.nets['netG'], init_type='kaiming', distribution='uniform')
+        init_weights(self.nets['netG'],
+                     init_type='kaiming',
+                     distribution='uniform')
         if self.is_train:
             self.nets['netDS'] = build_discriminator(discriminator_sync)
             weights_path = get_weights_path_from_url(SYNCNET_WEIGHT_URL)
@@ -71,8 +71,9 @@ class Wav2LipModelHq(BaseModel):
             self.nets['netDS'].load_dict(params)
 
             self.nets['netDH'] = build_discriminator(discriminator_hq)
-            init_weights(
-                self.nets['netDH'], init_type='kaiming', distribution='uniform')
+            init_weights(self.nets['netDH'],
+                         init_type='kaiming',
+                         distribution='uniform')
 
         if self.is_train:
             self.recon_loss = paddle.nn.L1Loss()
@@ -102,9 +103,7 @@ class Wav2LipModelHq(BaseModel):
         self.l1_loss = self.recon_loss(self.g, self.y)
 
         if self.disc_wt > 0.:
-            if isinstance(
-                    self.nets['netDH'], paddle.
-                    DataParallel):  #paddle.fluid.dygraph.parallel.DataParallel)
+            if isinstance(self.nets['netDH'], paddle.DataParallel):
                 self.perceptual_loss = self.nets[
                     'netDH']._layers.perceptual_forward(self.g)
             else:
@@ -163,12 +162,10 @@ class Wav2LipModelHq(BaseModel):
 
             pred_real = self.nets['netDH'](self.y)
             pred_fake = self.nets['netDH'](self.g)
-            disc_real_loss = F.binary_cross_entropy(pred_real,
-                                                    paddle.ones(
-                                                        (len(pred_real), 1)))
-            disc_fake_loss = F.binary_cross_entropy(pred_fake,
-                                                    paddle.zeros(
-                                                        (len(pred_fake), 1)))
+            disc_real_loss = F.binary_cross_entropy(
+                pred_real, paddle.ones((len(pred_real), 1)))
+            disc_fake_loss = F.binary_cross_entropy(
+                pred_fake, paddle.zeros((len(pred_fake), 1)))
 
             self.eval_disc_fake_losses.append(disc_fake_loss.numpy().item())
             self.eval_disc_real_losses.append(disc_real_loss.numpy().item())
@@ -177,11 +174,10 @@ class Wav2LipModelHq(BaseModel):
             self.eval_recon_losses.append(l1loss.numpy().item())
 
             if self.disc_wt > 0.:
-                if isinstance(self.nets['netDH'], paddle.DataParallel
-                              ):  #paddle.fluid.dygraph.parallel.DataParallel)
+                if isinstance(self.nets['netDH'], paddle.DataParallel):
                     perceptual_loss = self.nets[
-                        'netDH']._layers.perceptual_forward(self.g).numpy(
-                        ).item()
+                        'netDH']._layers.perceptual_forward(
+                            self.g).numpy().item()
                 else:
                     perceptual_loss = self.nets['netDH'].perceptual_forward(
                         self.g).numpy().item()
@@ -203,10 +199,11 @@ class Wav2LipModelHq(BaseModel):
             if averaged_sync_loss < .75:
                 self.syncnet_wt = 0.01
 
-            print('L1: {}, Sync loss: {}, Percep: {}, Fake: {}, Real: {}'.
-                  format(averaged_recon_loss, averaged_sync_loss,
-                         averaged_perceptual_loss, averaged_disc_fake_loss,
-                         averaged_disc_real_loss))
+            print(
+                'L1: {}, Sync loss: {}, Percep: {}, Fake: {}, Real: {}'.format(
+                    averaged_recon_loss, averaged_sync_loss,
+                    averaged_perceptual_loss, averaged_disc_fake_loss,
+                    averaged_disc_real_loss))
             self.eval_sync_losses, self.eval_recon_losses = [], []
             self.eval_disc_real_losses, self.eval_disc_fake_losses = [], []
             self.eval_perceptual_losses = []

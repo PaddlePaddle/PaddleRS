@@ -9,8 +9,8 @@ import numpy as np
 def generate_P_from_lmks(lmks, resize, w, h):
     """generate P from lmks"""
     diff_size = (64, 64)
-    xs, ys = np.meshgrid(
-        np.linspace(0, resize - 1, resize), np.linspace(0, resize - 1, resize))
+    xs, ys = np.meshgrid(np.linspace(0, resize - 1, resize),
+                         np.linspace(0, resize - 1, resize))
     xs = xs[None].repeat(68, axis=0)
     ys = ys[None].repeat(68, axis=0)
     fix = np.concatenate([ys, xs], axis=0)
@@ -27,8 +27,10 @@ def generate_P_from_lmks(lmks, resize, w, h):
 
 def copy_area(tar, src, lms):
     rect = [
-        int(min(lms[:, 1])) - 16, int(min(lms[:, 0])) - 16,
-        int(max(lms[:, 1])) + 16 + 1, int(max(lms[:, 0])) + 16 + 1
+        int(min(lms[:, 1])) - 16,
+        int(min(lms[:, 0])) - 16,
+        int(max(lms[:, 1])) + 16 + 1,
+        int(max(lms[:, 0])) + 16 + 1
     ]
     tar[rect[1]:rect[3], rect[0]:rect[2]] = \
         src[rect[1]:rect[3], rect[0]:rect[2]]
@@ -65,15 +67,13 @@ def calculate_consis_mask(mask, mask_B):
     h_b, w_b = mask_B.shape[1:]
     mask_transpose = np.transpose(mask, (1, 2, 0))
     mask_B_transpose = np.transpose(mask_B, (1, 2, 0))
-    mask = cv2.resize(
-        mask_transpose,
-        dsize=(w_a // 4, h_a // 4),
-        interpolation=cv2.INTER_NEAREST)
+    mask = cv2.resize(mask_transpose,
+                      dsize=(w_a // 4, h_a // 4),
+                      interpolation=cv2.INTER_NEAREST)
     mask = np.transpose(mask, (2, 0, 1))
-    mask_B = cv2.resize(
-        mask_B_transpose,
-        dsize=(w_b // 4, h_b // 4),
-        interpolation=cv2.INTER_NEAREST)
+    mask_B = cv2.resize(mask_B_transpose,
+                        dsize=(w_b // 4, h_b // 4),
+                        interpolation=cv2.INTER_NEAREST)
     mask_B = np.transpose(mask_B, (2, 0, 1))
     """calculate consistency mask between images"""
     h_a, w_a = mask.shape[1:]
@@ -97,9 +97,8 @@ def calculate_consis_mask(mask, mask_B):
     maskB_one_hot[:, 1] = mask_B_eye.flatten()
     maskB_one_hot[:, 2] = mask_B_lip.flatten()
 
-    con_mask = np.matmul(
-        maskA_one_hot.reshape((h_a * w_a, 3)),
-        np.transpose(maskB_one_hot.reshape((h_b * w_b, 3))))
+    con_mask = np.matmul(maskA_one_hot.reshape((h_a * w_a, 3)),
+                         np.transpose(maskB_one_hot.reshape((h_b * w_b, 3))))
     con_mask = np.clip(con_mask, 0, 1)
     return con_mask
 
@@ -200,7 +199,8 @@ def generate_mask_aug(mask, lmks):
     mask_lip = np.float32(mask == 7) + np.float32(mask == 9)
 
     mask_eye = mask_eye_left + mask_eye_right
-    mask_aug = np.concatenate((np.expand_dims(mask_lip, 0), np.expand_dims(
-        mask_skin, 0), np.expand_dims(mask_eye, 0)), 0)
+    mask_aug = np.concatenate(
+        (np.expand_dims(mask_lip, 0), np.expand_dims(
+            mask_skin, 0), np.expand_dims(mask_eye, 0)), 0)
 
     return mask_aug

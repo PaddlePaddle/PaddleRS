@@ -41,7 +41,6 @@ class MakeupModel(BaseModel):
     """
     PSGAN paper: https://arxiv.org/pdf/1909.06956.pdf
     """
-
     def __init__(self,
                  generator,
                  discriminator=None,
@@ -122,18 +121,22 @@ class MakeupModel(BaseModel):
 
     def forward(self):
         """Run forward pass; called by both functions <optimize_parameters> and <test>."""
-        self.fake_A, amm = self.nets['netG'](
-            self.real_A, self.real_B, self.P_A, self.P_B, self.c_m,
-            self.mask_A_aug, self.mask_B_aug)  # G_A(A)
-        self.fake_B, _ = self.nets['netG'](
-            self.real_B, self.real_A, self.P_B, self.P_A, self.c_m_t,
-            self.mask_A_aug, self.mask_B_aug)  # G_A(A)
-        self.rec_A, _ = self.nets['netG'](
-            self.fake_A, self.real_A, self.P_A, self.P_A, self.c_m_idt_a,
-            self.mask_A_aug, self.mask_B_aug)  # G_A(A)
-        self.rec_B, _ = self.nets['netG'](
-            self.fake_B, self.real_B, self.P_B, self.P_B, self.c_m_idt_b,
-            self.mask_A_aug, self.mask_B_aug)  # G_A(A)
+        self.fake_A, amm = self.nets['netG'](self.real_A, self.real_B, self.P_A,
+                                             self.P_B, self.c_m,
+                                             self.mask_A_aug,
+                                             self.mask_B_aug)  # G_A(A)
+        self.fake_B, _ = self.nets['netG'](self.real_B, self.real_A, self.P_B,
+                                           self.P_A, self.c_m_t,
+                                           self.mask_A_aug,
+                                           self.mask_B_aug)  # G_A(A)
+        self.rec_A, _ = self.nets['netG'](self.fake_A, self.real_A, self.P_A,
+                                          self.P_A, self.c_m_idt_a,
+                                          self.mask_A_aug,
+                                          self.mask_B_aug)  # G_A(A)
+        self.rec_B, _ = self.nets['netG'](self.fake_B, self.real_B, self.P_B,
+                                          self.P_B, self.c_m_idt_b,
+                                          self.mask_A_aug,
+                                          self.mask_B_aug)  # G_A(A)
 
         # visual
         self.visual_items['real_A'] = self.real_A
@@ -145,9 +148,10 @@ class MakeupModel(BaseModel):
 
     def test(self, input):
         with paddle.no_grad():
-            return self.nets['netG'](
-                input['image_A'], input['image_B'], input['P_A'], input['P_B'],
-                input['consis_mask'], input['mask_A_aug'], input['mask_B_aug'])
+            return self.nets['netG'](input['image_A'], input['image_B'],
+                                     input['P_A'], input['P_B'],
+                                     input['consis_mask'], input['mask_A_aug'],
+                                     input['mask_B_aug'])
 
     def backward_D_basic(self, netD, real, fake):
         """Calculate GAN loss for the discriminator
@@ -194,14 +198,16 @@ class MakeupModel(BaseModel):
 
         # Identity loss
         if self.idt_criterion:
-            self.idt_A, _ = self.nets['netG'](
-                self.real_A, self.real_A, self.P_A, self.P_A, self.c_m_idt_a,
-                self.mask_A_aug, self.mask_B_aug)  # G_A(A)
+            self.idt_A, _ = self.nets['netG'](self.real_A, self.real_A,
+                                              self.P_A, self.P_A,
+                                              self.c_m_idt_a, self.mask_A_aug,
+                                              self.mask_B_aug)  # G_A(A)
             self.loss_idt_A = self.idt_criterion(self.idt_A,
                                                  self.real_A) * lambda_A
-            self.idt_B, _ = self.nets['netG'](
-                self.real_B, self.real_B, self.P_B, self.P_B, self.c_m_idt_b,
-                self.mask_A_aug, self.mask_B_aug)  # G_A(A)
+            self.idt_B, _ = self.nets['netG'](self.real_B, self.real_B,
+                                              self.P_B, self.P_B,
+                                              self.c_m_idt_b, self.mask_A_aug,
+                                              self.mask_B_aug)  # G_A(A)
             self.loss_idt_B = self.idt_criterion(self.idt_B,
                                                  self.real_B) * lambda_B
 
@@ -313,10 +319,10 @@ class MakeupModel(BaseModel):
         g_B_eye_loss_his = self.l1_criterion(fake_B_eye_masked,
                                              fake_match_eye_B)
 
-        self.loss_G_A_his = (
-            g_A_eye_loss_his + g_A_lip_loss_his + g_A_skin_loss_his * 0.1) * 0.1
-        self.loss_G_B_his = (
-            g_B_eye_loss_his + g_B_lip_loss_his + g_B_skin_loss_his * 0.1) * 0.1
+        self.loss_G_A_his = (g_A_eye_loss_his + g_A_lip_loss_his +
+                             g_A_skin_loss_his * 0.1) * 0.1
+        self.loss_G_B_his = (g_B_eye_loss_his + g_B_lip_loss_his +
+                             g_B_skin_loss_his * 0.1) * 0.1
 
         self.losses['G_A_his_loss'] = self.loss_G_A_his
         self.losses['G_B_his_loss'] = self.loss_G_B_his

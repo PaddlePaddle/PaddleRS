@@ -36,8 +36,8 @@ def make_grid(tensor, nrow=8, normalize=False, range=None, scale_each=False):
             images separately rather than the (min, max) over all images. Default: ``False``.
     """
     if not (isinstance(tensor, paddle.Tensor) or
-            (isinstance(tensor, list) and
-             all(isinstance(t, paddle.Tensor) for t in tensor))):
+            (isinstance(tensor, list)
+             and all(isinstance(t, paddle.Tensor) for t in tensor))):
         raise TypeError('tensor or list of tensors expected, got {}'.format(
             type(tensor)))
 
@@ -92,15 +92,15 @@ def make_grid(tensor, nrow=8, normalize=False, range=None, scale_each=False):
     ymaps = int(math.ceil(float(nmaps) / xmaps))
     height, width = int(tensor.shape[2]), int(tensor.shape[3])
     num_channels = tensor.shape[1]
-    canvas = paddle.zeros(
-        (num_channels, height * ymaps, width * xmaps), dtype=tensor.dtype)
+    canvas = paddle.zeros((num_channels, height * ymaps, width * xmaps),
+                          dtype=tensor.dtype)
     k = 0
     for y in irange(ymaps):
         for x in irange(xmaps):
             if k >= nmaps:
                 break
-            canvas[:, y * height:(y + 1) * height, x * width:(x + 1) *
-                   width] = tensor[k]
+            canvas[:, y * height:(y + 1) * height,
+                   x * width:(x + 1) * width] = tensor[k]
             k = k + 1
     return canvas
 
@@ -113,7 +113,6 @@ def tensor2img(input_image, min_max=(-1., 1.), image_num=1, imtype=np.uint8):
         image_num (int): the convert iamge numbers
         imtype (type): the desired type of the converted numpy array
     """
-
     def processing(img, transpose=True):
         """"processing one numpy image.
 
@@ -153,8 +152,7 @@ def tensor2img(input_image, min_max=(-1., 1.), image_num=1, imtype=np.uint8):
         else:
             # for more image, log NCHW image
             image_numpy = np.stack(
-                [processing(
-                    im, transpose=False) for im in image_numpy])
+                [processing(im, transpose=False) for im in image_numpy])
 
     else:
         # if it is a numpy array, do nothing

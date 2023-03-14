@@ -12,26 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import math
 import os.path as osp
 from collections import OrderedDict
 from operator import itemgetter
 
 import numpy as np
 import paddle
-import paddle.nn.functional as F
 from paddle.static import InputSpec
 
 import paddlers
 import paddlers.models.ppcls as ppcls
 import paddlers.rs_models.clas as cmcls
 import paddlers.utils.logging as logging
-from paddlers.utils import get_single_card_bs, DisablePrint
 from paddlers.models.ppcls.metric import build_metrics
 from paddlers.models import clas_losses
 from paddlers.models.ppcls.data.postprocess import build_postprocess
 from paddlers.utils.checkpoint import cls_pretrain_weights_dict
-from paddlers.transforms import Resize, decode_image
+from paddlers.transforms import Resize, decode_image, construct_sample
 from .base import BaseModel
 
 __all__ = ["ResNet50_vd", "MobileNetV3", "HRNet", "CondenseNetV2"]
@@ -64,7 +61,6 @@ class BaseClassifier(BaseModel):
         if params.get('with_net', True):
             params.pop('with_net', None)
             self.net = self.build_net(**params)
-        self.find_unused_parameters = True
 
     def build_net(self, **params):
         with paddle.utils.unique_name.guard():
@@ -459,10 +455,8 @@ class BaseClassifier(BaseModel):
             images = [img_file]
         else:
             images = img_file
-        batch_im, batch_origin_shape = self.preprocess(images, transforms,
-                                                       self.model_type)
+        data, _ = self.preprocess(images, transforms, self.model_type)
         self.net.eval()
-        data = (batch_im, batch_origin_shape, transforms.transforms)
 
         if self.postprocess is None:
             self.build_postprocess_from_labels()
@@ -488,69 +482,19 @@ class BaseClassifier(BaseModel):
     def preprocess(self, images, transforms, to_tensor=True):
         self._check_transforms(transforms, 'test')
         batch_im = list()
-        batch_ori_shape = list()
         for im in images:
             if isinstance(im, str):
                 im = decode_image(im, read_raw=True)
-            ori_shape = im.shape[:2]
-            sample = {'image': im}
-            im = transforms(sample)
+            sample = construct_sample(image=im)
+            data = transforms(sample)
+            im = data[0][0]
             batch_im.append(im)
-            batch_ori_shape.append(ori_shape)
         if to_tensor:
             batch_im = paddle.to_tensor(batch_im)
         else:
             batch_im = np.asarray(batch_im)
 
-        return batch_im, batch_ori_shape
-
-    @staticmethod
-    def get_transforms_shape_info(batch_ori_shape, transforms):
-        batch_restore_list = list()
-        for ori_shape in batch_ori_shape:
-            restore_list = list()
-            h, w = ori_shape[0], ori_shape[1]
-            for op in transforms:
-                if op.__class__.__name__ == 'Resize':
-                    restore_list.append(('resize', (h, w)))
-                    h, w = op.target_size
-                elif op.__class__.__name__ == 'ResizeByShort':
-                    restore_list.append(('resize', (h, w)))
-                    im_short_size = min(h, w)
-                    im_long_size = max(h, w)
-                    scale = float(op.short_size) / float(im_short_size)
-                    if 0 < op.max_size < np.round(scale * im_long_size):
-                        scale = float(op.max_size) / float(im_long_size)
-                    h = int(round(h * scale))
-                    w = int(round(w * scale))
-                elif op.__class__.__name__ == 'ResizeByLong':
-                    restore_list.append(('resize', (h, w)))
-                    im_long_size = max(h, w)
-                    scale = float(op.long_size) / float(im_long_size)
-                    h = int(round(h * scale))
-                    w = int(round(w * scale))
-                elif op.__class__.__name__ == 'Pad':
-                    if op.target_size:
-                        target_h, target_w = op.target_size
-                    else:
-                        target_h = int(
-                            (np.ceil(h / op.size_divisor) * op.size_divisor))
-                        target_w = int(
-                            (np.ceil(w / op.size_divisor) * op.size_divisor))
-
-                    if op.pad_mode == -1:
-                        offsets = op.offsets
-                    elif op.pad_mode == 0:
-                        offsets = [0, 0]
-                    elif op.pad_mode == 1:
-                        offsets = [(target_h - h) // 2, (target_w - w) // 2]
-                    else:
-                        offsets = [target_h - h, target_w - w]
-                    restore_list.append(('padding', (h, w), offsets))
-                    h, w = target_h, target_w
-
-            batch_restore_list.append(restore_list)
-        return batch_restore_list
+        return batch_im, None
 
     def _check_transforms(self, transforms, mode):
         super()._check_transforms(transforms, mode)
@@ -559,7 +503,11 @@ class BaseClassifier(BaseModel):
             raise TypeError(
                 "`transforms.arrange` must be an ArrangeClassifier object.")
 
-    def build_data_loader(self, dataset, batch_size, mode='train'):
+    def build_data_loader(self,
+                          dataset,
+                          batch_size,
+                          mode='train',
+                          collate_fn=None):
         if dataset.num_samples < batch_size:
             raise ValueError(
                 'The volume of dataset({}) must be larger than batch size({}).'
@@ -571,7 +519,8 @@ class BaseClassifier(BaseModel):
                 batch_size=batch_size,
                 shuffle=dataset.shuffle,
                 drop_last=False,
-                collate_fn=dataset.batch_transforms,
+                collate_fn=dataset.collate_fn
+                if collate_fn is None else collate_fn,
                 num_workers=dataset.num_workers,
                 return_list=True,
                 use_shared_memory=False)

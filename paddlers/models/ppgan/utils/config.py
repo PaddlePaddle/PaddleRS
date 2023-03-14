@@ -63,7 +63,6 @@ def override(dl, ks, v):
         ks(list): list of keys
         v(str): value to be replaced
     """
-
     def str2num(v):
         try:
             return eval(v)
@@ -125,3 +124,13 @@ def get_config(fname, overrides=None, show=True):
     override_config(config, overrides)
 
     return config
+
+
+def cfg2dict(cfg):
+    if isinstance(cfg, AttrDict):
+        cfg = dict(cfg)
+    for k in cfg.keys():
+        if isinstance(cfg[k], AttrDict):
+            cfg[k] = cfg2dict(cfg[k])
+    return cfg
+    

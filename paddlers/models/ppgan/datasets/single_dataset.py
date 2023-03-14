@@ -20,7 +20,6 @@ from .builder import DATASETS
 class SingleDataset(BaseDataset):
     """
     """
-
     def __init__(self, dataroot, preprocess):
         """Initialize single dataset class.
 

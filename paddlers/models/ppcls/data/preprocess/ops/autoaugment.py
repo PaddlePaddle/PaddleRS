@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # This code is based on https://github.com/DeepVoltaire/AutoAugment/blob/master/autoaugment.py
+# reference: https://arxiv.org/abs/1805.09501
 
 from PIL import Image, ImageEnhance, ImageOps
 import numpy as np
@@ -160,7 +161,8 @@ class SVHNPolicy(object):
             SubPolicy(0.3, "contrast", 3, 0.8, "rotate", 4, fillcolor),
             SubPolicy(0.8, "invert", 5, 0.0, "translateY", 2, fillcolor),
             SubPolicy(0.7, "shearY", 6, 0.4, "solarize", 8, fillcolor),
-            SubPolicy(0.6, "invert", 4, 0.8, "rotate", 4, fillcolor), SubPolicy(
+            SubPolicy(0.6, "invert", 4, 0.8, "rotate", 4, fillcolor),
+            SubPolicy(
                 0.3, "shearY", 7, 0.9, "translateX", 3, fillcolor), SubPolicy(
                     0.1, "shearX", 6, 0.6, "invert", 5, fillcolor), SubPolicy(
                         0.7, "solarize", 2, 0.6, "translateY", 7,
