@@ -26,6 +26,7 @@ import paddlers.models.ppdet as ppdet
 from paddlers.models.ppdet.modeling.proposal_generator.target_layer import BBoxAssigner, MaskAssigner
 from paddlers.transforms import decode_image, construct_sample
 from paddlers.transforms.operators import _NormalizeBox, _PadBox, _BboxXYXY2XYWH, Resize, Pad
+from paddlers.transforms.operators import ArrangeDetector
 from paddlers.transforms.batch_operators import BatchCompose, BatchRandomResize, BatchRandomResizeByShort, \
     _BatchPad, _Gt2YoloTarget
 from paddlers.models.ppdet.optimizer import ModelEMA
@@ -42,6 +43,8 @@ __all__ = [
 
 
 class BaseDetector(BaseModel):
+    _arrage = ArrangeDetector
+
     def __init__(self, model_name, num_classes=80, **params):
         self.init_params.update(locals())
         if 'with_net' in self.init_params:
@@ -530,8 +533,8 @@ class BaseDetector(BaseModel):
                 }
         eval_dataset.batch_transforms = self._compose_batch_transform(
             eval_dataset.transforms, mode='eval')
-        self._check_transforms(eval_dataset.transforms, 'eval')
 
+        self._check_transforms(eval_dataset.transforms)
         self.net.eval()
         nranks = paddle.distributed.get_world_size()
         local_rank = paddle.distributed.get_rank()
@@ -570,6 +573,8 @@ class BaseDetector(BaseModel):
                     coco_gt=copy.deepcopy(eval_dataset.coco_gt),
                     classwise=False)
             scores = collections.OrderedDict()
+
+            self._check_arrange(eval_dataset.transforms, 'eval')
             logging.info(
                 "Start to evaluate(total_samples={}, total_steps={})...".format(
                     eval_dataset.num_samples, eval_dataset.num_samples))
@@ -623,6 +628,8 @@ class BaseDetector(BaseModel):
         else:
             images = img_file
 
+        transforms = self._build_transforms(transforms, "test")
+        self._check_arrange(transforms, "test")
         batch_samples, _ = self.preprocess(images, transforms)
         self.net.eval()
         outputs = self.run(self.net, batch_samples, 'test')
@@ -633,7 +640,7 @@ class BaseDetector(BaseModel):
         return prediction
 
     def preprocess(self, images, transforms, to_tensor=True):
-        self._check_transforms(transforms, 'test')
+        self._check_transforms(transforms)
         batch_samples = list()
         for im in images:
             if isinstance(im, str):
@@ -718,8 +725,8 @@ class BaseDetector(BaseModel):
 
         return results
 
-    def _check_transforms(self, transforms, mode):
-        super()._check_transforms(transforms, mode)
+    def _check_arrange(self, transforms, mode):
+        super()._check_arrange(transforms, mode)
         if not isinstance(transforms.arrange,
                           paddlers.transforms.ArrangeDetector):
             raise TypeError(

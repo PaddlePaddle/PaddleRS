@@ -29,6 +29,7 @@ import paddlers.utils.logging as logging
 from paddlers.models import res_losses
 from paddlers.models.ppgan.modules.init import init_weights
 from paddlers.transforms import Resize, decode_image, construct_sample
+from paddlers.transforms.operators import ArrangeRestorer
 from paddlers.transforms.functions import calc_hr_shape
 from paddlers.utils.checkpoint import res_pretrain_weights_dict
 from .base import BaseModel
@@ -39,6 +40,7 @@ __all__ = ["DRN", "LESRCNN", "ESRGAN"]
 
 
 class BaseRestorer(BaseModel):
+    _arrage = ArrangeRestorer
     MIN_MAX = (0., 1.)
     TEST_OUT_KEY = None
 
@@ -390,7 +392,7 @@ class BaseRestorer(BaseModel):
 
         """
 
-        self._check_transforms(eval_dataset.transforms, 'eval')
+        self._check_transforms(eval_dataset.transforms)
 
         self.net.eval()
         nranks = paddle.distributed.get_world_size()
@@ -411,6 +413,7 @@ class BaseRestorer(BaseModel):
         if nranks < 2 or local_rank == 0:
             self.eval_data_loader = self.build_data_loader(
                 eval_dataset, batch_size=batch_size, mode='eval')
+            self._check_arrange(eval_dataset.transforms, 'eval')
             # XXX: Hard-code crop_border and test_y_channel
             psnr = metrics.PSNR(crop_border=4, test_y_channel=True)
             ssim = metrics.SSIM(crop_border=4, test_y_channel=True)
@@ -466,6 +469,8 @@ class BaseRestorer(BaseModel):
             images = [img_file]
         else:
             images = img_file
+        transforms = self._build_transforms(transforms, "test")
+        self._check_arrange(transforms, "test")
         data = self.preprocess(images, transforms, self.model_type)
         self.net.eval()
         outputs = self.run(self.net, data, 'test')
@@ -477,7 +482,7 @@ class BaseRestorer(BaseModel):
         return prediction
 
     def preprocess(self, images, transforms, to_tensor=True):
-        self._check_transforms(transforms, 'test')
+        self._check_transforms(transforms)
         batch_im = list()
         batch_trans_info = list()
         for im in images:
@@ -559,8 +564,8 @@ class BaseRestorer(BaseModel):
             res_maps.append(res_map.squeeze())
         return res_maps
 
-    def _check_transforms(self, transforms, mode):
-        super()._check_transforms(transforms, mode)
+    def _check_arrange(self, transforms, mode):
+        super()._check_arrange(transforms, mode)
         if not isinstance(transforms.arrange,
                           paddlers.transforms.ArrangeRestorer):
             raise TypeError(

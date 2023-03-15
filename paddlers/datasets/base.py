@@ -18,7 +18,7 @@ from paddle.io import Dataset
 from paddle.fluid.dataloader.collate import default_collate_fn
 
 from paddlers.utils import get_num_workers
-from paddlers.transforms import construct_sample_from_dict
+from paddlers.transforms import construct_sample_from_dict, Compose, DecodeImg
 
 
 class BaseDataset(Dataset):
@@ -30,6 +30,8 @@ class BaseDataset(Dataset):
         self.data_dir = data_dir
         self.label_list = label_list
         self.transforms = deepcopy(transforms)
+        self.normal_transforms(self.transforms)
+
         self.num_workers = get_num_workers(num_workers)
         self.shuffle = shuffle
 
@@ -46,3 +48,11 @@ class BaseDataset(Dataset):
                 [s[0] for s in batch]), [s[1] for s in batch]
         else:
             return default_collate_fn([s[0] for s in batch])
+
+    def normal_transforms(self, trans):
+        # NOTE: add `DecodeImg` and convert to `Compose`
+        if isinstance(trans, list):
+            trans = Compose(trans)
+        if not isinstance(trans.transforms[0], DecodeImg):
+            trans.transforms.insert(0, DecodeImg())
+        self.transforms = trans

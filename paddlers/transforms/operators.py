@@ -110,7 +110,7 @@ class Compose(object):
                 "Length of transforms must not be less than 1, but received is {}."
                 .format(len(transforms)))
         transforms = copy.deepcopy(transforms)
-        self.arrange = self._pick_arrange(transforms)
+        self.arrange = None
         self.transforms = transforms
 
     def __call__(self, sample):
@@ -137,17 +137,6 @@ class Compose(object):
         if self.arrange is not None:
             sample = self.arrange(sample)
         return sample
-
-    def _pick_arrange(self, transforms):
-        arrange = None
-        for idx, op in enumerate(transforms):
-            if isinstance(op, Arrange):
-                if idx != len(transforms) - 1:
-                    raise ValueError(
-                        "Arrange operator must be placed at the end of the list."
-                    )
-                arrange = transforms.pop(idx)
-        return arrange
 
 
 class Transform(object):

@@ -31,7 +31,7 @@ class CDDataset(BaseDataset):
             the change mask. When `with_seg_labels` is True, each line in the file contains the paths of the
             bi-temporal images, the path of the change mask, and the paths of the segmentation masks in both
             temporal phases.
-        transforms (paddlers.transforms.Compose): Data preprocessing and data augmentation operators to apply.
+        transforms (paddlers.transforms.Compose|list): Data preprocessing and data augmentation operators to apply.
         label_list (str|None, optional): Path of the file that contains the category names. Defaults to None.
         num_workers (int|str, optional): Number of processes used for data loading. If `num_workers` is 'auto',
             the number of workers will be automatically determined according to the number of CPU cores: If 

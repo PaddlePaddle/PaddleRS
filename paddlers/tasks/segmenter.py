@@ -28,6 +28,7 @@ import paddlers.rs_models.seg as cmseg
 import paddlers.utils.logging as logging
 from paddlers.models import seg_losses
 from paddlers.transforms import Resize, decode_image, construct_sample
+from paddlers.transforms.operators import ArrangeSegmenter
 from paddlers.utils import get_single_card_bs, DisablePrint
 from paddlers.utils.checkpoint import seg_pretrain_weights_dict
 from .base import BaseModel
@@ -42,6 +43,8 @@ __all__ = [
 
 
 class BaseSegmenter(BaseModel):
+    _arrage = ArrangeSegmenter
+
     def __init__(self,
                  model_name,
                  num_classes=2,
@@ -406,7 +409,7 @@ class BaseSegmenter(BaseModel):
 
         """
 
-        self._check_transforms(eval_dataset.transforms, 'eval')
+        self._check_transforms(eval_dataset.transforms)
         self.net.eval()
         nranks = paddle.distributed.get_world_size()
         local_rank = paddle.distributed.get_rank()
@@ -426,6 +429,7 @@ class BaseSegmenter(BaseModel):
                 "is forcibly set to {}.".format(batch_size))
         self.eval_data_loader = self.build_data_loader(
             eval_dataset, batch_size=batch_size, mode='eval')
+        self._check_arrange(eval_dataset.transforms, 'eval')
 
         intersect_area_all = 0
         pred_area_all = 0
@@ -524,6 +528,8 @@ class BaseSegmenter(BaseModel):
             images = [img_file]
         else:
             images = img_file
+        transforms = self._build_transforms(transforms, "test")
+        self._check_arrange(transforms, "test")
         data = self.preprocess(images, transforms, self.model_type)
         self.net.eval()
         outputs = self.run(self.net, data, 'test')
@@ -585,7 +591,7 @@ class BaseSegmenter(BaseModel):
                        eager_load, not quiet)
 
     def preprocess(self, images, transforms, to_tensor=True):
-        self._check_transforms(transforms, 'test')
+        self._check_transforms(transforms)
         batch_im = list()
         batch_trans_info = list()
         for im in images:
@@ -675,8 +681,8 @@ class BaseSegmenter(BaseModel):
             score_maps.append(score_map.squeeze())
         return label_maps, score_maps
 
-    def _check_transforms(self, transforms, mode):
-        super()._check_transforms(transforms, mode)
+    def _check_arrange(self, transforms, mode):
+        super()._check_arrange(transforms, mode)
         if not isinstance(transforms.arrange,
                           paddlers.transforms.ArrangeSegmenter):
             raise TypeError(

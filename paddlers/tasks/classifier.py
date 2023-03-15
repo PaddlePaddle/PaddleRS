@@ -29,12 +29,16 @@ from paddlers.models import clas_losses
 from paddlers.models.ppcls.data.postprocess import build_postprocess
 from paddlers.utils.checkpoint import cls_pretrain_weights_dict
 from paddlers.transforms import Resize, decode_image, construct_sample
+from paddlers.transforms.operators import ArrangeClassifier
+
 from .base import BaseModel
 
 __all__ = ["ResNet50_vd", "MobileNetV3", "HRNet", "CondenseNetV2"]
 
 
 class BaseClassifier(BaseModel):
+    _arrage = ArrangeClassifier
+
     def __init__(self,
                  model_name,
                  in_channels=3,
@@ -380,7 +384,7 @@ class BaseClassifier(BaseModel):
                  "top5": acc of top5}.
         """
 
-        self._check_transforms(eval_dataset.transforms, 'eval')
+        self._check_transforms(eval_dataset.transforms)
 
         self.net.eval()
         nranks = paddle.distributed.get_world_size()
@@ -400,6 +404,8 @@ class BaseClassifier(BaseModel):
         if nranks < 2 or local_rank == 0:
             self.eval_data_loader = self.build_data_loader(
                 eval_dataset, batch_size=batch_size, mode='eval')
+            self._check_arrange(self.eval_data_loader.dataset.transforms,
+                                'eval')
             logging.info(
                 "Start to evaluate(total_samples={}, total_steps={})...".format(
                     eval_dataset.num_samples, eval_dataset.num_samples))
@@ -455,6 +461,8 @@ class BaseClassifier(BaseModel):
             images = [img_file]
         else:
             images = img_file
+        transforms = self._build_transforms(transforms, "test")
+        self._check_arrange(transforms, "test")
         data, _ = self.preprocess(images, transforms, self.model_type)
         self.net.eval()
 
@@ -480,7 +488,7 @@ class BaseClassifier(BaseModel):
         return prediction
 
     def preprocess(self, images, transforms, to_tensor=True):
-        self._check_transforms(transforms, 'test')
+        self._check_transforms(transforms)
         batch_im = list()
         for im in images:
             if isinstance(im, str):
@@ -496,8 +504,8 @@ class BaseClassifier(BaseModel):
 
         return batch_im, None
 
-    def _check_transforms(self, transforms, mode):
-        super()._check_transforms(transforms, mode)
+    def _check_arrange(self, transforms, mode):
+        super()._check_arrange(transforms, mode)
         if not isinstance(transforms.arrange,
                           paddlers.transforms.ArrangeClassifier):
             raise TypeError(
