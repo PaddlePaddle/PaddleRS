@@ -61,11 +61,6 @@ __all__ = [
     "ReloadMask",
     "AppendIndex",
     "MatchRadiance",
-    "ArrangeRestorer",
-    "ArrangeSegmenter",
-    "ArrangeChangeDetector",
-    "ArrangeClassifier",
-    "ArrangeDetector",
 ]
 
 interp_dict = {
