@@ -26,12 +26,11 @@ __all__ = ['TestPostProgress']
 
 class TestPostProgress(CpuCommonTest):
     def setUp(self):
-        self.image1 = np.asarray(Image.open("tests/data/ssmt/optical_t2.bmp"))
-        self.image2 = np.asarray(Image.open("tests/data/ssmt/optical_t2.bmp"))
-        self.b_label = np.asarray(Image.open(
-            "tests/data/ssmt/binary_gt.bmp")).clip(0, 1)
-        self.m_label = np.asarray(
-            Image.open("tests/data/ssmt/multiclass_gt2.png"))
+        self.image1 = np.asarray(Image.open("data/ssmt/optical_t2.bmp"))
+        self.image2 = np.asarray(Image.open("data/ssmt/optical_t2.bmp"))
+        self.b_label = np.asarray(Image.open("data/ssmt/binary_gt.bmp")).clip(0,
+                                                                              1)
+        self.m_label = np.asarray(Image.open("data/ssmt/multiclass_gt2.png"))
 
     def test_prepro_mask(self):
         mask = copy.deepcopy(self.b_label)
