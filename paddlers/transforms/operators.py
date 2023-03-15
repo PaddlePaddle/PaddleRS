@@ -18,6 +18,7 @@ import random
 from numbers import Number
 from functools import partial
 from operator import methodcaller
+from collections import OrderedDict
 from collections.abc import Sequence
 
 import numpy as np
@@ -32,6 +33,8 @@ import paddlers.transforms.indices as indices
 import paddlers.transforms.satellites as satellites
 
 __all__ = [
+    "construct_sample",
+    "construct_sample_from_dict",
     "Compose",
     "DecodeImg",
     "Resize",
@@ -74,6 +77,19 @@ interp_dict = {
 }
 
 
+def construct_sample(**kwargs):
+    sample = OrderedDict()
+    for k, v in kwargs.items():
+        sample[k] = v
+    if 'trans_info' not in sample:
+        sample['trans_info'] = []
+    return sample
+
+
+def construct_sample_from_dict(dict_like_obj):
+    return construct_sample(**dict_like_obj)
+
+
 class Compose(object):
     """
     Apply a series of data augmentation strategies to the input.
@@ -107,17 +123,17 @@ class Compose(object):
         This is equivalent to sequentially calling compose_obj.apply_transforms() 
             and compose_obj.arrange_outputs().
         """
-
+        if 'trans_info' not in sample:
+            sample['trans_info'] = []
         sample = self.apply_transforms(sample)
+        trans_info = sample['trans_info']
         sample = self.arrange_outputs(sample)
-        return sample
+        return sample, trans_info
 
     def apply_transforms(self, sample):
         for op in self.transforms:
-            # Skip batch transforms amd mixup
-            if isinstance(op, (paddlers.transforms.BatchRandomResize,
-                               paddlers.transforms.BatchRandomResizeByShort,
-                               MixupImage)):
+            # Skip batch transforms
+            if getattr(op, 'is_batch_transform', False):
                 continue
             sample = op(sample)
         return sample
@@ -461,6 +477,7 @@ class Resize(Transform):
         return resized_segms
 
     def apply(self, sample):
+        sample['trans_info'].append(('resize', sample['image'].shape[0:2]))
         if self.interp == "RANDOM":
             interp = random.choice(list(interp_dict.values()))
         else:
@@ -679,7 +696,7 @@ class RandomFlipOrRotate(Transform):
         train_transforms = T.Compose([
             T.DecodeImg(),
             T.RandomFlipOrRotate(
-                probs  = [0.3, 0.2]             # p=0.3 to flip the image，p=0.2 to rotate the image，p=0.5 to keep the image unchanged.
+                probs  = [0.3, 0.2]             # p=0.3 to flip the image, p=0.2 to rotate the image, p=0.5 to keep the image unchanged.
                 probsf = [0.3, 0.25, 0, 0, 0]   # p=0.3 and p=0.25 to perform horizontal and vertical flipping; probility of no-flipping is 0.45.
                 probsr = [0, 0.65, 0]),         # p=0.65 to rotate the image by 180°; probility of no-rotation is 0.35.
             T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
@@ -1439,6 +1456,8 @@ class Pad(Transform):
 
         offsets = self._get_offsets(im_h, im_w, h, w)
 
+        sample['trans_info'].append(
+            ('padding', sample['image'].shape[0:2], offsets))
         sample['image'] = self.apply_im(sample['image'], offsets, (h, w))
         if 'image2' in sample:
             sample['image2'] = self.apply_im(sample['image2'], offsets, (h, w))
@@ -1468,6 +1487,8 @@ class Pad(Transform):
 
 
 class MixupImage(Transform):
+    is_batch_transform = True
+
     def __init__(self, alpha=1.5, beta=1.5, mixup_epoch=-1):
         """
         Mixup two images and their gt_bbbox/gt_score.
@@ -2075,7 +2096,6 @@ class ArrangeSegmenter(Arrange):
         if 'mask' in sample:
             mask = sample['mask']
             mask = mask.astype('int64')
-
         image = F.permute(sample['image'], False)
         if self.mode == 'train':
             return image, mask
@@ -2090,7 +2110,6 @@ class ArrangeChangeDetector(Arrange):
         if 'mask' in sample:
             mask = sample['mask']
             mask = mask.astype('int64')
-
         image_t1 = F.permute(sample['image'], False)
         image_t2 = F.permute(sample['image2'], False)
         if self.mode == 'train':
@@ -2104,7 +2123,7 @@ class ArrangeChangeDetector(Arrange):
         if self.mode == 'eval':
             return image_t1, image_t2, mask
         if self.mode == 'test':
-            return image_t1, image_t2,
+            return image_t1, image_t2
 
 
 class ArrangeClassifier(Arrange):
@@ -2113,7 +2132,7 @@ class ArrangeClassifier(Arrange):
         if self.mode in ['train', 'eval']:
             return image, sample['label']
         else:
-            return image
+            return image,
 
 
 class ArrangeDetector(Arrange):

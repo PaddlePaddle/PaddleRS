@@ -45,7 +45,6 @@ class LPIPSMetric(paddle.metric.Metric):
     Returns:
         float: lpips result.
     """
-
     def __init__(self, net='vgg', version='0.1', mean=None, std=None):
         self.net = net
         self.version = version
@@ -77,10 +76,10 @@ class LPIPSMetric(paddle.metric.Metric):
         for pred, gt in zip(preds, gts):
             pred, gt = pred.astype(np.float32) / 255., gt.astype(
                 np.float32) / 255.
-            pred = paddle.vision.transforms.normalize(
-                pred.transpose([2, 0, 1]), self.mean, self.std)
-            gt = paddle.vision.transforms.normalize(
-                gt.transpose([2, 0, 1]), self.mean, self.std)
+            pred = paddle.vision.transforms.normalize(pred.transpose([2, 0, 1]),
+                                                      self.mean, self.std)
+            gt = paddle.vision.transforms.normalize(gt.transpose([2, 0, 1]),
+                                                    self.mean, self.std)
 
             with paddle.no_grad():
                 value = self.loss_fn(
@@ -111,13 +110,11 @@ def spatial_average(in_tens, keepdim=True):
 # assumes scale factor is same for H and W
 def upsample(in_tens, out_HW=(64, 64)):
     in_H, in_W = in_tens.shape[2], in_tens.shape[3]
-    scale_factor_H, scale_factor_W = 1. * out_HW[0] / in_H, 1. * out_HW[
-        1] / in_W
+    scale_factor_H, scale_factor_W = 1. * out_HW[0] / in_H, 1. * out_HW[1] / in_W
 
-    return nn.Upsample(
-        scale_factor=(scale_factor_H, scale_factor_W),
-        mode='bilinear',
-        align_corners=False)(in_tens)
+    return nn.Upsample(scale_factor=(scale_factor_H, scale_factor_W),
+                       mode='bilinear',
+                       align_corners=False)(in_tens)
 
 
 def normalize_tensor(in_feat, eps=1e-10):
@@ -146,8 +143,8 @@ class LPIPS(nn.Layer):
         if (verbose):
             print(
                 'Setting up [%s] perceptual loss: trunk [%s], v[%s], spatial [%s]'
-                % ('LPIPS' if lpips else 'baseline', net, version, 'on'
-                   if spatial else 'off'))
+                % ('LPIPS' if lpips else 'baseline', net, version,
+                   'on' if spatial else 'off'))
 
         self.pnet_type = net
         self.pnet_tune = pnet_tune
@@ -210,35 +207,31 @@ class LPIPS(nn.Layer):
         feats0, feats1, diffs = {}, {}, {}
 
         for kk in range(self.L):
-            feats0[kk], feats1[kk] = normalize_tensor(outs0[
-                kk]), normalize_tensor(outs1[kk])
+            feats0[kk], feats1[kk] = normalize_tensor(
+                outs0[kk]), normalize_tensor(outs1[kk])
             diffs[kk] = (feats0[kk] - feats1[kk])**2
 
         if (self.lpips):
             if (self.spatial):
                 res = [
-                    upsample(
-                        self.lins[kk].model(diffs[kk]), out_HW=in0.shape[2:])
-                    for kk in range(self.L)
+                    upsample(self.lins[kk].model(diffs[kk]),
+                             out_HW=in0.shape[2:]) for kk in range(self.L)
                 ]
             else:
                 res = [
-                    spatial_average(
-                        self.lins[kk].model(diffs[kk]), keepdim=True)
-                    for kk in range(self.L)
+                    spatial_average(self.lins[kk].model(diffs[kk]),
+                                    keepdim=True) for kk in range(self.L)
                 ]
         else:
             if (self.spatial):
                 res = [
-                    upsample(
-                        diffs[kk].sum(dim=1, keepdim=True),
-                        out_HW=in0.shape[2:]) for kk in range(self.L)
+                    upsample(diffs[kk].sum(dim=1, keepdim=True),
+                             out_HW=in0.shape[2:]) for kk in range(self.L)
                 ]
             else:
                 res = [
-                    spatial_average(
-                        diffs[kk].sum(dim=1, keepdim=True), keepdim=True)
-                    for kk in range(self.L)
+                    spatial_average(diffs[kk].sum(dim=1, keepdim=True),
+                                    keepdim=True) for kk in range(self.L)
                 ]
 
         val = res[0]
@@ -258,7 +251,8 @@ class ScalingLayer(nn.Layer):
             'shift',
             paddle.to_tensor([-.030, -.088, -.188]).reshape([1, 3, 1, 1]))
         self.register_buffer(
-            'scale', paddle.to_tensor([.458, .448, .450]).reshape([1, 3, 1, 1]))
+            'scale',
+            paddle.to_tensor([.458, .448, .450]).reshape([1, 3, 1, 1]))
 
     def forward(self, inp):
         return (inp - self.shift) / self.scale
@@ -266,14 +260,14 @@ class ScalingLayer(nn.Layer):
 
 class NetLinLayer(nn.Layer):
     ''' A single linear layer which does a 1x1 conv '''
-
     def __init__(self, chn_in, chn_out=1, use_dropout=False):
         super(NetLinLayer, self).__init__()
 
-        layers = [nn.Dropout(), ] if (use_dropout) else []
+        layers = [
+            nn.Dropout(),
+        ] if (use_dropout) else []
         layers += [
-            nn.Conv2D(
-                chn_in, chn_out, 1, stride=1, padding=0, bias_attr=False),
+            nn.Conv2D(chn_in, chn_out, 1, stride=1, padding=0, bias_attr=False),
         ]
         self.model = nn.Sequential(*layers)
 

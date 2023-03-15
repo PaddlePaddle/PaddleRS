@@ -23,6 +23,11 @@ import paddle.nn.functional as F
 
 
 class PairwiseCosface(nn.Layer):
+    """
+    paper: Circle Loss: A Unified Perspective of Pair Similarity Optimization
+    code reference: https://github.com/leoluopy/circle-loss-demonstration/blob/main/circle_loss.py
+    """
+
     def __init__(self, margin, gamma):
         super(PairwiseCosface, self).__init__()
         self.margin = margin
@@ -48,7 +53,8 @@ class PairwiseCosface(nn.Layer):
         s_n = dist_mat * is_neg
 
         logit_p = -self.gamma * s_p + (-99999999.) * (1 - is_pos)
-        logit_n = self.gamma * (s_n + self.margin) + (-99999999.) * (1 - is_neg)
+        logit_n = self.gamma * (s_n + self.margin) + (-99999999.) * (1 - is_neg
+                                                                     )
 
         loss = F.softplus(
             paddle.logsumexp(

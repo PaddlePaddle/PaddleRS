@@ -12,16 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import paddle
 import cv2
 
-from ppcls.arch import build_model
-from ppcls.utils.config import parse_config, parse_args
-from ppcls.utils.save_load import load_dygraph_pretrain
-from ppcls.utils.logger import init_logger
-from ppcls.data import create_operators
-from ppcls.arch.slim import quantize_model
+import os
+import sys
+__dir__ = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.abspath(os.path.join(__dir__, '../../')))
+
+from ..arch import build_model
+from .config import parse_config, parse_args
+from .save_load import load_dygraph_pretrain
+from .logger import init_logger
+from ..data import create_operators
+from ..arch.slim import quantize_model
 
 
 class GalleryLayer(paddle.nn.Layer):
@@ -58,6 +62,10 @@ class GalleryLayer(paddle.nn.Layer):
         for i, label_i in enumerate(gallery_labels):
             output_label_str += "{} {}\n".format(i, label_i)
         output_path = configs["Global"]["save_inference_dir"] + "_label.txt"
+
+        save_dir = os.path.dirname(configs["Global"]["save_inference_dir"])
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
         with open(output_path, "w") as f:
             f.write(output_label_str)
 
@@ -88,6 +96,7 @@ class GalleryLayer(paddle.nn.Layer):
                     norm_feature = paddle.nn.functional.normalize(
                         feature, axis=0)
                     gallery_feature[i - batch_index + j + 1] = norm_feature
+                batch_index = 0
         self.gallery_layer.set_state_dict({"_layer.weight": gallery_feature.T})
 
 

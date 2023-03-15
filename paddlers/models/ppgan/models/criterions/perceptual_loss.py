@@ -3,7 +3,7 @@ import paddle
 import paddle.nn as nn
 import paddle.vision.models.vgg as vgg
 
-from ppgan.utils.download import get_path_from_url
+from paddlers.models.ppgan.utils.download import get_path_from_url
 from .builder import CRITERIONS
 
 
@@ -25,7 +25,6 @@ class PerceptualVGG(nn.Layer):
             Default: True.
         pretrained_url (str): Path for pretrained weights. Default:
     """
-
     def __init__(
             self,
             layer_name_list,
@@ -114,7 +113,6 @@ class PerceptualLoss(nn.Layer):
         pretrained (str): Path for pretrained weights. Default:
 
     """
-
     def __init__(
             self,
             layer_weights,
@@ -134,11 +132,10 @@ class PerceptualLoss(nn.Layer):
         self.perceptual_weight = perceptual_weight
         self.style_weight = style_weight
         self.layer_weights = layer_weights
-        self.vgg = PerceptualVGG(
-            layer_name_list=list(layer_weights.keys()),
-            vgg_type=vgg_type,
-            use_input_norm=use_input_norm,
-            pretrained_url=pretrained)
+        self.vgg = PerceptualVGG(layer_name_list=list(layer_weights.keys()),
+                                 vgg_type=vgg_type,
+                                 use_input_norm=use_input_norm,
+                                 pretrained_url=pretrained)
 
         if criterion == 'l1':
             self.criterion = nn.L1Loss()
@@ -179,9 +176,9 @@ class PerceptualLoss(nn.Layer):
         if self.style_weight > 0:
             style_loss = 0
             for k in x_features.keys():
-                style_loss += self.criterion(
-                    self._gram_mat(x_features[k]),
-                    self._gram_mat(gt_features[k])) * self.layer_weights[k]
+                style_loss += self.criterion(self._gram_mat(
+                    x_features[k]), self._gram_mat(
+                        gt_features[k])) * self.layer_weights[k]
             style_loss *= self.style_weight
         else:
             style_loss = None

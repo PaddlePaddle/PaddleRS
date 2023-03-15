@@ -16,8 +16,8 @@ import copy
 from PIL import Image
 
 import numpy as np
-
 import paddle
+
 import paddlers.utils.postprocs as P
 from testing_utils import CpuCommonTest
 

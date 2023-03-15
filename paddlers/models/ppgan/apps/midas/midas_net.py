@@ -22,7 +22,6 @@ class BaseModel(paddle.nn.Layer):
 class MidasNet(BaseModel):
     """Network for monocular depth estimation.
     """
-
     def __init__(self, path=None, features=256, non_negative=True):
         """Init.
 
@@ -48,15 +47,11 @@ class MidasNet(BaseModel):
         self.scratch.refinenet1 = FeatureFusionBlock(features)
 
         output_conv = [
-            nn.Conv2D(
-                features, 128, kernel_size=3, stride=1, padding=1),
-            nn.Upsample(
-                scale_factor=2, mode="bilinear"),
-            nn.Conv2D(
-                128, 32, kernel_size=3, stride=1, padding=1),
+            nn.Conv2D(features, 128, kernel_size=3, stride=1, padding=1),
+            nn.Upsample(scale_factor=2, mode="bilinear"),
+            nn.Conv2D(128, 32, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
-            nn.Conv2D(
-                32, 1, kernel_size=1, stride=1, padding=0),
+            nn.Conv2D(32, 1, kernel_size=1, stride=1, padding=0),
             nn.ReLU() if non_negative else nn.Identity(),
         ]
         if non_negative:

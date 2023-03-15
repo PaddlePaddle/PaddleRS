@@ -17,24 +17,29 @@ import copy
 import paddle
 import numpy as np
 from paddle.io import DistributedBatchSampler, BatchSampler, DataLoader
-from ppcls.utils import logger
+from paddlers.models.ppcls.utils import logger
 
-from ppcls.data import dataloader
+from paddlers.models.ppcls.data import dataloader
 # dataset
-from ppcls.data.dataloader.imagenet_dataset import ImageNetDataset
-from ppcls.data.dataloader.multilabel_dataset import MultiLabelDataset
-from ppcls.data.dataloader.common_dataset import create_operators
-from ppcls.data.dataloader.vehicle_dataset import CompCars, VeriWild
-from ppcls.data.dataloader.logo_dataset import LogoDataset
-from ppcls.data.dataloader.icartoon_dataset import ICartoonDataset
-from ppcls.data.dataloader.mix_dataset import MixDataset
+from paddlers.models.ppcls.data.dataloader.imagenet_dataset import ImageNetDataset
+from paddlers.models.ppcls.data.dataloader.multilabel_dataset import MultiLabelDataset
+from paddlers.models.ppcls.data.dataloader.common_dataset import create_operators
+from paddlers.models.ppcls.data.dataloader.vehicle_dataset import CompCars, VeriWild
+from paddlers.models.ppcls.data.dataloader.logo_dataset import LogoDataset
+from paddlers.models.ppcls.data.dataloader.icartoon_dataset import ICartoonDataset
+from paddlers.models.ppcls.data.dataloader.mix_dataset import MixDataset
+from paddlers.models.ppcls.data.dataloader.multi_scale_dataset import MultiScaleDataset
+from paddlers.models.ppcls.data.dataloader.person_dataset import Market1501, MSMT17
+from paddlers.models.ppcls.data.dataloader.face_dataset import FiveValidationDataset, AdaFaceDataset
+
 
 # sampler
-from ppcls.data.dataloader.DistributedRandomIdentitySampler import DistributedRandomIdentitySampler
-from ppcls.data.dataloader.pk_sampler import PKSampler
-from ppcls.data.dataloader.mix_sampler import MixSampler
-from ppcls.data import preprocess
-from ppcls.data.preprocess import transform
+from paddlers.models.ppcls.data.dataloader.DistributedRandomIdentitySampler import DistributedRandomIdentitySampler
+from paddlers.models.ppcls.data.dataloader.pk_sampler import PKSampler
+from paddlers.models.ppcls.data.dataloader.mix_sampler import MixSampler
+from paddlers.models.ppcls.data.dataloader.multi_scale_sampler import MultiScaleSampler
+from paddlers.models.ppcls.data import preprocess
+from paddlers.models.ppcls.data.preprocess import transform
 
 
 def create_operators(params, class_num=None):
@@ -66,8 +71,13 @@ def build_dataloader(config, mode, device, use_dali=False, seed=None):
     ], "Dataset mode should be Train, Eval, Test, Gallery, Query"
     # build dataset
     if use_dali:
-        from ppcls.data.dataloader.dali import dali_dataloader
-        return dali_dataloader(config, mode, paddle.device.get_device(), seed)
+        from paddlers.models.ppcls.data.dataloader.dali import dali_dataloader
+        return dali_dataloader(
+            config,
+            mode,
+            paddle.device.get_device(),
+            num_threads=config[mode]['loader']["num_workers"],
+            seed=seed)
 
     class_num = config.get("class_num", None)
     config_dataset = config[mode]['dataset']
@@ -84,7 +94,7 @@ def build_dataloader(config, mode, device, use_dali=False, seed=None):
 
     # build sampler
     config_sampler = config[mode]['sampler']
-    if "name" not in config_sampler:
+    if config_sampler and "name" not in config_sampler:
         batch_sampler = None
         batch_size = config_sampler["batch_size"]
         drop_last = config_sampler["drop_last"]

@@ -73,8 +73,8 @@ def adaptive_instance_normalization(content_feat, style_feat):
     style_mean, style_std = calc_mean_std(style_feat)
     content_mean, content_std = calc_mean_std(content_feat)
 
-    normalized_feat = (
-        content_feat - content_mean.expand(size)) / content_std.expand(size)
+    normalized_feat = (content_feat -
+                       content_mean.expand(size)) / content_std.expand(size)
     return normalized_feat * style_std.expand(size) + style_mean.expand(size)
 
 
@@ -88,17 +88,12 @@ class ResnetBlock(nn.Layer):
     Args:
         dim (int): Channel number of intermediate features.
     """
-
     def __init__(self, dim):
         super(ResnetBlock, self).__init__()
-        self.conv_block = nn.Sequential(
-            nn.Pad2D(
-                [1, 1, 1, 1], mode='reflect'),
-            nn.Conv2D(dim, dim, (3, 3)),
-            nn.ReLU(),
-            nn.Pad2D(
-                [1, 1, 1, 1], mode='reflect'),
-            nn.Conv2D(dim, dim, (3, 3)))
+        self.conv_block = nn.Sequential(nn.Pad2D([1, 1, 1, 1], mode='reflect'),
+                                        nn.Conv2D(dim, dim, (3, 3)), nn.ReLU(),
+                                        nn.Pad2D([1, 1, 1, 1], mode='reflect'),
+                                        nn.Conv2D(dim, dim, (3, 3)))
 
     def forward(self, x):
         out = x + self.conv_block(x)
@@ -115,14 +110,11 @@ class ConvBlock(nn.Layer):
         dim1 (int): Channel number of input features.
         dim2 (int): Channel number of output features.
     """
-
     def __init__(self, dim1, dim2):
         super(ConvBlock, self).__init__()
-        self.conv_block = nn.Sequential(
-            nn.Pad2D(
-                [1, 1, 1, 1], mode='reflect'),
-            nn.Conv2D(dim1, dim2, (3, 3)),
-            nn.ReLU())
+        self.conv_block = nn.Sequential(nn.Pad2D([1, 1, 1, 1], mode='reflect'),
+                                        nn.Conv2D(dim1, dim2, (3, 3)),
+                                        nn.ReLU())
 
     def forward(self, x):
         out = self.conv_block(x)
@@ -136,7 +128,6 @@ class DecoderNet(nn.Layer):
         Drafting and Revision: Laplacian Pyramid Network for Fast High-Quality
         Artistic Style Transfer.
     """
-
     def __init__(self):
         super(DecoderNet, self).__init__()
 
@@ -151,9 +142,8 @@ class DecoderNet(nn.Layer):
         self.convblock_11 = ConvBlock(64, 64)
         self.upsample = nn.Upsample(scale_factor=2, mode='nearest')
 
-        self.final_conv = nn.Sequential(
-            nn.Pad2D(
-                [1, 1, 1, 1], mode='reflect'), nn.Conv2D(64, 3, (3, 3)))
+        self.final_conv = nn.Sequential(nn.Pad2D([1, 1, 1, 1], mode='reflect'),
+                                        nn.Conv2D(64, 3, (3, 3)))
 
     def forward(self, cF, sF):
 
@@ -177,6 +167,8 @@ class DecoderNet(nn.Layer):
         return out
 
 
+
+
 @GENERATORS.register()
 class Encoder(nn.Layer):
     """Encoder of Drafting module.
@@ -184,97 +176,76 @@ class Encoder(nn.Layer):
         Drafting and Revision: Laplacian Pyramid Network for Fast High-Quality
         Artistic Style Transfer.
     """
-
     def __init__(self):
         super(Encoder, self).__init__()
         vgg_net = nn.Sequential(
             nn.Conv2D(3, 3, (1, 1)),
-            nn.Pad2D(
-                [1, 1, 1, 1], mode='reflect'),
+            nn.Pad2D([1, 1, 1, 1], mode='reflect'),
             nn.Conv2D(3, 64, (3, 3)),
             nn.ReLU(),  # relu1-1
-            nn.Pad2D(
-                [1, 1, 1, 1], mode='reflect'),
+            nn.Pad2D([1, 1, 1, 1], mode='reflect'),
             nn.Conv2D(64, 64, (3, 3)),
             nn.ReLU(),  # relu1-2
-            nn.MaxPool2D(
-                (2, 2), (2, 2), (0, 0), ceil_mode=True),
-            nn.Pad2D(
-                [1, 1, 1, 1], mode='reflect'),
+            nn.MaxPool2D((2, 2), (2, 2), (0, 0), ceil_mode=True),
+            nn.Pad2D([1, 1, 1, 1], mode='reflect'),
             nn.Conv2D(64, 128, (3, 3)),
             nn.ReLU(),  # relu2-1
-            nn.Pad2D(
-                [1, 1, 1, 1], mode='reflect'),
+            nn.Pad2D([1, 1, 1, 1], mode='reflect'),
             nn.Conv2D(128, 128, (3, 3)),
             nn.ReLU(),  # relu2-2
-            nn.MaxPool2D(
-                (2, 2), (2, 2), (0, 0), ceil_mode=True),
-            nn.Pad2D(
-                [1, 1, 1, 1], mode='reflect'),
+            nn.MaxPool2D((2, 2), (2, 2), (0, 0), ceil_mode=True),
+            nn.Pad2D([1, 1, 1, 1], mode='reflect'),
             nn.Conv2D(128, 256, (3, 3)),
             nn.ReLU(),  # relu3-1
-            nn.Pad2D(
-                [1, 1, 1, 1], mode='reflect'),
+            nn.Pad2D([1, 1, 1, 1], mode='reflect'),
             nn.Conv2D(256, 256, (3, 3)),
             nn.ReLU(),  # relu3-2
-            nn.Pad2D(
-                [1, 1, 1, 1], mode='reflect'),
+            nn.Pad2D([1, 1, 1, 1], mode='reflect'),
             nn.Conv2D(256, 256, (3, 3)),
             nn.ReLU(),  # relu3-3
-            nn.Pad2D(
-                [1, 1, 1, 1], mode='reflect'),
+            nn.Pad2D([1, 1, 1, 1], mode='reflect'),
             nn.Conv2D(256, 256, (3, 3)),
             nn.ReLU(),  # relu3-4
-            nn.MaxPool2D(
-                (2, 2), (2, 2), (0, 0), ceil_mode=True),
-            nn.Pad2D(
-                [1, 1, 1, 1], mode='reflect'),
+            nn.MaxPool2D((2, 2), (2, 2), (0, 0), ceil_mode=True),
+            nn.Pad2D([1, 1, 1, 1], mode='reflect'),
             nn.Conv2D(256, 512, (3, 3)),
             nn.ReLU(),  # relu4-1, this is the last layer used
-            nn.Pad2D(
-                [1, 1, 1, 1], mode='reflect'),
+            nn.Pad2D([1, 1, 1, 1], mode='reflect'),
             nn.Conv2D(512, 512, (3, 3)),
             nn.ReLU(),  # relu4-2
-            nn.Pad2D(
-                [1, 1, 1, 1], mode='reflect'),
+            nn.Pad2D([1, 1, 1, 1], mode='reflect'),
             nn.Conv2D(512, 512, (3, 3)),
             nn.ReLU(),  # relu4-3
-            nn.Pad2D(
-                [1, 1, 1, 1], mode='reflect'),
+            nn.Pad2D([1, 1, 1, 1], mode='reflect'),
             nn.Conv2D(512, 512, (3, 3)),
             nn.ReLU(),  # relu4-4
-            nn.MaxPool2D(
-                (2, 2), (2, 2), (0, 0), ceil_mode=True),
-            nn.Pad2D(
-                [1, 1, 1, 1], mode='reflect'),
+            nn.MaxPool2D((2, 2), (2, 2), (0, 0), ceil_mode=True),
+            nn.Pad2D([1, 1, 1, 1], mode='reflect'),
             nn.Conv2D(512, 512, (3, 3)),
             nn.ReLU(),  # relu5-1
-            nn.Pad2D(
-                [1, 1, 1, 1], mode='reflect'),
+            nn.Pad2D([1, 1, 1, 1], mode='reflect'),
             nn.Conv2D(512, 512, (3, 3)),
             nn.ReLU(),  # relu5-2
-            nn.Pad2D(
-                [1, 1, 1, 1], mode='reflect'),
+            nn.Pad2D([1, 1, 1, 1], mode='reflect'),
             nn.Conv2D(512, 512, (3, 3)),
             nn.ReLU(),  # relu5-3
-            nn.Pad2D(
-                [1, 1, 1, 1], mode='reflect'),
+            nn.Pad2D([1, 1, 1, 1], mode='reflect'),
             nn.Conv2D(512, 512, (3, 3)),
             nn.ReLU()  # relu5-4
         )
         weight_path = get_path_from_url(
             'https://paddlegan.bj.bcebos.com/models/vgg_normalised.pdparams')
         vgg_net.set_dict(paddle.load(weight_path))
-        self.enc_1 = nn.Sequential(
-            *list(vgg_net.children())[:4])  # input -> relu1_1
-        self.enc_2 = nn.Sequential(
-            *list(vgg_net.children())[4:11])  # relu1_1 -> relu2_1
-        self.enc_3 = nn.Sequential(
-            *list(vgg_net.children())[11:18])  # relu2_1 -> relu3_1
-        self.enc_4 = nn.Sequential(
-            *list(vgg_net.children())[18:31])  # relu3_1 -> relu4_1
-        self.enc_5 = nn.Sequential(
-            *list(vgg_net.children())[31:44])  # relu4_1 -> relu5_1
+        self.enc_1 = nn.Sequential(*list(
+            vgg_net.children())[:4])  # input -> relu1_1
+        self.enc_2 = nn.Sequential(*list(
+            vgg_net.children())[4:11])  # relu1_1 -> relu2_1
+        self.enc_3 = nn.Sequential(*list(
+            vgg_net.children())[11:18])  # relu2_1 -> relu3_1
+        self.enc_4 = nn.Sequential(*list(
+            vgg_net.children())[18:31])  # relu3_1 -> relu4_1
+        self.enc_5 = nn.Sequential(*list(
+            vgg_net.children())[31:44])  # relu4_1 -> relu5_1
 
     def forward(self, x):
         out = {}
@@ -298,33 +269,32 @@ class RevisionNet(nn.Layer):
         Drafting and Revision: Laplacian Pyramid Network for Fast High-Quality
         Artistic Style Transfer.
     """
-
     def __init__(self, input_nc=6):
         super(RevisionNet, self).__init__()
         DownBlock = []
         DownBlock += [
-            nn.Pad2D(
-                [1, 1, 1, 1], mode='reflect'), nn.Conv2D(input_nc, 64, (3, 3)),
+            nn.Pad2D([1, 1, 1, 1], mode='reflect'),
+            nn.Conv2D(input_nc, 64, (3, 3)),
             nn.ReLU()
         ]
         DownBlock += [
-            nn.Pad2D(
-                [1, 1, 1, 1], mode='reflect'), nn.Conv2D(
-                    64, 64, (3, 3), stride=2), nn.ReLU()
+            nn.Pad2D([1, 1, 1, 1], mode='reflect'),
+            nn.Conv2D(64, 64, (3, 3), stride=2),
+            nn.ReLU()
         ]
 
         self.resblock = ResnetBlock(64)
 
         UpBlock = []
         UpBlock += [
-            nn.Upsample(
-                scale_factor=2, mode='nearest'), nn.Pad2D(
-                    [1, 1, 1, 1], mode='reflect'), nn.Conv2D(64, 64, (3, 3)),
+            nn.Upsample(scale_factor=2, mode='nearest'),
+            nn.Pad2D([1, 1, 1, 1], mode='reflect'),
+            nn.Conv2D(64, 64, (3, 3)),
             nn.ReLU()
         ]
         UpBlock += [
-            nn.Pad2D(
-                [1, 1, 1, 1], mode='reflect'), nn.Conv2D(64, 3, (3, 3))
+            nn.Pad2D([1, 1, 1, 1], mode='reflect'),
+            nn.Conv2D(64, 3, (3, 3))
         ]
 
         self.DownBlock = nn.Sequential(*DownBlock)

@@ -25,25 +25,27 @@ class LapStyleDiscriminator(nn.Layer):
         num_layer = 3
         num_channel = 32
         self.head = nn.Sequential(
-            ('conv', nn.Conv2D(
-                3, num_channel, kernel_size=3, stride=1,
-                padding=1)), ('norm', nn.BatchNorm2D(num_channel)),
+            ('conv',
+             nn.Conv2D(3, num_channel, kernel_size=3, stride=1, padding=1)),
+            ('norm', nn.BatchNorm2D(num_channel)),
             ('LeakyRelu', nn.LeakyReLU(0.2)))
         self.body = nn.Sequential()
         for i in range(num_layer - 2):
             self.body.add_sublayer(
                 'conv%d' % (i + 1),
-                nn.Conv2D(
-                    num_channel,
-                    num_channel,
-                    kernel_size=3,
-                    stride=1,
-                    padding=1))
+                nn.Conv2D(num_channel,
+                          num_channel,
+                          kernel_size=3,
+                          stride=1,
+                          padding=1))
             self.body.add_sublayer('norm%d' % (i + 1),
                                    nn.BatchNorm2D(num_channel))
             self.body.add_sublayer('LeakyRelu%d' % (i + 1), nn.LeakyReLU(0.2))
-        self.tail = nn.Conv2D(
-            num_channel, 1, kernel_size=3, stride=1, padding=1)
+        self.tail = nn.Conv2D(num_channel,
+                              1,
+                              kernel_size=3,
+                              stride=1,
+                              padding=1)
 
     def forward(self, x):
         x = self.head(x)

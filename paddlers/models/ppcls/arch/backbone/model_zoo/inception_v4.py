@@ -1,4 +1,4 @@
-# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# reference: https://arxiv.org/abs/1602.07261
+
 import paddle
 from paddle import ParamAttr
 import paddle.nn as nn
@@ -21,7 +23,7 @@ from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 from paddle.nn.initializer import Uniform
 import math
 
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "InceptionV4":
@@ -145,7 +147,11 @@ class InceptionA(nn.Layer):
             act="relu",
             name="inception_a" + name + "_3x3")
         self._conv4_1 = ConvBNLayer(
-            384, 64, 1, act="relu", name="inception_a" + name + "_3x3_2_reduce")
+            384,
+            64,
+            1,
+            act="relu",
+            name="inception_a" + name + "_3x3_2_reduce")
         self._conv4_2 = ConvBNLayer(
             64,
             96,
@@ -210,7 +216,11 @@ class InceptionB(nn.Layer):
         self._conv2 = ConvBNLayer(
             1024, 384, 1, act="relu", name="inception_b" + name + "_1x1_2")
         self._conv3_1 = ConvBNLayer(
-            1024, 192, 1, act="relu", name="inception_b" + name + "_1x7_reduce")
+            1024,
+            192,
+            1,
+            act="relu",
+            name="inception_b" + name + "_1x7_reduce")
         self._conv3_2 = ConvBNLayer(
             192,
             224, (1, 7),

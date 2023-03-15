@@ -1,4 +1,4 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved. 
+# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserved. 
 #   
 # Licensed under the Apache License, Version 2.0 (the "License");   
 # you may not use this file except in compliance with the License.  
@@ -139,6 +139,7 @@ def _dump_infer_config(config, path, image_shape, model):
             "Exporting RCNN model to ONNX only support batch_size = 1")
         infer_cfg['export_onnx'] = True
         infer_cfg['export_eb'] = export_eb
+
 
     if infer_arch in MOT_ARCH:
         if infer_arch == 'DeepSORT':

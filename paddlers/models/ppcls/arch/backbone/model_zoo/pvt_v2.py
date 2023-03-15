@@ -1,4 +1,4 @@
-# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2021 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # Code was heavily based on https://github.com/whai362/PVT
+# reference: https://arxiv.org/abs/2106.13797
 
 from functools import partial
 import math
@@ -23,7 +24,7 @@ from paddle.nn.initializer import TruncatedNormal, Constant
 
 from .vision_transformer import trunc_normal_, zeros_, ones_, to_2tuple, DropPath, Identity, drop_path
 
-from ppcls.utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
+from ....utils.save_load import load_dygraph_pretrain, load_dygraph_pretrain_from_url
 
 MODEL_URLS = {
     "PVT_V2_B0":

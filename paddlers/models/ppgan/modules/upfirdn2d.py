@@ -38,9 +38,13 @@ def upfirdn2d_native(input, kernel, up_x, up_y, down_x, down_y, pad_x0, pad_x1,
     out = out.reshape((-1, minor, in_h * up_y, in_w * up_x))
 
     out = F.pad(
-        out, [max(pad_x0, 0), max(pad_x1, 0), max(pad_y0, 0), max(pad_y1, 0)])
-    out = out[:, :, max(-pad_y0, 0):out.shape[2] - max(-pad_y1, 0), max(
-        -pad_x0, 0):out.shape[3] - max(-pad_x1, 0), ]
+        out, [max(pad_x0, 0),
+              max(pad_x1, 0),
+              max(pad_y0, 0),
+              max(pad_y1, 0)])
+    out = out[:, :,
+              max(-pad_y0, 0):out.shape[2] - max(-pad_y1, 0),
+              max(-pad_x0, 0):out.shape[3] - max(-pad_x1, 0), ]
 
     out = out.reshape(
         ([-1, 1, in_h * up_y + pad_y0 + pad_y1, in_w * up_x + pad_x0 + pad_x1]))
@@ -50,7 +54,8 @@ def upfirdn2d_native(input, kernel, up_x, up_y, down_x, down_y, pad_x0, pad_x1,
         -1,
         minor,
         in_h * up_y + pad_y0 + pad_y1 - kernel_h + 1,
-        in_w * up_x + pad_x0 + pad_x1 - kernel_w + 1, ))
+        in_w * up_x + pad_x0 + pad_x1 - kernel_w + 1,
+    ))
     out = out.transpose((0, 2, 3, 1))
     out = out[:, ::down_y, ::down_x, :]
 
@@ -94,8 +99,11 @@ class Upfirdn2dUpsample(nn.Layer):
         self.pad = (pad0, pad1)
 
     def forward(self, input):
-        out = upfirdn2d(
-            input, self.kernel, up=self.factor, down=1, pad=self.pad)
+        out = upfirdn2d(input,
+                        self.kernel,
+                        up=self.factor,
+                        down=1,
+                        pad=self.pad)
 
         return out
 
@@ -116,8 +124,11 @@ class Upfirdn2dDownsample(nn.Layer):
         self.pad = (pad0, pad1)
 
     def forward(self, input):
-        out = upfirdn2d(
-            input, self.kernel, up=1, down=self.factor, pad=self.pad)
+        out = upfirdn2d(input,
+                        self.kernel,
+                        up=1,
+                        down=self.factor,
+                        pad=self.pad)
 
         return out
 

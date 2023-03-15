@@ -26,8 +26,8 @@ def write_pfm(path, image, scale=1):
 
         if len(image.shape) == 3 and image.shape[2] == 3:  # color image
             color = True
-        elif (len(image.shape) == 2 or len(image.shape) == 3 and
-              image.shape[2] == 1):  # greyscale
+        elif (len(image.shape) == 2
+              or len(image.shape) == 3 and image.shape[2] == 1):  # greyscale
             color = False
         else:
             raise Exception(

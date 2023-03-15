@@ -37,52 +37,54 @@ class MobileResnetGenerator(nn.Layer):
             use_bias = norm_layer == nn.InstanceNorm2D
 
         self.model = nn.LayerList([
-            nn.ReflectionPad2d([3, 3, 3, 3]), nn.Conv2D(
-                input_channel,
-                int(ngf),
-                kernel_size=7,
-                padding=0,
-                bias_attr=use_bias), norm_layer(ngf), nn.ReLU()
+            nn.ReflectionPad2d([3, 3, 3, 3]),
+            nn.Conv2D(input_channel,
+                      int(ngf),
+                      kernel_size=7,
+                      padding=0,
+                      bias_attr=use_bias),
+            norm_layer(ngf),
+            nn.ReLU()
         ])
 
         n_downsampling = 2
         for i in range(n_downsampling):
             mult = 2**i
             self.model.extend([
-                nn.Conv2D(
-                    ngf * mult,
-                    ngf * mult * 2,
-                    kernel_size=3,
-                    stride=2,
-                    padding=1,
-                    bias_attr=use_bias), norm_layer(ngf * mult * 2), nn.ReLU()
+                nn.Conv2D(ngf * mult,
+                          ngf * mult * 2,
+                          kernel_size=3,
+                          stride=2,
+                          padding=1,
+                          bias_attr=use_bias),
+                norm_layer(ngf * mult * 2),
+                nn.ReLU()
             ])
 
         mult = 2**n_downsampling
 
         for i in range(n_blocks):
             self.model.extend([
-                MobileResnetBlock(
-                    ngf * mult,
-                    ngf * mult,
-                    padding_type=padding_type,
-                    norm_layer=norm_layer,
-                    use_dropout=use_dropout,
-                    use_bias=use_bias)
+                MobileResnetBlock(ngf * mult,
+                                  ngf * mult,
+                                  padding_type=padding_type,
+                                  norm_layer=norm_layer,
+                                  use_dropout=use_dropout,
+                                  use_bias=use_bias)
             ])
 
         for i in range(n_downsampling):
             mult = 2**(n_downsampling - i)
             output_size = (i + 1) * 128
             self.model.extend([
-                nn.Conv2DTranspose(
-                    ngf * mult,
-                    int(ngf * mult / 2),
-                    kernel_size=3,
-                    stride=2,
-                    padding=1,
-                    output_padding=1,
-                    bias_attr=use_bias), norm_layer(int(ngf * mult / 2)),
+                nn.Conv2DTranspose(ngf * mult,
+                                   int(ngf * mult / 2),
+                                   kernel_size=3,
+                                   stride=2,
+                                   padding=1,
+                                   output_padding=1,
+                                   bias_attr=use_bias),
+                norm_layer(int(ngf * mult / 2)),
                 nn.ReLU()
             ])
 
@@ -117,12 +119,13 @@ class MobileResnetBlock(nn.Layer):
                                       self.padding_type)
 
         self.conv_block.extend([
-            SeparableConv2D(
-                num_channels=in_c,
-                num_filters=out_c,
-                filter_size=3,
-                padding=p,
-                stride=1), norm_layer(out_c), nn.ReLU()
+            SeparableConv2D(num_channels=in_c,
+                            num_filters=out_c,
+                            filter_size=3,
+                            padding=p,
+                            stride=1),
+            norm_layer(out_c),
+            nn.ReLU()
         ])
 
         self.conv_block.extend([nn.Dropout(0.5)])
@@ -138,12 +141,12 @@ class MobileResnetBlock(nn.Layer):
                                       self.padding_type)
 
         self.conv_block.extend([
-            SeparableConv2D(
-                num_channels=out_c,
-                num_filters=in_c,
-                filter_size=3,
-                padding=p,
-                stride=1), norm_layer(in_c)
+            SeparableConv2D(num_channels=out_c,
+                            num_filters=in_c,
+                            filter_size=3,
+                            padding=p,
+                            stride=1),
+            norm_layer(in_c)
         ])
 
     def forward(self, inputs):
@@ -175,8 +178,8 @@ class SeparableConv2D(nn.Layer):
                 stride=stride,
                 padding=padding,
                 groups=num_channels,
-                weight_attr=paddle.ParamAttr(initializer=nn.initializer.Normal(
-                    loc=0.0, scale=stddev)),
+                weight_attr=paddle.ParamAttr(
+                    initializer=nn.initializer.Normal(loc=0.0, scale=stddev)),
                 bias_attr=use_bias)
         ])
 
@@ -188,8 +191,8 @@ class SeparableConv2D(nn.Layer):
                 out_channels=num_filters,
                 kernel_size=1,
                 stride=1,
-                weight_attr=paddle.ParamAttr(initializer=nn.initializer.Normal(
-                    loc=0.0, scale=stddev)),
+                weight_attr=paddle.ParamAttr(
+                    initializer=nn.initializer.Normal(loc=0.0, scale=stddev)),
                 bias_attr=use_bias)
         ])
 

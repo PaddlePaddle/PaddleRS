@@ -187,7 +187,7 @@ class ConvNeXt(nn.Layer):
         dp_rates = [x for x in np.linspace(0, drop_path_rate, sum(depths))]
         cur = 0
         for i in range(4):
-            stage = nn.Sequential(*[
+            stage = nn.Sequential(* [
                 Block(
                     dim=dims[i],
                     drop_path=dp_rates[cur + j],

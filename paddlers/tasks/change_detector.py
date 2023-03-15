@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import math
-import os
 import os.path as osp
 from collections import OrderedDict
 from operator import attrgetter
@@ -25,11 +24,11 @@ import paddle.nn.functional as F
 from paddle.static import InputSpec
 
 import paddlers
-import paddlers.models.ppseg as ppseg
+import paddlers.models.paddleseg as ppseg
 import paddlers.rs_models.cd as cmcd
 import paddlers.utils.logging as logging
 from paddlers.models import seg_losses
-from paddlers.transforms import Resize, decode_image
+from paddlers.transforms import Resize, decode_image, construct_sample
 from paddlers.utils import get_single_card_bs
 from paddlers.utils.checkpoint import cd_pretrain_weights_dict
 from .base import BaseModel
@@ -63,7 +62,6 @@ class BaseChangeDetector(BaseModel):
         if params.get('with_net', True):
             params.pop('with_net', None)
             self.net = self.build_net(**params)
-        self.find_unused_parameters = True
 
     def build_net(self, **params):
         # TODO: add other model
@@ -112,17 +110,16 @@ class BaseChangeDetector(BaseModel):
         ]
 
     def run(self, net, inputs, mode):
+        inputs, batch_restore_list = inputs
         net_out = net(inputs[0], inputs[1])
         logit = net_out[0]
         outputs = OrderedDict()
         if mode == 'test':
-            origin_shape = inputs[2]
             if self.status == 'Infer':
                 label_map_list, score_map_list = self.postprocess(
-                    net_out, origin_shape, transforms=inputs[3])
+                    net_out, batch_restore_list)
             else:
-                logit_list = self.postprocess(
-                    logit, origin_shape, transforms=inputs[3])
+                logit_list = self.postprocess(logit, batch_restore_list)
                 label_map_list = []
                 score_map_list = []
                 for logit in logit_list:
@@ -148,9 +145,7 @@ class BaseChangeDetector(BaseModel):
             if label.ndim != 4:
                 raise ValueError("Expected label.ndim == 4 but got {}".format(
                     label.ndim))
-            origin_shape = [label.shape[-2:]]
-            pred = self.postprocess(
-                pred, origin_shape, transforms=inputs[3])[0]  # NCHW
+            pred = self.postprocess(pred, batch_restore_list)[0]  # NCHW
             intersect_area, pred_area, label_area = ppseg.utils.metrics.calculate_area(
                 pred, label, self.num_classes)
             outputs['intersect_area'] = intersect_area
@@ -464,7 +459,6 @@ class BaseChangeDetector(BaseModel):
                 math.ceil(eval_dataset.num_samples * 1.0 / batch_size)))
         with paddle.no_grad():
             for step, data in enumerate(self.eval_data_loader):
-                data.append(eval_dataset.transforms.transforms)
                 outputs = self.run(self.net, data, 'eval')
                 pred_area = outputs['pred_area']
                 label_area = outputs['label_area']
@@ -563,10 +557,8 @@ class BaseChangeDetector(BaseModel):
             images = [img_file]
         else:
             images = img_file
-        batch_im1, batch_im2, batch_origin_shape = self.preprocess(
-            images, transforms, self.model_type)
+        data = self.preprocess(images, transforms, self.model_type)
         self.net.eval()
-        data = (batch_im1, batch_im2, batch_origin_shape, transforms.transforms)
         outputs = self.run(self.net, data, 'test')
         label_map_list = outputs['label_map']
         score_map_list = outputs['score_map']
@@ -628,18 +620,19 @@ class BaseChangeDetector(BaseModel):
     def preprocess(self, images, transforms, to_tensor=True):
         self._check_transforms(transforms, 'test')
         batch_im1, batch_im2 = list(), list()
-        batch_ori_shape = list()
+        batch_trans_info = list()
         for im1, im2 in images:
             if isinstance(im1, str) or isinstance(im2, str):
                 im1 = decode_image(im1, read_raw=True)
                 im2 = decode_image(im2, read_raw=True)
-            ori_shape = im1.shape[:2]
             # XXX: sample do not contain 'image_t1' and 'image_t2'.
-            sample = {'image': im1, 'image2': im2}
-            im1, im2 = transforms(sample)[:2]
+            sample = construct_sample(image=im1, image2=im2)
+            data = transforms(sample)
+            im1, im2 = data[0][:2]
+            trans_info = data[1]
             batch_im1.append(im1)
             batch_im2.append(im2)
-            batch_ori_shape.append(ori_shape)
+            batch_trans_info.append(trans_info)
         if to_tensor:
             batch_im1 = paddle.to_tensor(batch_im1)
             batch_im2 = paddle.to_tensor(batch_im2)
@@ -647,59 +640,9 @@ class BaseChangeDetector(BaseModel):
             batch_im1 = np.asarray(batch_im1)
             batch_im2 = np.asarray(batch_im2)
 
-        return batch_im1, batch_im2, batch_ori_shape
+        return (batch_im1, batch_im2), batch_trans_info
 
-    @staticmethod
-    def get_transforms_shape_info(batch_ori_shape, transforms):
-        batch_restore_list = list()
-        for ori_shape in batch_ori_shape:
-            restore_list = list()
-            h, w = ori_shape[0], ori_shape[1]
-            for op in transforms:
-                if op.__class__.__name__ == 'Resize':
-                    restore_list.append(('resize', (h, w)))
-                    h, w = op.target_size
-                elif op.__class__.__name__ == 'ResizeByShort':
-                    restore_list.append(('resize', (h, w)))
-                    im_short_size = min(h, w)
-                    im_long_size = max(h, w)
-                    scale = float(op.short_size) / float(im_short_size)
-                    if 0 < op.max_size < np.round(scale * im_long_size):
-                        scale = float(op.max_size) / float(im_long_size)
-                    h = int(round(h * scale))
-                    w = int(round(w * scale))
-                elif op.__class__.__name__ == 'ResizeByLong':
-                    restore_list.append(('resize', (h, w)))
-                    im_long_size = max(h, w)
-                    scale = float(op.long_size) / float(im_long_size)
-                    h = int(round(h * scale))
-                    w = int(round(w * scale))
-                elif op.__class__.__name__ == 'Pad':
-                    if op.target_size:
-                        target_h, target_w = op.target_size
-                    else:
-                        target_h = int(
-                            (np.ceil(h / op.size_divisor) * op.size_divisor))
-                        target_w = int(
-                            (np.ceil(w / op.size_divisor) * op.size_divisor))
-
-                    if op.pad_mode == -1:
-                        offsets = op.offsets
-                    elif op.pad_mode == 0:
-                        offsets = [0, 0]
-                    elif op.pad_mode == 1:
-                        offsets = [(target_h - h) // 2, (target_w - w) // 2]
-                    else:
-                        offsets = [target_h - h, target_w - w]
-                    restore_list.append(('padding', (h, w), offsets))
-                    h, w = target_h, target_w
-
-            batch_restore_list.append(restore_list)
-        return batch_restore_list
-
-    def postprocess(self, batch_pred, batch_origin_shape, transforms):
-        batch_restore_list = BaseChangeDetector.get_transforms_shape_info(
-            batch_origin_shape, transforms)
+    def postprocess(self, batch_pred, batch_restore_list):
         if isinstance(batch_pred, (tuple, list)) and self.status == 'Infer':
             return self._infer_postprocess(
                 batch_label_map=batch_pred[0],
@@ -721,7 +664,7 @@ class BaseChangeDetector(BaseModel):
                     x, y = item[2]
                     pred = pred[:, :, y:y + h, x:x + w]
                 else:
-                    pass
+                    raise RuntimeError
             results.append(pred)
         return results
 
@@ -760,7 +703,7 @@ class BaseChangeDetector(BaseModel):
                         label_map = label_map[:, y:y + h, x:x + w, :]
                         score_map = score_map[:, y:y + h, x:x + w, :]
                 else:
-                    pass
+                    raise RuntimeError
             label_map = label_map.squeeze()
             score_map = score_map.squeeze()
             if not isinstance(label_map, np.ndarray):

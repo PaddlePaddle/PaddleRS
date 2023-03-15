@@ -1,4 +1,4 @@
-# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,12 +27,12 @@ import paddle
 from paddle.distributed import fleet
 from visualdl import LogWriter
 
-from ppcls.data import build_dataloader
-from ppcls.utils.config import get_config, print_config
-from ppcls.utils import logger
-from ppcls.utils.logger import init_logger
-from ppcls.static.save_load import init_model, save_model
-from ppcls.static import program
+from paddlers.models.ppcls.data import build_dataloader
+from paddlers.models.ppcls.utils.config import get_config, print_config
+from paddlers.models.ppcls.utils import logger
+from paddlers.models.ppcls.utils.logger import init_logger
+from paddlers.models.ppcls.static.save_load import init_model, save_model
+from paddlers.models.ppcls.static import program
 
 
 def parse_args():
@@ -69,15 +69,19 @@ def main(args):
 
     mode = "train"
 
-    log_file = os.path.join(global_config['output_dir'], config["Arch"]["name"],
-                            f"{mode}.log")
-    init_logger(name='root', log_file=log_file)
+    log_file = os.path.join(global_config['output_dir'],
+                            config["Arch"]["name"], f"{mode}.log")
+    init_logger(log_file=log_file)
     print_config(config)
 
     if global_config.get("is_distributed", True):
         fleet.init(is_collective=True)
+
     # assign the device
-    use_gpu = global_config.get("use_gpu", True)
+    assert global_config[
+        "device"] in ["cpu", "gpu", "xpu", "npu", "mlu", "ascend"]
+    device = paddle.set_device(global_config["device"])
+
     # amp related config
     if 'AMP' in config:
         AMP_RELATED_FLAGS_SETTING = {
@@ -87,22 +91,7 @@ def main(args):
             'FLAGS_max_inplace_grad_add': 8,
         }
         os.environ['FLAGS_cudnn_batchnorm_spatial_persistent'] = '1'
-        paddle.fluid.set_flags(AMP_RELATED_FLAGS_SETTING)
-
-    use_xpu = global_config.get("use_xpu", False)
-    use_npu = global_config.get("use_npu", False)
-    assert (
-        use_gpu and use_xpu and use_npu
-    ) is not True, "gpu, xpu and npu can not be true in the same time in static mode!"
-
-    if use_gpu:
-        device = paddle.set_device('gpu')
-    elif use_xpu:
-        device = paddle.set_device('xpu')
-    elif use_npu:
-        device = paddle.set_device('npu')
-    else:
-        device = paddle.set_device('cpu')
+        paddle.set_flags(AMP_RELATED_FLAGS_SETTING)
 
     # visualDL
     vdl_writer = None
@@ -158,12 +147,22 @@ def main(args):
     # load pretrained models or checkpoints
     init_model(global_config, train_prog, exe)
 
-    if 'AMP' in config and config.AMP.get("level", "O1") == "O2":
+    if 'AMP' in config:
+        if config["AMP"].get("level", "O1").upper() == "O2":
+            use_fp16_test = True
+            msg = "Only support FP16 evaluation when AMP O2 is enabled."
+            logger.warning(msg)
+        elif "use_fp16_test" in config["AMP"]:
+            use_fp16_test = config["AMP"].get["use_fp16_test"]
+        else:
+            use_fp16_test = False
+
         optimizer.amp_init(
             device,
             scope=paddle.static.global_scope(),
             test_program=eval_prog
-            if global_config["eval_during_train"] else None)
+            if global_config["eval_during_train"] else None,
+            use_fp16_test=use_fp16_test)
 
     if not global_config.get("is_distributed", True):
         compiled_train_prog = program.compile(
@@ -179,7 +178,7 @@ def main(args):
         program.run(train_dataloader, exe, compiled_train_prog, train_feeds,
                     train_fetchs, epoch_id, 'train', config, vdl_writer,
                     lr_scheduler, args.profiler_options)
-        # 2. evaate with eval dataset
+        # 2. evaluate with eval dataset
         if global_config["eval_during_train"] and epoch_id % global_config[
                 "eval_interval"] == 0:
             top1_acc = program.run(eval_dataloader, exe, compiled_eval_prog,

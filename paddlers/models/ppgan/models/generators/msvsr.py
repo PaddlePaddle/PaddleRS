@@ -59,7 +59,6 @@ class MSVSR(nn.Layer):
         use_local_connnect (bool): Whether add feature of stage1 after upsample.
             Default: True.
     """
-
     def __init__(self,
                  mid_channels=32,
                  num_init_blocks=2,
@@ -130,30 +129,34 @@ class MSVSR(nn.Layer):
                 (3 + i) * mid_channels, mid_channels, num_blocks)
 
         # stage1
-        self.stage1_align = AlignmentModule(
-            mid_channels,
-            mid_channels,
-            3,
-            padding=1,
-            deformable_groups=stage1_groups)
-        self.stage1_blocks = ResidualBlocksWithInputConv(3 * mid_channels,
-                                                         mid_channels, 3)
+        self.stage1_align = AlignmentModule(mid_channels,
+                                            mid_channels,
+                                            3,
+                                            padding=1,
+                                            deformable_groups=stage1_groups)
+        self.stage1_blocks = ResidualBlocksWithInputConv(
+            3 * mid_channels, mid_channels, 3)
 
         # upsampling module
         self.reconstruction = ResidualBlocksWithInputConv(
             6 * mid_channels, mid_channels, num_reconstruction_blocks)
 
-        self.upsample1 = PixelShufflePack(
-            mid_channels, mid_channels, 2, upsample_kernel=3)
-        self.upsample2 = PixelShufflePack(
-            mid_channels, mid_channels, 2, upsample_kernel=3)
+        self.upsample1 = PixelShufflePack(mid_channels,
+                                          mid_channels,
+                                          2,
+                                          upsample_kernel=3)
+        self.upsample2 = PixelShufflePack(mid_channels,
+                                          mid_channels,
+                                          2,
+                                          upsample_kernel=3)
         if self.only_last:
             self.conv_last = nn.Conv2D(mid_channels, 3, 3, 1, 1)
         else:
             self.conv_hr = nn.Conv2D(mid_channels, mid_channels, 3, 1, 1)
             self.conv_last = nn.Conv2D(mid_channels, 3, 3, 1, 1)
-        self.img_upsample = nn.Upsample(
-            scale_factor=4, mode='bilinear', align_corners=False)
+        self.img_upsample = nn.Upsample(scale_factor=4,
+                                        mode='bilinear',
+                                        align_corners=False)
 
         # activation function
         self.lrelu = nn.LeakyReLU(negative_slope=0.1)
@@ -176,10 +179,14 @@ class MSVSR(nn.Layer):
 
             self.aux_conv_last = nn.Conv2D(mid_channels, 3, 3, 1, 1)
 
-        self.aux_upsample1 = PixelShufflePack(
-            mid_channels, mid_channels, 2, upsample_kernel=3)
-        self.aux_upsample2 = PixelShufflePack(
-            mid_channels, mid_channels, 2, upsample_kernel=3)
+        self.aux_upsample1 = PixelShufflePack(mid_channels,
+                                              mid_channels,
+                                              2,
+                                              upsample_kernel=3)
+        self.aux_upsample2 = PixelShufflePack(mid_channels,
+                                              mid_channels,
+                                              2,
+                                              upsample_kernel=3)
         self.hybrid_conv_last = nn.Conv2D(mid_channels, 3, 3, 1, 1)
 
     def check_if_mirror_extended(self, lrs):
@@ -260,8 +267,8 @@ class MSVSR(nn.Layer):
             if i < t:
                 feat_back = feats['spatial'][mapping_idx[idx - 1]]
                 flow_n1_ = flows_forward[:, flow_idx[i] - 1, :, :, :]
-                cond_n1_ = flow_warp(feat_back,
-                                     flow_n1_.transpose([0, 2, 3, 1]))
+                cond_n1_ = flow_warp(feat_back, flow_n1_.transpose([0, 2, 3,
+                                                                    1]))
                 cond_ = paddle.concat([cond_n1_, feat_current], axis=1)
                 feat_back, _, _ = self.stage1_align(feat_back, cond_, flow_n1_)
             else:
@@ -332,8 +339,8 @@ class MSVSR(nn.Layer):
 
                 # concatenate and residual blocks
                 feat = [feat_current] + [
-                    feats[k][idx] for k in feats
-                    if k not in ['spatial', prop_name]
+                    feats[k][idx]
+                    for k in feats if k not in ['spatial', prop_name]
                 ] + [feat_prop]
 
                 feat = paddle.concat(feat, axis=1)
@@ -405,8 +412,8 @@ class MSVSR(nn.Layer):
 
                 # concatenate and residual blocks
                 feat = [feat_current] + [
-                    feats[k][idx] for k in feats
-                    if k not in ['spatial', prop_name]
+                    feats[k][idx]
+                    for k in feats if k not in ['spatial', prop_name]
                 ] + [feat_prop]
 
                 feat = paddle.concat(feat, axis=1)
@@ -453,15 +460,12 @@ class MSVSR(nn.Layer):
             # output tensor of auxiliary_stage with shape (n, 3, 4*h, 4*w)
             aux_feats['outs'].append(hr)
 
-            aux_feat = self.aux_block_down1(
-                paddle.concat(
-                    [hr, hr_high], axis=1))
+            aux_feat = self.aux_block_down1(paddle.concat([hr, hr_high],
+                                                          axis=1))
             aux_feat = self.aux_block_down2(
-                paddle.concat(
-                    [aux_feat, hr_mid], axis=1))
-            aux_feat = self.aux_fusion(
-                paddle.concat(
-                    [aux_feat, hr_low], axis=1))
+                paddle.concat([aux_feat, hr_mid], axis=1))
+            aux_feat = self.aux_fusion(paddle.concat([aux_feat, hr_low],
+                                                     axis=1))
 
             # out feature of auxiliary_stage with shape (n, c, h, w)
             aux_feats['feats'].append(aux_feat)
@@ -516,9 +520,8 @@ class MSVSR(nn.Layer):
             outputs.append(hr)
 
         if self.auxiliary_loss:
-            return paddle.stack(
-                aux_feats['outs'], axis=1), paddle.stack(
-                    outputs, axis=1)
+            return paddle.stack(aux_feats['outs'],
+                                axis=1), paddle.stack(outputs, axis=1)
         return paddle.stack(outputs, axis=1)
 
     def forward(self, lqs):
@@ -544,10 +547,9 @@ class MSVSR(nn.Layer):
         feats['spatial'] = [feats_[:, i, :, :, :] for i in range(0, t)]
 
         # compute optical flow using the low-res inputs
-        assert lqs_downsample.shape[3] >= 64 and lqs_downsample.shape[
-            4] >= 64, (
-                'The height and width of low-res inputs must be at least 64, '
-                f'but got {h} and {w}.')
+        assert lqs_downsample.shape[3] >= 64 and lqs_downsample.shape[4] >= 64, (
+            'The height and width of low-res inputs must be at least 64, '
+            f'but got {h} and {w}.')
 
         flows_forward, flows_backward = self.compute_flow(lqs_downsample)
 
@@ -579,7 +581,6 @@ class AlignmentModule(nn.Layer):
         groups (int): Same as nn.Conv2d.
         deformable_groups (int): Number of deformable_groups in DeformConv2D.
     """
-
     def __init__(self,
                  in_channels=128,
                  out_channels=64,
@@ -598,15 +599,15 @@ class AlignmentModule(nn.Layer):
             nn.LeakyReLU(negative_slope=0.1),
             nn.Conv2D(out_channels, out_channels, 3, 1, 1),
             nn.LeakyReLU(negative_slope=0.1),
-            nn.Conv2D(out_channels, 27 * deformable_groups, 3, 1, 1), )
-        self.dcn = DeformConv2D(
-            in_channels,
-            out_channels,
-            kernel_size=kernel_size,
-            stride=stride,
-            padding=padding,
-            dilation=dilation,
-            deformable_groups=deformable_groups)
+            nn.Conv2D(out_channels, 27 * deformable_groups, 3, 1, 1),
+        )
+        self.dcn = DeformConv2D(in_channels,
+                                out_channels,
+                                kernel_size=kernel_size,
+                                stride=stride,
+                                padding=padding,
+                                dilation=dilation,
+                                deformable_groups=deformable_groups)
 
         self.init_offset()
 
@@ -641,7 +642,6 @@ class ReAlignmentModule(nn.Layer):
         groups (int): Same as nn.Conv2d.
         deformable_groups (int): Number of deformable_groups in DeformConv2D.
     """
-
     def __init__(self,
                  in_channels=128,
                  out_channels=64,
@@ -653,14 +653,13 @@ class ReAlignmentModule(nn.Layer):
                  deformable_groups=16):
         super(ReAlignmentModule, self).__init__()
 
-        self.mdconv = DeformConv2D(
-            in_channels,
-            out_channels,
-            kernel_size=kernel_size,
-            stride=stride,
-            padding=padding,
-            dilation=dilation,
-            deformable_groups=deformable_groups)
+        self.mdconv = DeformConv2D(in_channels,
+                                   out_channels,
+                                   kernel_size=kernel_size,
+                                   stride=stride,
+                                   padding=padding,
+                                   dilation=dilation,
+                                   deformable_groups=deformable_groups)
         self.conv_offset = nn.Sequential(
             nn.Conv2D(2 * out_channels + 2, out_channels, 3, 1, 1),
             nn.LeakyReLU(negative_slope=0.1),
@@ -668,15 +667,15 @@ class ReAlignmentModule(nn.Layer):
             nn.LeakyReLU(negative_slope=0.1),
             nn.Conv2D(out_channels, out_channels, 3, 1, 1),
             nn.LeakyReLU(negative_slope=0.1),
-            nn.Conv2D(out_channels, 27 * deformable_groups, 3, 1, 1), )
-        self.dcn = DeformConv2D(
-            in_channels,
-            out_channels,
-            kernel_size=kernel_size,
-            stride=stride,
-            padding=padding,
-            dilation=dilation,
-            deformable_groups=deformable_groups)
+            nn.Conv2D(out_channels, 27 * deformable_groups, 3, 1, 1),
+        )
+        self.dcn = DeformConv2D(in_channels,
+                                out_channels,
+                                kernel_size=kernel_size,
+                                stride=stride,
+                                padding=padding,
+                                dilation=dilation,
+                                deformable_groups=deformable_groups)
 
         self.init_offset()
 
@@ -735,7 +734,6 @@ class ModifiedSPyNet(nn.Layer):
         use_tiny_block (bool): Whether use tiny spynet.
             Default: True.
     """
-
     def __init__(self,
                  act_cfg=dict(name='LeakyReLU'),
                  num_blocks=6,
@@ -743,8 +741,7 @@ class ModifiedSPyNet(nn.Layer):
         super().__init__()
         self.num_blocks = num_blocks
         self.basic_module = nn.LayerList([
-            SPyNetBlock(
-                act_cfg=act_cfg, use_tiny_block=use_tiny_block)
+            SPyNetBlock(act_cfg=act_cfg, use_tiny_block=use_tiny_block)
             for _ in range(num_blocks)
         ])
 
@@ -784,8 +781,8 @@ class ModifiedSPyNet(nn.Layer):
         # flow computation
         flow = paddle.to_tensor(
             np.zeros([
-                n, 2, h // (2**(self.num_blocks - 1)), w // (2**(self.num_blocks
-                                                                 - 1))
+                n, 2, h // (2**(self.num_blocks - 1)), w //
+                (2**(self.num_blocks - 1))
             ], 'float32'))
 
         for level in range(len(ref)):
@@ -797,14 +794,13 @@ class ModifiedSPyNet(nn.Layer):
                     align_corners=True) * 2.0
 
             # add the residue to the upsampled flow
-            flow = flow_up + self.basic_module[level](paddle.concat(
-                [
-                    ref[level], flow_warp(
-                        supp[level],
-                        flow_up.transpose([0, 2, 3, 1]),
-                        padding_mode='border'), flow_up
-                ],
-                axis=1))
+            flow = flow_up + self.basic_module[level](paddle.concat([
+                ref[level],
+                flow_warp(supp[level],
+                          flow_up.transpose([0, 2, 3, 1]),
+                          padding_mode='border'), flow_up
+            ],
+                                                                    axis=1))
 
         return flow
 
@@ -826,8 +822,8 @@ class ModifiedSPyNet(nn.Layer):
         flow_list = []
         flow = paddle.to_tensor(
             np.zeros([
-                n, 2, h // (2**(self.num_blocks - 1)), w // (2**(self.num_blocks
-                                                                 - 1))
+                n, 2, h // (2**(self.num_blocks - 1)), w //
+                (2**(self.num_blocks - 1))
             ], 'float32'))
         for level in range(len(ref)):
             if level == 0:
@@ -838,14 +834,13 @@ class ModifiedSPyNet(nn.Layer):
                     align_corners=True) * 2.0
 
             # add the residue to the upsampled flow
-            flow = flow_up + self.basic_module[level](paddle.concat(
-                [
-                    ref[level], flow_warp(
-                        supp[level],
-                        flow_up.transpose([0, 2, 3, 1]),
-                        padding_mode='border'), flow_up
-                ],
-                axis=1))
+            flow = flow_up + self.basic_module[level](paddle.concat([
+                ref[level],
+                flow_warp(supp[level],
+                          flow_up.transpose([0, 2, 3, 1]),
+                          padding_mode='border'), flow_up
+            ],
+                                                                    axis=1))
             flow_list.append(flow)
         return flow_list
 
@@ -866,21 +861,24 @@ class ModifiedSPyNet(nn.Layer):
         h, w = ref.shape[2:4]
         w_up = w if (w % 32) == 0 else 32 * (w // 32 + 1)
         h_up = h if (h % 32) == 0 else 32 * (h // 32 + 1)
-        ref = F.interpolate(
-            ref, size=(h_up, w_up), mode='bilinear', align_corners=False)
+        ref = F.interpolate(ref,
+                            size=(h_up, w_up),
+                            mode='bilinear',
+                            align_corners=False)
 
-        supp = F.interpolate(
-            supp, size=(h_up, w_up), mode='bilinear', align_corners=False)
+        supp = F.interpolate(supp,
+                             size=(h_up, w_up),
+                             mode='bilinear',
+                             align_corners=False)
 
         ref.stop_gradient = False
         supp.stop_gradient = False
 
         # compute flow, and resize back to the original resolution
-        flow = F.interpolate(
-            self.compute_flow(ref, supp),
-            size=(h, w),
-            mode='bilinear',
-            align_corners=False)
+        flow = F.interpolate(self.compute_flow(ref, supp),
+                             size=(h, w),
+                             mode='bilinear',
+                             align_corners=False)
 
         # adjust the flow values
         flow[:, 0, :, :] *= float(w) / float(w_up)
@@ -893,202 +891,174 @@ class SPyNetBlock(nn.Layer):
     """Basic Block of Modified SPyNet.
     refer to Optical Flow Estimation using a Spatial Pyramid Network, CVPR, 2017
     """
-
     def __init__(self, act_cfg=dict(name='LeakyReLU'), use_tiny_block=False):
         super().__init__()
         if use_tiny_block:
             self.basic_module = nn.Sequential(
-                ConvLayer(
-                    in_channels=8,
-                    out_channels=16,
-                    kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    act_cfg=act_cfg),
-                ConvLayer(
-                    in_channels=16,
-                    out_channels=16,
-                    kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    act_cfg=act_cfg),
-                ConvLayer(
-                    in_channels=16,
-                    out_channels=32,
-                    kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    act_cfg=act_cfg),
-                ConvLayer(
-                    in_channels=32,
-                    out_channels=32,
-                    kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    act_cfg=act_cfg),
-                ConvLayer(
-                    in_channels=32,
-                    out_channels=32,
-                    kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    act_cfg=act_cfg),
-                ConvLayer(
-                    in_channels=32,
-                    out_channels=32,
-                    kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    act_cfg=act_cfg),
-                ConvLayer(
-                    in_channels=32,
-                    out_channels=16,
-                    kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    act_cfg=act_cfg),
-                ConvLayer(
-                    in_channels=16,
-                    out_channels=16,
-                    kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    act_cfg=act_cfg),
-                ConvLayer(
-                    in_channels=16,
-                    out_channels=16,
-                    kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    act_cfg=act_cfg),
-                ConvLayer(
-                    in_channels=16,
-                    out_channels=8,
-                    kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    act_cfg=act_cfg),
-                ConvLayer(
-                    in_channels=8,
-                    out_channels=8,
-                    kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    act_cfg=act_cfg),
-                ConvLayer(
-                    in_channels=8,
-                    out_channels=2,
-                    kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    act_cfg=None))
+                ConvLayer(in_channels=8,
+                          out_channels=16,
+                          kernel_size=3,
+                          stride=1,
+                          padding=1,
+                          act_cfg=act_cfg),
+                ConvLayer(in_channels=16,
+                          out_channels=16,
+                          kernel_size=3,
+                          stride=1,
+                          padding=1,
+                          act_cfg=act_cfg),
+                ConvLayer(in_channels=16,
+                          out_channels=32,
+                          kernel_size=3,
+                          stride=1,
+                          padding=1,
+                          act_cfg=act_cfg),
+                ConvLayer(in_channels=32,
+                          out_channels=32,
+                          kernel_size=3,
+                          stride=1,
+                          padding=1,
+                          act_cfg=act_cfg),
+                ConvLayer(in_channels=32,
+                          out_channels=32,
+                          kernel_size=3,
+                          stride=1,
+                          padding=1,
+                          act_cfg=act_cfg),
+                ConvLayer(in_channels=32,
+                          out_channels=32,
+                          kernel_size=3,
+                          stride=1,
+                          padding=1,
+                          act_cfg=act_cfg),
+                ConvLayer(in_channels=32,
+                          out_channels=16,
+                          kernel_size=3,
+                          stride=1,
+                          padding=1,
+                          act_cfg=act_cfg),
+                ConvLayer(in_channels=16,
+                          out_channels=16,
+                          kernel_size=3,
+                          stride=1,
+                          padding=1,
+                          act_cfg=act_cfg),
+                ConvLayer(in_channels=16,
+                          out_channels=16,
+                          kernel_size=3,
+                          stride=1,
+                          padding=1,
+                          act_cfg=act_cfg),
+                ConvLayer(in_channels=16,
+                          out_channels=8,
+                          kernel_size=3,
+                          stride=1,
+                          padding=1,
+                          act_cfg=act_cfg),
+                ConvLayer(in_channels=8,
+                          out_channels=8,
+                          kernel_size=3,
+                          stride=1,
+                          padding=1,
+                          act_cfg=act_cfg),
+                ConvLayer(in_channels=8,
+                          out_channels=2,
+                          kernel_size=3,
+                          stride=1,
+                          padding=1,
+                          act_cfg=None))
         else:
             self.basic_module = nn.Sequential(
-                ConvLayer(
-                    in_channels=8,
-                    out_channels=16,
-                    kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    act_cfg=act_cfg),
-                ConvLayer(
-                    in_channels=16,
-                    out_channels=16,
-                    kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    act_cfg=act_cfg),
-                ConvLayer(
-                    in_channels=16,
-                    out_channels=32,
-                    kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    act_cfg=act_cfg),
-                ConvLayer(
-                    in_channels=32,
-                    out_channels=32,
-                    kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    act_cfg=act_cfg),
-                ConvLayer(
-                    in_channels=32,
-                    out_channels=32,
-                    kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    act_cfg=act_cfg),
-                ConvLayer(
-                    in_channels=32,
-                    out_channels=64,
-                    kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    act_cfg=act_cfg),
-                ConvLayer(
-                    in_channels=64,
-                    out_channels=32,
-                    kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    act_cfg=act_cfg),
-                ConvLayer(
-                    in_channels=32,
-                    out_channels=32,
-                    kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    act_cfg=act_cfg),
-                ConvLayer(
-                    in_channels=32,
-                    out_channels=32,
-                    kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    act_cfg=act_cfg),
-                ConvLayer(
-                    in_channels=32,
-                    out_channels=16,
-                    kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    act_cfg=act_cfg),
-                ConvLayer(
-                    in_channels=16,
-                    out_channels=16,
-                    kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    act_cfg=act_cfg),
-                ConvLayer(
-                    in_channels=16,
-                    out_channels=16,
-                    kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    act_cfg=act_cfg),
-                ConvLayer(
-                    in_channels=16,
-                    out_channels=16,
-                    kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    act_cfg=act_cfg),
-                ConvLayer(
-                    in_channels=16,
-                    out_channels=16,
-                    kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    act_cfg=act_cfg),
-                ConvLayer(
-                    in_channels=16,
-                    out_channels=2,
-                    kernel_size=3,
-                    stride=1,
-                    padding=1,
-                    act_cfg=None))
+                ConvLayer(in_channels=8,
+                          out_channels=16,
+                          kernel_size=3,
+                          stride=1,
+                          padding=1,
+                          act_cfg=act_cfg),
+                ConvLayer(in_channels=16,
+                          out_channels=16,
+                          kernel_size=3,
+                          stride=1,
+                          padding=1,
+                          act_cfg=act_cfg),
+                ConvLayer(in_channels=16,
+                          out_channels=32,
+                          kernel_size=3,
+                          stride=1,
+                          padding=1,
+                          act_cfg=act_cfg),
+                ConvLayer(in_channels=32,
+                          out_channels=32,
+                          kernel_size=3,
+                          stride=1,
+                          padding=1,
+                          act_cfg=act_cfg),
+                ConvLayer(in_channels=32,
+                          out_channels=32,
+                          kernel_size=3,
+                          stride=1,
+                          padding=1,
+                          act_cfg=act_cfg),
+                ConvLayer(in_channels=32,
+                          out_channels=64,
+                          kernel_size=3,
+                          stride=1,
+                          padding=1,
+                          act_cfg=act_cfg),
+                ConvLayer(in_channels=64,
+                          out_channels=32,
+                          kernel_size=3,
+                          stride=1,
+                          padding=1,
+                          act_cfg=act_cfg),
+                ConvLayer(in_channels=32,
+                          out_channels=32,
+                          kernel_size=3,
+                          stride=1,
+                          padding=1,
+                          act_cfg=act_cfg),
+                ConvLayer(in_channels=32,
+                          out_channels=32,
+                          kernel_size=3,
+                          stride=1,
+                          padding=1,
+                          act_cfg=act_cfg),
+                ConvLayer(in_channels=32,
+                          out_channels=16,
+                          kernel_size=3,
+                          stride=1,
+                          padding=1,
+                          act_cfg=act_cfg),
+                ConvLayer(in_channels=16,
+                          out_channels=16,
+                          kernel_size=3,
+                          stride=1,
+                          padding=1,
+                          act_cfg=act_cfg),
+                ConvLayer(in_channels=16,
+                          out_channels=16,
+                          kernel_size=3,
+                          stride=1,
+                          padding=1,
+                          act_cfg=act_cfg),
+                ConvLayer(in_channels=16,
+                          out_channels=16,
+                          kernel_size=3,
+                          stride=1,
+                          padding=1,
+                          act_cfg=act_cfg),
+                ConvLayer(in_channels=16,
+                          out_channels=16,
+                          kernel_size=3,
+                          stride=1,
+                          padding=1,
+                          act_cfg=act_cfg),
+                ConvLayer(in_channels=16,
+                          out_channels=2,
+                          kernel_size=3,
+                          stride=1,
+                          padding=1,
+                          act_cfg=None))
 
     def forward(self, tensor_input):
         """Forward function of SPyNetBlock.
@@ -1117,14 +1087,13 @@ class ConvLayer(nn.Layer):
         self.act_cfg = act_cfg
         self.with_activation = act_cfg is not None
 
-        self.conv = nn.Conv2D(
-            in_channels=in_channels,
-            out_channels=out_channels,
-            kernel_size=kernel_size,
-            stride=stride,
-            padding=padding,
-            dilation=dilation,
-            groups=groups)
+        self.conv = nn.Conv2D(in_channels=in_channels,
+                              out_channels=out_channels,
+                              kernel_size=kernel_size,
+                              stride=stride,
+                              padding=padding,
+                              dilation=dilation,
+                              groups=groups)
 
         if self.with_activation:
             if act_cfg['name'] == 'ReLU':

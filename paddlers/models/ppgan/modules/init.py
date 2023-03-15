@@ -74,8 +74,8 @@ def calculate_gain(nonlinearity, param=None):
             # True/False are instances of int, hence check above
             negative_slope = param
         else:
-            raise ValueError("negative_slope {} not a valid number".format(
-                param))
+            raise ValueError(
+                "negative_slope {} not a valid number".format(param))
         return math.sqrt(2.0 / (1 + negative_slope**2))
     else:
         raise ValueError("Unsupported nonlinearity {}".format(nonlinearity))
@@ -259,15 +259,19 @@ def kaiming_init(layer,
                  distribution='normal'):
     assert distribution in ['uniform', 'normal']
     if distribution == 'uniform':
-        kaiming_uniform_(
-            layer.weight, a=a, mode=mode, nonlinearity=nonlinearity)
+        kaiming_uniform_(layer.weight,
+                         a=a,
+                         mode=mode,
+                         nonlinearity=nonlinearity)
     else:
         kaiming_normal_(layer.weight, a=a, mode=mode, nonlinearity=nonlinearity)
     if hasattr(layer, 'bias') and layer.bias is not None:
         constant_(layer.bias, bias)
 
 
-def init_weights(net, init_type='normal', init_gain=0.02,
+def init_weights(net,
+                 init_type='normal',
+                 init_gain=0.02,
                  distribution='normal'):
     """Initialize network weights.
     Args:
@@ -277,11 +281,10 @@ def init_weights(net, init_type='normal', init_gain=0.02,
     We use 'normal' in the original pix2pix and CycleGAN paper. But xavier and kaiming might
     work better for some applications. Feel free to try yourself.
     """
-
     def init_func(m):  # define the initialization function
         classname = m.__class__.__name__
-        if hasattr(m, 'weight') and (classname.find('Conv') != -1 or
-                                     classname.find('Linear') != -1):
+        if hasattr(m, 'weight') and (classname.find('Conv') != -1
+                                     or classname.find('Linear') != -1):
             if init_type == 'normal':
                 normal_(m.weight, 0.0, init_gain)
             elif init_type == 'xavier':

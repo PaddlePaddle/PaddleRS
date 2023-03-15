@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import paddle
-from .base_model import BaseModel
+from .base_model import BaseModel, apply_to_static
 
 from .builder import MODELS
 from .generators.builder import build_generator
@@ -31,7 +31,6 @@ class CycleGANModel(BaseModel):
 
     CycleGAN paper: https://arxiv.org/pdf/1703.10593.pdf
     """
-
     def __init__(self,
                  generator,
                  discriminator=None,
@@ -41,7 +40,9 @@ class CycleGANModel(BaseModel):
                  pool_size=50,
                  direction='a2b',
                  lambda_a=10.,
-                 lambda_b=10.):
+                 lambda_b=10.,
+                 to_static=False,
+                 image_shape=None):
         """Initialize the CycleGAN class.
 
         Args:
@@ -60,6 +61,9 @@ class CycleGANModel(BaseModel):
         # Code (vs. paper): G_A (G), G_B (F), D_A (D_Y), D_B (D_X)
         self.nets['netG_A'] = build_generator(generator)
         self.nets['netG_B'] = build_generator(generator)
+        # set @to_static for benchmark, skip this by default.
+        apply_to_static(to_static, image_shape, self.nets['netG_A'])
+        apply_to_static(to_static, image_shape, self.nets['netG_B'])
         init_weights(self.nets['netG_A'])
         init_weights(self.nets['netG_B'])
 
@@ -67,6 +71,9 @@ class CycleGANModel(BaseModel):
         if discriminator:
             self.nets['netD_A'] = build_discriminator(discriminator)
             self.nets['netD_B'] = build_discriminator(discriminator)
+            # set @to_static for benchmark, skip this by default.
+            apply_to_static(to_static, image_shape, self.nets['netD_A'])
+            apply_to_static(to_static, image_shape, self.nets['netD_B'])
             init_weights(self.nets['netD_A'])
             init_weights(self.nets['netD_B'])
 
@@ -115,6 +122,7 @@ class CycleGANModel(BaseModel):
     def forward(self):
         """Run forward pass; called by both functions <optimize_parameters> and <test>."""
         if hasattr(self, 'real_A'):
+            self.real_A.stop_gradient = False
             self.fake_B = self.nets['netG_A'](self.real_A)  # G_A(A)
             self.rec_A = self.nets['netG_B'](self.fake_B)  # G_B(G_A(A))
 
@@ -222,14 +230,13 @@ class CycleGANModel(BaseModel):
         # forward
         # compute fake images and reconstruction images.
         self.forward()
-        # G_A and G_B
-        # Ds require no gradients when optimizing Gs
-        self.set_requires_grad([self.nets['netD_A'], self.nets['netD_B']],
-                               False)
         # set G_A and G_B's gradients to zero
         optimizers['optimG'].clear_grad()
         # calculate gradients for G_A and G_B
         self.backward_G()
+        # G_A and G_B
+        # Ds require no gradients when optimizing Gs
+        self.set_requires_grad([self.nets['netD_A'], self.nets['netD_B']], False)
         # update G_A and G_B's weights
         self.optimizers['optimG'].step()
         # D_A and D_B
@@ -243,3 +250,13 @@ class CycleGANModel(BaseModel):
         self.backward_D_B()
         # update D_A and D_B's weights
         optimizers['optimD'].step()
+
+
+    def test_iter(self, metrics=None):
+        self.nets['netG_A'].eval()
+        self.forward()
+        with paddle.no_grad():
+            if metrics is not None:
+                for metric in metrics.values():
+                    metric.update(self.fake_B, self.real_B)
+        self.nets['netG_A'].train()

@@ -25,7 +25,7 @@ import paddle
 from paddle.distributed import ParallelEnv
 
 from resnet import ResNet50
-from ppcls.utils.save_load import load_dygraph_pretrain
+from paddlers.models.ppcls.utils.save_load import load_dygraph_pretrain
 
 
 def parse_args():
@@ -50,7 +50,8 @@ def create_operators(interpolation=1):
     img_std = [0.229, 0.224, 0.225]
     img_scale = 1.0 / 255.0
 
-    resize_op = utils.ResizeImage(resize_short=256, interpolation=interpolation)
+    resize_op = utils.ResizeImage(
+        resize_short=256, interpolation=interpolation)
     crop_op = utils.CropImage(size=(size, size))
     normalize_op = utils.NormalizeImage(
         scale=img_scale, mean=img_mean, std=img_std)

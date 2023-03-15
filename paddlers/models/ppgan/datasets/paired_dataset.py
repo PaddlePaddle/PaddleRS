@@ -20,7 +20,6 @@ from .base_dataset import BaseDataset
 class PairedDataset(BaseDataset):
     """A dataset class for paired image dataset.
     """
-
     def __init__(self, dataroot, preprocess):
         """Initialize this dataset class.
 

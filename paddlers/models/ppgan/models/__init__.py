@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .base_model import BaseModel
+from .base_model import BaseModel, apply_to_static
 from .gan_model import GANModel
 from .cycle_gan_model import CycleGANModel
 from .pix2pix_model import Pix2PixModel
@@ -34,3 +34,12 @@ from .basicvsr_model import BasicVSRModel
 from .mpr_model import MPRModel
 from .photopen_model import PhotoPenModel
 from .msvsr_model import MultiStageVSRModel
+from .singan_model import SinGANModel
+from .rcan_model import RCANModel
+from .prenet_model import PReNetModel
+from .gpen_model import GPENModel
+from .swinir_model import SwinIRModel
+from .gfpgan_model import GFPGANModel
+from .invdn_model import InvDNModel
+from .nafnet_model import NAFNetModel
+from .aotgan_model import AOTGANModel

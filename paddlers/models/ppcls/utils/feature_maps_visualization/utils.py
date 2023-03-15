@@ -24,7 +24,8 @@ class DecodeImage(object):
         data = np.frombuffer(img, dtype='uint8')
         img = cv2.imdecode(data, 1)
         if self.to_rgb:
-            assert img.shape[2] == 3, 'invalid shape of image[%s]' % (img.shape)
+            assert img.shape[2] == 3, 'invalid shape of image[%s]' % (
+                img.shape)
             img = img[:, :, ::-1]
 
         return img

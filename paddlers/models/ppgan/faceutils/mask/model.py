@@ -2,6 +2,7 @@
 # MIT License 
 # Copyright (c) 2020 Wentao Jiang
 
+
 import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
@@ -19,13 +20,12 @@ class ConvBNReLU(paddle.nn.Layer):
                  *args,
                  **kwargs):
         super(ConvBNReLU, self).__init__()
-        self.conv = nn.Conv2D(
-            in_chan,
-            out_chan,
-            kernel_size=ks,
-            stride=stride,
-            padding=padding,
-            bias_attr=False)
+        self.conv = nn.Conv2D(in_chan,
+                              out_chan,
+                              kernel_size=ks,
+                              stride=stride,
+                              padding=padding,
+                              bias_attr=False)
         self.bn = nn.BatchNorm2D(out_chan)
         self.relu = nn.ReLU()
 
@@ -40,8 +40,10 @@ class BiSeNetOutput(paddle.nn.Layer):
     def __init__(self, in_chan, mid_chan, n_classes, *args, **kwargs):
         super(BiSeNetOutput, self).__init__()
         self.conv = ConvBNReLU(in_chan, mid_chan, ks=3, stride=1, padding=1)
-        self.conv_out = nn.Conv2D(
-            mid_chan, n_classes, kernel_size=1, bias_attr=False)
+        self.conv_out = nn.Conv2D(mid_chan,
+                                  n_classes,
+                                  kernel_size=1,
+                                  bias_attr=False)
 
     def forward(self, x):
         x = self.conv(x)
@@ -53,8 +55,10 @@ class AttentionRefinementModule(paddle.nn.Layer):
     def __init__(self, in_chan, out_chan, *args, **kwargs):
         super(AttentionRefinementModule, self).__init__()
         self.conv = ConvBNReLU(in_chan, out_chan, ks=3, stride=1, padding=1)
-        self.conv_atten = nn.Conv2D(
-            out_chan, out_chan, kernel_size=1, bias_attr=False)
+        self.conv_atten = nn.Conv2D(out_chan,
+                                    out_chan,
+                                    kernel_size=1,
+                                    bias_attr=False)
         self.bn_atten = nn.BatchNorm(out_chan)
         self.sigmoid_atten = nn.Sigmoid()
 
@@ -133,20 +137,18 @@ class FeatureFusionModule(paddle.nn.Layer):
     def __init__(self, in_chan, out_chan, *args, **kwargs):
         super(FeatureFusionModule, self).__init__()
         self.convblk = ConvBNReLU(in_chan, out_chan, ks=1, stride=1, padding=0)
-        self.conv1 = nn.Conv2D(
-            out_chan,
-            out_chan // 4,
-            kernel_size=1,
-            stride=1,
-            padding=0,
-            bias_attr=False)
-        self.conv2 = nn.Conv2D(
-            out_chan // 4,
-            out_chan,
-            kernel_size=1,
-            stride=1,
-            padding=0,
-            bias_attr=False)
+        self.conv1 = nn.Conv2D(out_chan,
+                               out_chan // 4,
+                               kernel_size=1,
+                               stride=1,
+                               padding=0,
+                               bias_attr=False)
+        self.conv2 = nn.Conv2D(out_chan // 4,
+                               out_chan,
+                               kernel_size=1,
+                               stride=1,
+                               padding=0,
+                               bias_attr=False)
         self.relu = nn.ReLU()
         self.sigmoid = nn.Sigmoid()
 

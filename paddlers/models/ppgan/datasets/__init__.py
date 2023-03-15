@@ -21,11 +21,19 @@ from .common_vision_dataset import CommonVisionDataset
 from .animeganv2_dataset import AnimeGANV2Dataset
 from .wav2lip_dataset import Wav2LipDataset
 from .starganv2_dataset import StarGANv2Dataset
-from .edvr_dataset import REDSDataset
 from .firstorder_dataset import FirstOrderDataset
 from .lapstyle_dataset import LapStyleDataset
-from .sr_reds_multiple_gt_dataset import SRREDSMultipleGTDataset
 from .mpr_dataset import MPRTrain, MPRVal, MPRTest
+from .vsr_reds_dataset import VSRREDSDataset
+from .vsr_reds_multiple_gt_dataset import VSRREDSMultipleGTDataset
 from .vsr_vimeo90k_dataset import VSRVimeo90KDataset
 from .vsr_folder_dataset import VSRFolderDataset
 from .photopen_dataset import PhotoPenDataset
+from .empty_dataset import EmptyDataset
+from .gpen_dataset import GPENDataset
+from .swinir_dataset import SwinIRDataset
+from .gfpgan_datasets import FFHQDegradationDataset
+from .paired_image_datasets import PairedImageDataset
+from .invdn_dataset import InvDNDataset
+from .nafnet_dataset import NAFNetTrain, NAFNetVal, NAFNetTest
+from .aotgan_dataset import AOTGANDataset

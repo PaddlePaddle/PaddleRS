@@ -31,13 +31,7 @@ from .builder import DISCRIMINATORS
 @DISCRIMINATORS.register()
 class NLayerDiscriminator(nn.Layer):
     """Defines a PatchGAN discriminator"""
-
-    def __init__(self,
-                 input_nc,
-                 ndf=64,
-                 n_layers=3,
-                 norm_type='instance',
-                 use_sigmoid=False):
+    def __init__(self, input_nc, ndf=64, n_layers=3, norm_type='instance', use_sigmoid=False):
         """Construct a PatchGAN discriminator
 
         Parameters:
@@ -62,19 +56,22 @@ class NLayerDiscriminator(nn.Layer):
         if norm_type == 'spectral':
             sequence = [
                 Spectralnorm(
-                    nn.Conv2D(
-                        input_nc, ndf, kernel_size=kw, stride=2, padding=padw)),
+                    nn.Conv2D(input_nc,
+                              ndf,
+                              kernel_size=kw,
+                              stride=2,
+                              padding=padw)),
                 nn.LeakyReLU(0.01)
             ]
         else:
             sequence = [
-                nn.Conv2D(
-                    input_nc,
-                    ndf,
-                    kernel_size=kw,
-                    stride=2,
-                    padding=padw,
-                    bias_attr=use_bias), nn.LeakyReLU(0.2)
+                nn.Conv2D(input_nc,
+                          ndf,
+                          kernel_size=kw,
+                          stride=2,
+                          padding=padw,
+                          bias_attr=use_bias),
+                nn.LeakyReLU(0.2)
             ]
         nf_mult = 1
         nf_mult_prev = 1
@@ -84,22 +81,22 @@ class NLayerDiscriminator(nn.Layer):
             if norm_type == 'spectral':
                 sequence += [
                     Spectralnorm(
-                        nn.Conv2D(
-                            ndf * nf_mult_prev,
-                            ndf * nf_mult,
-                            kernel_size=kw,
-                            stride=2,
-                            padding=padw)), nn.LeakyReLU(0.01)
+                        nn.Conv2D(ndf * nf_mult_prev,
+                                  ndf * nf_mult,
+                                  kernel_size=kw,
+                                  stride=2,
+                                  padding=padw)),
+                    nn.LeakyReLU(0.01)
                 ]
             else:
                 sequence += [
-                    nn.Conv2D(
-                        ndf * nf_mult_prev,
-                        ndf * nf_mult,
-                        kernel_size=kw,
-                        stride=2,
-                        padding=padw,
-                        bias_attr=use_bias), norm_layer(ndf * nf_mult),
+                    nn.Conv2D(ndf * nf_mult_prev,
+                              ndf * nf_mult,
+                              kernel_size=kw,
+                              stride=2,
+                              padding=padw,
+                              bias_attr=use_bias),
+                    norm_layer(ndf * nf_mult),
                     nn.LeakyReLU(0.2)
                 ]
 
@@ -108,44 +105,46 @@ class NLayerDiscriminator(nn.Layer):
         if norm_type == 'spectral':
             sequence += [
                 Spectralnorm(
-                    nn.Conv2D(
-                        ndf * nf_mult_prev,
-                        ndf * nf_mult,
-                        kernel_size=kw,
-                        stride=1,
-                        padding=padw)), nn.LeakyReLU(0.01)
+                    nn.Conv2D(ndf * nf_mult_prev,
+                              ndf * nf_mult,
+                              kernel_size=kw,
+                              stride=1,
+                              padding=padw)),
+                nn.LeakyReLU(0.01)
             ]
         else:
             sequence += [
-                nn.Conv2D(
-                    ndf * nf_mult_prev,
-                    ndf * nf_mult,
-                    kernel_size=kw,
-                    stride=1,
-                    padding=padw,
-                    bias_attr=use_bias), norm_layer(ndf * nf_mult),
+                nn.Conv2D(ndf * nf_mult_prev,
+                          ndf * nf_mult,
+                          kernel_size=kw,
+                          stride=1,
+                          padding=padw,
+                          bias_attr=use_bias),
+                norm_layer(ndf * nf_mult),
                 nn.LeakyReLU(0.2)
             ]
 
         if norm_type == 'spectral':
             sequence += [
                 Spectralnorm(
-                    nn.Conv2D(
-                        ndf * nf_mult,
-                        1,
-                        kernel_size=kw,
-                        stride=1,
-                        padding=padw,
-                        bias_attr=False))
+                    nn.Conv2D(ndf * nf_mult,
+                              1,
+                              kernel_size=kw,
+                              stride=1,
+                              padding=padw,
+                              bias_attr=False))
             ]  # output 1 channel prediction map
         else:
             sequence += [
-                nn.Conv2D(
-                    ndf * nf_mult, 1, kernel_size=kw, stride=1, padding=padw)
+                nn.Conv2D(ndf * nf_mult,
+                          1,
+                          kernel_size=kw,
+                          stride=1,
+                          padding=padw)
             ]  # output 1 channel prediction map
 
         self.model = nn.Sequential(*sequence)
-        self.final_act = F.sigmoid if use_sigmoid else (lambda x: x)
+        self.final_act = F.sigmoid if use_sigmoid else (lambda x:x)
 
     def forward(self, input):
         """Standard forward."""
@@ -156,17 +155,17 @@ class NLayerDiscriminator(nn.Layer):
 class NLayerDiscriminatorWithClassification(NLayerDiscriminator):
     def __init__(self, input_nc, n_class=10, **kwargs):
         input_nc = input_nc + n_class
-        super(NLayerDiscriminatorWithClassification, self).__init__(input_nc,
-                                                                    **kwargs)
+        super(NLayerDiscriminatorWithClassification, self).__init__(input_nc, **kwargs)
 
         self.n_class = n_class
-
+    
     def forward(self, x, class_id):
         if self.n_class > 0:
             class_id = (class_id % self.n_class).detach()
             class_id = F.one_hot(class_id, self.n_class).astype('float32')
             class_id = class_id.reshape([x.shape[0], -1, 1, 1])
-            class_id = class_id.tile([1, 1, *x.shape[2:]])
+            class_id = class_id.tile([1,1,*x.shape[2:]])
             x = paddle.concat([x, class_id], 1)
-
+        
         return super(NLayerDiscriminatorWithClassification, self).forward(x)
+

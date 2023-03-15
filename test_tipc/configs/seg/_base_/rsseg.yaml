@@ -52,6 +52,8 @@ transforms:
             mean: [0.5, 0.5, 0.5]
             std: [0.5, 0.5, 0.5]
         - !Node
+          type: ReloadMask
+        - !Node
           type: ArrangeSegmenter
           args: ['eval']
 download_on: False

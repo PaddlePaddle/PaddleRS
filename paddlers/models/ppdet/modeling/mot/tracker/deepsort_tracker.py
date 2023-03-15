@@ -1,4 +1,4 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
+# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -103,9 +103,7 @@ class DeepSORTTracker(object):
         pred_cls_ids = pred_dets[:, 0:1]
         pred_scores = pred_dets[:, 1:2]
         pred_xyxys = pred_dets[:, 2:6]
-        pred_tlwhs = np.concatenate(
-            (pred_xyxys[:, 0:2], pred_xyxys[:, 2:4] - pred_xyxys[:, 0:2] + 1),
-            axis=1)
+        pred_tlwhs = np.concatenate((pred_xyxys[:, 0:2], pred_xyxys[:, 2:4] - pred_xyxys[:, 0:2] + 1), axis=1)
 
         detections = [
             Detection(tlwh, score, feat, cls_id)
