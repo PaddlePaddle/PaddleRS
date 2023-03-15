@@ -267,16 +267,16 @@ class BaseModel(metaclass=ModelMeta):
         open(osp.join(save_dir, '.success'), 'w').close()
         logging.info("Model saved in {}.".format(save_dir))
 
-    def _build_transforms(self, transforms, mode):
+    def _build_transforms(self, trans, mode):
         if isinstance(trans, list):
             trans = Compose(trans)
         if not isinstance(trans.transforms[0], DecodeImg):
             trans.transforms.insert(0, DecodeImg())
-        if not isinstance(self._arrage, Arrange):
+        if not issubclass(self._arrage, Arrange):
             raise ValueError(
-                "The subclass must modify `_arrange` to an Arrange class.")
-        transforms.arrange = self._arrange(mode)
-        return transforms
+                "The subclass must modify `_arrage` to an Arrange class.")
+        trans.arrange = self._arrage(mode)
+        return trans
 
     def build_data_loader(self,
                           dataset,
@@ -698,12 +698,12 @@ class BaseModel(metaclass=ModelMeta):
 
     def _check_transforms(self, transforms):
         # NOTE: Check transforms
-        if not isinstance(transforms, paddlers.transforms.Compose):
+        if not isinstance(transforms, Compose):
             raise TypeError("`transforms` must be paddlers.transforms.Compose.")
 
     def _check_arrange(self, transforms, mode):
         arrange_obj = transforms.arrange
-        if not isinstance(arrange_obj, paddlers.transforms.operators.Arrange):
+        if not isinstance(arrange_obj, Arrange):
             raise TypeError("`transforms.arrange` must be an Arrange object.")
         if arrange_obj.mode != mode:
             raise ValueError(

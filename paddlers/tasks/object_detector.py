@@ -727,8 +727,7 @@ class BaseDetector(BaseModel):
 
     def _check_arrange(self, transforms, mode):
         super()._check_arrange(transforms, mode)
-        if not isinstance(transforms.arrange,
-                          paddlers.transforms.ArrangeDetector):
+        if not isinstance(transforms.arrange, ArrangeDetector):
             raise TypeError(
                 "`transforms.arrange` must be an ArrangeDetector object.")
 

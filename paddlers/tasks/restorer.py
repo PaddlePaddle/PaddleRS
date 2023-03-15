@@ -566,8 +566,7 @@ class BaseRestorer(BaseModel):
 
     def _check_arrange(self, transforms, mode):
         super()._check_arrange(transforms, mode)
-        if not isinstance(transforms.arrange,
-                          paddlers.transforms.ArrangeRestorer):
+        if not isinstance(transforms.arrange, ArrangeRestorer):
             raise TypeError(
                 "`transforms.arrange` must be an ArrangeRestorer object.")
 

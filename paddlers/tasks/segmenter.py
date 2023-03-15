@@ -683,8 +683,7 @@ class BaseSegmenter(BaseModel):
 
     def _check_arrange(self, transforms, mode):
         super()._check_arrange(transforms, mode)
-        if not isinstance(transforms.arrange,
-                          paddlers.transforms.ArrangeSegmenter):
+        if not isinstance(transforms.arrange, ArrangeSegmenter):
             raise TypeError(
                 "`transforms.arrange` must be an ArrangeSegmenter object.")
 

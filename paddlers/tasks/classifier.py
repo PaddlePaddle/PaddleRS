@@ -506,8 +506,7 @@ class BaseClassifier(BaseModel):
 
     def _check_arrange(self, transforms, mode):
         super()._check_arrange(transforms, mode)
-        if not isinstance(transforms.arrange,
-                          paddlers.transforms.ArrangeClassifier):
+        if not isinstance(transforms.arrange, ArrangeClassifier):
             raise TypeError(
                 "`transforms.arrange` must be an ArrangeClassifier object.")
 
