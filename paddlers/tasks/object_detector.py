@@ -43,7 +43,7 @@ __all__ = [
 
 
 class BaseDetector(BaseModel):
-    _arrage = ArrangeDetector
+    _arrange = ArrangeDetector
 
     def __init__(self, model_name, num_classes=80, **params):
         self.init_params.update(locals())
@@ -729,7 +729,7 @@ class BaseDetector(BaseModel):
         super()._check_arrange(transforms, mode)
         if not isinstance(transforms.arrange, ArrangeDetector):
             raise TypeError(
-                "`transforms.arrange` must be an ArrangeDetector object.")
+                "`transforms.arrange` must be an `ArrangeDetector` object.")
 
     def get_pruning_info(self):
         info = super().get_pruning_info()

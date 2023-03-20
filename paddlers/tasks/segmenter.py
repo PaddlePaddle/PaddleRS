@@ -43,7 +43,7 @@ __all__ = [
 
 
 class BaseSegmenter(BaseModel):
-    _arrage = ArrangeSegmenter
+    _arrange = ArrangeSegmenter
 
     def __init__(self,
                  model_name,
@@ -685,7 +685,7 @@ class BaseSegmenter(BaseModel):
         super()._check_arrange(transforms, mode)
         if not isinstance(transforms.arrange, ArrangeSegmenter):
             raise TypeError(
-                "`transforms.arrange` must be an ArrangeSegmenter object.")
+                "`transforms.arrange` must be an `ArrangeSegmenter` object.")
 
     def set_losses(self, losses, weights=None):
         if weights is None:

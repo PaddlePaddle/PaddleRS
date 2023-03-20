@@ -37,7 +37,7 @@ __all__ = ["ResNet50_vd", "MobileNetV3", "HRNet", "CondenseNetV2"]
 
 
 class BaseClassifier(BaseModel):
-    _arrage = ArrangeClassifier
+    _arrange = ArrangeClassifier
 
     def __init__(self,
                  model_name,
@@ -508,7 +508,7 @@ class BaseClassifier(BaseModel):
         super()._check_arrange(transforms, mode)
         if not isinstance(transforms.arrange, ArrangeClassifier):
             raise TypeError(
-                "`transforms.arrange` must be an ArrangeClassifier object.")
+                "`transforms.arrange` must be an `ArrangeClassifier` object.")
 
     def build_data_loader(self,
                           dataset,

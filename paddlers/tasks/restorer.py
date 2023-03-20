@@ -40,7 +40,7 @@ __all__ = ["DRN", "LESRCNN", "ESRGAN"]
 
 
 class BaseRestorer(BaseModel):
-    _arrage = ArrangeRestorer
+    _arrange = ArrangeRestorer
     MIN_MAX = (0., 1.)
     TEST_OUT_KEY = None
 
@@ -568,7 +568,7 @@ class BaseRestorer(BaseModel):
         super()._check_arrange(transforms, mode)
         if not isinstance(transforms.arrange, ArrangeRestorer):
             raise TypeError(
-                "`transforms.arrange` must be an ArrangeRestorer object.")
+                "`transforms.arrange` must be an `ArrangeRestorer` object.")
 
     def build_data_loader(self,
                           dataset,

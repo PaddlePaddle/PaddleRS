@@ -110,6 +110,7 @@ class Compose(object):
                 "Length of transforms must not be less than 1, but received is {}."
                 .format(len(transforms)))
         transforms = copy.deepcopy(transforms)
+        # We will have to do a late binding of `self.arrange`
         self.arrange = None
         self.transforms = transforms
 

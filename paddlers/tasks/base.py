@@ -63,7 +63,7 @@ class ModelMeta(type):
 
 
 class BaseModel(metaclass=ModelMeta):
-    _arrage: Optional[Arrange] = None
+    _arrange: Optional[Arrange] = None
     find_unused_parameters = False
 
     def __init__(self, model_type):
@@ -207,7 +207,7 @@ class BaseModel(metaclass=ModelMeta):
                         attr = op.__dict__
                     info['Transforms'].append({name: attr})
                 info['Transforms'].append({
-                    self._arrage.__name__: {
+                    self._arrange.__name__: {
                         'mode': 'test'
                     }
                 })
@@ -272,10 +272,13 @@ class BaseModel(metaclass=ModelMeta):
             trans = Compose(trans)
         if not isinstance(trans.transforms[0], DecodeImg):
             trans.transforms.insert(0, DecodeImg())
-        if not issubclass(self._arrage, Arrange):
+        if self._arrange is Arrange or not issubclass(self._arrange, Arrange):
             raise ValueError(
-                "The subclass must modify `_arrage` to an Arrange class.")
-        trans.arrange = self._arrage(mode)
+                "`self._arrange` must be set to a concrete Arrange type.")
+        if trans.arrange is None:
+            # For backward compatibility, we only set `trans.arrange`
+            # when it is not set by user.
+            trans.arrange = self._arrange(mode)
         return trans
 
     def build_data_loader(self,
@@ -283,7 +286,7 @@ class BaseModel(metaclass=ModelMeta):
                           batch_size,
                           mode='train',
                           collate_fn=None):
-        # NOTE: add `Arrange` after transforms
+        # NOTE: Append `Arrange` to transforms
         dataset.transforms = self._build_transforms(dataset.transforms, mode)
 
         if dataset.num_samples < batch_size:
@@ -329,7 +332,7 @@ class BaseModel(metaclass=ModelMeta):
                    early_stop=False,
                    early_stop_patience=5,
                    use_vdl=True):
-        self._check_transforms(train_dataset)
+        self._check_transforms(train_dataset.transforms)
 
         # XXX: Hard-coding
         if self.model_type == 'detector' and 'RCNN' in self.__class__.__name__ and train_dataset.pos_num < len(
@@ -699,7 +702,8 @@ class BaseModel(metaclass=ModelMeta):
     def _check_transforms(self, transforms):
         # NOTE: Check transforms
         if not isinstance(transforms, Compose):
-            raise TypeError("`transforms` must be paddlers.transforms.Compose.")
+            raise TypeError(
+                "`transforms` must be `paddlers.transforms.Compose`.")
 
     def _check_arrange(self, transforms, mode):
         arrange_obj = transforms.arrange
@@ -707,7 +711,7 @@ class BaseModel(metaclass=ModelMeta):
             raise TypeError("`transforms.arrange` must be an Arrange object.")
         if arrange_obj.mode != mode:
             raise ValueError(
-                f"Incorrect arrange mode! Expected {mode} but got {arrange_obj.mode}."
+                f"Incorrect arrange mode! Expected {repr(mode)} but got {repr(arrange_obj.mode)}."
             )
 
     def run(self, net, inputs, mode):

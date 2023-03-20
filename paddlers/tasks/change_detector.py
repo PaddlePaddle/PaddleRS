@@ -44,7 +44,7 @@ __all__ = [
 
 
 class BaseChangeDetector(BaseModel):
-    _arrage = ArrangeChangeDetector
+    _arrange = ArrangeChangeDetector
 
     def __init__(self,
                  model_name,
@@ -723,7 +723,8 @@ class BaseChangeDetector(BaseModel):
         super()._check_arrange(transforms, mode)
         if not isinstance(transforms.arrange, ArrangeChangeDetector):
             raise TypeError(
-                "`transforms.arrange` must be an ArrangeChangeDetector object.")
+                "`transforms.arrange` must be an `ArrangeChangeDetector` object."
+            )
 
     def set_losses(self, losses, weights=None):
         if weights is None:
