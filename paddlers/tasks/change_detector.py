@@ -29,6 +29,7 @@ import paddlers.rs_models.cd as cmcd
 import paddlers.utils.logging as logging
 from paddlers.models import seg_losses
 from paddlers.transforms import Resize, decode_image, construct_sample
+from paddlers.transforms.operators import ArrangeChangeDetector
 from paddlers.utils import get_single_card_bs
 from paddlers.utils.checkpoint import cd_pretrain_weights_dict
 from .base import BaseModel
@@ -43,6 +44,8 @@ __all__ = [
 
 
 class BaseChangeDetector(BaseModel):
+    _arrange = ArrangeChangeDetector
+
     def __init__(self,
                  model_name,
                  num_classes=2,
@@ -426,7 +429,7 @@ class BaseChangeDetector(BaseModel):
                     "category_F1-score": F1 score}.
         """
 
-        self._check_transforms(eval_dataset.transforms, 'eval')
+        self._check_transforms(eval_dataset.transforms)
 
         self.net.eval()
         nranks = paddle.distributed.get_world_size()
@@ -448,6 +451,7 @@ class BaseChangeDetector(BaseModel):
             )
         self.eval_data_loader = self.build_data_loader(
             eval_dataset, batch_size=batch_size, mode='eval')
+        self._check_arrange(self.eval_data_loader.dataset.transforms, 'eval')
 
         intersect_area_all = 0
         pred_area_all = 0
@@ -531,7 +535,7 @@ class BaseChangeDetector(BaseModel):
             img_file (list[tuple] | tuple[str|np.ndarray]): Tuple of image paths or 
                 decoded image data for bi-temporal images, which also could constitute
                 a list, meaning all image pairs to be predicted as a mini-batch.
-            transforms (paddlers.transforms.Compose|None, optional): Transforms for 
+            transforms (paddlers.transforms.Compose|list|None, optional): Transforms for 
                 inputs. If None, the transforms for evaluation process will be used. 
                 Defaults to None.
 
@@ -557,6 +561,8 @@ class BaseChangeDetector(BaseModel):
             images = [img_file]
         else:
             images = img_file
+        transforms = self._build_transforms(transforms, "test")
+        self._check_arrange(transforms, "test")
         data = self.preprocess(images, transforms, self.model_type)
         self.net.eval()
         outputs = self.run(self.net, data, 'test')
@@ -597,7 +603,7 @@ class BaseChangeDetector(BaseModel):
             overlap (list[int] | tuple[int] | int, optional):
                 Overlap between two blocks. If `overlap` is a list or tuple, it should
                 be in (W, H) format. Defaults to 36.
-            transforms (paddlers.transforms.Compose|None, optional): Transforms for 
+            transforms (paddlers.transforms.Compose|list|None, optional): Transforms for 
                 inputs. If None, the transforms for evaluation process will be used. 
                 Defaults to None.
             invalid_value (int, optional): Value that marks invalid pixels in output 
@@ -618,7 +624,7 @@ class BaseChangeDetector(BaseModel):
                        eager_load, not quiet)
 
     def preprocess(self, images, transforms, to_tensor=True):
-        self._check_transforms(transforms, 'test')
+        self._check_transforms(transforms)
         batch_im1, batch_im2 = list(), list()
         batch_trans_info = list()
         for im1, im2 in images:
@@ -713,12 +719,12 @@ class BaseChangeDetector(BaseModel):
             score_maps.append(score_map.squeeze())
         return label_maps, score_maps
 
-    def _check_transforms(self, transforms, mode):
-        super()._check_transforms(transforms, mode)
-        if not isinstance(transforms.arrange,
-                          paddlers.transforms.ArrangeChangeDetector):
+    def _check_arrange(self, transforms, mode):
+        super()._check_arrange(transforms, mode)
+        if not isinstance(transforms.arrange, ArrangeChangeDetector):
             raise TypeError(
-                "`transforms.arrange` must be an ArrangeChangeDetector object.")
+                "`transforms.arrange` must be an `ArrangeChangeDetector` object."
+            )
 
     def set_losses(self, losses, weights=None):
         if weights is None:

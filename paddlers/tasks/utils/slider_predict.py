@@ -330,7 +330,7 @@ def slider_predict(predict_func,
         overlap (list[int] | tuple[int] | int):
             Overlap between two blocks. If `overlap` is list or tuple, it should
             be in (W, H) format.
-        transforms (paddlers.transforms.Compose|None): Transforms for inputs. If 
+        transforms (paddlers.transforms.Compose|list|None): Transforms for inputs. If 
             None, the transforms for evaluation process will be used. 
         invalid_value (int): Value that marks invalid pixels in output image. 
             Defaults to 255.
