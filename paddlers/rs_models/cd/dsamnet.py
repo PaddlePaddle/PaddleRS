@@ -42,6 +42,20 @@ class DSAMNet(nn.Layer):
         sa_kernel (int, optional): Size of the convolutional kernel used in the 
             spatial attention module. Default: 7.
     """
+    """
+    DSAMNet是一种基于PaddlePaddle的实现，用于遥感变化检测。
+
+    该模型基于论文"Q. Shi, et al., "A Deeply Supervised Attention Metric-Based Network and an Open Aerial Image Dataset for Remote Sensing Change Detection"，主要包括一个深度监督的注意力度量网络和一个开放的航空图像数据集。
+    需要注意的是，该实现与原始工作在以下两个方面存在差异：
+        1. 我们在ResNet主干网络的第四层中不使用多个扩张率。
+        2. 为了稳定训练过程，使用分类头代替原始的度量学习头。
+    
+    该实现包含以下参数：
+        in_channels（int）：输入图像的波段数。
+        num_classes（int）：目标类别数。
+        ca_ratio（int，可选）：通道注意力模块中的通道缩减比率。默认值为8。
+        sa_kernel（int，可选）：空间注意力模块中使用的卷积核大小。默认值为7。
+    """
 
     def __init__(self, in_channels, num_classes, ca_ratio=8, sa_kernel=7):
         super(DSAMNet, self).__init__()

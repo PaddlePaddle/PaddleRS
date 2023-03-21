@@ -131,3 +131,34 @@ visualdl --logdir output/deeplabv3p/vdl_log --port 8001
 ```
 
 服务启动后，使用浏览器打开 https://0.0.0.0:8001 或 https://localhost:8001 即可进入可视化页面。
+
+##模型精度验证
+模型训练完成后，需要对模型进行精度验证，以确保模型的预测效果符合预期。以DeepLab V3+图像分割模型为例，可以使用以下命令启动：
+```shell
+# 指定需要使用的GPU设备编号
+export CUDA_VISIBLE_DEVICES=0
+python tutorials/eval/semantic_segmentation/deeplabv3p.py --model_path /path/to/model --save_dir /path/to/result
+```
+其中，/path/to/model是训练好的模型的保存路径，/path/to/result是验证结果保存路径。
+
+##模型部署
+在完成模型训练和验证后，可以使用PaddleServing进行模型部署。PaddleServing是飞桨的一个高性能、灵活的模型服务部署框架，可以为训练好的模型提供在线服务。具体的操作步骤如下：
+1. 安装PaddleServing
+
+    PaddleServing可以通过pip安装，具体命令如下：
+```shell
+pip install paddle-serving-server paddle-serving-client paddle-serving-app
+```
+2. 导出模型
+在使用PaddleServing进行模型部署之前，需要将PaddlePaddle训练好的模型导出成符合PaddleServing要求的格式。可以使用PaddlePaddle的fluid.io.save_inference_model()函数导出模型，具体操作可以参考飞桨文档：
+https://www.paddlepaddle.org.cn/documentation/docs/zh/user_guides/howto/deploy/save_load_model/save_model_cn.html
+3. 启动服务
+在导出模型后，可以使用PaddleServing启动服务。具体命令如下：
+```shell
+# 启动PaddleServing服务
+python -m paddle_serving_server.serve --model /path/to/exported_model --port 9292
+
+# 启动PaddleServing客户端
+python tutorials/serving/semantic_segmentation/deeplabv3p_client.py --image_path /path/to/image --server_ip 127.0.0.1 --port 9292
+```
+其中，/path/to/exported_model是导出的模型所在的路径，9292是服务端口号。/path/to/image是需要进行图像分割的图片的路径，127.0.0.1是服务端IP地址。

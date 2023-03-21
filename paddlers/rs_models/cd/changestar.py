@@ -103,6 +103,24 @@ class ChangeStar_FarSeg(_ChangeStarBase):
         scale_factor (float, optional): Scaling factor of the output upsampling 
             layer. Default: 4.0.
     """
+    """
+    这是一个基于PaddlePaddle实现的ChangeStar模型，其使用FarSeg编码器。
+
+    原始文章是“Change is Everywhere: Single-Temporal Supervised Object Change Detection in Remote Sensing Imagery”，作者是Zheng等人。
+    
+    需要注意的是，此实现与原始代码在两个方面有所不同：
+    
+    1. FarSeg模型的编码器是ResNet50。
+    2. 我们使用conv-bn-relu而不是conv-relu-bn。
+    
+    参数说明如下：
+    Args:
+        num_classes (int): 目标类别数。
+        mid_channels (int, optional): ChangeMixin模块所需的通道数。默认值为256。
+        inner_channels (int, optional): ChangeMixin模块中用于卷积层的滤波器数量。默认值为16。
+        num_convs (int, optional): ChangeMixin模块中使用的卷积层数量。默认值为4。
+        scale_factor (float, optional): 输出上采样层的缩放因子。默认值为4.0。
+    """
 
     def __init__(
             self,

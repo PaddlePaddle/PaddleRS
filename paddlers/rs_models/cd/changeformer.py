@@ -183,6 +183,19 @@ class ChangeFormer(nn.Layer):
         decoder_softmax (bool, optional): Use softmax after decode or not. Default: False.
         embed_dim (int, optional): Embedding dimension of each decoder head. Default: 256.
     """
+    """
+    基于PaddlePaddle的ChangeFormer实现。
+    
+    原论文参考文献为：
+    Wele Gedara Chaminda Bandara，Vishal M. Patel，“A TRANSFORMER-BASED SIAMESE NETWORK FOR CHANGE DETECTION”
+    (https://arxiv.org/pdf/2201.01293.pdf)。
+
+    参数：
+        in_channels (int)：输入图像的波段数。
+        num_classes (int)：目标类别数。
+        decoder_softmax (bool, optional)：是否在解码后使用softmax。默认为False。
+        embed_dim (int, optional)：每个解码器头的嵌入维度。默认为256。
+    """
 
     def __init__(self,
                  in_channels,

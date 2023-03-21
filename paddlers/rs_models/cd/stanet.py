@@ -50,6 +50,28 @@ class STANet(nn.Layer):
         ValueError: When `att_type` has an illeagal value (unsupported attention 
             type).
     """
+    """
+    基于PaddlePaddle的STANet实现。
+    
+    原文来自
+        H. Chen and Z. Shi, "A Spatial-Temporal Attention-Based Method and a New 
+            Dataset for Remote Sensing Image Change Detection"
+            (https://www.mdpi.com/2072-4292/12/10/1662).
+
+    注意，这个实现与原来的工作有两个不同之处:
+    1.     我们在ResNet主干网的第4层中不使用多重膨胀率。
+    2.     使使用分类头代替原始的基于度量学习的头来稳定训练过程。
+    
+    参数:
+        in_channels (int):输入图像的频带数。
+        num_classes (int):目标类的个数。
+        att_type (str，可选):模型中使用的注意模块。选项
+        是'PAM'和'BAM'。默认值:“BAM”。
+        ds_factor (int，可选):注意力模块的下采样因子。当' ds_factor '设置值大于1时，输入特征将首先经过内核大小为' ds_factor '的平均池化层处理，然后用于计算注意力得分。默认值:1。
+    
+    Raises:
+        ValueError:当' att_type '有一个非法的值(不支持的注意类型)。
+    """
 
     def __init__(self, in_channels, num_classes, att_type='BAM', ds_factor=1):
         super(STANet, self).__init__()

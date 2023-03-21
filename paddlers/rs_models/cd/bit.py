@@ -64,6 +64,32 @@ class BIT(nn.Layer):
     Raises:
         ValueError: When an unsupported backbone type is specified, or the number of backbone stages is not 3, 4, or 5.
     """
+    """
+    基于PaddlePaddle实现的BIT模型。
+
+    该模型的原始文章见于
+    H. Chen, et al., "Remote Sensing Image Change Detection With Transformers" (https://arxiv.org/abs/2103.00208)。
+    
+    该实现采用预训练编码器，而非原始工作中随机初始化权重。
+    
+    参数：
+        in_channels (int)：输入图像的波段数。
+        num_classes (int)：目标类别数。
+        backbone (str, optional)：用作主干的ResNet体系结构。目前仅支持'resnet18'和'resnet34'。默认为'resnet18'。
+        n_stages (int, optional)：主干中使用的ResNet阶段数，应为{3、4、5}中的值。默认为4。
+        use_tokenizer (bool, optional)：是否使用分词器。默认为True。
+        token_len (int, optional)：输入令牌的长度。默认为4。
+        pool_mode (str, optional)：当'use_tokenizer'设置为False时，获取输入令牌的池化策略。'max'表示全局最大池化，'avg'表示全局平均池化。默认为'max'。
+        pool_size (int, optional)：当'use_tokenizer'设置为False时，池化后的特征图的高度和宽度。默认为2。
+        enc_with_pos (bool, optional)：是否将学习的位置嵌入添加到编码器的输入特征序列中。默认为True。
+        enc_depth (int, optional)：编码器中使用的注意力块数。默认为1。
+        enc_head_dim (int, optional)：每个编码器头部的嵌入维度。默认为64。
+        dec_depth (int, optional)：解码器中使用的注意力块数。默认为8。
+        dec_head_dim (int, optional)：每个解码器头部的嵌入维度。默认为8。
+    
+    抛出异常：
+        ValueError：当指定不支持的主干类型或主干阶段数不为3、4或5时。
+    """
 
     def __init__(self,
                  in_channels,

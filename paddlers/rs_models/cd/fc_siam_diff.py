@@ -37,6 +37,20 @@ class FCSiamDiff(nn.Layer):
             dropout layers. When the model is trained on a relatively small dataset, 
             the dropout layers help prevent overfitting. Default: False.
     """
+    """
+    基于PaddlePaddle的FC-Siam-diff实现。
+
+    原文提及
+    罗德里戈·凯·达特等人。”用于变化检测的全卷积暹罗网络”
+    (https://arxiv.org/abs/1810.08462).
+
+    参数:
+        in_channels (int):输入图像的频带数。
+        num_classes (int):目标类的个数。
+        use_dropout (bool，可选):bool值，指示是否使用
+        辍学层。当模型在一个相对较小的数据集上训练时，
+        漏压层有助于防止过拟合。默认值:False。
+    """
 
     def __init__(self, in_channels, num_classes, use_dropout=False):
         super(FCSiamDiff, self).__init__()

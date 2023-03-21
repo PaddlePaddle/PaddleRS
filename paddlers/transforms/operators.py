@@ -419,6 +419,22 @@ class Resize(Transform):
         TypeError: Invalid type of target_size.
         ValueError: Invalid interpolation method.
     """
+    """
+    调整输入。
+
+    -如果' target_size '是int，将图像大小调整为(' target_size '， ' target_size ')。
+    -如果' target_size '是一个列表或元组，将图像大小调整为' target_size '。
+    注意:如果' interp '为'RANDOM'，则插值方法将随机选择。
+    
+    参数:
+        target_size (int | list[int] | tuple[int]):目标大小。如果它是一个整数，目标高度和宽度都将被设置为' target_size '。否则，' target_size '表示[目标高度，目标宽度]。
+        interp (str，可选):调整图像大小的插值方法。{'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}之一。默认为“LINEAR”。
+        keep_ratio (bool，可选):如果为True，宽度和高度的比例因子将被设置为相同的值，调整图像的高度/宽度将不大于目标宽度/高度。默认为False。
+    
+    Raises:
+    TypeError: 类型无效。
+    ValueError: 无效的插值方法。
+    """
 
     def __init__(self, target_size, interp='LINEAR', keep_ratio=False):
         super(Resize, self).__init__()
@@ -549,6 +565,21 @@ class RandomResize(Transform):
         TypeError: Invalid type of `target_size`.
         ValueError: Invalid interpolation method.
     """
+    """
+    将输入大小调整为随机大小。
+
+    注意:如果' interp '为'RANDOM'，则插值方法将随机选择。
+    
+    参数:
+    Target_sizes (list[int] | list[list|tuple] |tuple [list|tuple]):
+    多个目标大小，每个目标大小应该是int、list或tuple。
+    interp (str，可选):调整图像大小的插值方法。{'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}之一。
+    默认为“LINEAR”。
+    
+    提出了:
+    TypeError:类型无效。
+    ValueError:无效的插值方法。
+    """
 
     def __init__(self, target_sizes, interp='LINEAR'):
         super(RandomResize, self).__init__()
@@ -587,6 +618,19 @@ class ResizeByShort(Transform):
 
     Raises:
         ValueError: Invalid interpolation method.
+    """
+    """
+    调整输入的大小，同时保持纵横比。
+
+    注意:如果' interp '为'RANDOM'，则插值方法将随机选择。
+    
+    参数:
+        short_size (int):图像较短一侧的目标大小。
+        mamax_size (int，可选):图像长边的上界。如果' max_size '为-1，则不应用上限。默认值为-1。
+        interp (str，可选):调整图像大小的插值方法。{'最近的'，'线性'，'立方'，'区域'，'LANCZOS4'， '随机'}之一。默认为“线性”。
+    
+    Raises:
+    ValueError:无效的插值方法。
     """
 
     def __init__(self, short_size=256, max_size=-1, interp='LINEAR'):
@@ -634,6 +678,23 @@ class RandomResizeByShort(Transform):
     See Also:
         ResizeByShort: Resize image(s) in input while keeping the aspect ratio.
     """
+    """
+    调整输入大小为随机大小，同时保持纵横比。
+
+    注意:如果' interp '为'RANDOM'，则插值方法将随机选择。
+    
+    参数:
+        short_sizes (list[int]):图像较短一侧的目标大小。
+        max_size (int，可选):图像长边的上界。如果' max_size '为-1，则不应用上限。默认值为-1。
+        interp (str，可选):调整图像大小的插值方法。{'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}之一。默认为“LINEAR”。
+    
+    提出了:
+    TypeError:类型无效。
+    ValueError:无效的插值方法。
+    
+    参见:
+    ResizeByShort:调整输入图像的大小，同时保持纵横比。
+        """
 
     def __init__(self, short_sizes, max_size=-1, interp='LINEAR'):
         super(RandomResizeByShort, self).__init__()
@@ -656,6 +717,28 @@ class RandomResizeByShort(Transform):
 
 
 class ResizeByLong(Transform):
+    """
+    Resize the input image, keeping the aspect ratio unchanged (calculate the scaling factor based on the long side).
+
+    Attention: If `interp` is 'RANDOM', the interpolation method will be chosen randomly.
+
+    Args:
+        long_size (int): The size of the target on the longer side of the image.
+        interp (str, optional): Interpolation method for resizing image(s). One of
+            {'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}.
+            Defaults to 'LINEAR'.
+
+    """
+    """
+    调整输入影像大小，保持纵横比不变（根据长边计算缩放系数）。
+    
+    注意:如果' interp '为'RANDOM'，则插值方法将随机选择。
+    
+    参数：
+        long_size (int):图像较长一侧的目标大小。
+        interp:(str，可选):调整图像大小的插值方法。{'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}之一。默认为“LINEAR”。
+    """
+
     def __init__(self, long_size=256, interp='LINEAR'):
         super(ResizeByLong, self).__init__()
         self.long_size = long_size
@@ -832,6 +915,12 @@ class RandomHorizontalFlip(Transform):
     Args:
         prob (float, optional): Probability of flipping the input. Defaults to .5.
     """
+    """
+    随机翻转输入水平。
+
+    参数:
+        probb (float，可选):翻转输入的概率。默认为.5。
+    """
 
     def __init__(self, prob=0.5):
         super(RandomHorizontalFlip, self).__init__()
@@ -891,6 +980,12 @@ class RandomVerticalFlip(Transform):
 
     Args:
         prob (float, optional): Probability of flipping the input. Defaults to .5.
+    """
+    """
+    随机垂直翻转输入。
+
+    参数:
+        probb (float，可选):翻转输入的概率。默认为.5。
     """
 
     def __init__(self, prob=0.5):
@@ -964,6 +1059,19 @@ class Normalize(Transform):
         apply_to_tar (bool, optional): Whether to apply transformation to the target
             image. Defaults to True.
     """
+    """
+    对输入图像应用归一化。归一化步骤如下:
+    1.       Im = (Im - min_value) * 1 / (max_value - min_value)
+    2.       Im = Im - mean
+    3.Im = Im / STD
+    
+    参数:
+        mean (list[float] | tuple[float]，可选):输入图像的均值。默认值为[0.485,0.456,0.406]。
+        std (list[float] | tuple[float]，可选):输入图像的标准差。默认值为[0.229,0.224,0.225]。
+        min_val (list[float] | tuple[float]，可选):输入图像的最小值。如果为None，则对所有通道使用0。默认为None。
+        max_val (list[float] | tuple[float]，可选):输入图像的最大值。如果为None，则所有通道均使用255。默认为None。
+        apply_to_tar (bool，可选):是否对目标图像应用转换。默认为True。
+    """
 
     def __init__(self,
                  mean=[0.485, 0.456, 0.406],
@@ -1022,6 +1130,14 @@ class CenterCrop(Transform):
         crop_size (int, optional): Target size of the cropped image(s). 
             Defaults to 224.
     """
+    """
+    在中间裁剪输入图像。
+    1. 定位图像的中心。
+    2. 裁剪图像。
+    
+    参数:
+        crop_size (int，可选):裁剪图像的目标大小。默认值为224。
+    """
 
     def __init__(self, crop_size=224):
         super(CenterCrop, self).__init__()
@@ -1074,6 +1190,23 @@ class RandomCrop(Transform):
             allowed. Defaults to True.
         cover_all_box (bool, optional): Whether to ensure all bboxes be covered in 
             the final crop. Defaults to False.
+    """
+    """
+    随机裁剪输入。
+    1. 根据' aspect_ratio '和' scaling '计算裁剪区域的高度和宽度。
+    2. 随机定位裁剪区域的左上角。
+    3.裁剪图像。
+    4. 调整裁剪区域的大小为' crop_size ' x ' crop_size '。
+    
+    参数：
+        crop_size (int | list[int] | tuple[int]):裁剪区域的目标大小。如果为None，裁剪区域将不会被调整大小。默认为None。
+        aspect_ratio (list[float]，可选):以[min, max]格式显示裁剪区域的纵横比。默认为[.5, 2.]。
+        thresholds (list[float]，可选):Iou阈值，用于决定有效的bbox裁剪。默认为[.0,.1， .3， .5， .7， .9]。
+        缩放(list[float]，可选):裁剪区域与原始图像之间的比例，格式为[min, max]。默认为[.3, 1.]。
+        num_attempts (int，可选):放弃前的最大尝试次数。默认值为50。
+        allow_no_crop (bool，可选):是否允许不进行裁剪而返回。默认为True。
+        cover_all_box (bool，可选):是否确保在最终裁剪中覆盖所有盒子。默认为False。
+    
     """
 
     def __init__(self,
@@ -1271,6 +1404,13 @@ class RandomScaleAspect(Transform):
             image. If 0, image(s) will not be cropped. Defaults to .5.
         aspect_ratio (float): Aspect ratio of cropped region. Defaults to .33.
     """
+    """
+    裁剪输入图像并将大小调整回原始大小。
+
+    参数:
+        min_scale (float):裁剪区域与原始图像之间的最小比例。如果为0，图像将不会被裁剪。默认为.5。
+        aspect_ratio (float):裁剪区域的纵横比。默认为.33。
+    """
 
     def __init__(self, min_scale=0.5, aspect_ratio=0.33):
         super(RandomScaleAspect, self).__init__()
@@ -1303,6 +1443,18 @@ class RandomExpand(Transform):
             Defaults to 255.
 
     See Also:
+        paddlers.transforms.Pad
+    """
+    """
+    根据随机偏移量随机扩展输入。
+
+    参数:
+        upper_ratio (float，可选):原始图像扩展到的最大比例。默认为4..
+        probb (float，可选):应用扩展的概率。默认为.5。
+        im_padding_value (list[float] | tuple[float]，可选):图像的RGB填充值。默认为(127.5,127.5,127.5)。
+        label_padding_value (int，可选):掩码的填充值。缺省值为255。
+    
+    参见:
         paddlers.transforms.Pad
     """
 
@@ -1364,6 +1516,17 @@ class Pad(Transform):
                 Defaults to 255.
             size_divisor (int): Image width and height after padding will be a multiple of 
                 `size_divisor`.
+        """
+        """
+        将图像填充到指定大小或' size_除数'的倍数。
+
+        参数:
+            target_size (list[int] | tuple[int]，可选):图像目标大小，如果为None，则填充到size_除数的倍数。默认为None。
+            pad_mode (int，可选):Pad模式。目前只支持四种模式:[- 1,0,1,2]。如果是-1，使用指定的偏移量。若为0，只向右和底部垫;若为1，按中心垫。如果2，只垫左侧和顶部。默认值为0。
+            offset (list[int]|无，可选):填充偏移量。默认为None。
+            im_padding_value (list[float] | tuple[float]):填充区域的RGB值。默认为(127.5,127.5,127.5)。
+            label_padding_value (int，可选):掩码的填充值。默认值为255。
+            size_divisor (int):填充后的图像宽度和高度将是' size_divisor '的倍数。
         """
         super(Pad, self).__init__()
         if isinstance(target_size, (list, tuple)):
@@ -1497,6 +1660,13 @@ class MixupImage(Transform):
             beta (float, optional): Beta parameter of beta distribution. 
                 Defaults to 1.5.
         """
+        """
+        混合两个图像和它们的gt_bbbox/gt_score。
+
+    参数:
+        alpha (float，可选):beta分布的alpha参数。默认为1.5。
+        beta (float，可选):beta分布的beta参数。默认为1.5。
+        """
         super(MixupImage, self).__init__()
         if alpha <= 0.0:
             raise ValueError("`alpha` should be positive in MixupImage.")
@@ -1592,6 +1762,22 @@ class RandomDistort(Transform):
         count (int, optional): Number of distortions to apply. Defaults to 4.
         shuffle_channel (bool, optional): Whether to swap channels randomly. 
             Defaults to False.
+    """
+    """
+    随机颜色失真。
+
+    参数:
+        brightness_range (float，可选):亮度失真范围。默认为.5。
+        brightness_prob (float，可选):亮度失真的概率。默认为.5。
+        反差范围(float，可选):对比度失真范围。默认为.5。
+        对比问题(浮动，可选):对比度失真的概率。默认为.5。
+        饱和失真范围(float，可选)。默认为.5。
+        saturation_prob (float，可选):饱和失真的概率。默认为.5。
+        hue_range (float，可选):色调失真范围。默认为.5。
+        hue_probb (float，可选):色相失真的概率。默认为.5。
+        random_apply (bool，可选):以随机(yolo)或固定(SSD)顺序应用转换。默认为True。
+        count (int，可选):应用的扭曲数。默认为4。
+        shuffle_channel (bool，可选):是否随机交换通道。默认为False。
     """
 
     def __init__(self,
@@ -1740,6 +1926,12 @@ class RandomBlur(Transform):
     Args: 
         prob (float): Probability of blurring.
     """
+    """
+    随机模糊输入图像。
+
+    参数:
+        probb (float):模糊的概率。
+    """
 
     def __init__(self, prob=0.1):
         super(RandomBlur, self).__init__()
@@ -1776,6 +1968,12 @@ class Dehaze(Transform):
     Args: 
         gamma (bool, optional): Use gamma correction or not. Defaults to False.
     """
+    """
+    去雾化输入图像。
+
+    参数:
+        gamma (bool，可选):是否使用gamma校正。默认为False。
+    """
 
     def __init__(self, gamma=False):
         super(Dehaze, self).__init__()
@@ -1800,6 +1998,13 @@ class ReduceDim(Transform):
         joblib_path (str): Path of *.joblib file of PCA.
         apply_to_tar (bool, optional): Whether to apply transformation to the target
             image. Defaults to True.
+    """
+    """
+    使用PCA来降低输入图像的维数。
+
+    参数:
+        joblib_path (str): *的路径。joblib文件。
+        apply_to_tar (bool，可选):是否对目标图像应用转换。默认为True。
     """
 
     def __init__(self, joblib_path, apply_to_tar=True):
@@ -1836,6 +2041,13 @@ class SelectBand(Transform):
             Defaults to [1, 2, 3].
         apply_to_tar (bool, optional): Whether to apply transformation to the target
             image. Defaults to True.
+    """
+    """
+    选择一组输入图像的波段。
+
+    参数:
+        band_list (list，可选):要选择的波段(波段索引从1开始)。默认值为[1,2,3]。
+        apply_to_tar (bool，可选):是否将转换应用到targetimage。默认为True。
     """
 
     def __init__(self, band_list=[1, 2, 3], apply_to_tar=True):
@@ -1953,6 +2165,13 @@ class RandomSwap(Transform):
         prob (float, optional): Probability of swapping the input images. 
             Default: 0.2.
     """
+    """
+    随机交换多时间图像。
+
+    参数:
+        probb (float，可选):交换输入图像的概率。
+            默认值:0.2。
+    """
 
     def __init__(self, prob=0.2):
         super(RandomSwap, self).__init__()
@@ -1993,6 +2212,19 @@ class AppendIndex(Transform):
             band indices will be automatically determined accordingly. See supported satellites in 
             https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/satellites.py .
             Default: None.
+    """
+    """
+    对输入图像追加遥感索引。
+
+    参数:
+        index_type (str):遥感索引类型。中受支持的索引类型
+        https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/indices.py。
+        band_indexes (dict，可选):波段名称到波段索引的映射(从1开始)
+        https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/indices.py。
+        默认值:None。
+        satellite (str，可选):卫星类型。设置后，将自动确定相应的带指数。请参阅支援卫星
+        https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/satellites.py。
+        默认值:None。
     """
 
     def __init__(self, index_type, band_indices=None, satellite=None, **kwargs):
@@ -2044,6 +2276,12 @@ class MatchRadiance(Transform):
             stands for histogram matching, 'lsr' stands for least-squares 
             regression, and 'fft' replaces the low-frequency components of
             the image to match the reference image. Default: 'hist'.
+    """
+    """
+    执行双时间图像之间的相对辐射校正。
+
+    参数:
+        method (str，可选):用于匹配双时间图像亮度的方法。选项有{'hist'， 'lsr'， 'fft}。“hist”代表直方图匹配，“lsr”代表最小二乘回归，“fft”替换图像的低频分量以匹配参考图像。默认值:“hist”。
     """
 
     def __init__(self, method='hist'):

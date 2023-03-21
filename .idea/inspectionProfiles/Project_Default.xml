@@ -1,0 +1,85 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <value>
+          <list size="72">
+            <item index="0" class="java.lang.String" itemvalue="tqdm" />
+            <item index="1" class="java.lang.String" itemvalue="opencv-contrib-python" />
+            <item index="2" class="java.lang.String" itemvalue="tensorboard" />
+            <item index="3" class="java.lang.String" itemvalue="opencv-python" />
+            <item index="4" class="java.lang.String" itemvalue="torch" />
+            <item index="5" class="java.lang.String" itemvalue="numpy" />
+            <item index="6" class="java.lang.String" itemvalue="torchvision" />
+            <item index="7" class="java.lang.String" itemvalue="opencv-python-headless" />
+            <item index="8" class="java.lang.String" itemvalue="Pillow" />
+            <item index="9" class="java.lang.String" itemvalue="joblib" />
+            <item index="10" class="java.lang.String" itemvalue="threadpoolctl" />
+            <item index="11" class="java.lang.String" itemvalue="scikit-learn" />
+            <item index="12" class="java.lang.String" itemvalue="python-dateutil" />
+            <item index="13" class="java.lang.String" itemvalue="dgl" />
+            <item index="14" class="java.lang.String" itemvalue="sklearn" />
+            <item index="15" class="java.lang.String" itemvalue="kiwisolver" />
+            <item index="16" class="java.lang.String" itemvalue="cycler" />
+            <item index="17" class="java.lang.String" itemvalue="mkl-random" />
+            <item index="18" class="java.lang.String" itemvalue="mkl-fft" />
+            <item index="19" class="java.lang.String" itemvalue="certifi" />
+            <item index="20" class="java.lang.String" itemvalue="matplotlib" />
+            <item index="21" class="java.lang.String" itemvalue="pyparsing" />
+            <item index="22" class="java.lang.String" itemvalue="torchaudio" />
+            <item index="23" class="java.lang.String" itemvalue="mkl-service" />
+            <item index="24" class="java.lang.String" itemvalue="pandas" />
+            <item index="25" class="java.lang.String" itemvalue="pip" />
+            <item index="26" class="java.lang.String" itemvalue="itsdangerous" />
+            <item index="27" class="java.lang.String" itemvalue="click" />
+            <item index="28" class="java.lang.String" itemvalue="Jinja2" />
+            <item index="29" class="java.lang.String" itemvalue="Flask" />
+            <item index="30" class="java.lang.String" itemvalue="Keras-Preprocessing" />
+            <item index="31" class="java.lang.String" itemvalue="scipy" />
+            <item index="32" class="java.lang.String" itemvalue="six" />
+            <item index="33" class="java.lang.String" itemvalue="h5py" />
+            <item index="34" class="java.lang.String" itemvalue="PyYAML" />
+            <item index="35" class="java.lang.String" itemvalue="nltk" />
+            <item index="36" class="java.lang.String" itemvalue="Keras" />
+            <item index="37" class="java.lang.String" itemvalue="pytz" />
+            <item index="38" class="java.lang.String" itemvalue="xgboost" />
+            <item index="39" class="java.lang.String" itemvalue="lightgbm" />
+            <item index="40" class="java.lang.String" itemvalue="Keras-Applications" />
+            <item index="41" class="java.lang.String" itemvalue="gevent" />
+            <item index="42" class="java.lang.String" itemvalue="requests" />
+            <item index="43" class="java.lang.String" itemvalue="olefile" />
+            <item index="44" class="java.lang.String" itemvalue="torch-scatter" />
+            <item index="45" class="java.lang.String" itemvalue="networkx" />
+            <item index="46" class="java.lang.String" itemvalue="torchtext" />
+            <item index="47" class="java.lang.String" itemvalue="opt-einsum" />
+            <item index="48" class="java.lang.String" itemvalue="pyzmq" />
+            <item index="49" class="java.lang.String" itemvalue="zipp" />
+            <item index="50" class="java.lang.String" itemvalue="torch-cluster" />
+            <item index="51" class="java.lang.String" itemvalue="torch-sparse" />
+            <item index="52" class="java.lang.String" itemvalue="urllib3" />
+            <item index="53" class="java.lang.String" itemvalue="torch-geometric" />
+            <item index="54" class="java.lang.String" itemvalue="pickleshare" />
+            <item index="55" class="java.lang.String" itemvalue="absl-py" />
+            <item index="56" class="java.lang.String" itemvalue="pbr" />
+            <item index="57" class="java.lang.String" itemvalue="protobuf" />
+            <item index="58" class="java.lang.String" itemvalue="decorator" />
+            <item index="59" class="java.lang.String" itemvalue="html5lib" />
+            <item index="60" class="java.lang.String" itemvalue="Werkzeug" />
+            <item index="61" class="java.lang.String" itemvalue="funcsigs" />
+            <item index="62" class="java.lang.String" itemvalue="astor" />
+            <item index="63" class="java.lang.String" itemvalue="gast" />
+            <item index="64" class="java.lang.String" itemvalue="futures" />
+            <item index="65" class="java.lang.String" itemvalue="tensorflow" />
+            <item index="66" class="java.lang.String" itemvalue="backports.weakref" />
+            <item index="67" class="java.lang.String" itemvalue="bleach" />
+            <item index="68" class="java.lang.String" itemvalue="mock" />
+            <item index="69" class="java.lang.String" itemvalue="grpcio" />
+            <item index="70" class="java.lang.String" itemvalue="enum34" />
+            <item index="71" class="java.lang.String" itemvalue="Markdown" />
+          </list>
+        </value>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>

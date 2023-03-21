@@ -70,6 +70,23 @@ class FactSeg(nn.Layer):
          backbone_pretrained (bool, optional): Whether the backbone network uses
          IMAGENET pretrained weights. Default: True.
      """
+    """
+    基于PaddlePaddle的FactSeg实现。
+
+    原文提及
+        A. Ma, J. Wang, Y. Zhong and Z. Zheng, "FactSeg: Foreground Activation
+     -Driven Small Object Semantic Segmentation in Large-Scale Remote Sensing
+      Imagery,"in IEEE Transactions on Geoscience and Remote Sensing, vol. 60,
+       pp. 1-16, 2022, Art no. 5606216.
+    
+    
+    参数:
+        in_channels (int):输入模型的图像通道数。
+        num_classes (int):目标类的唯一数量。
+        backbone (str，可选):骨干网，模型在' paddle.vision.models.resnet '中可用。默认值:resnet50。
+        backbone_pretrained (bool，可选):骨干网是否使用
+        IMAGENET预训练权重。默认值:True。
+    """
 
     def __init__(self,
                  in_channels,

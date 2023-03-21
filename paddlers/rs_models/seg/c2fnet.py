@@ -40,6 +40,19 @@ class C2FNet(nn.Layer):
          align_corners (bool, optional): An argument of `F.interpolate`. It should be set to False when the output size of feature
             is even, e.g. 1024x512, otherwise it is True, e.g. 769x769.  Default: False.
      """
+    """
+    遥感图像中小目标的粗到细分割网络。
+
+    参数:
+        num_classes (int):目标类的唯一数量。
+        backbone (str):骨干网。
+        backbone_indexes(元组，可选):元组中的值表示骨干输出的索引。默认值:(-1，)。
+        kernel_sizes(元组，可选):滑动窗口的大小。默认值:(128128)。
+        training_stride(int，可选):滑动窗口的步幅。默认值:32。
+        samples_per_gpu(int，可选):被细化的进程的批处理大小。默认值:32。
+        channels (int，可选):conv层和FCNHead最后一层之间的通道。如果为None，则为输入特征的通道数。默认值:None。
+        align_corners (bool，可选):' f.p inate '的参数。当feature输出大小为偶数时，如1024x512，设置为False，否则设置为True，如769x769。默认值:False。
+    """
 
     def __init__(self,
                  num_classes,

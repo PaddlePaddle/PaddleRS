@@ -31,6 +31,17 @@ class CDNet(nn.Layer):
         in_channels (int): Number of bands of the input images.
         num_classes (int): Number of target classes.
     """
+    """
+    该基于PaddlePaddle的CDNet实现。
+    
+    原始文章参考：
+    Pablo F. Alcantarilla, et al.，“Deconvolutional Networks进行街景变化检测”
+    (https://link.springer.com/article/10.1007/s10514-018-9734-5)。
+
+    Args:
+        in_channels（int）：输入图像的波段数。
+        num_classes（int）：目标类别数。
+    """
 
     def __init__(self, in_channels, num_classes):
         super(CDNet, self).__init__()

@@ -245,6 +245,24 @@ class FarSeg(nn.Layer):
         scale_aware_proj (bool, optional): Whether to use scale awareness in F-S relation module. Default: True.
         decoder_out_channels (int, optional): Number of channels output by the decoder. Default: 128.
     """
+    """
+    基于PaddlePaddle的FarSeg实现。
+
+    原文提及
+        Zheng Z, Zhong Y, Wang J, et al. Foreground-aware relation network for geospatial object segmentation in
+        high spatial resolution remote sensing imagery[C]//Proceedings of the IEEE/CVF conference on computer vision
+        and pattern recognition. 2020: 4096-4105.
+    
+    参数:
+        in_channels (int):输入通道数。
+        num_classes (int):目标类的唯一数量。
+        backbone (str，可选):骨干网，是' paddle.vision.models.resnet '中可用的模型之一。默认值:resnet50。
+        backbone_pretrained (bool，可选):骨干网是否使用IMAGENET预训练权重。默认值:True。
+        fpn_out_channels (int，可选):特征金字塔网络输出的通道数量。默认值:256。
+        fsr_out_channels (int，可选):F-S关系模块输出的通道数。默认值:256。
+        scale_aware_proj (bool，可选):是否在F-S关系模块中使用缩放感知。默认值:True。
+        decoder_out_channels (int，可选):解码器输出的通道数。默认值:128。
+    """
 
     def __init__(self,
                  in_channels,
