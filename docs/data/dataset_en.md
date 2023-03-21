@@ -5,12 +5,12 @@ PaddleRS collected and summarized the most commonly used **open source** deep le
 * 32 image classification datasets;
 * 40 object detection datasets;
 * 70 image segmentation datasets;
-* 28 change detection datasets；
-* 7 instance segmentation datasets；
-* 3 multi-label classification datasets；
-* 9 object tracking datasets；
-* 3 image caption datasets；
-* 8 image generation datasets。
+* 28 change detection datasets;
+* 7 instance segmentation datasets;
+* 3 multi-label classification datasets;
+* 9 object tracking datasets;
+* 3 image caption datasets;
+* 8 image generation datasets.
 
 Visit [Remote Sensing Data Set Summary](./dataset_summary.md) for more information.
 

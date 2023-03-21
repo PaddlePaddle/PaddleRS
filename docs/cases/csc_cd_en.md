@@ -1,12 +1,12 @@
-# [The 11th "China Software Cup" Baidu Remote Sensing Competition: change detection function](https://aistudio.baidu.com/aistudio/projectdetail/3684588)
+# [The 11th "China Software Cup" Baidu Remote Sensing Competition: Change Detection Function](https://aistudio.baidu.com/aistudio/projectdetail/3684588)
 
-## Competition introduction
+## Competition Introduction
 
 "China Software Cup" College Students Software Design Competition is a public welfare competition for Chinese students. It is a competition in the 2021 National College Students Competition list. The competition is co-sponsored by the Ministry of Industry and Information Technology, the Ministry of Education and the People's Government of Jiangsu Province. It is committed to guiding Chinese school students to actively participate in software scientific research activities, enhancing self-innovation and practical ability, and cultivating more high-end and outstanding talents for Chinese software and information technology service industry. In 2022, Baidu Paddle will host Group A and Group B. This race is called Group A.
 
 [Competition official website link](https://aistudio.baidu.com/aistudio/competition/detail/151/0/introduction)
 
-### Competition background
+### Competition Background
 
 Mastering the utilization of land resources and the types of land cover is an important content of the census and monitoring of geographical national conditions. Efficient acquisition of accurate and objective land use and monitoring of land change can provide support for national and local geographic information decision-making. With the development of remote sensing and sensor technology, especially the popularization of multi-temporal high-resolution remote sensing image data, we can master the subtle changes of any global surface without leaving our homes.
 
@@ -14,17 +14,17 @@ At present, the field of remote sensing has stepped into the fast lane of high r
 
 The problem from baidu OARS and [buaa LEVIR team](http://levir.buaa.edu.cn/) set together, require participants to use baidu AI Studio platform for training framework based on the localization of AI -- baidu fly oar PaddlePaddle framework for development, Design and develop a WEB system which can realize automatic interpretation of remote sensing images by deep learning technology.
 
-### Task description
+### Task Description
 
 In the part of change detection, participants are required to realize building change detection in multi-temporal images by using the training data provided. Specifically, the task of building change detection in multi-temporal remote sensing images is given two remote sensing images of the same position (geographic registration) taken at different times, which requires locating the area of building change.
 
 Reference link:[What is Remote sensing image change detection?](https://baike.baidu.com/item/%E5%8F%98%E5%8C%96%E6%A3%80%E6%B5%8B/8636264)
 
-### Dataset introduction
+### Dataset Introduction
 
 See [Dataset Link](https://aistudio.baidu.com/aistudio/datasetdetail/134796) and [Competition introduction](https://aistudio.baidu.com/aistudio/competition/detail/151/0/task-definition).
 
-## Data preprocessing
+## Data Preprocessing
 
 ```python
 # Divide the training set/verification set and generate a list of file names
@@ -77,7 +77,7 @@ print("Dataset partitioning completed.")
 
 ```
 
-## Model training and inference
+## Model Training and Inference
 
 This project USES [PaddleRS](https://github.com/PaddlePaddle/PaddleRS) suite building model training and inference framework. PaddleRS is a remote sensing processing platform developed based on flying paddlers, which supports common remote sensing tasks such as remote sensing image classification, target detection, image segmentation and change detection, and can help developers more easily complete the whole process of remote sensing deep learning applications from training to deployment. In terms of change detection, PaddleRS currently supports nine state-of-the-art (SOTA) models, and complex training and reasoning processes are encapsulated in several apis to provide an out-of-the-box user experience.
 
@@ -171,7 +171,7 @@ def quantize(arr):
     return (arr*255).astype('uint8')
 ```
 
-### Model construction
+### Model Construction
 
 As a demonstration, BIT-CD[1], a change detection model based on Transformer created by LEVIR Group in 2021, was selected for this project. Please refer to [paper link](https://ieeexplore.ieee.org/document/9491802), Official implementation of the original author please refer to [this link](https://github.com/justchenhao/BIT_CD).
 
@@ -211,7 +211,7 @@ model = pdrs.tasks.BIT(
 )
 ```
 
-### Dataset construction
+### Dataset Construction
 
 ```python
 # Build the data transform needed (data enhancement, preprocessing)
@@ -585,7 +585,7 @@ Image.frombytes('RGB', fig.canvas.get_width_height(), fig.canvas.tostring_rgb())
 
 ![output_23_0](https://user-images.githubusercontent.com/71769312/161358173-552a7cca-b5b5-4e5e-8d10-426f40df530b.png)
 
-## Reference material
+## Reference Material
 
 - [Introduction to remote sensing data](https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/data/rs_data.md)
 - [PaddleRS Document](https://github.com/PaddlePaddle/PaddleRS/blob/develop/tutorials/train/README.md)

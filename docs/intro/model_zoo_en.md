@@ -1,6 +1,6 @@
 # Model Zoo
 
-PaddleRS' base model library comes from the Paddle-CV suite: [PaddleClas](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/algorithm_introduction/ImageNet_models.md)、[PaddleSeg](https://github.com/PaddlePaddle/PaddleSeg/blob/release/2.4/docs/model_zoo_overview_cn.md)、[PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.3/README_cn.md#模型库)以及[PaddleGAN](https://github.com/PaddlePaddle/PaddleGAN/blob/develop/README_cn.md#模型库). In addition, PaddleRS also contains a series of remote sensing feature models, which can be used for remote sensing image segmentation and change detection.
+PaddleRS' base model library comes from the Paddle-CV suite: [PaddleClas](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/en/algorithm_introduction/ImageNet_models_en.md)、[PaddleSeg](https://github.com/PaddlePaddle/PaddleSeg/blob/release/2.4/docs/model_zoo_overview.md)、[PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.3/README_en.md#Model libraries) and [PaddleGAN](https://github.com/PaddlePaddle/PaddleGAN/blob/develop/README.md#Model Tutorial). In addition, PaddleRS also contains a series of remote sensing feature models, which can be used for remote sensing image segmentation and change detection.
 
 ## List of PaddleRS supported models
 

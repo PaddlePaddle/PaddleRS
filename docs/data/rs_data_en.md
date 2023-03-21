@@ -89,13 +89,13 @@ The difference between RGBD image and RGB image is that there is an extra D chan
 
 Compared with natural images, the preprocessing of remote sensing images is very complicated. Specifically, it can be divided into the following steps:
 
-1. **Radiometric Calibration**：The DN value is converted into radiation brightness value or reflectivity and other physical quantities.
-2. **Atmospheric Correction**：The radiation error caused by atmospheric influence is eliminated and the real surface reflectance of surface objects is retrieved. This step together with radiometric calibration is called **Radiometric Correction**.
-3. **Orthographic Correction**：The oblique correction and projection difference correction were carried out at the same time, and the image was resampled to orthophoto.
-4. **Image Registration**：Match and overlay two or more images taken at different times, from different sensors (imaging equipment) or under different conditions (weather, illumination, camera position and Angle, etc.).
-5. **Image Fusion**：The image data of the same object collected by multiple source channels are synthesized into high quality image.
-6. **Image Clipping**：The large remote sensing image was cut into small pieces to extract the region of interest.
-7. **Defined Projection**：Define projection information (a geographic coordinate system) on the data.
+1. **Radiometric Calibration**: The DN value is converted into radiation brightness value or reflectivity and other physical quantities.
+2. **Atmospheric Correction**: The radiation error caused by atmospheric influence is eliminated and the real surface reflectance of surface objects is retrieved. This step together with radiometric calibration is called **Radiometric Correction**.
+3. **Orthographic Correction**: The oblique correction and projection difference correction were carried out at the same time, and the image was resampled to orthophoto.
+4. **Image Registration**: Match and overlay two or more images taken at different times, from different sensors (imaging equipment) or under different conditions (weather, illumination, camera position and Angle, etc.).
+5. **Image Fusion**: The image data of the same object collected by multiple source channels are synthesized into high quality image.
+6. **Image Clipping**: The large remote sensing image was cut into small pieces to extract the region of interest.
+7. **Defined Projection**: Define projection information (a geographic coordinate system) on the data.
 
 It should be noted that in practical application, the above steps are not all necessary, and some of them can be performed selectively according to needs.
 

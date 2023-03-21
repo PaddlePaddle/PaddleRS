@@ -2,13 +2,13 @@
 
 ## Dataset
 
-In PaddleRS, all datasets are inherit from the parent class [`BaseDataset`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/datasets/base.py)。
+In PaddleRS, all datasets inherit from the parent class [`BaseDataset`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/datasets/base.py).
 
 ### Change Detection Dataset`CDDataset`
 
 `CDDataset` is defined in: https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/datasets/cd_dataset.py
 
-The initialization parameter list is as follows：
+The initialization parameter list is as follows:
 
 |Parameter Name|Type|Parameter Description|Default Value|
 |-------|----|--------|-----|
@@ -16,15 +16,15 @@ The initialization parameter list is as follows：
 |`file_list`|`str`|file list path. file list is a text file, in which each line contains the path infomation of sample.The specific requirements of `CDDataset` on the file list are listed below.||
 |`transforms`|`paddlers.transforms.Compose`|Data transformation operator applied to input data.||
 |`label_list`|`str` \| `None`|label list file. label list is a text file, in which each line contains the name of class.|`None`|
-|`num_workers`|`int` \| `str`|The number of worker processes used when loading data. If it is set to `'auto'`, the following rules determine the number of processes to use:When the number of CPU cores is greater than 16, 8 data read helper processes are used; Otherwise, use CPU cores to count half as many worker processes.|`'auto'`|
+|`num_workers`|`int` \| `str`|The number of auxiliary processes used when loading data. If it is set to `'auto'`, the following rules determine the number of processes to use:When the number of CPU cores is greater than 16, 8 data read auxiliary processes are used; Otherwise, use CPU cores to count half as many auxiliary processes.|`'auto'`|
 |`shuffle`|`bool`|Whether to randomly shuffle the samples in the dataset.|`False`|
-|`with_seg_labels`|`bool`|Specify this option as `True` when the dataset contains split labels for each phase.|`False`|
-|`binarize_labels`|`bool`|If it is `True`, the change label (and split label) is binarized after all data transformation operators except `Arrange` are processed. For example, binarize a tag with the value {0, 255} to {0, 1}.|`False`|
+|`with_seg_labels`|`bool`|Specify this option as `True` when the dataset contains segmentation labels for each phase.|`False`|
+|`binarize_labels`|`bool`|If it is `True`, the change labels (and segmentation label) is binarized after all data transformation operators except `Arrange` are processed. For example, binarize a tag with the value {0, 255} to {0, 1}.|`False`|
 
-The requirments of `CDDataset` for the file list are as follows:
+The requirements of `CDDataset` for the file list are as follows:
 
 - If `with_seg_labels` is `False`, each line in the file list should contain three space-separated items representing, in turn, the path to `data_dir` for the first phase image, `data_dir` for the second phase image, and the path to `data_dir` for the change label.
-- If `with_seg_labels` is `True`, each line in the file list should contain five space-separated items, the first three of which have the same meaning as `with_seg_labels` is `False`, and the last two represent the path of the first and second phase images corresponding to the split label `data_dir`.
+- If `with_seg_labels` is `True`, each line in the file list should contain five space-separated items, the first three of which have the same meaning as `with_seg_labels` is `False`, and the last two represent the path of the first and second phase images corresponding to the segmentation label `data_dir`.
 
 ### Scenario Classification Dataset`ClasDataset`
 
@@ -38,7 +38,7 @@ The initialization parameter list is as follows:
 |`file_list`|`str`|file list path. file list is a text file, in which each line contains the path infomation of sample.The specific requirements of `ClasDataset` on the file list are listed below.||
 |`transforms`|`paddlers.transforms.Compose`|Data transformation operator applied to input data.||
 |`label_list`|`str` \| `None`|label list file. label list is a text file, in which each line contains the name of class.|`None`|
-|`num_workers`|`int` \| `str`|The number of worker processes used when loading data. If it is set to `'auto'`, the following rules determine the number of processes to use:When the number of CPU cores is greater than 16, 8 data read helper processes are used; Otherwise, use CPU cores to count half as many worker processes.|`'auto'`|
+|`num_workers`|`int` \| `str`|The number of auxiliary processes used when loading data. If it is set to `'auto'`, the following rules determine the number of processes to use:When the number of CPU cores is greater than 16, 8 data read auxiliary processes are used; Otherwise, use CPU cores to count half as many auxiliary processes.|`'auto'`|
 |`shuffle`|`bool`|Whether to randomly shuffle the samples in the dataset.|`False`|
 
 The requirments of `ClasDataset` for the file list are as follows:
@@ -58,7 +58,7 @@ The initialization parameter list is as follows:
 |`ann_path`|`str`|[COCO Format](https://cocodataset.org/#home)label file path.||
 |`transforms`|`paddlers.transforms.Compose`|Data transformation operator applied to input data.||
 |`label_list`|`str` \| `None`|label list file. label list is a text file, in which each line contains the name of class.|`None`|
-|`num_workers`|`int` \| `str`|The number of worker processes used when loading data. If it is set to `'auto'`, the following rules determine the number of processes to use:When the number of CPU cores is greater than 16, 8 data read helper processes are used; Otherwise, use CPU cores to count half as many worker processes.|`'auto'`|
+|`num_workers`|`int` \| `str`|The number of auxiliary processes used when loading data. If it is set to `'auto'`, the following rules determine the number of processes to use:When the number of CPU cores is greater than 16, 8 data read auxiliary processes are used; Otherwise, use CPU cores to count half as many auxiliary processes.|`'auto'`|
 |`shuffle`|`bool`|Whether to randomly shuffle the samples in the dataset.|`False`|
 |`allow_empty`|`bool`|Whether to add negative samples to the dataset.|`False`|
 |`empty_ratio`|`float`|Negative sample ratio, take effect only if `allow_empty` is `True`. If `empty_ratio` is negative or greater than or equal to 1, all negative samples generated are retained.|`1.0`|
@@ -75,7 +75,7 @@ The initialization parameter list is as follows:
 |`file_list`|`str`|file list path. file list is a text file, in which each line contains the path infomation of sample.The specific requirements of `VOCDetDataset` on the file list are listed below.||
 |`transforms`|`paddlers.transforms.Compose`|Data transformation operator applied to input data.||
 |`label_list`|`str` \| `None`|label list file. label list is a text file, in which each line contains the name of class.|`None`|
-|`num_workers`|`int` \| `str`|The number of worker processes used when loading data. If it is set to `'auto'`, the following rules determine the number of processes to use:When the number of CPU cores is greater than 16, 8 data read helper processes are used; Otherwise, use CPU cores to count half as many worker processes.|`'auto'`|
+|`num_workers`|`int` \| `str`|The number of auxiliary processes used when loading data. If it is set to `'auto'`, the following rules determine the number of processes to use:When the number of CPU cores is greater than 16, 8 data read auxiliary processes are used; Otherwise, use CPU cores to count half as many auxiliary processes.|`'auto'`|
 |`shuffle`|`bool`|Whether to randomly shuffle the samples in the dataset.|`False`|
 |`allow_empty`|`bool`|Whether to add negative samples to the dataset.|`False`|
 |`empty_ratio`|`float`|Negative sample ratio, take effect only if `allow_empty` is `True`. If `empty_ratio` is negative or greater than or equal to 1, all negative samples generated are retained.|`1.0`|
@@ -95,9 +95,9 @@ The initialization parameter list is as follows:
 |`data_dir`|`str`|Dataset storage directory.||
 |`file_list`|`str`|file list path. file list is a text file, in which each line contains the path infomation of sample.The specific requirements of `ResDataset` on the file list are listed below.||
 |`transforms`|`paddlers.transforms.Compose`|Data transformation operator applied to input data.||
-|`num_workers`|`int` \| `str`|The number of worker processes used when loading data. If it is set to `'auto'`, the following rules determine the number of processes to use:When the number of CPU cores is greater than 16, 8 data read helper processes are used; Otherwise, use CPU cores to count half as many worker processes.|`'auto'`|
+|`num_workers`|`int` \| `str`|The number of auxiliary processes used when loading data. If it is set to `'auto'`, the following rules determine the number of processes to use:When the number of CPU cores is greater than 16, 8 data read auxiliary processes are used; Otherwise, use CPU cores to count half as many auxiliary processes.|`'auto'`|
 |`shuffle`|`bool`|Whether to randomly shuffle the samples in the dataset.|`False`|
-|`sr_factor`|`int` \| `None`|For super resolution reconstruction task, specify as super resolution multiple; For other tasks, specify as `None`。|`None`|
+|`sr_factor`|`int` \| `None`|For super resolution reconstruction task, specify as super resolution multiple; For other tasks, specify as `None`.|`None`|
 
 The requirments of `ResDataset` for the file list are as follows:
 
@@ -115,12 +115,12 @@ The initialization parameter list is as follows:
 |`file_list`|`str`|file list path. file list is a text file, in which each line contains the path infomation of sample.The specific requirements of `SegDataset` on the file list are listed below.||
 |`transforms`|`paddlers.transforms.Compose`|Data transformation operator applied to input data.||
 |`label_list`|`str` \| `None`|label list file. label list is a text file, in which each line contains the name of class.|`None`|
-|`num_workers`|`int` \| `str`|The number of worker processes used when loading data. If it is set to `'auto'`, the following rules determine the number of processes to use:When the number of CPU cores is greater than 16, 8 data read helper processes are used; Otherwise, use CPU cores to count half as many worker processes.|`'auto'`|
+|`num_workers`|`int` \| `str`|The number of auxiliary processes used when loading data. If it is set to `'auto'`, the following rules determine the number of processes to use:When the number of CPU cores is greater than 16, 8 data read auxiliary processes are used; Otherwise, use CPU cores to count half as many auxiliary processes.|`'auto'`|
 |`shuffle`|`bool`|Whether to randomly shuffle the samples in the dataset.|`False`|
 
 The requirments of `SegDataset` for the file list are as follows:
 
-- Each line in the file list should contain two space-separated items representing, in turn, the path of input image relative to `data_dir` and the path of the split label relative to `data_dir`.
+- Each line in the file list should contain two space-separated items representing, in turn, the path of input image relative to `data_dir` and the path of the segmentation label relative to `data_dir`.
 
 ## API of Data Reading
 
@@ -143,12 +143,12 @@ The argument lish of `decode_image()` function is as follows:
 
 The return format is as follows:
 
-- If `read_geo_info` is `False`，the image data ([h, w, c] arrangement) is returned in the format of np.ndarray.
-- If `read_geo_info` is `True`，a binary group is returned, in which the first element is the image data read, the second element is a dictionary, in which the key-value pair is the geographic information of the image, such as geographic transformation information, geographic projection information, etc.
+- If `read_geo_info` is `False`, the image data ([h, w, c] arrangement) is returned in the format of np.ndarray.
+- If `read_geo_info` is `True`, a binary group is returned, in which the first element is the image data read, the second element is a dictionary, in which the key-value pair is the geographic information of the image, such as geographic transformation information, geographic projection information, etc.
 
 ## Data Transformation Operator
 
-In PaddleRS a series of classes are defined that, when instantiated, perform certain data preprocessing or data enhancement operations by calling the `__call__` method. PaddleRS calls these classes data preprocessing/data enhancement operators, and collectively **Data Transform Operators**. All data transformation operators inherit from the parent class[`Transform`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/transforms/operators.py)。
+In PaddleRS a series of classes are defined that, when instantiated, perform certain data preprocessing or data enhancement operations by calling the `__call__` method. PaddleRS calls these classes data preprocessing/data enhancement operators, and collectively **Data Transform Operators**. All data transformation operators inherit from the parent class[`Transform`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/transforms/operators.py).
 
 ### `Transform`
 

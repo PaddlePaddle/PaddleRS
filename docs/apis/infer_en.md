@@ -82,7 +82,7 @@ If `img_file` is a string or NumPy array, return a list with a predicted target 
  "category": Category name,
  "bbox": Target box position information, including the horizontal and vertical coordinates of the upper left corner of the target box and the width and length of the target box,  
  "score": Category confidence,
- "mask": [RLE Format](https://baike.baidu.com/item/rle/366352) mask，only instance segmentation model prediction results contain this key-value pair}
+ "mask": [RLE Format](https://baike.baidu.com/item/rle/366352) mask, only instance segmentation model prediction results contain this key-value pair}
 ```
 
 If `img_file` is a list, return a list as long as `img_file`, where each item is a list of dictionaries (key-value pairs shown above), corresponding in order to each element in `img_file`.
@@ -184,7 +184,7 @@ The sliding window inference API of the change detection task is similar to that
 
 ### Python API
 
-[Export the model to a deployment format](https://github.com/PaddlePaddle/PaddleRS/blob/develop/deploy/export/README.md)or execution model quantization，PaddleRS provide `paddlers.deploy.Predictor` used to load the deployment model or quantization model and performing inference based on [Paddle Inference](https://www.paddlepaddle.org.cn/tutorials/projectdetail/3952715).
+[Export the model to a deployment format](https://github.com/PaddlePaddle/PaddleRS/blob/develop/deploy/export/README.md)or execution model quantization, PaddleRS provide `paddlers.deploy.Predictor` used to load the deployment model or quantization model and performing inference based on [Paddle Inference](https://www.paddlepaddle.org.cn/tutorials/projectdetail/3952715).
 
 #### Initialize `Predictor`
 
@@ -228,7 +228,7 @@ Input parameter list:
 |`repeats`|`int`|The number of repetitions used to assess model reasoning and pre- and post-processing speed. If it is greater than 1, repeats the prediction and averages the time.|`1`|
 |`quiet`|`bool`|If `True`, no timing information is printed.|`False`|
 
-`Predictor.predict()`returns exactly the same format as the graph inference api. For details, refer to[Dynamic Graph Inference API](#Dynamic Graph Inference API)。
+`Predictor.predict()`returns exactly the same format as the graph inference api. For details, refer to[Dynamic Graph Inference API](#Dynamic Graph Inference API).
 
 ### `Predictor.slider_predict()`
 

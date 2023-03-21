@@ -1,6 +1,6 @@
-# [Use image superfraction to improve the segmentation accuracy of low resolution UAV images](https://aistudio.baidu.com/aistudio/projectdetail/3696814)
+# [Use Image Super-Resolution to Improve the Segmentation Accuracy of Low Resolution UAV Images](https://aistudio.baidu.com/aistudio/projectdetail/3696814)
 
-## 1 Project background
+## 1 Project Background
 
 - I wrote a project recently: [PaddleSeg: Segmentation of aero remote sensing images using the Transfomer model](https://aistudio.baidu.com/aistudio/projectdetail/3565870), The PaddleSeg module was used to train Transfomer semantic segmentation models, and the transfomer **mIOU reached 74.50%** in the UDD6 data set, compared with 73.18% in the original paper higher **1.32%** . The training results are as follows: Red; Road: Light blue; Vegetation: dark blue; Building facade: bright green; Building roof: Purple; Other: Burnt green
 
@@ -18,8 +18,8 @@ plt.imshow(output), plt.axis('off')
 ![output_1_2](https://user-images.githubusercontent.com/71769312/161358238-5dc85c26-de33-4552-83ea-ad9936a5c85a.png)
 
 - The results of the training were very good. The UDD6 data was collected from four cities of Beijing, Huludao, Cangzhou and Zhengzhou with DJI Spirit Four UAV at a height of 60m-100m. However, **In the actual production process, the city, the altitude of the flight, the quality of the image will change**
-- A larger area of data can be obtained in the same time with the increase of flight altitude, but the resolution will be reduced. **For low-quality data, the prediction effect of directly using the previously trained data is not ideal, and it will be a large workload to mark the data and train the model.** The solution is to improve the generalization ability of the model. Also consider using image overscore to reconstruct low-quality drone images and then make predictions
-- In this project, the UAV remote sensing image superfraction module provided by PaddleRS was used to carry out the real low-quality UAV image data **superfraction**, and then the Segformer model trained by UDD6 was used to predict, and the low-resolution model was compared with that directly used. Index cannot be calculated because low quality data is not marked. However, human eyes judged that the prediction results after the super score were better. **The left side was the artificially labeled label, the middle was the prediction result of low resolution, and the right side was the result after the super resolution reconstruction**
+- A larger area of data can be obtained in the same time with the increase of flight altitude, but the resolution will be reduced. **For low-quality data, the prediction effect of directly using the previously trained data is not ideal, and it will be a large workload to mark the data and train the model.** The solution is to improve the generalization ability of the model. Also consider using image super-resolution to reconstruct low-quality drone images and then make predictions
+- In this project, the UAV remote sensing image super-resolution module provided by PaddleRS was used to carry out the real low-quality UAV image data **super-resolution**, and then the Segformer model trained by UDD6 was used to predict, and the low-resolution model was compared with that directly used. Index cannot be calculated because low quality data is not marked. However, human eyes judged that the prediction results after the super-resolution were better. **The left side was the artificially labeled label, the middle was the prediction result of low resolution, and the right side was the result after the super resolution reconstruction**
 
 ```python
 img = Image.open(r"work/example/Seg/gt_result/data_05_2_14.png")
@@ -38,8 +38,8 @@ plt.show()
 
 ![output_3_0](https://user-images.githubusercontent.com/71769312/161358300-b85cdda4-7d1f-40e7-a39b-74b2cd5347b6.png)
 
-## 2 Data introduction and presentation
-- The data used was collected by DJI Spirit Four UAV in **Shanghai, flying at an altitude of 300m**. The weather at the time of collection was normal, and the quality was not high, you can see the following examples. Since it is only to show the prediction effect after overscore reconstruction, we only annotate 5 photos briefly. **After all, it is really laborious to annotate data!** It would be nice to be able to predict your own data using models trained in open data sets.
+## 2 Data Introduction and Presentation
+- The data used was collected by DJI Spirit Four UAV in **Shanghai, flying at an altitude of 300m**. The weather at the time of collection was normal, and the quality was not high, you can see the following examples. Since it is only to show the prediction effect after super-resolution reconstruction, we only annotate 5 photos briefly. **After all, it is really laborious to annotate data!** It would be nice to be able to predict your own data using models trained in open data sets.
 - Part of the annotated data is shown below
 
 ```python
@@ -59,7 +59,7 @@ plt.show()
 
 ![output_5_0](https://user-images.githubusercontent.com/71769312/161358312-3c16cbb0-1162-4fbe-b3d6-9403502aefef.png)
 
-## 3 Unmanned aerial vehicle remote sensing image super-resolution
+## 3 Unmanned Aerial Vehicle Remote Sensing Image Super-Resolution
 - Since PaddleRS provides a pre-trained super-resolution model, this step is mainly divided into the following two steps:
     - Prepare for PaddleRS and set the environment
     - The super-resolution prediction interface in PaddleRS was called to carry out the **super-resolution reconstruction** for the low resolution UAV image
@@ -130,7 +130,7 @@ for i in range(show_num):
 
 ![output_11_2](https://user-images.githubusercontent.com/71769312/161358342-d2875098-cb9b-4bc2-99b0-bcab4c1bc5e1.png)
 
-## 4 Comparison of image segmentation effect before and after super-resolution
+## 4 Comparison of Image Segmentation Effect Before and After Super-Resolution
 
 - The model used was Segformer_b3, which was trained 40,000 times with the UDD6 dataset
 - The best performing models and.yml files have been placed in the work folder
@@ -168,7 +168,7 @@ for i in range(show_num):
 ```
 
 **Prediction Result**
-- The colors are as follows：
+- The colors are as follows:
 
 |   Kind | Color   |
 |----------|---------|
@@ -220,5 +220,5 @@ for filename in img_list:
 
 ## 5 Summarize
 - This project called the super resolution reconstruction interface provided by PaddleRS, used the DRN model to reconstruct the low-resolution image acquired in reality, and then segmtioned the reconstructed image. From the results, **the segmentation result of the image after super resolution reconstruction was better**
-- **Deficiency**：compared with low-resolution images, the prediction accuracy after super-resolution reconstruction is improved from the visual point of view, but it does not reach the effect of UDD6 test set. Therefore, **the generalization ability of model also needs to be improved, and super-resolution reconstruction alone is still not good enough**
-- **Future work**：the super resolution reconstruction will be integrated into PaddleRS transform module, which can be called before high-level task prediction to improve image quality, please pay attention to [PaddleRS](https://github.com/PaddlePaddle/PaddleRS)
+- **Deficiency**: compared with low-resolution images, the prediction accuracy after super-resolution reconstruction is improved from the visual point of view, but it does not reach the effect of UDD6 test set. Therefore, **the generalization ability of model also needs to be improved, and super-resolution reconstruction alone is still not good enough**
+- **Future work**: the super resolution reconstruction will be integrated into PaddleRS transform module, which can be called before high-level task prediction to improve image quality, please pay attention to [PaddleRS](https://github.com/PaddlePaddle/PaddleRS)

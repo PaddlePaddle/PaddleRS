@@ -1,6 +1,6 @@
 # Dataset preprocessing script
 
-## List of PaddleRS supported data set preprocessing scripts
+## List of PaddleRS Supported Data Set Preprocessing Scripts
 
 | Task | Dataset Name | Dataset Urls | Preprocessing Script |
 |-----|-----------|----------|----------|

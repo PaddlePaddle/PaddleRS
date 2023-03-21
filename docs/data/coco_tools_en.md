@@ -155,7 +155,7 @@ contributor : COCO Consortium
 
 #### 3.2.4 Result Description
 
-`instances_val2017.json` has 5 keys：
+`instances_val2017.json` has 5 keys:
 
 ```
 'info', 'licenses', 'images', 'annotations', 'categories'
@@ -275,7 +275,7 @@ python ./coco_tools/json_AnnoSta.py \
 
 #### 3.4.3 Result Presentation
 
-执行上述命令后，输出结果如下：
+After the preceding command is executed, the following information is displayed:
 
 ```
 ------------------------------------------------Args------------------------------------------------

@@ -2,7 +2,7 @@
 
 Through `paddlers.transforms.AppendIndex` operator remote sensing index can be calculated and appended to the input image of the last band. When you build the `AppendIndex` object, you need to pass in the remote sensing index name and a dictionary containing the band-index correspondence (the key in the dictionary is the band name and the index number counts from 1).
 
-## List of PaddleRS supported remote sensing indices
+## List of PaddleRS Supported Remote Sensing Indices
 
 |Remote sensing index name|Full name|Purpose|Reference|
 |-----------|----|---|--------|
@@ -56,7 +56,7 @@ Through `paddlers.transforms.AppendIndex` operator remote sensing index can be c
 | `'WI2'` | Water Index 2 | Water | https://doi.org/10.3390/rs11182186 |
 | `'WRI'` | Water Ratio Index | Water | https://doi.org/10.1109/GEOINFORMATICS.2010.5567762 |
 
-## Band name and description
+## Band Name and Description
 
 |    Band name    |     Description    | Reference wavelength range(μm) |  \*Reference wavelength source  |
 |---------------|-------------|-------------|-------------|
