@@ -40,18 +40,6 @@ class DSIFN(nn.Layer):
             dropout layers. When the model is trained on a relatively small dataset, 
             the dropout layers help prevent overfitting. Default: False.
     """
-    """
-    基于PaddlePaddle的DSIFN实现。
-
-    原文引用了C. Zhang等人，“用于高分辨率双时间遥感图像变化检测的深度监督图像融合网络”
-    (https://www.sciencedirect.com/science/article/pii/S0924271620301532)。
-    
-    注意，在这个实现中，目标类的数量是灵活的。
-    
-    参数:
-        num_classes (int):目标类的个数。
-        use_dropout (bool，可选):bool值，指示是否使用dropout层。当模型在相对较小的数据集上训练时，dropout层有助于防止过拟合。默认值:False。
-    """
 
     def __init__(self, num_classes, use_dropout=False):
         super(DSIFN, self).__init__()

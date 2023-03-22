@@ -366,19 +366,6 @@ class FCCDN(nn.Layer):
         os (int, optional): Number of output stride. Default: 16.
         use_se (bool, optional): Whether to use SEModule. Default: True.
     """
-    """
-    基于PaddlePaddle的FCCDN实现。
-
-    原文提及
-    潘晨等，“FCCDN: VHR图像变化检测的特征约束网络”
-    (https://arxiv.org/pdf/2105.10860.pdf).
-
-    参数:
-        in_channels (int):输入通道数。
-        num_classes (int):目标类的个数。
-        os (int，可选):输出步幅数。默认值:16。
-        use_se (bool，可选):是否使用SEModule。默认值:True。
-    """
 
     def __init__(self, in_channels, num_classes, os=16, use_se=True):
         super(FCCDN, self).__init__()

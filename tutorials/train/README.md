@@ -142,23 +142,66 @@ python tutorials/eval/semantic_segmentation/deeplabv3p.py --model_path /path/to/
 其中，/path/to/model是训练好的模型的保存路径，/path/to/result是验证结果保存路径。
 
 ##模型部署
-在完成模型训练和验证后，可以使用PaddleServing进行模型部署。PaddleServing是飞桨的一个高性能、灵活的模型服务部署框架，可以为训练好的模型提供在线服务。具体的操作步骤如下：
-1. 安装PaddleServing
-
-    PaddleServing可以通过pip安装，具体命令如下：
+1. 导出模型
+在服务端部署模型时，需要将训练过程中保存的模型导出为专用的格式。
 ```shell
-pip install paddle-serving-server paddle-serving-client paddle-serving-app
+python deploy/export/export_model.py --model_dir=./output/deeplabv3p/best_model/ --save_dir=./inference_model/
 ```
-2. 导出模型
-在使用PaddleServing进行模型部署之前，需要将PaddlePaddle训练好的模型导出成符合PaddleServing要求的格式。可以使用PaddlePaddle的fluid.io.save_inference_model()函数导出模型，具体操作可以参考飞桨文档：
-https://www.paddlepaddle.org.cn/documentation/docs/zh/user_guides/howto/deploy/save_load_model/save_model_cn.html
-3. 启动服务
-在导出模型后，可以使用PaddleServing启动服务。具体命令如下：
-```shell
-# 启动PaddleServing服务
-python -m paddle_serving_server.serve --model /path/to/exported_model --port 9292
+其中，--model_dir选项和--save_dir选项分别指定存储训练格式模型和部署格式模型的目录。例如，在上面的例子中，./inference_model/目录下将生成model.pdmodel、model.pdiparams、model.pdiparams.info、model.yml和pipeline.yml五个文件。
+- `model.pdmodel`，记录模型的网络结构；
+- `model.pdiparams`，包含模型权重参数；
+- `model.pdiparams.info`，包含模型权重名称；
+- `model.yml`，模型的配置文件（包括预处理参数、模型规格参数等）；
+- `pipeline.yml`，流程配置文件。
 
-# 启动PaddleServing客户端
-python tutorials/serving/semantic_segmentation/deeplabv3p_client.py --image_path /path/to/image --server_ip 127.0.0.1 --port 9292
+deploy/export/export_model.py包含三个命令行选项：
+
+| 参数 | 说明 |
+| ---- | ---- |
+| --model_dir | 待导出的训练格式模型存储路径，例如`./output/deeplabv3p/best_model/`。 |
+| --save_dir | 导出的部署格式模型存储路径，例如`./inference_model/`。 |
+| --fixed_input_shape | 固定导出模型的输入张量形状。默认值为None，表示使用任务默认输入张量形状。 |
+
+2. python部署（以BIT为例）
+
+使用预测接口的基本流程为：首先构建Predictor对象，然后调用Predictor的predict()方法执行预测。需要说明的是，Predictor对象的predict()方法返回的结果与对应的训练器（在paddlers/tasks/目录的文件中定义）的predict()方法返回结果具有相同的格式。
+```shell
+from paddlers.deploy import Predictor
+
+# 第一步：构建Predictor。该类接受的构造参数如下：
+#     model_dir: 模型路径（必须是导出的部署或量化模型）。
+#     use_gpu: 是否使用GPU，默认为False。
+#     gpu_id: 使用GPU的ID，默认为0。
+#     cpu_thread_num：使用CPU进行预测时的线程数，默认为1。
+#     use_mkl: 是否使用MKL-DNN计算库，CPU情况下使用，默认为False。
+#     mkl_thread_num: MKL-DNN计算线程数，默认为4。
+#     use_trt: 是否使用TensorRT，默认为False。
+#     use_glog: 是否启用glog日志, 默认为False。
+#     memory_optimize: 是否启动内存优化，默认为True。
+#     max_trt_batch_size: 在使用TensorRT时配置的最大batch size，默认为1。
+#     trt_precision_mode：在使用TensorRT时采用的精度，可选值['float32', 'float16']。默认为'float32'。
+#
+# 下面的语句构建的Predictor对象依赖static_models/目录中存储的部署格式模型，并使用GPU进行推理。
+predictor = Predictor("static_models/", use_gpu=True)
+
+# 第二步：调用Predictor的predict()方法执行推理。该方法接受的输入参数如下：
+#     img_file: 对于场景分类、图像复原、目标检测和图像分割任务来说，该参数可为单一图像路径，或是解码后的、排列格式为（H, W, C）
+#         且具有float32类型的图像数据（表示为numpy的ndarray形式），或者是一组图像路径或np.ndarray对象构成的列表；对于变化检测
+#         任务来说，该参数可以为图像路径二元组（分别表示前后两个时相影像路径），或是两幅图像组成的二元组，或者是上述两种二元组
+#         之一构成的列表。
+#     topk: 场景分类模型预测时使用，表示选取模型输出概率大小排名前`topk`的类别作为最终结果。默认值为1。
+#     transforms: 对输入数据应用的数据变换算子。若为None，则使用从`model.yml`中读取的算子。默认值为None。
+#     warmup_iters: 预热轮数，用于评估模型推理以及前后处理速度。若大于1，会预先重复执行`warmup_iters`次推理，而后才开始正式的预测及其速度评估。默认值为0。
+#     repeats: 重复次数，用于评估模型推理以及前后处理速度。若大于1，会执行`repeats`次预测并取时间平均值。默认值为1。
+#
+# 下面的语句传入两幅输入影像的路径
+res = predictor.predict(("demo_data/A.png", "demo_data/B.png"))
+
+# 第三步：解析predict()方法返回的结果。
+#     对于图像分割和变化检测任务而言，predict()方法返回的结果为一个字典或字典构成的列表。字典中的`label_map`键对应的值为类别标签图，对于二值变化检测
+#     任务而言只有0（不变类）或者1（变化类）两种取值；`score_map`键对应的值为类别概率图，对于二值变化检测任务来说一般包含两个通道，第0个通道表示不发生
+#     变化的概率，第1个通道表示发生变化的概率。如果返回的结果是由字典构成的列表，则列表中的第n项与输入的img_file中的第n项对应。
+#
+# 下面的语句从res中解析二值变化图（binary change map）
+cm_1024x1024 = res['label_map']
 ```
-其中，/path/to/exported_model是导出的模型所在的路径，9292是服务端口号。/path/to/image是需要进行图像分割的图片的路径，127.0.0.1是服务端IP地址。

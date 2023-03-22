@@ -290,39 +290,27 @@ class CondenseNetV2(nn.Layer):
     """
     The CondenseNetV2 implementation based on PaddlePaddle.
 
+    The original article refers to
+        Yang L, Jiang H, Cai R, et al. Condensenet v2: Sparse feature reactivation for deep networks[C]//Proceedings of
+            the IEEE/CVF Conference on Computer Vision and Pattern Recognition. 2021: 3569-3578.
+            (https://arxiv.org/abs/2104.04382)
+
+
     Args:
         stages (list[int]): Lists the number of stages containing Dense blocks.
         growth (list[int]): Contains a list of the output channels of the convolutional layer in the Dense Block.
         HS_start_block (int): Which Dense Block starts with the initial bangs (Hard-Swish) activation function.
         SE_start_block (int): Which Dense Block to start with is the Squeeze-and-Excitation (SE) module.
-        fc_channel (int): indicates the number of output channels of the full connection layer.
-        group_1x1 (int): indicates the number of groups in the 1x1 convolution layer.
+        fc_channel (int): Indicates the number of output channels of the full connection layer.
+        group_1x1 (int): Indicates the number of groups in the 1x1 convolution layer.
         group_3x3 (int): Number of groups of 3x3 convolution layers.
         group_trans (int): The number of groups of 1x1 convolution layers in the Transition Layer.
-        bottleneck (bool): Specifies whether to use a bottleneck structure in the Dense Block, which means that a 1x1 convolution layer is used to reduce the number of input channels, and then 3x3 convolution is done.
-        last_se_reduction (int): indicates the proportion of channel reduction in SE module in the last Dense Block.
-        in_channels (int): indicates the number of channels to input the image. The default value is 3, which represents an RGB image.
-        class_num (int) : indicates the number of categories of a class task.
-
-
-    """
-    """
-    基于PaddlePaddle的CondenseNetV2实现。
-    
-    参数:
-        stages (list[int]): 包含 Dense Block 的阶段数量列表，每个 Dense Block 包含了多个卷积层，且每个 Dense Block 中卷积层的数量都是相同的。
-        growth (list[int]): 包含 Dense Block 中卷积层的输出通道数列表。
-        HS_start_block (int): 从哪个 Dense Block 开始使用初始的刘海（Hard-Swish）激活函数。
-        SE_start_block (int): 从哪个 Dense Block 开始使用 Squeeze-and-Excitation（SE）模块。
-        fc_channel (int): 全连接层的输出通道数。
-        group_1x1 (int): 1x1 卷积层的分组数量。
-        group_3x3 (int): 3x3 卷积层的分组数量。
-        group_trans (int): 转换层（Transition Layer）中的 1x1 卷积层的分组数量。
-        bottleneck (bool): 是否在 Dense Block 中使用瓶颈结构（bottleneck），即先使用 1x1 卷积层将输入通道数降低，再进行 3x3 卷积操作。
-        last_se_reduction (int): 最后一个 Dense Block 中 SE 模块中的通道数缩减比例。
-        in_channels (int): 表示输入图像的通道数。默认值为3，表示RGB图像。
-        class_num (int) ：表示分类任务的类别数量。
-    
+        bottleneck (bool): Specifies whether to use a bottleneck structure in the Dense Block, which means that a 1x1
+            convolution layer is used to reduce the number of input channels, and then 3x3 convolution is done.
+        last_se_reduction (int): Indicates the proportion of channel reduction in SE module in the last Dense Block.
+        in_channels (int): Indicates the number of channels to input the image. The default value is 3, which represents
+            an RGB image.
+        class_num (int) : Indicates the number of categories of a class task.
     """
 
     def __init__(

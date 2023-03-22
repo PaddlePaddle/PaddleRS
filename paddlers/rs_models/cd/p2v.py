@@ -249,25 +249,6 @@ class P2V(nn.Layer):
         decoder_channels (tuple[int], optional): Output channels of each block in the 
             decoder. Default: (256, 128, 64, 32).
     """
-    """
-    基于PaddlePaddle的P2V-CD实现。
-
-    原文提及
-    M. Lin, et al. "Transition Is a Process: Pair-to-Video Change Detection Networks 
-        for Very High Resolution Remote Sensing Images"
-        (https://ieeexplore.ieee.org/document/9975266).
-
-    参数:
-        in_channels (int):输入图像的频带数。
-        num_classes (int):目标类的个数。
-        video_len (int，可选):构造的伪视频的帧数。默认值:8。
-        pair_encoder_channels (tuple[int]，可选):参数中每个块的输出通道
-        空间(对)编码器。默认值:(32,64,128)。
-        video_encoder_channels (tuple[int]，可选):每个块的输出通道
-        时序(视频)编码器。默认值:(64,128)。
-        decoder_channels (tuple[int]，可选):每个块的输出通道
-        译码器。默认值:(256,128,64,32)。
-    """
 
     def __init__(self,
                  in_channels,

@@ -40,21 +40,6 @@ class SNUNet(nn.Layer, KaimingInitMixin):
         width (int, optional): Output channels of the first convolutional layer. 
             Default: 32.
     """
-    """
-    基于PaddlePaddle的SNUNet实现。
-
-    原文提及
-        S. Fang, et al., "SNUNet-CD: A Densely Connected Siamese Network for Change 
-            Detection of VHR Images"
-            (https://ieeexplore.ieee.org/document/9355573).
-    
-    注意，上采样方法采用双线性插值，与本文不同。
-    
-    参数:
-        in_channels (int):输入图像的频带数。
-        num_classes (int):目标类的个数。
-        width (int，可选):第一卷积层的输出通道。默认值:32。
-    """
 
     def __init__(self, in_channels, num_classes, width=32):
         super(SNUNet, self).__init__()
