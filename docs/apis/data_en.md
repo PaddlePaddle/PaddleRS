@@ -13,7 +13,7 @@ The initialization parameter list is as follows:
 |Parameter Name|Type|Parameter Description|Default Value|
 |-------|----|--------|-----|
 |`data_dir`|`str`|Dataset storage directory.||
-|`file_list`|`str`|File list path. file list is a text file, in which each line contains the path infomation of sample.The specific requirements of `CDDataset` on the file list are listed below.||
+|`file_list`|`str`|File list path. File list is a text file, in which each line contains the path infomation of sample. The specific requirements of `CDDataset` on the file list are listed below.||
 |`transforms`|`paddlers.transforms.Compose`|Data transformation operator applied to input data.||
 |`label_list`|`str` \| `None`|Label list file. label list is a text file, in which each line contains the name of class.|`None`|
 |`num_workers`|`int` \| `str`|The number of auxiliary processes used when loading data. If it is set to `'auto'`, the following rules determine the number of processes to use:When the number of CPU cores is greater than 16, 8 data read auxiliary processes are used; Otherwise, use CPU cores to count half as many auxiliary processes.|`'auto'`|
@@ -71,10 +71,10 @@ The initialization parameter list is as follows:
 
 |Parameter Name|Type|Parameter Description|Default Value|
 |-------|----|--------|-----|
-|`data_dir`|`str`|Dataset storage directory.||
-|`file_list`|`str`|File list path. file list is a text file, in which each line contains the path infomation of sample.The specific requirements of `VOCDetDataset` on the file list are listed below.||
-|`transforms`|`paddlers.transforms.Compose`|Data transformation operator applied to input data.||
-|`label_list`|`str` \| `None`|Label list file. label list is a text file, in which each line contains the name of class.|`None`|
+|`data_dir`|`str`|Dataset storage directory. ||
+|`file_list`|`str`|File list path. File list is a text file, in which each line contains the path infomation of sample.The specific requirements of `VOCDetDataset` on the file list are listed below.||
+|`transforms`|`paddlers.transforms.Compose`|Data transformation operator applied to input data. ||
+|`label_list`|`str` \| `None`|Label list file. label list is a text file, in which each line contains the name of class. |`None`|
 |`num_workers`|`int` \| `str`|The number of auxiliary processes used when loading data. If it is set to `'auto'`, the following rules determine the number of processes to use:When the number of CPU cores is greater than 16, 8 data read auxiliary processes are used; Otherwise, use CPU cores to count half as many auxiliary processes.|`'auto'`|
 |`shuffle`|`bool`|Whether to randomly shuffle the samples in the dataset.|`False`|
 |`allow_empty`|`bool`|Whether to add negative samples to the dataset.|`False`|
