@@ -291,10 +291,8 @@ class CondenseNetV2(nn.Layer):
     The CondenseNetV2 implementation based on PaddlePaddle.
 
     The original article refers to
-        Yang L, Jiang H, Cai R, et al. Condensenet v2: Sparse feature reactivation for deep networks[C]//Proceedings of
-            the IEEE/CVF Conference on Computer Vision and Pattern Recognition. 2021: 3569-3578.
+        Yang L, Jiang H, Cai R, et al. "Condensenet v2: Sparse feature reactivation for deep networks"
             (https://arxiv.org/abs/2104.04382)
-
 
     Args:
         stages (list[int]): Lists the number of stages containing Dense blocks.
