@@ -74,7 +74,7 @@ PaddleRS' code style specification is basically the same as the [Google Python S
 
 - Line length: No more than 80 characters per line (either code or comment), especially for lines in a docstring.
 
-- Parentheses: Parentheses can be used for line concatenation, but do not use unnecessary parentheses in `if` judgments.
+- Parentheses: Parentheses can be used for line concatenation, but do not use unnecessary parentheses in `if` conditions.
 
 - Exceptions: Throw and catch exceptions with as specific an Exception type as possible, and almost never use the base class `Exception` (unless the purpose is to catch any exception of any type).
 
