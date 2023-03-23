@@ -132,22 +132,30 @@ visualdl --logdir output/deeplabv3p/vdl_log --port 8001
 
 服务启动后，使用浏览器打开 https://0.0.0.0:8001 或 https://localhost:8001 即可进入可视化页面。
 
-##模型精度验证
+## 模型精度验证
+
 模型训练完成后，需要对模型进行精度验证，以确保模型的预测效果符合预期。以DeepLab V3+图像分割模型为例，可以使用以下命令启动：
+
 ```shell
 # 指定需要使用的GPU设备编号
 export CUDA_VISIBLE_DEVICES=0
 python tutorials/eval/semantic_segmentation/deeplabv3p.py --model_path /path/to/model --save_dir /path/to/result
 ```
+
 其中，`/path/to/model`是训练好的模型的保存路径，`/path/to/result`是验证结果保存路径。
 
-##模型部署
-1. 导出模型
+## 模型部署
+
+### 1. 导出模型
+
 在服务端部署模型时，需要将训练过程中保存的模型导出为专用的格式。
+
 ```shell
 python deploy/export/export_model.py --model_dir=./output/deeplabv3p/best_model/ --save_dir=./inference_model/
 ```
+
 其中，`--model_dir`选项和`--save_dir`选项分别指定存储训练格式模型和部署格式模型的目录。例如，在上面的例子中，`./inference_model/`目录下将生成`model.pdmodel`、`model.pdiparams`、`model.pdiparams.info`、`model.yml`和`pipeline.yml`五个文件。
+
 - `model.pdmodel`，记录模型的网络结构；
 - `model.pdiparams`，包含模型权重参数；
 - `model.pdiparams.info`，包含模型权重名称；
@@ -162,9 +170,10 @@ python deploy/export/export_model.py --model_dir=./output/deeplabv3p/best_model/
 | `--save_dir` | 导出的部署格式模型存储路径，例如`./inference_model/`。 |
 | `--fixed_input_shape` | 固定导出模型的输入张量形状。默认值为None，表示使用任务默认输入张量形状。 |
 
-2. python部署（以BIT为例）
+### 2. python部署（以BIT为例）
 
 使用预测接口的基本流程为：首先构建`Predictor`对象，然后调用`Predictor`的`predict()`方法执行预测。需要说明的是，`Predictor`对象的predict()方法返回的结果与对应的训练器（在`paddlers/tasks/`目录的文件中定义）的`predict()`方法返回结果具有相同的格式。
+
 ```python
 from paddlers.deploy import Predictor
 

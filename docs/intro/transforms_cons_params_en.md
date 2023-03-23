@@ -1,6 +1,8 @@
-#PaddleRS data transform operator construct parameter
+# PaddleRS data transform operator construct parameter
+
 This document describes the parameters of each PaddleRS data transform operator in detail, including the operator name, operator purpose, parameter name, parameter type, parameter meaning, and parameter default value of each operator.
-##`AppendIndex`
+
+## `AppendIndex`
 
 Append remote sensing index to input image(s).
 
@@ -11,17 +13,19 @@ Append remote sensing index to input image(s).
 |`satellite (str，optional)`|Type of satellite. If set, band indices will be automatically determined accordingly. See supported satellites in https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/satellites.py。                               | None      |
 
 
-##`CenterCrop`
-Crop the input image(s) at the center.
-    1. Locate the center of the image.
-    2. Crop the image.
+## `CenterCrop`
+
++ Crop the input image(s) at the center.
+  - 1. Locate the center of the image.
+  - 2. Crop the image.
 
 
 | arg_name             | description                                                                                                       | default  |
 |-----------------|----------------------------------------------------------------------------------------------------------|------|
 |`crop_size (int, optional)`| Target size of the cropped image(s)  | `224`  |
 
-##`Dehaze`
+## `Dehaze`
+
  Dehaze input image(s)
 
 
@@ -29,14 +33,17 @@ Crop the input image(s) at the center.
 |-----------------|-----------------------------------------------------|-------|
 |`gamma (bool，optional)`| Use gamma correction or not  | `False` |
 
-##`MatchRadiance`
+## `MatchRadiance`
+
 Perform relative radiometric correction between bi-temporal images.
 
 | arg_name             | description                                                                                                                                                                                                                                                                 | default   |
 |-----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------|
 |`method (str，optional)`| Method used to match the radiance of the bi-temporal images. Choices are {'hist', 'lsr', 'fft}. 'hist' stands for histogram matching, 'lsr' stands for least-squares regression, and 'fft' replaces the low-frequency components of the image to match the reference image. | `"hist"` |
 
-##`MixupImage`
+
+## `MixupImage`
+
 Mixup two images and their gt_bbbox/gt_score.
 
 | arg_name             | description                                     | default |
@@ -44,12 +51,13 @@ Mixup two images and their gt_bbbox/gt_score.
 |`alpha (float，optional)`| Alpha parameter of beta distribution. | `1.5` |
 |`beta (float，optional)` |Beta parameter of beta distribution. | `1.5` |
 
-##`Normalize`
-Apply normalization to the input image(s). The normalization steps are:
+## `Normalize`
 
-    1. im = (im - min_value) * 1 / (max_value - min_value)
-    2. im = im - mean
-    3. im = im / std
++ Apply normalization to the input image(s). The normalization steps are:
+
+  - 1. im = (im - min_value) * 1 / (max_value - min_value)
+  - 2. im = im - mean
+  - 3. im = im / std
 
 
 | arg_name                                     | description                                                       | default                          |
@@ -60,7 +68,8 @@ Apply normalization to the input image(s). The normalization steps are:
 | `max_val (list[float] / tuple[float]，optional)` | Maximum value of input image(s). If None, use 255. for all channels. |  `None`        |
 | `apply_to_tar (bool，optional)`                  | Whether to apply transformation to the target image               | `True`                         |
 
-##`Pad`
+## `Pad`
+
 Pad image to a specified size or multiple of `size_divisor`.
 
 | arg_name                                           | description                                                                                                                                                                                                           | default              |
@@ -72,21 +81,23 @@ Pad image to a specified size or multiple of `size_divisor`.
 | `label_padding_value (int，optional)`                  |Filling value for the mask.                                                                                                                                                                                                               | `255`                  |
 | `size_divisor (int)`                            | Image width and height after padding will be a multiple of `size_divisor`.                                                                                                                                                                        |                      |
 
-##`RandomBlur`
+## `RandomBlur`
+
 Randomly blur input image(s).
 
 | arg_name             | description                                     | default  |
 |-----------------|-----------------------------------------------------|------|
 |`probb (float)`|Probability of blurring. |      |
 
-##`RandomCrop`
-Randomly crop the input.
+## `RandomCrop`
 
-    1. Compute the height and width of cropped area according to `aspect_ratio` and
-        `scaling`.
-    2. Locate the upper left corner of cropped area randomly.
-    3. Crop the image(s).
-    4. Resize the cropped area to `crop_size` x `crop_size`.
++ Randomly crop the input.
+
+  - 1. Compute the height and width of cropped area according to `aspect_ratio` and
+          `scaling`.
+  - 2. Locate the upper left corner of cropped area randomly.
+  - 3. Crop the image(s).
+  - 4. Resize the cropped area to `crop_size` x `crop_size`.
 
 | arg_name                                     | description                                                                       | default                     |
 |-----------------------------------------|---------------------------------------------------------------------------|-------------------------|
@@ -98,7 +109,8 @@ Randomly crop the input.
 | `allow_no_crop (bool，optional)`           | hether returning without doing crop is allowed.| `True`                    |
 | `cover_all_box (bool，optional)`        | Whether to ensure all bboxes be covered in the final crop.  | `False`                   |
 
-##`RandomDistort`
+## `RandomDistort`
+
 Random color distortion.
 
 | arg_name                       | description                                                     | default   |
@@ -116,7 +128,8 @@ Random color distortion.
 | `shuffle_channel (bool，optional)` | Whether to swap channels randomly.                                           | `False` |
 
 
-##`RandomExpand`
+## `RandomExpand`
+
 Randomly expand the input by padding according to random offsets.
 
 | arg_name                                              | description                                    | default                 |
@@ -126,17 +139,19 @@ Randomly expand the input by padding according to random offsets.
 | `im_padding_value (list[float] / tuple[float]，optional)` |  RGB filling value for the image  | `(127.5,127.5,127.5)` |
 | `label_padding_value (int，optional)` | Filling value for the mask.  | `255`    |
 
-##`RandomHorizontalFlip`
+## `RandomHorizontalFlip`
+
 Randomly flip the input horizontally.
 
 | arg_name                                              | description        | default                |
 |--------------------------------------------------|-----------|---------------------|
 | `probb (float，optional)`                           | Probability of flipping the input   | `.5`                  |
 
-##`RandomResize`
+## `RandomResize`
+
 Resize input to random sizes.
 
-    Attention: If `interp` is 'RANDOM', the interpolation method will be chosen randomly.
++ Attention: If `interp` is 'RANDOM', the interpolation method will be chosen randomly.
 
 | arg_name                                                               | description                                                          | default                 |
 |-------------------------------------------------------------------|----------------------------------------------------------------------|---------------------|
@@ -144,11 +159,11 @@ Resize input to random sizes.
 | `interp (str，optional)`               | Interpolation method for resizing image(s)`. One of {'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}. |   `'LINEAR'`                  |
 
 
-##`RandomResizeByShort`
+## `RandomResizeByShort`
+
 Resize input to random sizes while keeping the aspect ratio.
 
-    Attention: If `interp` is 'RANDOM', the interpolation method will be chosen randomly.
-
++ Attention: If `interp` is 'RANDOM', the interpolation method will be chosen randomly.
 
 | arg_name                  | description        | default |
 |---------------------------|-----------|-----|
@@ -156,8 +171,8 @@ Resize input to random sizes while keeping the aspect ratio.
 | `max_size (int，optional)` |Upper bound of longer side of the image(s). If `max_size` is -1, no upper bound will be applied.    | `-1`  |
 | `interp (str，optional)`    |  Interpolation method for resizing image(s). One of {'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}.  | `'LINEAR'`    |
 
+## `RandomScaleAspect`
 
-##`RandomScaleAspect`
 Crop input image(s) and resize back to original sizes.
 
 
@@ -166,8 +181,8 @@ Crop input image(s) and resize back to original sizes.
 | `min_scale (float)`| Minimum ratio between the cropped region and the original image. If 0, image(s) will not be cropped. | `0`      |
 | `aspect_ratio (float)`    | Aspect ratio of cropped region.                                                                                 | `.33`    |
 
+## `RandomSwap`
 
-##`RandomSwap`
 Randomly swap multi-temporal images.
 
 
@@ -175,7 +190,7 @@ Randomly swap multi-temporal images.
 |-------------------------------------------------------------------|-----------|-----|
 |`probb (float，optional)`| Probability of swapping the input images.| `0.2` |
 
-##`RandomVerticalFlip`
+## `RandomVerticalFlip`
 Randomly flip the input vertically.
 
 
@@ -184,7 +199,7 @@ Randomly flip the input vertically.
 |`prob (float，optional)`| Probability of flipping the input| `.5`  |
 
 
-##`ReduceDim`
+## `ReduceDim`
 Use PCA to reduce the dimension of input image(s).
 
 | arg_name                                                               | description                                          | default  |
@@ -193,7 +208,7 @@ Use PCA to reduce the dimension of input image(s).
 |`apply_to_tar (bool，optional)` | Whether to apply transformation to the target image. | `True` |
 
 
-##`Resize`
+## `Resize`
 Resize input.
 
     - If `target_size` is an int, resize the image(s) to (`target_size`, `target_size`).
@@ -206,7 +221,7 @@ Resize input.
 | `interp (str，optional)`                   | Interpolation method for resizing image(s). One of {'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}.                                                     | `'LINEAR'` |
 | `keep_ratio (bool，optional)`           | If True, the scaling factor of width and height will be set to same value, and height/width of the resized image will be not  greater than the target width/height.  | `False`    |
 
-##`ResizeByLong`
+## `ResizeByLong`
 Resize the input image, keeping the aspect ratio unchanged (calculate the scaling factor based on the long side).
 
     Attention: If `interp` is 'RANDOM', the interpolation method will be chosen randomly.
@@ -217,7 +232,7 @@ Resize the input image, keeping the aspect ratio unchanged (calculate the scalin
 | `long_size (int)`|The size of the target on the longer side of the image.|          |
 | `interp (str，optional)`                    | Interpolation method for resizing image(s). One of {'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}.  | `'LINEAR'` |
 
-##`ResizeByShort`
+## `ResizeByShort`
 Resize input while keeping the aspect ratio.
 
     Attention: If `interp` is 'RANDOM', the interpolation method will be chosen randomly.
@@ -230,7 +245,7 @@ Resize input while keeping the aspect ratio.
 | `interp (str，optional)`  | Interpolation method for resizing image(s). One of {'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}.          | `'LINEAR'` |
 
 
-##`SelectBand`
+## `SelectBand`
 Select a set of bands of input image(s).
 
 | arg_name              | description                                          | default      |

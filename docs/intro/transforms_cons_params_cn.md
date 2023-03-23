@@ -1,9 +1,11 @@
-#PaddleRS数据变换算子构造参数
+# PaddleRS数据变换算子构造参数
+
 本文档详细介绍了PaddleRS各个数据变化算子的构造参数，包括算子名称、算子用途、各个算子的参数名称、参数类型、参数意义以及参数默认值。
 
-PaddleRS所支持的数据变换算子可见https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/intro/transforms.md
+PaddleRS所支持的数据变换算子可见(https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/intro/transforms.md)
 
-##`AppendIndex`
+## `AppendIndex`
+
 计算遥感指数并添加到输入影像中。
 
 | 参数名             | 描述                                                                                                       | 默认值  |
@@ -13,17 +15,19 @@ PaddleRS所支持的数据变换算子可见https://github.com/PaddlePaddle/Padd
 |satellite (str，可选)`| 卫星类型。设置后，将自动确定相应的带指数。请参阅支援卫星https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/satellites.py。 | `None` |
 
 
-##`CenterCrop`
-对输入影像进行中心裁剪。
-    1. 定位图像的中心。
-    2. 裁剪图像。
+## `CenterCrop`
+
++ 对输入影像进行中心裁剪。
+    - 1. 定位图像的中心。
+    - 2. 裁剪图像。
 
 
 | 参数名             | 描述                                                                                                       | 默认值  |
 |-----------------|----------------------------------------------------------------------------------------------------------|------|
 |`crop_size (int，可选)`| 裁剪图像的目标大小  | `224`  |
 
-##`Dehaze`
+## `Dehaze`
+
 对输入图像进行去雾。
 
 
@@ -31,14 +35,16 @@ PaddleRS所支持的数据变换算子可见https://github.com/PaddlePaddle/Padd
 |-----------------|-----------------------------------------------------|-------|
 |`gamma (bool，可选)`| 是否使用gamma校正  | `False` |
 
-##`MatchRadiance`
+## `MatchRadiance`
+
 对两个时相的输入影像进行相对辐射校正
 
 | 参数名             | 描述                                     | 默认值   |
 |-----------------|-----------------------------------------------------|-------|
 |`method (str，可选)`| 用于匹配双时间图像亮度的方法。选项有{'hist'， 'lsr'， 'fft}。“hist”代表直方图匹配，“lsr”代表最小二乘回归，“fft”替换图像的低频分量以匹配参考图像  | `"hist"` |
 
-##`MixupImage`
+## `MixupImage`
+
 将两幅影像（及对应的目标检测标注）混合在一起作为新的样本。
 
 | 参数名             | 描述                                     | 默认值 |
@@ -46,13 +52,14 @@ PaddleRS所支持的数据变换算子可见https://github.com/PaddlePaddle/Padd
 |`alpha (float，可选)`| beta分布的alpha参数  | `1.5` |
 |`beta (float，可选)` |beta分布的beta参数  | `1.5` |
 
-##`Normalize`
+## `Normalize`
+
 对输入影像应用标准化
 
-    对输入图像应用归一化。归一化步骤如下:
-    1.       Im = (Im - min_value) * 1 / (max_value - min_value)
-    2.       Im = Im - mean
-    3.Im = Im / STD
++ 对输入图像应用归一化。归一化步骤如下:
+  - 1. Im = (Im - min_value) * 1 / (max_value - min_value)
+  - 2. Im = Im - mean
+  - 3. Im = Im / STD
 
 
 | 参数名                                     | 描述              | 默认值                          |
@@ -63,7 +70,8 @@ PaddleRS所支持的数据变换算子可见https://github.com/PaddlePaddle/Padd
 | `max_val (list[float] / tuple[float]，可选)` | 输入图像的最大值。如果为None，则所有通道均使用255 |  `None`        |
 | `apply_to_tar (bool，可选)`                  |是否对目标图像应用转换  | `True`                         |
 
-##`Pad`
+## `Pad`
+
 将输入影像填充到指定的大小
 
 | 参数名                                          | 描述                                                                             | 默认值                           |
@@ -75,21 +83,24 @@ PaddleRS所支持的数据变换算子可见https://github.com/PaddlePaddle/Padd
 | `label_padding_value (int，可选)`                | 掩码的填充值         | `255`                           |
 | `size_divisor (int)`                          |  填充后的图像宽度和高度将是' size_divisor '的倍数 |                               |
 
-##`RandomBlur`
+## `RandomBlur`
+
 对输入施加随机模糊
 
 | 参数名             | 描述                                     | 默认值  |
 |-----------------|-----------------------------------------------------|------|
 |`probb (float)`| 模糊的概率 |      |
 
-##`RandomCrop`
+## `RandomCrop`
+
 对输入影像进行随机中心裁剪
 
-    随机裁剪输入。
-    1. 根据' aspect_ratio '和' scaling '计算裁剪区域的高度和宽度。
-    2. 随机定位裁剪区域的左上角。
-    3. 裁剪图像。
-    4. 调整裁剪区域的大小为' crop_size ' x ' crop_size '。
++ 随机裁剪输入。
+
+  1. 根据' aspect_ratio '和' scaling '计算裁剪区域的高度和宽度。
+  - 2. 随机定位裁剪区域的左上角。
+  - 3. 裁剪图像。
+  - 4. 调整裁剪区域的大小为' crop_size ' x ' crop_size '。
 
 | 参数名                                    | 描述                                                                            | 默认值                     |
 |----------------------------------------|-------------------------------------------------------------------------------|-------------------------|
@@ -101,7 +112,7 @@ PaddleRS所支持的数据变换算子可见https://github.com/PaddlePaddle/Padd
 | `allow_no_crop (bool，可选)`           |  是否允许不进行裁剪而返回 | `True`                    |
 | `cover_all_box (bool，可选)`        | 是否确保在最终裁剪中覆盖所有盒子   | `False`                   |
 
-##`RandomDistort`
+## `RandomDistort`
 
 | 参数名                       | 描述                                                                             | 默认值   |
 |---------------------------|--------------------------------------------------------------------------------|-------|
@@ -118,7 +129,8 @@ PaddleRS所支持的数据变换算子可见https://github.com/PaddlePaddle/Padd
 | `shuffle_channel (bool，可选)` | 是否随机交换通道 | `False` |
 
 
-##`RandomExpand`
+## `RandomExpand`
+
 根据随机偏移扩展输入影像。
 
 | 参数名                                              | 描述                                     | 默认值                 |
@@ -128,14 +140,16 @@ PaddleRS所支持的数据变换算子可见https://github.com/PaddlePaddle/Padd
 | `im_padding_value (list[float] / tuple[float]，可选)` |  图像的RGB填充值  | `(127.5,127.5,127.5)` |
 | `label_padding_value (int，可选)` | 掩码的填充值 | `255`    |
 
-##`RandomHorizontalFlip`
+## `RandomHorizontalFlip`
+
 随机水平翻转输入影像。
 
 | 参数名                                              | 描述        | 默认值                 |
 |--------------------------------------------------|-----------|---------------------|
 | `probb (float，可选)`                           | 翻转输入的概率   | `.5`                  |
 
-##`RandomResize`
+## `RandomResize`
+
 随机调整输入影像大小。
 
 | 参数名                                                               | 描述        | 默认值                 |
@@ -144,7 +158,8 @@ PaddleRS所支持的数据变换算子可见https://github.com/PaddlePaddle/Padd
 | `interp (str，可选)`               |调整图像大小的插值方法。{'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}之一        |   `'LINEAR'`                  |
 
 
-##`RandomResizeByShort`
+## `RandomResizeByShort`
+
 随机调整输入影像大小，保持纵横比不变（根据短边计算缩放系数）。
 
 
@@ -155,7 +170,8 @@ PaddleRS所支持的数据变换算子可见https://github.com/PaddlePaddle/Padd
 | `interp (str，可选)`          | 调整图像大小的插值方法。{'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}之一           | `'LINEAR'`    |
 
 
-##`RandomScaleAspect`
+## `RandomScaleAspect`
+
 裁剪输入影像并重新缩放到原始尺寸。
 
 
@@ -165,7 +181,8 @@ PaddleRS所支持的数据变换算子可见https://github.com/PaddlePaddle/Padd
 | `aspect_ratio (float)`    |裁剪区域的纵横比  | `.33`    |
 
 
-##`RandomSwap`
+## `RandomSwap`
+
 随机交换两个时相的输入影像。
 
 
@@ -173,7 +190,8 @@ PaddleRS所支持的数据变换算子可见https://github.com/PaddlePaddle/Padd
 |-------------------------------------------------------------------|-----------|-----|
 |`probb (float，可选)`| 交换输入图像的概率 | `0.2` |
 
-##`RandomVerticalFlip`
+## `RandomVerticalFlip`
+
 随机竖直翻转输入影像。
 
 
@@ -182,7 +200,8 @@ PaddleRS所支持的数据变换算子可见https://github.com/PaddlePaddle/Padd
 |`prob (float，可选)`| 翻转输入的概率| `.5`  |
 
 
-##`ReduceDim`
+## `ReduceDim`
+
 对输入图像进行波段降维。
 
 | 参数名                                                               | 描述            | 默认值  |
@@ -191,7 +210,8 @@ PaddleRS所支持的数据变换算子可见https://github.com/PaddlePaddle/Padd
 |`apply_to_tar (bool，可选)` | 是否对目标图像应用转换   | `True` |
 
 
-##`Resize`
+## `Resize`
+
 调整输入影像大小。
 
     -如果' target_size '是int，将图像大小调整为(' target_size '， ' target_size ')`。
@@ -204,7 +224,8 @@ PaddleRS所支持的数据变换算子可见https://github.com/PaddlePaddle/Padd
 | `interp (str，可选)`                    | 调整图像大小的插值方法。{'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}之一   | `'LINEAR'` |
 | `keep_ratio (bool，可选)`           |  如果为True，宽度和高度的比例因子将被设置为相同的值，调整图像的高度/宽度将不大于目标宽度/高度        | `False`    |
 
-##`ResizeByLong`
+## `ResizeByLong`
+
 调整输入影像大小，保持纵横比不变（根据长边计算缩放系数）。
 
 | 参数名                                        | 描述        | 默认值      |
@@ -212,9 +233,9 @@ PaddleRS所支持的数据变换算子可见https://github.com/PaddlePaddle/Padd
 | `long_size (int)`|图像较长一侧的目标大小|          |
 | `interp (str，可选)`                    | 调整图像大小的插值方法。{'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}之一   | `'LINEAR'` |
 
-##`ResizeByShort`
-调整输入影像大小，保持纵横比不变（根据短边计算缩放系数）。
+## `ResizeByShort`
 
+调整输入影像大小，保持纵横比不变（根据短边计算缩放系数）。
 
 | 参数名                   | 描述        | 默认值      |
 |-----------------------|-----------|----------|
@@ -223,7 +244,8 @@ PaddleRS所支持的数据变换算子可见https://github.com/PaddlePaddle/Padd
 | `interp (str，可选)`      | 调整图像大小的插值方法。{'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}之一   | `'LINEAR'` |
 
 
-##`SelectBand`
+## `SelectBand`
+
 对输入影像进行波段选择。
 
 | 参数名              | 描述               | 默认值      |

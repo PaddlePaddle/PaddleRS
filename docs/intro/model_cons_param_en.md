@@ -1,7 +1,9 @@
-#PaddleRS model construction parameters
+# PaddleRS model construction parameters
+
 This document describes the construction parameters of each PaddleRS model trainer in detail, including their parameter names, parameter types, parameter descriptions and default values.
 
-##`BIT`
+## `BIT`
+
 The BIT implementation based on PaddlePaddle.
 
 The original article refers to H. Chen, et al., "Remote Sensing Image Change Detection With Transformers "(https://arxiv.org/abs/2103.00208).
@@ -28,7 +30,8 @@ This implementation adopts pretrained encoders, as opposed to the original work 
 | `dec_depth (int, optional)` | Number of attention blocks used in decoder                                                                                                          | `8` |
 | `dec_head_dim (int, optional)` | Embedding dimension for each decoder head                                                                                                           | `8` |
 | `**params` | Other model parameters, such as convolution kernel size, number of filters, etc. It depends on the implementation of the model. | - |
-##`CDNet`
+
+## `CDNet`
 
 The CDNet implementation based on PaddlePaddle.
 
@@ -42,7 +45,9 @@ The original article refers to Pablo F. Alcantarilla, et al., "Street-View Chang
 | `in_channels` | Number of channels of the input image                                                              | `6` |
 | `model_name` | Model name                                                                                         | `'CDNet'` |
 | `**params` | Other model parameters, such as convolution kernel size, number of filters, etc. It depends on the implementation of the model. | - |
-##`ChangeFormer`
+
+## `ChangeFormer`
+
 The ChangeFormer implementation based on PaddlePaddle.
 
 The original article refers to Wele Gedara Chaminda Bandara，Vishal M. Patel，“A TRANSFORMER-BASED SIAMESE NETWORK FOR CHANGE DETECTION”(https://arxiv.org/pdf/2201.01293.pdf)。
@@ -57,7 +62,8 @@ The original article refers to Wele Gedara Chaminda Bandara，Vishal M. Patel，
 | `embed_dim (int)` | Hidden layer dimension of the Transformer encoder                           | `256` |
 | `**params` | Other model parameters, such as convolution kernel size, number of filters, etc. It depends on the implementation of the model. | - |
 
-##`ChangeStar_FarSeg`
+## `ChangeStar_FarSeg`
+
 The ChangeStar implementation with a FarSeg encoder based on PaddlePaddle.
 
 The original article refers to Z. Zheng, et al., "Change is Everywhere: Single-Temporal Supervised Object Change Detection in Remote Sensing Imagery"(https://arxiv.org/abs/2108.07002).
@@ -73,7 +79,8 @@ The original article refers to Z. Zheng, et al., "Change is Everywhere: Single-T
 | `scale_factor` | Upsampling factor to scale the size of the output segmentation mask | `4.0` |
 | `**params` | Other model parameters, such as convolution kernel size, number of filters, etc. It depends on the implementation of the model. | - |
 
-##`DSAMNet`
+## `DSAMNet`
+
 The DSAMNet implementation based on PaddlePaddle.
 
 The original article refers to Q. Shi, et al., "A Deeply Supervised Attention Metric-Based Network and an Open Aerial Image Dataset for Remote Sensing Change Detection"(https://ieeexplore.ieee.org/document/9467555).
@@ -88,7 +95,8 @@ The original article refers to Q. Shi, et al., "A Deeply Supervised Attention Me
 | `sa_kernel (int)` | Kernel size in the spatial attention module                                                        | `7` |
 | `**params` | Other model parameters, such as convolution kernel size, number of filters, etc. It depends on the implementation of the model. | - |
 
-##`DSIFN`
+## `DSIFN`
+
 The DSIFN implementation based on PaddlePaddle.
 
 The original article refers to C. Zhang, et al., "A deeply supervised image fusion network for change detection in high resolution bi-temporal remote sensing images"(https://www.sciencedirect.com/science/article/pii/S0924271620301532).
@@ -100,7 +108,9 @@ The original article refers to C. Zhang, et al., "A deeply supervised image fusi
 | `losses (list)` | List of loss functions                                                                             | `None` |
 | `use_dropout (bool)` | Whether to use dropout                                                                             | `False`|
 | `**params` | Other model parameters, such as convolution kernel size, number of filters, etc. It depends on the implementation of the model. | - |
-##`FC-EF`
+
+## `FC-EF`
+
 The FC-EF implementation based on PaddlePaddle.
 
 The original article refers to Rodrigo Caye Daudt, et al. "Fully convolutional siamese networks for change detection"(https://arxiv.org/abs/1810.08462)`.
@@ -114,7 +124,8 @@ The original article refers to Rodrigo Caye Daudt, et al. "Fully convolutional s
 | `use_dropout (bool)` | Whether to use dropout                | `False`|
 | `**params` | Other model parameters, such as convolution kernel size, number of filters, etc. It depends on the implementation of the model. | - |
 
-##`FC-Siam-conc`
+## `FC-Siam-conc`
+
 The FC-Siam-conc implementation based on PaddlePaddle.
 
 The original article refers to Rodrigo Caye Daudt, et al. "Fully convolutional siamese networks for change detection"(https://arxiv.org/abs/1810.08462).
@@ -128,7 +139,8 @@ The original article refers to Rodrigo Caye Daudt, et al. "Fully convolutional s
 | `use_dropout (bool)` | Whether to use dropout                                                                             | `False`|
 | `**params` | Other model parameters, such as convolution kernel size, number of filters, etc. It depends on the implementation of the model. | - |
 
-##`FC-Siam-diff`
+## `FC-Siam-diff`
+
 The FC-Siam-diff implementation based on PaddlePaddle.
 
 The original article refers to Rodrigo Caye Daudt, et al. "Fully convolutional siamese networks for change detection"(https://arxiv.org/abs/1810.08462).
@@ -142,7 +154,8 @@ The original article refers to Rodrigo Caye Daudt, et al. "Fully convolutional s
 | `use_dropout (bool)` | Boolean indicating whether to use dropout regularization                                         | `False` |
 | `**params` | Other model parameters, such as convolution kernel size, number of filters, etc. It depends on the implementation of the model. | - |
 
-##`FCCDN`
+## `FCCDN`
+
 The FCCDN implementation based on PaddlePaddle.
 
 The original article refers to Pan Chen, et al., "FCCDN: Feature Constraint Network for VHR Image Change Detection"(https://arxiv.org/pdf/2105.10860.pdf).
@@ -155,7 +168,8 @@ The original article refers to Pan Chen, et al., "FCCDN: Feature Constraint Netw
 | `losses (list)` | List of loss functions                                                                             | `None` |
 | `**params` | Other model parameters, such as convolution kernel size, number of filters, etc. It depends on the implementation of the model. | - |
 
-##`P2V-CD`
+## `P2V-CD`
+
 The P2V-CD implementation based on PaddlePaddle.
 
 The original article refers to M. Lin, et al. "Transition Is a Process: Pair-to-Video Change Detection Networks for Very High Resolution Remote Sensing Images"(https://ieeexplore.ieee.org/document/9975266).
@@ -169,7 +183,8 @@ The original article refers to M. Lin, et al. "Transition Is a Process: Pair-to-
 | `video_len (int)` | Number of input video frames                                                                       | `8` |
 | `**params` | Other model parameters, such as convolution kernel size, number of filters, etc. It depends on the implementation of the model. | - |
 
-##`SNUNet`
+## `SNUNet`
+
 The SNUNet implementation based on PaddlePaddle.
 
 The original article refers to S. Fang, et al., "SNUNet-CD: A Densely Connected Siamese Network for Change Detection of VHR Images" (https://ieeexplore.ieee.org/document/9355573).
@@ -180,7 +195,8 @@ The original article refers to S. Fang, et al., "SNUNet-CD: A Densely Connected 
 | `num_classes（int)`      | Number of target classes                        |      |
 | `width (int，optional)` | Utput channels of the first convolutional layer | 32   |
 
-##`STANet`
+## `STANet`
+
 The STANet implementation based on PaddlePaddle。
 
 The original article refers to  H. Chen and Z. Shi, "A Spatial-Temporal Attention-Based Method and a New Dataset for Remote Sensing Image Change Detection"(https://www.mdpi.com/2072-4292/12/10/1662).
@@ -194,7 +210,8 @@ The original article refers to  H. Chen and Z. Shi, "A Spatial-Temporal Attentio
 | `width (int)` | Number of channels in the neural network                                                                                        | `32` |
 | `**params` | Other model parameters, such as convolution kernel size, number of filters, etc. It depends on the implementation of the model. | - |
 
-##`CondenseNetV2`
+## `CondenseNetV2`
+
 The CondenseNetV2 implementation based on PaddlePaddle.
 
 | parameter name | description | default value |
@@ -206,7 +223,8 @@ The CondenseNetV2 implementation based on PaddlePaddle.
 | `arch (str)` | The architecture of the model, can be 'A', 'B' or 'C' | `'A'` |
 | `**params` | Other model parameters, such as convolution kernel size, number of filters, etc. It depends on the implementation of the model. | - |
 
-## `HRNet`
+##  `HRNet`
+
 The HRNet implementation based on PaddlePaddle.
 
 | parameter name | description | default value |
@@ -216,7 +234,8 @@ The HRNet implementation based on PaddlePaddle.
 | `losses (List)` | List of loss functions to use, if `use_mixed_loss` is True | `None` |
 
 
-## `MobileNetV3`
+##  `MobileNetV3`
+
 The MobileNetV3 implementation based on PaddlePaddle.
 
 | parameter name | description | default value |
@@ -226,7 +245,8 @@ The MobileNetV3 implementation based on PaddlePaddle.
 | `losses (List)` | List of loss functions to use, if `use_mixed_loss` is True | `None` |
 
 
-## `ResNet50-vd`
+##  `ResNet50-vd`
+
 The ResNet50-vd implementation based on PaddlePaddle.
 
 | parameter name | description | default value |
@@ -235,7 +255,8 @@ The ResNet50-vd implementation based on PaddlePaddle.
 | `use_mixed_loss (bool)` | Boolean indicating whether to use a combination of multiple loss functions | `False` |
 | `losses (List)` | List of loss functions to use, if `use_mixed_loss` is True | `None` |
 
-##DRN
+## `DRN`
+
 The DRN implementation based on PaddlePaddle.
 
 | parameter name | description | default value |
@@ -254,7 +275,8 @@ The DRN implementation based on PaddlePaddle.
 | `**params` | Other model parameters, such as learning rate, weight decay, etc. It depends on the implementation of the model. | - |
 
 
-##ESRGAN
+## `ESRGAN`
+
 The ESRGAN implementation based on PaddlePaddle.
 
 | parameter name | description | default value |
@@ -268,7 +290,8 @@ The ESRGAN implementation based on PaddlePaddle.
 | `nf (int)` | The number of filters in the first convolutional layer of the model. | `64` |
 | `nb (int)` | Number of residual blocks in the model. | `23` |
 
-##LESRCNN
+## `LESRCNN`
+
 The LESRCNN implementation based on PaddlePaddle.
 
 | parameter name | description | default value |
@@ -280,7 +303,8 @@ The LESRCNN implementation based on PaddlePaddle.
 | `group (int)` | Controls the number of groups for convolution operations. Standard convolution if set to `1`, DWConv if set to the number of input channels. | `1` |
 | `**params` | Other model parameters, such as convolution kernel size, number of filters, etc. It depends on the implementation of the model. | - |
 
-## `Faster R-CNN`
+##  `Faster R-CNN`
+
 The Faster R-CNN implementation based on PaddlePaddle.
 
 | parameter name | description | default value |
@@ -301,7 +325,8 @@ The Faster R-CNN implementation based on PaddlePaddle.
 | `test_post_nms_top_n (int)` | The number of predicted boxes to keep after NMS operation at test time. | `1000` |
 | `**params` | Other model parameters, such as learning rate, weight decay, etc. It depends on the implementation of the model. | - |
 
-##`PP-YOLO`
+## `PP-YOLO`
+
 The PP-YOLO implementation based on PaddlePaddle.
 
 | parameter name | description | default value |
@@ -325,7 +350,8 @@ The PP-YOLO implementation based on PaddlePaddle.
 | `nms_iou_threshold (float)` | NMS IoU threshold | `0.45` |
 | `**params` | Other model parameters, such as learning rate, weight decay, etc. It depends on the implementation of the model. | - |
 
-## `PP-YOLO Tiny`
+##  `PP-YOLO Tiny`
+
 The PP-YOLO Tiny implementation based on PaddlePaddle.
 
 | parameter name | description | default value |
@@ -348,7 +374,8 @@ The PP-YOLO Tiny implementation based on PaddlePaddle.
 | `nms_iou_threshold (float)` | NMS IoU threshold | `0.45` |
 | `**params` | Other model parameters, such as learning rate, weight decay, etc. It depends on the implementation of the model. | - |
 
-##`PP-YOLOv2`
+## `PP-YOLOv2`
+
 The PP-YOLOv2 implementation based on PaddlePaddle.
 
 | parameter name | description | default value |
@@ -371,7 +398,8 @@ The PP-YOLOv2 implementation based on PaddlePaddle.
 | `nms_iou_threshold (float)` | NMS IoU threshold | `0.45` |
 | `**params` | Other model parameters, such as learning rate, weight decay, etc. It depends on the implementation of the model. | - |
 
-##`YOLOv3`
+## `YOLOv3`
+
 The YOLOv3 implementation based on PaddlePaddle.
 
 | parameter name | description | default value |
@@ -388,7 +416,8 @@ The YOLOv3 implementation based on PaddlePaddle.
 | `label_smooth (bool)` | Whether to use label smoothing when computing loss | `False` |
 | `**params` | Other model parameters, such as learning rate, weight decay, etc. It depends on the implementation of the model. | - |
 
-## `BiSeNet V2`
+##  `BiSeNet V2`
+
 The BiSeNet V2 implementation based on PaddlePaddle.
 
 | parameter name | description | default value |
@@ -400,7 +429,8 @@ The BiSeNet V2 implementation based on PaddlePaddle.
 | `align_corners (bool)` | Whether to use pixel center alignment in bilinear interpolation | `False` |
 | `**params` | Other model parameters, such as learning rate, weight decay, etc. It depends on the implementation of the model. | - |
 
-## `DeepLab V3+`
+##  `DeepLab V3+`
+
 The DeepLab V3+ implementation based on PaddlePaddle.
 
 | parameter name | description | default value |
@@ -417,7 +447,8 @@ The DeepLab V3+ implementation based on PaddlePaddle.
 | `align_corners (bool)` | Whether to use the corner alignment method | `False` |
 
 
-##`FactSeg`
+## `FactSeg`
+
 The FactSeg implementation based on PaddlePaddle.
 
 The original article refers to  A. Ma, J. Wang, Y. Zhong and Z. Zheng, "FactSeg: Foreground Activation -Driven Small Object Semantic Segmentation in Large-Scale Remote Sensing Imagery,"in IEEE Transactions on Geoscience and Remote Sensing, vol. 60, pp. 1-16, 2022, Art no. 5606216.
@@ -430,7 +461,8 @@ The original article refers to  A. Ma, J. Wang, Y. Zhong and Z. Zheng, "FactSeg:
 | `losses (dict)` | Loss function settings dictionary                                                                                | `None` |
 | `**params` | Other model parameters, such as learning rate, weight decay, etc. It depends on the implementation of the model. | - |
 
-##`FarSeg`
+## `FarSeg`
+
 The FarSeg implementation based on PaddlePaddle.
 
 The original article refers to  Zheng Z, Zhong Y, Wang J, et al. Foreground-aware relation network for geospatial object segmentation in high spatial resolution remote sensing imagery[C]//Proceedings of the IEEE/CVF conference on computer vision and pattern recognition. 2020: 4096-4105.
@@ -443,7 +475,8 @@ The original article refers to  Zheng Z, Zhong Y, Wang J, et al. Foreground-awar
 | `losses (dict)` | Loss function settings dictionary                                                                                | `None` |
 | `**params` | Other model parameters, such as learning rate, weight decay, etc. It depends on the implementation of the model. | - |
 
-## `Fast-SCNN`
+##  `Fast-SCNN`
+
 The Fast-SCNN implementation based on PaddlePaddle.
 
 | parameter name | description                                    | default value |
@@ -455,7 +488,8 @@ The Fast-SCNN implementation based on PaddlePaddle.
 | `align_corners (bool)` | Whether to use the corner alignment method     | `False` |
 
 
-## `HRNet`
+##  `HRNet`
+
 The HRNet implementation based on PaddlePaddle
 
 | parameter name | description                                                                                                      | default value |

@@ -1,7 +1,9 @@
-#PaddleRS模型构造参数
+# PaddleRS模型构造参数
+
 本文档详细介绍了PaddleRS各个模型训练器的构造参数，包括其参数名、参数类型、参数描述及默认值。
 
-##`BIT`
+## `BIT`
+
 基于PaddlePaddle实现的BIT模型。
 
 该模型的原始文章见于 H. Chen, et al., "Remote Sensing Image Change Detection With Transformers" (https://arxiv.org/abs/2103.00208)。
@@ -31,7 +33,7 @@
 
 
 
-##`CDNet`
+## `CDNet`
 
 该基于PaddlePaddle的CDNet实现。
 
@@ -48,7 +50,8 @@
 
 
 
-##`ChangeFormer`
+## `ChangeFormer`
+
 基于PaddlePaddle的ChangeFormer实现。
 
 该模型的原始文章见于 Wele Gedara Chaminda Bandara，Vishal M. Patel，“A TRANSFORMER-BASED SIAMESE NETWORK FOR CHANGE DETECTION”(https://arxiv.org/pdf/2201.01293.pdf)。
@@ -65,7 +68,8 @@
 
 
 
-##`ChangeStar_FarSeg`
+## `ChangeStar_FarSeg`
+
 基于PaddlePaddle实现的ChangeStar模型，其使用FarSeg编码器。
 
 该模型的原始文章见于 Z. Zheng, et al., "Change is Everywhere: Single-Temporal Supervised Object Change Detection in Remote Sensing Imagery"(https://arxiv.org/abs/2108.07002).
@@ -84,7 +88,8 @@
 
 
 
-##`DSAMNet`
+## `DSAMNet`
+
 基于PaddlePaddle实现的DSAMNet，用于遥感变化检测。
 
 该模型的原始文章见于 Q. Shi, et al., "A Deeply Supervised Attention Metric-Based Network and an Open Aerial Image Dataset for Remote Sensing Change Detection"(https://ieeexplore.ieee.org/document/9467555).
@@ -100,7 +105,8 @@
 | `**params` | 其他模型参数，例如卷积核大小、滤波器数量等。具体取决于模型的实现。 | - |
 
 
-##`DSIFN`
+## `DSIFN`
+
 基于PaddlePaddle的DSIFN实现。
 
 该模型的原始文章见于 The original article refers to C. Zhang, et al., "A deeply supervised image fusion network for change detection in high resolution bi-temporal remote sensing images"(https://www.sciencedirect.com/science/article/pii/S0924271620301532).
@@ -114,7 +120,8 @@
 | `**params` | 其他模型参数，例如卷积核大小、滤波器数量等。具体取决于模型的实现。 | - |
 
 
-##`FC-EF`
+## `FC-EF`
+
 基于PaddlePaddle的FC-EF实现。
 
 该模型的原始文章见于 The original article refers to Rodrigo Caye Daudt, et al. "Fully convolutional siamese networks for change detection"(https://arxiv.org/abs/1810.08462).
@@ -130,7 +137,8 @@
 
 
 
-##`FC-Siam-conc`
+## `FC-Siam-conc`
+
 基于PaddlePaddle的FC-Siam-conc实现。
 
 该模型的原始文章见于 Rodrigo Caye Daudt, et al. "Fully convolutional siamese networks for change detection"(https://arxiv.org/abs/1810.08462).
@@ -146,7 +154,8 @@
 
 
 
-##`FC-Siam-diff`
+## `FC-Siam-diff`
+
 基于PaddlePaddle的FC-Siam-diff实现。
 
 该模型的原始文章见于 Rodrigo Caye Daudt, et al. "Fully convolutional siamese networks for change detection"(https://arxiv.org/abs/1810.08462).
@@ -162,7 +171,8 @@
 
 
 
-##`FCCDN`
+## `FCCDN`
+
 基于PaddlePaddle的FCCDN实现。
 
 该模型的原始文章见于 Pan Chen, et al., "FCCDN: Feature Constraint Network for VHR Image Change Detection"(https://arxiv.org/pdf/2105.10860.pdf).
@@ -176,7 +186,8 @@
 | `**params` | 其他模型参数，例如卷积核大小、滤波器数量等。具体取决于模型的实现。 | - |
 
 
-##`P2V-CD`
+## `P2V-CD`
+
 基于PaddlePaddle的P2V-CD实现。
 
 该模型的原始文章见于 M. Lin, et al. "Transition Is a Process: Pair-to-Video Change Detection Networks for Very High Resolution Remote Sensing Images"(https://ieeexplore.ieee.org/document/9975266).
@@ -190,7 +201,8 @@
 | `video_len (int)`     | 输入视频帧的数量              | `8`    |
 | `**params` | 其他模型参数，例如卷积核大小、滤波器数量等。具体取决于模型的实现。 | - |
 
-##`SNUNet`
+## `SNUNet`
+
 基于PaddlePaddle的SNUNet实现。
 
 该模型的原始文章见于 S. Fang, et al., "SNUNet-CD: A Densely Connected Siamese Network for Change Detection of VHR Images" (https://ieeexplore.ieee.org/document/9355573).
@@ -205,7 +217,8 @@
 | `**params` | 其他模型参数，例如卷积核大小、滤波器数量等。具体取决于模型的实现。 | - |
 
 
-##`STANet`
+## `STANet`
+
 基于PaddlePaddle的STANet实现。
 
 该模型的原始文章见于 H. Chen and Z. Shi, "A Spatial-Temporal Attention-Based Method and a New Dataset for Remote Sensing Image Change Detection"(https://www.mdpi.com/2072-4292/12/10/1662).
@@ -220,7 +233,8 @@
 | `ds_factor (int)` | 下采样因子，可以是1、2或4 | `1` |
 | `**params` | 其他模型参数，例如卷积核大小、滤波器数量等。具体取决于模型的实现。 | - |
 
-##`CondenseNetV2`
+## `CondenseNetV2`
+
 基于PaddlePaddle的CondenseNetV2实现。
 
 该模型的原始文章见于Yang L, Jiang H, Cai R, et al. “Condensenet v2: Sparse feature reactivation for deep networks” (https://arxiv.org/abs/2104.04382)
@@ -235,7 +249,8 @@
 | `**params` | 其他模型参数，例如卷积核大小、滤波器数量等。具体取决于模型的实现。 | - |
 
 
-##`HRNet`
+## `HRNet`
+
 基于PaddlePaddle的HRNet实现。
 
 | 参数名 | 描述 | 默认值 |
@@ -244,7 +259,8 @@
 | `use_mixed_loss (bool)` | 布尔值，指示是否使用多个损失函数的组合 | `False` |
 | `losses (List)` | 要使用的损失函数列表，如果`use_mixed_loss`为True | `None` |
 
-##`MobileNetV3`
+## `MobileNetV3`
+
 基于PaddlePaddle的MobileNetV3实现。
 
 | 参数名 | 描述 | 默认值 |
@@ -254,7 +270,8 @@
 | `losses (List)` | 要使用的损失函数列表，如果`use_mixed_loss`为True | `None` |
 
 
-##`ResNet50-vd`
+## `ResNet50-vd`
+
 基于PaddlePaddle的ResNet50-vd实现。
 
 | 参数名 | 描述 | 默认值 |
@@ -263,7 +280,8 @@
 | `use_mixed_loss (bool)` | 布尔值，指示是否使用多个损失函数的组合 | `False` |
 | `losses (List)` | 要使用的损失函数列表，如果`use_mixed_loss`为True | `None` |
 
-##DRN
+## `DRN`
+
 基于PaddlePaddle的DRN实现。
 
 | 参数名                                    | 描述 | 默认值   |
@@ -281,7 +299,8 @@
 | `dual_loss_weight (float)`             | 双边损失的权重 | `0.1` |
 | `**params` | 其他模型参数，例如卷积核大小、滤波器数量等。具体取决于模型的实现。 | - |
 
-##ESRGAN
+## `ESRGAN`
+
 基于PaddlePaddle的ESRGAN实现。
 
 | 参数名 | 描述 | 默认值 |
@@ -295,7 +314,8 @@
 | `nf (int)` | 模型第一层卷积层的滤波器数量。 | `64` |
 | `nb (int)` | 模型中残差块的数量。 | `23` |
 
-##LESRCNN
+## `LESRCNN`
+
 基于PaddlePaddle的LESRCNN实现。
 
 | 参数名 | 描述 | 默认值 |
@@ -308,7 +328,8 @@
 | `**params` | 其他模型参数，例如卷积核大小、滤波器数量等。具体取决于模型的实现。 | - |
 
 
-##`Faster R-CNN`
+## `Faster R-CNN`
+
 基于PaddlePaddle的Faster R-CNN实现。
 
 | 参数名 | 描述 | 默认值 |
@@ -330,7 +351,8 @@
 | `**params` | 其他模型参数，例如学习率、权重衰减等。具体取决于模型的实现。 | - |
 
 
-##`PP-YOLO`
+## `PP-YOLO`
+
 基于PaddlePaddle的PP-YOLO实现。
 
 | 参数名 | 描述 | 默认值 |
@@ -356,7 +378,8 @@
 
 
 
-##`PP-YOLO Tiny`
+## `PP-YOLO Tiny`
+
 基于PaddlePaddle的PP-YOLO Tiny实现。
 
 | 参数名 | 描述 | 默认值 |
@@ -381,7 +404,8 @@
 
 
 
-##`PP-YOLOv2`
+## `PP-YOLOv2`
+
 基于PaddlePaddle的PP-YOLOv2实现。
 
 
@@ -406,7 +430,8 @@
 | `**params` | 其他模型参数，例如学习率、权重衰减等。具体取决于模型的实现。 | - |
 
 
-##`YOLOv3`
+## `YOLOv3`
+
 基于PaddlePaddle的YOLOv3实现。
 
 | 参数名 | 描述 | 默认值 |
@@ -424,7 +449,8 @@
 | `**params` | 其他模型参数，例如学习率、权重衰减等。具体取决于模型的实现。 | - |
 
 
-##`BiSeNet V2`
+## `BiSeNet V2`
+
 基于PaddlePaddle的BiSeNet V2实现。
 
 | 参数名 | 描述 | 默认值 |
@@ -439,7 +465,8 @@
 
 
 
-##`DeepLab V3+`
+## `DeepLab V3+`
+
 基于PaddlePaddle的DeepLab V3+实现。
 
 | 参数名 | 描述 | 默认值 |
@@ -455,7 +482,8 @@
 | `aspp_out_channels (int)` | ASPP 模块输出通道数 | `256` |
 | `align_corners (bool)` | 是否使用角点对齐方法 | `False` |
 
-##`FactSeg`
+## `FactSeg`
+
 基于PaddlePaddle的FactSeg实现。
 
 该模型的原始文章见于 A. Ma, J. Wang, Y. Zhong and Z. Zheng, "FactSeg: Foreground Activation -Driven Small Object Semantic Segmentation in Large-Scale Remote Sensing Imagery,"in IEEE Transactions on Geoscience and Remote Sensing, vol. 60, pp. 1-16, 2022, Art no. 5606216.
@@ -470,7 +498,8 @@
 | `**params` | 其他模型参数，例如学习率、权重衰减等。具体取决于模型的实现。 | - |
 
 
-##`FarSeg`
+## `FarSeg`
+
 基于PaddlePaddle的FarSeg实现
 
 该模型的原始文章见于 Zheng Z, Zhong Y, Wang J, et al. Foreground-aware relation network for geospatial object segmentation in high spatial resolution remote sensing imagery[C]//Proceedings of the IEEE/CVF conference on computer vision and pattern recognition. 2020: 4096-4105.
@@ -485,7 +514,8 @@
 | `**params` | 其他模型参数，例如学习率、权重衰减等。具体取决于模型的实现。 | - |
 
 
-##`Fast-SCNN`
+## `Fast-SCNN`
+
 基于PaddlePaddle的Fast-SCNN实现
 
 | 参数名 | 描述 | 默认值 |
@@ -497,7 +527,8 @@
 | `align_corners (bool)` | 是否使用角点对齐方法 | `False` |
 
 
-##`HRNet`
+## `HRNet`
+
 基于PaddlePaddle的HRNet实现
 
 | 参数名 | 描述 | 默认值 |
@@ -513,9 +544,9 @@
 
 
 
-##`UNet`
-基于PaddlePaddle的UNet实现
+## `UNet`
 
+基于PaddlePaddle的UNet实现
 
 | 参数名 | 描述 | 默认值 |
 | --- | --- | --- |
