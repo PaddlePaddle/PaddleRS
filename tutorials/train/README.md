@@ -139,7 +139,7 @@ visualdl --logdir output/deeplabv3p/vdl_log --port 8001
 export CUDA_VISIBLE_DEVICES=0
 python tutorials/eval/semantic_segmentation/deeplabv3p.py --model_path /path/to/model --save_dir /path/to/result
 ```
-其中，/path/to/model是训练好的模型的保存路径，/path/to/result是验证结果保存路径。
+其中，`/path/to/model`是训练好的模型的保存路径，`/path/to/result`是验证结果保存路径。
 
 ##模型部署
 1. 导出模型
@@ -147,25 +147,25 @@ python tutorials/eval/semantic_segmentation/deeplabv3p.py --model_path /path/to/
 ```shell
 python deploy/export/export_model.py --model_dir=./output/deeplabv3p/best_model/ --save_dir=./inference_model/
 ```
-其中，--model_dir选项和--save_dir选项分别指定存储训练格式模型和部署格式模型的目录。例如，在上面的例子中，./inference_model/目录下将生成model.pdmodel、model.pdiparams、model.pdiparams.info、model.yml和pipeline.yml五个文件。
+其中，`--model_dir`选项和`--save_dir`选项分别指定存储训练格式模型和部署格式模型的目录。例如，在上面的例子中，`./inference_model/`目录下将生成`model.pdmodel`、`model.pdiparams`、`model.pdiparams.info`、`model.yml`和`pipeline.yml`五个文件。
 - `model.pdmodel`，记录模型的网络结构；
 - `model.pdiparams`，包含模型权重参数；
 - `model.pdiparams.info`，包含模型权重名称；
 - `model.yml`，模型的配置文件（包括预处理参数、模型规格参数等）；
 - `pipeline.yml`，流程配置文件。
 
-deploy/export/export_model.py包含三个命令行选项：
+`deploy/export/export_model.py`包含三个命令行选项：
 
 | 参数 | 说明 |
 | ---- | ---- |
-| --model_dir | 待导出的训练格式模型存储路径，例如`./output/deeplabv3p/best_model/`。 |
-| --save_dir | 导出的部署格式模型存储路径，例如`./inference_model/`。 |
-| --fixed_input_shape | 固定导出模型的输入张量形状。默认值为None，表示使用任务默认输入张量形状。 |
+| `--model_dir` | 待导出的训练格式模型存储路径，例如`./output/deeplabv3p/best_model/`。 |
+| `--save_dir` | 导出的部署格式模型存储路径，例如`./inference_model/`。 |
+| `--fixed_input_shape` | 固定导出模型的输入张量形状。默认值为None，表示使用任务默认输入张量形状。 |
 
 2. python部署（以BIT为例）
 
-使用预测接口的基本流程为：首先构建Predictor对象，然后调用Predictor的predict()方法执行预测。需要说明的是，Predictor对象的predict()方法返回的结果与对应的训练器（在paddlers/tasks/目录的文件中定义）的predict()方法返回结果具有相同的格式。
-```shell
+使用预测接口的基本流程为：首先构建`Predictor`对象，然后调用`Predictor`的`predict()`方法执行预测。需要说明的是，`Predictor`对象的predict()方法返回的结果与对应的训练器（在`paddlers/tasks/`目录的文件中定义）的`predict()`方法返回结果具有相同的格式。
+```python
 from paddlers.deploy import Predictor
 
 # 第一步：构建Predictor。该类接受的构造参数如下：

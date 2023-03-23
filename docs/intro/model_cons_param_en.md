@@ -4,8 +4,7 @@ This document describes the construction parameters of each PaddleRS model train
 ##`BIT`
 The BIT implementation based on PaddlePaddle.
 
-The original article refers to
-        H. Chen, et al., "Remote Sensing Image Change Detection With Transformers"(https://arxiv.org/abs/2103.00208).
+The original article refers to H. Chen, et al., "Remote Sensing Image Change Detection With Transformers "(https://arxiv.org/abs/2103.00208).
 
 This implementation adopts pretrained encoders, as opposed to the original work where weights are randomly initialized.
 
