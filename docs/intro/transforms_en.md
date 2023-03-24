@@ -2,7 +2,7 @@
 
 ## List of PaddleRS supported data conversion operators
 
-PaddleRS organically integrated data preprocessing/data enhancement (collectively called data transformation) strategies required by different remote sensing tasks, and designed a unified operator. Considering the multi-band characteristics of remote sensing images, most data processing operators of PaddleRS can process input of any number of bands. All data conversion operators currently provided by PaddleRS are listed as follows:
+PaddleRS organically integrated data preprocessing/data augmentation (collectively called data transformation) strategies required by different remote sensing tasks, and designed a unified operator. Considering the multi-band characteristics of remote sensing images, most data processing operators of PaddleRS can process input of any number of bands. All data conversion operators currently provided by PaddleRS are listed as follows:
 
 | The name of the data transformation operator | Purpose                                                     | Task     | ... |
 | -------------------- | ------------------------------------------------- | -------- | ---- |
@@ -32,4 +32,4 @@ PaddleRS organically integrated data preprocessing/data enhancement (collectivel
 
 ## Combinatorial operator
 
-In the actual model training process, it is often necessary to combine a variety of data preprocessing and data enhancement strategies. PaddleRS provides `paddlers.transforms.Compose` operator to easily combine multiple data transformation, enables the operator to serial execution. For the specific usage of the `paddlers.transforms.Compose` please see [API Description](https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/data.md).
+In the actual model training process, it is often necessary to combine a variety of data preprocessing and data augmentation strategies. PaddleRS provides `paddlers.transforms.Compose` operator to easily combine multiple data transformation, enables the operator to serial execution. For the specific usage of the `paddlers.transforms.Compose` please see [API Description](https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/data.md).

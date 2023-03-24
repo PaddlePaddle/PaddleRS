@@ -214,7 +214,7 @@ model = pdrs.tasks.BIT(
 ### Dataset Construction
 
 ```python
-# Build the data transform needed (data enhancement, preprocessing)
+# Build the data transform needed (data augmentation, preprocessing)
 # Compose a variety of transformations using Compose. The transformations contained in Compose will be executed sequentially in sequence
 train_transforms = T.Compose([
     # Random cutting
