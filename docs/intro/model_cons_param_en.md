@@ -150,12 +150,12 @@ The FCCDN implementation based on PaddlePaddle.
 
 The original article refers to Pan Chen, et al., "FCCDN: Feature Constraint Network for VHR Image Change Detection"(https://arxiv.org/pdf/2105.10860.pdf).
 
-| parameter name | description                                                                                        | default value |
-|--------------------------|----------------------------------------------------------------------------------------------------|-------|
-| `in_channels (int)` | Number of channels of the input image                                                              | `3` |
-| `num_classes (int)` | number of target classes                                                                           | `2` |
-| `use_mixed_loss (bool)` | Whether to use mixed loss                                                                          | `False`|
-| `losses (list)` | List of loss functions                                                                             | `None` |
+| parameter name | description                           | default value |
+|--------------------------|---------------------------------------|-------|
+| `in_channels (int)` | Number of channels of the input image | `3` |
+| `num_classes (int)` | Number of target classes              | `2` |
+| `use_mixed_loss (bool)` | Whether to use mixed loss             | `False`|
+| `losses (list)` | List of loss functions                | `None` |
 
 ## `P2V-CD`
 
@@ -256,7 +256,7 @@ The DRN implementation based on PaddlePaddle.
 | `n_colors (int)`                        | Number of image channels                                                                                                                                                                                            | `3` |
 | `rgb_range (float)`                     | Range of image pixel values                                                                                                                                                                                         | `1.0` |
 | `negval (float)`                        | Negative value in nonlinear mapping                                                                                                                                                                                 | `0.2` |
-| `lq_loss_weight (float)`                | The weight of the low-quality image loss, which is used to control the impact of the reconstruction loss on the overall loss of restoring the low-resolution input image into a high-resolution output image.                                                                                                                                                                                    | `0.1` |
+| `Supplementary description of `lq_loss_weight` parameter (float)`                | The weight of the low-quality image loss, which is used to control the impact of the reconstruction loss on the overall loss of restoring the low-resolution input image into a high-resolution output image.                                                                                                                                                                                    | `0.1` |
 | `dual_loss_weight (float)`              | The weight of the bilateral loss                                                                                                                                                                                    | `0.1` |
 
 
@@ -297,7 +297,7 @@ The Faster R-CNN implementation based on PaddlePaddle.
 | `backbone (str)`              | The backbone network model to use | `'ResNet50'` |
 | `with_fpn (bool)`             | Boolean indicating whether to use Feature Pyramid Network (FPN) | `True` |
 | `with_dcn (bool)`             | Boolean indicating whether to use Deformable Convolutional Networks (DCN) | `False` |
-| `aspect_ratios (List)`        | List of aspect ratios of candidate boxes | `[0.5, 1.0, 2.0]` |
+| `aspect_ratios (list)`        | List of aspect ratios of candidate boxes | `[0.5, 1.0, 2.0]` |
 | `anchor_sizes (list)`         | A list of sizes of candidate boxes expressed as base sizes on each feature map | `[[32], [64], [128], [256], [512]]` |
 | `keep_top_k (int)`            | Number of predicted boxes to keep before NMS operation | `100` |
 | `nms_threshold (float)`       | The non-maximum suppression (NMS) threshold to use | `0.5` |
@@ -340,8 +340,8 @@ The PP-YOLO Tiny implementation based on PaddlePaddle.
 |----------------------------------|-------------------------------------------------------------| --- |
 | `num_classes (int)`              | Number of target classes                                    | `80` |
 | `backbone (str)`                 | Backbone network model name to use                          | `'MobileNetV3'` |
-| `anchors (list[list[float]])`    | list of anchor box sizes                                    | `[[10, 15], [24, 36], [72, 42], [35, 87], [102, 96] , [60, 170], [220, 125], [128, 222], [264, 266]]` |
-| `anchor_masks (list[list[int]])` | anchor box mask                                             | `[[6, 7, 8], [3, 4, 5], [0, 1, 2]]` |
+| `anchors (list[list[float]])`    | List of anchor box sizes                                    | `[[10, 15], [24, 36], [72, 42], [35, 87], [102, 96] , [60, 170], [220, 125], [128, 222], [264, 266]]` |
+| `anchor_masks (list[list[int]])` | Anchor box mask                                             | `[[6, 7, 8], [3, 4, 5], [0, 1, 2]]` |
 | `use_iou_aware (bool)`           | Boolean value indicating whether to use IoU-aware loss      | `False` |
 | `use_spp (bool)`                 | Boolean indicating whether to use the SPP module            | `True` |
 | `use_drop_block (bool)`          | Boolean value indicating whether to use the DropBlock block | `True` |

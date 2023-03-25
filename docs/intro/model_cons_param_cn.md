@@ -306,70 +306,70 @@
 
 基于PaddlePaddle的Faster R-CNN实现。
 
-| 参数名 | 描述                                                  | 默认值 |
-| --- |-----------------------------------------------------| --- |
-| `num_classes (int)` | 目标类别数量                                              | `80` |
-| `backbone (str)` | Faster R-CNN的主干网络                                   | `'ResNet50'` |
-| `with_fpn (bool)` | 布尔值，指示是否使用特征金字塔网络 (FPN)。                            | `True` |
-| `with_dcn (bool)` | 布尔值，指示是否使用 Deformable Convolutional Networks (DCN)。 | `False` |
-| `aspect_ratios (List)` | 候选框的宽高比列表。                                          | `[0.5, 1.0, 2.0]` |
-| `anchor_sizes (List)` | 候选框的大小列表，表示为每个特征图上的基本大小。                            | `[[32], [64], [128], [256], [512]]` |
-| `keep_top_k (int)` | 在进行 NMS 操作之前，保留的预测框的数量。                             | `100` |
-| `nms_threshold (float)` | 使用的非极大值抑制 (NMS) 阈值。                                 | `0.5` |
-| `score_threshold (float)` | 过滤预测框的分数阈值。                                         | `0.05` |
-| `fpn_num_channels (int)` | FPN 网络中每个金字塔层的通道数。                                  | `256` |
+| 参数名                           | 描述                                                  | 默认值 |
+|-------------------------------|-----------------------------------------------------| --- |
+| `num_classes (int)`           | 目标类别数量                                              | `80` |
+| `backbone (str)`              | Faster R-CNN的主干网络                                   | `'ResNet50'` |
+| `with_fpn (bool)`             | 布尔值，指示是否使用特征金字塔网络 (FPN)。                            | `True` |
+| `with_dcn (bool)`             | 布尔值，指示是否使用 Deformable Convolutional Networks (DCN)。 | `False` |
+| `aspect_ratios (list)`        | 候选框的宽高比列表。                                          | `[0.5, 1.0, 2.0]` |
+| `anchor_sizes (list)`         | 候选框的大小列表，表示为每个特征图上的基本大小。                            | `[[32], [64], [128], [256], [512]]` |
+| `keep_top_k (int)`            | 在进行 NMS 操作之前，保留的预测框的数量。                             | `100` |
+| `nms_threshold (float)`       | 使用的非极大值抑制 (NMS) 阈值。                                 | `0.5` |
+| `score_threshold (float)`     | 过滤预测框的分数阈值。                                         | `0.05` |
+| `fpn_num_channels (int)`      | FPN 网络中每个金字塔层的通道数。                                  | `256` |
 | `rpn_batch_size_per_im (int)` | RPN 网络中每张图像的正负样本比例。                                 | `256` |
-| `rpn_fg_fraction (float)` | RPN 网络中前景样本的比例。                                     | `0.5` |
-| `test_pre_nms_top_n (int)` | 测试时，进行 NMS 操作之前保留的预测框的数量。如果未指定，则使用 `keep_top_k`。    | `None` |
-| `test_post_nms_top_n (int)` | 测试时，进行 NMS 操作之后保留的预测框的数量。                           | `1000` |
+| `rpn_fg_fraction (float)`     | RPN 网络中前景样本的比例。                                     | `0.5` |
+| `test_pre_nms_top_n (int)`    | 测试时，进行 NMS 操作之前保留的预测框的数量。如果未指定，则使用 `keep_top_k`。    | `None` |
+| `test_post_nms_top_n (int)`   | 测试时，进行 NMS 操作之后保留的预测框的数量。                           | `1000` |
 
 ## `PP-YOLO`
 
 基于PaddlePaddle的PP-YOLO实现。
 
-| 参数名 | 描述                  | 默认值 |
-| --- |---------------------| --- |
-| `num_classes (int)` | 目标类别数量              | `80` |
-| `backbone (str)` | PPYOLO 的主干网络        | `'ResNet50_vd_dcn'` |
-| `anchors (List[List[float]])` | 预定义锚框的大小            | `None` |
-| `anchor_masks (List[List[int]])` | 预定义锚框的掩码            | `None` |
-| `use_coord_conv (bool)` | 是否使用坐标卷积            | `True` |
-| `use_iou_aware (bool)` | 是否使用 IoU 感知         | `True` |
-| `use_spp (bool)` | 是否使用空间金字塔池化（SPP）    | `True` |
-| `use_drop_block (bool)` | 是否使用 DropBlock 正则化  | `True` |
-| `scale_x_y (float)` | 对每个预测框进行缩放的参数       | `1.05` |
-| `ignore_threshold (float)` | IoU 阈值，用于将预测框分配给真实框 | `0.7` |
-| `label_smooth (bool)` | 是否使用标签平滑            | `False` |
-| `use_iou_loss (bool)` | 是否使用 IoU Loss       | `True` |
-| `use_matrix_nms (bool)` | 是否使用 Matrix NMS     | `True` |
-| `nms_score_threshold (float)` | NMS  的分数阈值          | `0.01` |
-| `nms_topk (int)` | 在执行 NMS 之前保留的最大检测数  | `-1` |
-| `nms_keep_topk (int)`   | NMS 后要保留的最大预测框数     | `100`|
-| `nms_iou_threshold (float)` | NMS IoU 阈值          | `0.45`  |
+| 参数名                              | 描述                  | 默认值 |
+|----------------------------------|---------------------| --- |
+| `num_classes (int)`              | 目标类别数量              | `80` |
+| `backbone (str)`                 | PPYOLO 的主干网络        | `'ResNet50_vd_dcn'` |
+| `anchors (list[list[float]])`    | 预定义锚框的大小            | `None` |
+| `anchor_masks (list[list[int]])` | 预定义锚框的掩码            | `None` |
+| `use_coord_conv (bool)`          | 是否使用坐标卷积            | `True` |
+| `use_iou_aware (bool)`           | 是否使用 IoU 感知         | `True` |
+| `use_spp (bool)`                 | 是否使用空间金字塔池化（SPP）    | `True` |
+| `use_drop_block (bool)`          | 是否使用 DropBlock 正则化  | `True` |
+| `scale_x_y (float)`              | 对每个预测框进行缩放的参数       | `1.05` |
+| `ignore_threshold (float)`       | IoU 阈值，用于将预测框分配给真实框 | `0.7` |
+| `label_smooth (bool)`            | 是否使用标签平滑            | `False` |
+| `use_iou_loss (bool)`            | 是否使用 IoU Loss       | `True` |
+| `use_matrix_nms (bool)`          | 是否使用 Matrix NMS     | `True` |
+| `nms_score_threshold (float)`    | NMS  的分数阈值          | `0.01` |
+| `nms_topk (int)`                 | 在执行 NMS 之前保留的最大检测数  | `-1` |
+| `nms_keep_topk (int)`            | NMS 后要保留的最大预测框数     | `100`|
+| `nms_iou_threshold (float)`      | NMS IoU 阈值          | `0.45`  |
 
 
 ## `PP-YOLO Tiny`
 
 基于PaddlePaddle的PP-YOLO Tiny实现。
 
-| 参数名 | 描述                    | 默认值 |
-| --- |-----------------------| --- |
-| `num_classes (int)` | 目标类别数量                | `80` |
-| `backbone (str)` | PP-YOLO Tiny的主干网络     | `'MobileNetV3'` |
-| `anchors (List[List[float]])` | anchor box 大小列表       | `[[10, 15], [24, 36], [72, 42], [35, 87], [102, 96], [60, 170], [220, 125], [128, 222], [264, 266]]` |
-| `anchor_masks (List[List[int]])` | anchor box 掩码         | `[[6, 7, 8], [3, 4, 5], [0, 1, 2]]` |
-| `use_iou_aware (bool)` | 布尔值，指示是否使用 IoU-aware loss | `False` |
-| `use_spp (bool)` | 布尔值，指示是否使用 SPP 模块     | `True` |
-| `use_drop_block (bool)` | 布尔值，指示是否使用 DropBlock 模块 | `True` |
-| `scale_x_y (float)` | 缩放参数                  | `1.05` |
-| `ignore_threshold (float)` | 忽略阈值                  | `0.5` |
-| `label_smooth (bool)` | 布尔值，指示是否使用标签平滑        | `False` |
-| `use_iou_loss (bool)` | 布尔值，指示是否使用 IoU Loss   | `True` |
-| `use_matrix_nms (bool)` | 布尔值，指示是否使用 Matrix NMS | `False` |
-| `nms_score_threshold (float)` | NMS 得分阈值              | `0.005` |
-| `nms_topk (int)` | NMS 操作前保留的边界框数        | `1000` |
-| `nms_keep_topk (int)` | NMS 操作后保留的边界框数        | `100` |
-| `nms_iou_threshold (float)` | NMS IoU 阈值            | `0.45` |
+| 参数名                              | 描述                    | 默认值 |
+|----------------------------------|-----------------------| --- |
+| `num_classes (int)`              | 目标类别数量                | `80` |
+| `backbone (str)`                 | PP-YOLO Tiny的主干网络     | `'MobileNetV3'` |
+| `anchors (list[list[float]])`    | anchor box 大小列表       | `[[10, 15], [24, 36], [72, 42], [35, 87], [102, 96], [60, 170], [220, 125], [128, 222], [264, 266]]` |
+| `anchor_masks (list[list[int]])` | anchor box 掩码         | `[[6, 7, 8], [3, 4, 5], [0, 1, 2]]` |
+| `use_iou_aware (bool)`           | 布尔值，指示是否使用 IoU-aware loss | `False` |
+| `use_spp (bool)`                 | 布尔值，指示是否使用 SPP 模块     | `True` |
+| `use_drop_block (bool)`          | 布尔值，指示是否使用 DropBlock 模块 | `True` |
+| `scale_x_y (float)`              | 缩放参数                  | `1.05` |
+| `ignore_threshold (float)`       | 忽略阈值                  | `0.5` |
+| `label_smooth (bool)`            | 布尔值，指示是否使用标签平滑        | `False` |
+| `use_iou_loss (bool)`            | 布尔值，指示是否使用 IoU Loss   | `True` |
+| `use_matrix_nms (bool)`          | 布尔值，指示是否使用 Matrix NMS | `False` |
+| `nms_score_threshold (float)`    | NMS 得分阈值              | `0.005` |
+| `nms_topk (int)`                 | NMS 操作前保留的边界框数        | `1000` |
+| `nms_keep_topk (int)`            | NMS 操作后保留的边界框数        | `100` |
+| `nms_iou_threshold (float)`      | NMS IoU 阈值            | `0.45` |
 
 
 ## `PP-YOLOv2`
@@ -377,24 +377,24 @@
 基于PaddlePaddle的PP-YOLOv2实现。
 
 
-| 参数名 | 描述                  | 默认值 |
-| --- |---------------------| --- |
-| `num_classes (int)` | 目标类别数量              | `80` |
-| `backbone (str)` | PPYOLO 的骨干网络        | `'ResNet50_vd_dcn'` |
-| `anchors (List[List[float]])` | 预定义锚框的大小            | `[[10, 13], [16, 30], [33, 23], [30, 61], [62, 45], [59, 119], [116, 90], [156, 198], [373, 326]]` |
-| `anchor_masks (List[List[int]])` | 预定义锚框的掩码            | `[[6, 7, 8], [3, 4, 5], [0, 1, 2]]` |
-| `use_iou_aware (bool)` | 是否使用 IoU 感知         | `True` |
-| `use_spp (bool)` | 是否使用空间金字塔池化（ SPP ）  | `True` |
-| `use_drop_block (bool)` | 是否使用 DropBlock 正则化  | `True` |
-| `scale_x_y (float)` | 对每个预测框进行缩放的参数       | `1.05` |
-| `ignore_threshold (float)` | IoU 阈值，用于将预测框分配给真实框 | `0.7` |
-| `label_smooth (bool)` | 是否使用标签平滑            | `False` |
-| `use_iou_loss (bool)` | 是否使用 IoU Loss       | `True` |
-| `use_matrix_nms (bool)` | 是否使用 Matrix NMS     | `True` |
-| `nms_score_threshold (float)` | NMS 的分数阈值           | `0.01` |
-| `nms_topk (int)` | 在执行 NMS 之前保留的最大检测数  | `-1` |
-| `nms_keep_topk (int)`   | NMS 后要保留的最大预测框数     | `100`|
-| `nms_iou_threshold (float)` | NMS IoU 阈值          | `0.45`  |
+| 参数名                              | 描述                  | 默认值 |
+|----------------------------------|---------------------| --- |
+| `num_classes (int)`              | 目标类别数量              | `80` |
+| `backbone (str)`                 | PPYOLO 的骨干网络        | `'ResNet50_vd_dcn'` |
+| `anchors (list[list[float]])`    | 预定义锚框的大小            | `[[10, 13], [16, 30], [33, 23], [30, 61], [62, 45], [59, 119], [116, 90], [156, 198], [373, 326]]` |
+| `anchor_masks (list[list[int]])` | 预定义锚框的掩码            | `[[6, 7, 8], [3, 4, 5], [0, 1, 2]]` |
+| `use_iou_aware (bool)`           | 是否使用 IoU 感知         | `True` |
+| `use_spp (bool)`                 | 是否使用空间金字塔池化（ SPP ）  | `True` |
+| `use_drop_block (bool)`          | 是否使用 DropBlock 正则化  | `True` |
+| `scale_x_y (float)`              | 对每个预测框进行缩放的参数       | `1.05` |
+| `ignore_threshold (float)`       | IoU 阈值，用于将预测框分配给真实框 | `0.7` |
+| `label_smooth (bool)`            | 是否使用标签平滑            | `False` |
+| `use_iou_loss (bool)`            | 是否使用 IoU Loss       | `True` |
+| `use_matrix_nms (bool)`          | 是否使用 Matrix NMS     | `True` |
+| `nms_score_threshold (float)`    | NMS 的分数阈值           | `0.01` |
+| `nms_topk (int)`                 | 在执行 NMS 之前保留的最大检测数  | `-1` |
+| `nms_keep_topk (int)`            | NMS 后要保留的最大预测框数     | `100`|
+| `nms_iou_threshold (float)`      | NMS IoU 阈值          | `0.45`  |
 
 ## `YOLOv3`
 
