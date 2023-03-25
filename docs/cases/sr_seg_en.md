@@ -2,7 +2,7 @@
 
 ## 1 Project Background
 
-- I wrote a project recently: [PaddleSeg: Segmentation of aero remote sensing images using the Transfomer model](https://aistudio.baidu.com/aistudio/projectdetail/3565870), The PaddleSeg module was used to train Transfomer semantic segmentation models, and the transfomer **mIOU reached 74.50%** in the UDD6 data set, compared with 73.18% in the original paper higher **1.32%** . The training results are as follows: Red; Road: Light blue; Vegetation: dark blue; Building facade: bright green; Building roof: Purple; Other: Burnt green
+- I wrote a project recently: [PaddleSeg: Segmentation of aero remote sensing images using the Transfomer model](https://aistudio.baidu.com/aistudio/projectdetail/3565870), The PaddleSeg module was used to train Transfomer semantic segmentation models, and the transfomer **mIOU reached 74.50%** in the UDD6 data set, compared with 73.18% in the original paper higher **1.32%** . The training results are as follows: car: red; road: light blue; vegetation: dark blue; building facade: bright green; building roof: purple; other: burnt green.
 
 ```python
 %cd /home/aistudio/

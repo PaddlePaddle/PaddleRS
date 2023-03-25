@@ -1,6 +1,6 @@
-# Data transformation operator
+# Data Transformation Operator
 
-## List of PaddleRS supported data conversion operators
+## List of PaddleRS Supported Data Conversion Operators
 
 PaddleRS organically integrated data preprocessing/data augmentation (collectively called data transformation) strategies required by different remote sensing tasks, and designed a unified operator. Considering the multi-band characteristics of remote sensing images, most data processing operators of PaddleRS can process input of any number of bands. All data conversion operators currently provided by PaddleRS are listed as follows:
 
@@ -30,6 +30,6 @@ PaddleRS organically integrated data preprocessing/data augmentation (collective
 | SelectBand           | Select the band of the input image. | All tasks | ... |
 | ...                  | ... | ... | ... |
 
-## Combinatorial operator
+## Combinatorial Operator
 
 In the actual model training process, it is often necessary to combine a variety of data preprocessing and data augmentation strategies. PaddleRS provides `paddlers.transforms.Compose` operator to easily combine multiple data transformation, enables the operator to serial execution. For the specific usage of the `paddlers.transforms.Compose` please see [API Description](https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/data.md).

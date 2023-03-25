@@ -69,7 +69,7 @@ Spectral information can often reflect the features of ground objects, and diffe
 
 **Band Selection**
 
-MSI/HSI may contain a larger number of bands. For one thing, not all bands are suitable for the task at hand; On the other hand, too many bands may bring heavy resource burden. In practical applications, partial bands of MSI/HSI can be selected according to the requirements to complete the task, and methods such as PCA and wavelet transform can also be used to reduce the dimension of MSI/HSI, so as to reduce redundancy and save computing resources.
+MSI/HSI may contain a larger number of bands. For one thing, not all bands are suitable for the task at hand; on the other hand, too many bands may bring heavy resource burden. In practical applications, partial bands of MSI/HSI can be selected according to the requirements to complete the task, and methods such as PCA and wavelet transform can also be used to reduce the dimension of MSI/HSI, so as to reduce redundancy and save computing resources.
 
 ### 4.3 SAR Image
 
@@ -85,7 +85,7 @@ Due to the special imaging mechanism of SAR image, its resolution is relatively 
 
 The difference between RGBD image and RGB image is that there is an extra D channel, namely depth. Depth images are similar to grayscale images, except that each pixel value represents the actual distance of the sensor from the object. Generally, RGB data and depth data in RGBD images are registered with each other. Depth image provides height information that RGB image does not have, and can distinguish some ground objects with similar spectral characteristics in some downstream tasks.
 
-## 5 The preprocessing of Remote Sensing Image
+## 5 The Preprocessing of Remote Sensing Image
 
 Compared with natural images, the preprocessing of remote sensing images is very complicated. Specifically, it can be divided into the following steps:
 

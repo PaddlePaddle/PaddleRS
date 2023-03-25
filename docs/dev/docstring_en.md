@@ -1,6 +1,6 @@
 # PaddleRS Code Annotation Specification
 
-## 1 Annotation specification
+## 1 Annotation Specification
 
 The docstring of the function consists of five modules:
 
@@ -20,7 +20,7 @@ Class docstring also consists of five modules:
 
 The specifications for each module are described in detail below.
 
-### 1.1 Function/class function description
+### 1.1 Function/Class Function Description
 
 The goal is for the user to understand it quickly. The module can be disassembled into 3 parts, function description + calculation formula + annotation.
 
@@ -41,7 +41,7 @@ Example:
 """
 ```
 
-### 1.2 Function arguments/class construction arguments
+### 1.2 Function Arguments/Class Construction Arguments
 
 Explain clearly the **type**, **meaning** and **default value** (if any) for each parameter.
 
@@ -67,7 +67,7 @@ Example:
 """
 ```
 
-### 1.3 Return value/construct object
+### 1.3 Return Value/Construct Object
 
 For a function return value, first describe the type of the return value (surrounded by `()`, with the same syntax as the parameter type description), and then explain the meaning of the return value. There is no need to specify the type of the object obtained by instantiating the class.
 
@@ -98,7 +98,7 @@ Example 3 (In the class definition):
 """
 ```
 
-### 1.4 Exceptions that may be thrown
+### 1.4 Exceptions That May Be Thrown
 
 You need to give the exception type and the conditions under which it is thrown.
 
@@ -112,7 +112,7 @@ Example:
 """
 ```
 
-### 1.5 Usage example
+### 1.5 Usage Example
 
 Provide as many examples as possible for various usage scenarios of the function or class, and give the expected results of executing the code in the comments.
 
@@ -188,7 +188,7 @@ Multi examples:
 - The sentences are smooth and in line with English grammar.
 - The document should be consistent in the expression of the same thing, for example, avoid using label sometimes and ground truth sometimes.
 
-### 1.7 Other points to note
+### 1.7 Other Points to Note
 
 - Different modules are separated by **1** blank lines.
 - Pay attention to capitalizing the first letter and punctuation (especially period **.**) in accordance with English grammar rules.
@@ -197,7 +197,7 @@ Multi examples:
 - Line breaks and indentation are required between each module's title/subtitle and the concrete content, and **1** blank lines are inserted between the `Examples:` title and the sample code content.
 - Suspension indentation is required when a single paragraph description spans lines.
 
-## 2 Complete docstring example
+## 2 Complete docstring Example
 
 ```python
 class Activation(nn.Layer):

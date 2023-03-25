@@ -28,7 +28,7 @@ The requirements of `CDDataset` for the file list are as follows:
 
 ### Scenario Classification Dataset `ClasDataset`
 
-`ClasDataset` is define in: https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/datasets/clas_dataset.py
+`ClasDataset` is defined in: https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/datasets/clas_dataset.py
 
 The initialization parameter list is as follows:
 
@@ -47,7 +47,7 @@ The requirements of `ClasDataset` for the file list are as follows:
 
 ### COCO Format Object Detection Dataset `COCODetDataset`
 
-`COCODetDataset` is define in: https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/datasets/coco.py
+`COCODetDataset` is defined in: https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/datasets/coco.py
 
 The initialization parameter list is as follows:
 
@@ -65,7 +65,7 @@ The initialization parameter list is as follows:
 
 ### VOC Format Object Detection Dataset `VOCDetDataset`
 
-`VOCDetDataset` is define in: https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/datasets/voc.py
+`VOCDetDataset` is defined in: https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/datasets/voc.py
 
 The initialization parameter list is as follows:
 
@@ -86,7 +86,7 @@ The requirements of `VOCDetDataset` for the file list are as follows:
 
 ### Image Restoration Dataset `ResDataset`
 
-`ResDataset` is define in: https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/datasets/res_dataset.py
+`ResDataset` is defined in: https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/datasets/res_dataset.py
 
 The initialization parameter list is as follows:
 
@@ -138,13 +138,13 @@ The argument list of `decode_image()` function is as follows:
 |`decode_bgr`|`bool`|If `True`, automatically parses non-geo format images (such as jpeg images) into BGR format.|`True`|
 |`decode_sar`|`bool`|If `True`, single-channel geo-format images (such as GeoTiff images) are automatically parsed as SAR images.|`True`|
 |`read_geo_info`|`bool`|If `True`, the geographic information is read from the image.|`False`|
-|`use_stretch`|`bool`|Whether to stretch the image brightness by 2% linear. Take effect only if `to_uint8` is `True`.|`False`|
+|`use_stretch`|`bool`|Whether to apply a linear stretch to image image brightness (with 2% max and min values removed). Take effect only if `to_uint8` is `True`.|`False`|
 |`read_raw`|`bool`|If `True`, it is equivalent to specifying `to_rgb` as `True` and `to_uint8` as `False`, and this parameter has a higher priority than the above.|`False`|
 
 The return format is as follows:
 
 - If `read_geo_info` is `False`, the image data ([h, w, c] arrangement) is returned in the format of np.ndarray.
-- If `read_geo_info` is `True`, a binary group is returned, in which the first element is the image data read, the second element is a dictionary, in which the key-value pair is the geographic information of the image, such as geographic transformation information, geographic projection information, etc.
+- If `read_geo_info` is `True`, return a tuple consisting of two elements. The first element is the image data, and the second element is a dictionary containing the geographic information of the image, such as the geotransform information and geographic projection information.
 
 ## Data Transformation Operator
 
@@ -152,7 +152,7 @@ In PaddleRS a series of classes are defined that, when instantiated, perform cer
 
 ### `Transform`
 
-The `__call__` method of the `Transform` object takes a unique argument `sample`. `sample` must be a dictionary or a sequence of dictionaries. When `sample` is a sequence, perform data transformations for each dictionary in `sample` and return the results sequentially stored in a Python build-in list; When `sample` is a dictionary, the `Transform` object extracts input from some of its key-value pairs (these keys are called "input keys"), performs the transformation, and writes the results as key-value pairs into `sample`(these keys are called "output keys"). It should be noted that many of the `Transform` objects in PaddleRS currently have a carbon copy behavior, that is, an intersection between the input key and the output key. The common key names in `sample` and their meanings are as follows:
+The `__call__` method of the `Transform` object takes a unique argument `sample`. `sample` must be a dictionary or a sequence of dictionaries. When `sample` is a sequence, perform data transformations for each dictionary in `sample` and return the results sequentially stored in a Python build-in list; when `sample` is a dictionary, the `Transform` object extracts input from some of its key-value pairs (these keys are called "input keys"), performs the transformation, and writes the results as key-value pairs into `sample`(these keys are called "output keys"). It should be noted that many of the `Transform` objects in PaddleRS overwrite key-value pairs, that is, there is an intersection between the input key and the output key. The common keys in `sample` and their meanings are as follows:
 
 |Key Name|Description|
 |----|----|
@@ -160,7 +160,7 @@ The `__call__` method of the `Transform` object takes a unique argument `sample`
 |`'image2'`|Second phase image data in change detection task.|
 |`'image_t1'`|First phase image path in change detection task.|
 |`'image_t2'`|Second phase image path in change detection task.|
-|`'mask'`|Truth label path or data in image segmentation/change detection task.|
+|`'mask'`|Ground-Truth label path or data in image segmentation/change detection task.|
 |`'aux_masks'`|Auxiliary label path or data in image segmentation/change detection tasks.|
 |`'gt_bbox'`|Detection box labeling data in object detection task.|
 |`'gt_poly'`|Polygon labeling data in object detection task.|
@@ -180,7 +180,7 @@ train_transforms = T.Compose([
     T.Resize(target_size=512),
     # Perform a random horizontal flip with a 50% probability
     T.RandomHorizontalFlip(prob=0.5),
-    # Normalized data to [-1,1]
+    # Normalize data to [-1,1]
     T.Normalize(
         mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
     # Select and organize the information that needs to be used later
@@ -188,9 +188,9 @@ train_transforms = T.Compose([
 ])
 ```
 
-Generally, in the list of `Compose` object accepted data transform operators, the first element is `paddlers.Transforms.DecodeImg` object, used to read image data; The last element is [`Arrange` Operator](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/transforms/operators.py, used to extract and arrange information from the `sample` dictionary.
+Generally, in the list of data transform operators accepted by a `Compose` object, the first element is `paddlers.Transforms.DecodeImg` object, used to read image data; the last element is [`Arrange` Operator](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/transforms/operators.py, used to extract and arrange information from the `sample` dictionary.
 
-For the verification set of image segmentation task and change detection task, the `ReloadMask` operator can be inserted before the `Arrange` operator to reload the GT label. The following is an example:
+For the validation dataset of image segmentation task and change detection task, the `ReloadMask` operator can be inserted before the `Arrange` operator to reload the Ground-Truth label. The following is an example:
 
 ```python
 eval_transforms = T.Compose([

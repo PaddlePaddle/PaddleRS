@@ -17,7 +17,7 @@ At present, coco_tools has 6 files, each file and its functions are as follows:
 - `json_Split.py`:       Divide the json file into train sets and val sets.
 - `json_Merge.py`:       Merge multiple json files into one.
 
-## 3 Usage example
+## 3 Usage Example
 
 ### 3.1 Sample Dataset
 
@@ -434,7 +434,7 @@ json keys: dict_keys(['images', 'categories'])
 ...
 ```
 
-### 3.6 json file splitting
+### 3.6 json File Splitting
 
 Using `json_Split.py`, you can split the `instances_val2017.json` file into 2 subsets.
 
@@ -488,7 +488,7 @@ image total 5000, train 4500, val 500
 anno total 36781, train 33119, val 3662
 ```
 
-### 3.7 json file merging
+### 3.7 json File Merging
 
 Using `json_Merge.py` to merge two json files.
 

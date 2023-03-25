@@ -124,6 +124,6 @@ bash check_coverage.sh
 
 If your contribution includes TIPC, please submit your PR with a log indicating successful execution of the TIPC basic training chain.
 
-## Contribution an Example
+## Contribute an Example
 
 tbd

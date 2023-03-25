@@ -2,15 +2,15 @@
 
 ## 0 Catalog
 
-- [Add Remote sensing special model](#1-Add Remote sensing special model)
+- [Add Remote Sensing Special Model](#1-Add Remote Sensing Special Model)
 
-- [Add data preprocessing data enhancement function or operator](#2-Add data preprocessing data enhancement function or operator)
+- [Add Data Preprocessing Data Augmentation Function or Operator](#2-Add Data Preprocessing Data Augmentation Function or Operator)
 
-- [Add remote sensing image processing tools](#3-Add remote sensing image processing tools)
+- [Add Remote Sensing Image Processing Tools](#3-Add Remote Sensing Image Processing Tools)
 
-## 1 Add Remote sensing special model
+## 1 Add Remote Sensing Special Model
 
-### 1.1 Edit model definitions
+### 1.1 Edit Model Definitions
 
 First, find the subdirectory (package) corresponding to the task in `paddlers/rs_models`. The mapping between the task and the subdirectory is as follows:
 
@@ -64,14 +64,14 @@ Please follow these steps:
 2. Locate the trainer definition file corresponding to the task in the `paddlers/tasks` directory (for example, the change detection task corresponds to `paddlers/tasks/change_detector.py`).
 
 3. Appends the new trainer definition to the end of the file. The trainer inherits from the related base class (such as `BaseChangeDetector`), overriding the `__init__()` method, and overriding other methods as needed. The trainer's `__init__()` method is written with the following requirements:
-    - For tasks such as change detection, scene classification, object detection and image segmentation, the first input parameter of `__init__()` method is `num_classes`, which represents the number of model output classes. For the tasks of change detection, scene classification and image segmentation, the second input parameter is `use_mixed_loss`, indicating whether the user uses the default definition of mixing loss. The third input parameter is `losses`, which represents the loss function used in training. For the image restoration task, the first parameter is `losses`, meaning the same as above; The second parameter is `rs_factor`, which represents the super resolution scaling ratio; The third parameter is `min_max`, which represents the numeric range of the input and output images.
+    - For tasks such as change detection, scene classification, object detection and image segmentation, the first input parameter of `__init__()` method is `num_classes`, which represents the number of model output classes. For the tasks of change detection, scene classification and image segmentation, the second input parameter is `use_mixed_loss`, indicating whether the user uses the default definition of mixing loss. The third input parameter is `losses`, which represents the loss function used in training. For the image restoration task, the first parameter is `losses`, meaning the same as above; the second parameter is `rs_factor`, which represents the super resolution scaling ratio; the third parameter is `min_max`, which represents the numeric range of the input and output images.
     - All input parameters of `__init__()` must have default values, and **in this case, the model receives 3-channel RGB input.**
     - In `__init__()` you need to update the `params` dictionary, whose key-value pairs will be used as input parameters during model construction.
 
 4. Add the class name of the new trainer to the global variable `__all__`.
 
 It should be noted that for the image restoration task, the forward and reverse logic of the model are implemented in the trainer definition. For GAN and other models that need to use multiple networks, please refer to the following specifications for the preparation of the trainer:
-- Override the `build_net()` method to maintain all networks using the `GANAdapter`. The `GANAdapter` object takes two lists as input when it is constructed: the first list contains all generators, where the first element is the main generator; The second list contains all discriminators.
+- Override the `build_net()` method to maintain all networks using the `GANAdapter`. The `GANAdapter` object takes two lists as input when it is constructed: the first list contains all generators, where the first element is the main generator; the second list contains all discriminators.
 - Override the `default_loss()` method to build the loss function. If more than one loss function is required in the training process, it is recommended to organize in the form of a dictionary.
 - Override the `default_optimizer()` method to build one or more optimizers. When `build_net()` returns a value of type `GANAdapter`, `parameters` is a dictionary. Where, `parameters['params_g']` is a list containing the state dict of the various generators in order; `parameters['params_d']` is a list that contains the state dict of the individual discriminators in order. If you build more than one optimizer, you should use the `OptimizerAdapter` wrapper on return.
 - Override the `run_gan()` method that accepts four parameters: `net`, `inputs`, `mode`, and `gan_mode` for one of the subtasks in the training process, e.g. forward calculation of generator, forward calculation of discriminator, etc.
@@ -79,13 +79,13 @@ It should be noted that for the image restoration task, the forward and reverse 
 
 See `ESRGAN` for specific examples of GAN trainers.
 
-## 2 Add data preprocessing data enhancement function or operator
+## 2 Add Data Preprocessing Data Augmentation Function or Operator
 
-### 2.1 Add data preprocessing/data enhancement functions
+### 2.1 Add Data Preprocessing/Data Augmentation Functions
 
 Define new function in `paddlers/transforms/functions.py`. If the function needs to be exposed and made available to users, you must add a docstring to it.
 
-### 2.2 Add data preprocessing/data enhancement operators
+### 2.2 Add Data Preprocessing/Data Augmentation Operators
 
 Define new operators in `paddlers/transforms/operators.py`, all operators are inherited from `paddlers.transforms.Transform`. The operator's `apply()` method receives a dictionary `sample` as input, takes out the related objects stored in it, and makes in-place modifications to the dictionary after processing, and finally returns the modified dictionary. Only in rare cases do we need to override the `apply()` method when defining an operator. In most cases, you just need to override the `apply_im()`, `apply_mask()`, `apply_bbox()`, and `apply_segm()` methods to handle the image, split label, target box, and target polygon, respectively.
 
@@ -93,7 +93,7 @@ If processing logic is more complicated, it is recommended that the encapsulated
 
 After writing the implementation of the operator, **must write docstring and add the class name in `__all__`.**
 
-## 3 Add remote sensing image processing tools
+## 3 Add Remote Sensing Image Processing Tools
 
 Remote sensing image processing tools are stored in the `tools/` directory. Each tool should be a relatively independent script, independent of the contents of the `paddlers/` directory, which can be executed by the user without installing PaddleRS.
 
