@@ -271,8 +271,8 @@
 | `n_feats (int)`                        | 残差块中的特征维度                                                                              | `16`  |
 | `n_colors (int)`                       | 图像通道数                                                                                  | `3`   |
 | `rgb_range (float)`                    | 图像像素值的范围                                                                               | `1.0` |
-| `negval (float)`                       | 用于激活函数中的负数值的处理                                                                          | `0.2` |
-| `lq_loss_weight (float)`               | 低质量图像损失的权重                                                                             | `0.1` |
+| `negval (float)`                       | 用于激活函数中的负数值的处理                                                                         | `0.2` |
+| `lq_loss_weight (float)`               | 低质量图像损失的权重，用来控制将低分辨率的输入图像恢复成高分辨率的输出图像的重构损失对于总体损失的影响程度。                                            | `0.1` |
 | `dual_loss_weight (float)`             | 双重损失的权重                                                                                | `0.1` |
 
 ## `ESRGAN`
