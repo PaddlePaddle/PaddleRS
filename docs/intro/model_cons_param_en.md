@@ -10,7 +10,7 @@ The original article refers to H. Chen, et al., "Remote Sensing Image Change Det
 
 This implementation adopts pretrained encoders, as opposed to the original work where weights are randomly initialized.
 
-| parameter name | description                                                                                                                                  | default value |
+| Parameter name | Description                                                                                                                                  | Default value |
 |-----------------|----------------------------------------------------------------------------------------------------------------------------------------------|-------------|
 | `in_channels (int)` | Number of channels of the input image                                                                                                          | `3` |
 | `num_classes (int)` | Number of target classes                                                                                                                     | `2` |
@@ -36,9 +36,9 @@ The CDNet implementation based on PaddlePaddle.
 
 The original article refers to Pablo F. Alcantarilla, et al., "Street-View Change Detection with Deconvolut ional Networks"(https://link.springer.com/article/10.1007/s10514-018-9734-5).
 
-| parameter name          | description                                                                                        | default value |
+| Parameter name          | Description                                                                                        | Default value |
 |-------------------------|----------------------------------------------------------------------------------------------------| ---------- |
-| `num_classes (int)`     | Number of classes, usually for binary classification problems                                      | `2` |
+| `num_classes (int)`     | Number of target classes                                     | `2` |
 | `use_mixed_loss (bool)` | Whether to use mixed loss function                                                                 | `False` |
 | `losses (list)`         | List of loss functions                                                                             | `None` |
 | `in_channels (int)`     | Number of channels of the input image                                                              | `6` |
@@ -49,7 +49,7 @@ The ChangeFormer implementation based on PaddlePaddle.
 
 The original article refers to Wele Gedara Chaminda Bandara，Vishal M. Patel，“A TRANSFORMER-BASED SIAMESE NETWORK FOR CHANGE DETECTION”(https://arxiv.org/pdf/2201.01293.pdf)。
 
-| parameter name | description                                                                 | default value |
+| Parameter name | Description                                                                 | Default value |
 |--------------------------------|-----------------------------------------------------------------------------|--------------|
 | `num_classes (int)` | Number of target classes                                                    | `2` |
 | `use_mixed_loss (bool)` | Whether to use mixed loss                                                   | `False` |
@@ -64,12 +64,12 @@ The ChangeStar implementation with a FarSeg encoder based on PaddlePaddle.
 
 The original article refers to Z. Zheng, et al., "Change is Everywhere: Single-Temporal Supervised Object Change Detection in Remote Sensing Imagery"(https://arxiv.org/abs/2108.07002).
 
-| parameter name          | description                                                         | default value |
+| Parameter name          | Description                                                         | Default value |
 |-------------------------|---------------------------------------------------------------------|-------------|
 | `num_classes (int)`     | Number of target classes                                            | `2` |
 | `use_mixed_loss (bool)` | Whether to use mixed loss                                           | `False` |
 | `losses (list)`         | List of loss functions                                              | `None` |
-| `mid_channels (int)`    | The number of channels in the middle layer of UNet                  | `256` |
+| `mid_channels (int)`    | Number of channels in the middle layer of UNet                      | `256` |
 | `inner_channels (int)`  | Number of channels inside the attention module                      | `16` |
 | `num_convs (int)`       | Number of convolutional layers in UNet encoder and decoder          | `4` |
 | `scale_factor (float)`  | Upsampling factor to scale the size of the output segmentation mask | `4.0` |
@@ -80,7 +80,7 @@ The DSAMNet implementation based on PaddlePaddle.
 
 The original article refers to Q. Shi, et al., "A Deeply Supervised Attention Metric-Based Network and an Open Aerial Image Dataset for Remote Sensing Change Detection"(https://ieeexplore.ieee.org/document/9467555).
 
-| parameter name | description                                                                                                                     | default value |
+| Parameter name | Description                                                                                                                     | Default value |
 |-----------------------|---------------------------------------------------------------------------------------------------------------------------------|-------|
 | `num_classes (int)` | Number of target classes                                                                                                        | `2` |
 | `use_mixed_loss (bool)` | Whether to use mixed loss                                                                                                       | `False`|
@@ -95,7 +95,7 @@ The DSIFN implementation based on PaddlePaddle.
 
 The original article refers to C. Zhang, et al., "A deeply supervised image fusion network for change detection in high resolution bi-temporal remote sensing images"(https://www.sciencedirect.com/science/article/pii/S0924271620301532).
 
-| parameter name | description                                                                                        | default value |
+| Parameter name | Description                                                                                        | Default value |
 |-----------------------|----------------------------------------------------------------------------------------------------|-------|
 | `num_classes (int)` | Number of target classes                                                                           | `2` |
 | `use_mixed_loss (bool)` | Whether to use mixed loss                                                                          | `False`|
@@ -108,7 +108,7 @@ The FC-EF implementation based on PaddlePaddle.
 
 The original article refers to Rodrigo Caye Daudt, et al. "Fully convolutional siamese networks for change detection"(https://arxiv.org/abs/1810.08462)`.
 
-| parameter name          | description                           | default value |
+| Parameter name          | Description                           | Default value |
 |-------------------------|---------------------------------------|-------|
 | `num_classes (int)`     | Number of target classes              | `2` |
 | `use_mixed_loss (bool)` | Whether to use mixed loss             | `False`|
@@ -122,7 +122,7 @@ The FC-Siam-conc implementation based on PaddlePaddle.
 
 The original article refers to Rodrigo Caye Daudt, et al. "Fully convolutional siamese networks for change detection"(https://arxiv.org/abs/1810.08462).
 
-| parameter name          | description                                                                                                                     | default value |
+| Parameter name          | Description                                                                                                                     | Default value |
 |-------------------------|---------------------------------------------------------------------------------------------------------------------------------|-------|
 | `num_classes (int)`     | Number of target classes                                                                                                        | `2` |
 | `use_mixed_loss (bool)` | Whether to use mixed loss                                                                                                       | `False`|
@@ -136,7 +136,7 @@ The FC-Siam-diff implementation based on PaddlePaddle.
 
 The original article refers to Rodrigo Caye Daudt, et al. "Fully convolutional siamese networks for change detection"(https://arxiv.org/abs/1810.08462).
 
-| parameter name          | description                                                                                      | default value |
+| Parameter name          | Description                                                                                      | Default value |
 |-------------------------|--------------------------------------------------------------------------------------------------| --- |
 | `num_classes (int)`     | Number of target classes                                                  | `2` |
 | `use_mixed_loss (bool)` | Whether to use mixed loss function                       |`False` |
@@ -150,7 +150,7 @@ The FCCDN implementation based on PaddlePaddle.
 
 The original article refers to Pan Chen, et al., "FCCDN: Feature Constraint Network for VHR Image Change Detection"(https://arxiv.org/pdf/2105.10860.pdf).
 
-| parameter name | description                           | default value |
+| Parameter name | Description                           | Default value |
 |--------------------------|---------------------------------------|-------|
 | `in_channels (int)` | Number of channels of the input image | `3` |
 | `num_classes (int)` | Number of target classes              | `2` |
@@ -163,7 +163,7 @@ The P2V-CD implementation based on PaddlePaddle.
 
 The original article refers to M. Lin, et al. "Transition Is a Process: Pair-to-Video Change Detection Networks for Very High Resolution Remote Sensing Images"(https://ieeexplore.ieee.org/document/9975266).
 
-| parameter name          | description                           | default value |
+| Parameter name          | Description                           | Default value |
 |-------------------------|---------------------------------------|-------|
 | `num_classes (int)`     | Number of target classes              | `2` |
 | `use_mixed_loss (bool)` | Whether to use mixed loss             | `False`|
@@ -177,7 +177,7 @@ The SNUNet implementation based on PaddlePaddle.
 
 The original article refers to S. Fang, et al., "SNUNet-CD: A Densely Connected Siamese Network for Change Detection of VHR Images" (https://ieeexplore.ieee.org/document/9355573).
 
-| arg_name               | description                                     | default  |
+| arg_name               | Description                                     | default  |
 |------------------------|-------------------------------------------------|------|
 | `in_channels (int)`    | Number of channels of the input image           |      |
 | `num_classes（int)`      | Number of target classes                        |      |
@@ -189,7 +189,7 @@ The STANet implementation based on PaddlePaddle.
 
 The original article refers to  H. Chen and Z. Shi, "A Spatial-Temporal Attention-Based Method and a New Dataset for Remote Sensing Image Change Detection"(https://www.mdpi.com/2072-4292/12/10/1662).
 
-| parameter name          | description                              | default value |
+| Parameter name          | Description                              | Default value |
 |-------------------------|------------------------------------------| --- |
 | `num_classes (int)`     | Number of target classes                 | `2` |
 | `use_mixed_loss (bool)` | Whether to use mixed loss                | `False` |
@@ -201,19 +201,19 @@ The original article refers to  H. Chen and Z. Shi, "A Spatial-Temporal Attentio
 
 The CondenseNetV2 implementation based on PaddlePaddle.
 
-| parameter name          | description | default value |
-|-------------------------| --- | --- |
-| `num_classes (int)`     | Number of target classes| `2` |
-| `use_mixed_loss (bool)` | Whether to use mixed loss function | `False` |
-| `losses (list)`         | List of loss functions | `None` |
-| `in_channels (int)`     | Number of channels of the input image | `3` |
-| `arch (str)`            | The architecture of the model, can be `'A'`, `'B'` or `'C'` | `'A'` |
+| Parameter name          | Description                                             | Default value |
+|-------------------------|---------------------------------------------------------| --- |
+| `num_classes (int)`     | Number of target classes                                | `2` |
+| `use_mixed_loss (bool)` | Whether to use mixed loss function                      | `False` |
+| `losses (list)`         | List of loss functions                                  | `None` |
+| `in_channels (int)`     | Number of channels of the input image                   | `3` |
+| `arch (str)`            | Architecture of the model, can be `'A'`, `'B'` or `'C'` | `'A'` |
 
 ##  `HRNet`
 
 The HRNet implementation based on PaddlePaddle.
 
-| parameter name          | description                        | default value |
+| Parameter name          | Description                        | Default value |
 |-------------------------|------------------------------------| --- |
 | `num_classes (int)`     | Number of target classes           | `2` |
 | `use_mixed_loss (bool)` | Whether to use mixed loss function | `False` |
@@ -224,7 +224,7 @@ The HRNet implementation based on PaddlePaddle.
 
 The MobileNetV3 implementation based on PaddlePaddle.
 
-| parameter name          | description | default value |
+| Parameter name          | Description | Default value |
 |-------------------------| --- | --- |
 | `num_classes (int)`     | Number of target classes| `2` |
 | `use_mixed_loss (bool)` | Whether to use mixed loss function | `False` |
@@ -235,7 +235,7 @@ The MobileNetV3 implementation based on PaddlePaddle.
 
 The ResNet50-vd implementation based on PaddlePaddle.
 
-| parameter name          | description | default value |
+| Parameter name          | Description | Default value |
 |-------------------------| --- | --- |
 | `num_classes (int)`     | Number of target classes | `2` |
 | `use_mixed_loss (bool)` | Whether to use mixed loss function | `False` |
@@ -245,7 +245,7 @@ The ResNet50-vd implementation based on PaddlePaddle.
 
 The DRN implementation based on PaddlePaddle.
 
-| parameter name                          | description                                                                                                                                                                                                         | default value |
+| Parameter name                          | Description                                                                                                                                                                                                         | Default value |
 |-----------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------|
 | `losses (list)`                         | List of loss functions                                                                                                                                                                                              | `None` |
 | `sr_factor (int)`                       | Scaling factor for super-resolution, the size of the original image will be multiplied by this factor. For example, if the original image is `H` x `W`, the output image will be `sr_factor * H` x `sr_factor * W`. | `4` |
@@ -256,7 +256,7 @@ The DRN implementation based on PaddlePaddle.
 | `n_colors (int)`                        | Number of image channels                                                                                                                                                                                            | `3` |
 | `rgb_range (float)`                     | Range of image pixel values                                                                                                                                                                                         | `1.0` |
 | `negval (float)`                        | Negative value in nonlinear mapping                                                                                                                                                                                 | `0.2` |
-| `Supplementary description of `lq_loss_weight` parameter (float)`                | The weight of the low-quality image loss, which is used to control the impact of the reconstruction loss on the overall loss of restoring the low-resolution input image into a high-resolution output image.                                                                                                                                                                                    | `0.1` |
+| `Supplementary Description of `lq_loss_weight` parameter (float)`                | Weight of the low-quality image loss, which is used to control the impact of the reconstruction loss on the overall loss of restoring the low-resolution input image into a high-resolution output image.           | `0.1` |
 | `dual_loss_weight (float)`              | The weight of the bilateral loss                                                                                                                                                                                    | `0.1` |
 
 
@@ -264,7 +264,7 @@ The DRN implementation based on PaddlePaddle.
 
 The ESRGAN implementation based on PaddlePaddle.
 
-| parameter name       | description                                                                                                                                                                                              | default value |
+| Parameter name       | Description                                                                                                                                                                                              | Default value |
 |----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| --- |
 | `losses (list)`      | List of loss functions                                                                                                                                 | `None` |
 | `sr_factor (int)`    | Scaling factor for super-resolution, the size of the original image will be multiplied by this factor. For example, if the original image is `H` x `W`, the output image will be `sr_factor * H` x `sr_factor * W` | `4` |
@@ -279,7 +279,7 @@ The ESRGAN implementation based on PaddlePaddle.
 
 The LESRCNN implementation based on PaddlePaddle.
 
-| parameter name       | description                                                                                                                                                                                                     | default value |
+| Parameter name       | Description                                                                                                                                                                                                     | Default value |
 |----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| --- |
 | `losses (list)`      | List of loss functions                                                                                                                                                                                                                | `None` |
 | `sr_factor (int)`    | Scaling factor for super-resolution, the size of the original image will be multiplied by this factor. For example, if the original image is `H` x `W`, the output image will be `sr_factor * H` x `sr_factor * W`. | `4` |
@@ -291,28 +291,28 @@ The LESRCNN implementation based on PaddlePaddle.
 
 The Faster R-CNN implementation based on PaddlePaddle.
 
-| parameter name                | description | default value |
-|-------------------------------| --- | --- |
-| `num_classes (int)`           | Number of target classes | `80` |
-| `backbone (str)`              | The backbone network model to use | `'ResNet50'` |
-| `with_fpn (bool)`             | Boolean indicating whether to use Feature Pyramid Network (FPN) | `True` |
-| `with_dcn (bool)`             | Boolean indicating whether to use Deformable Convolutional Networks (DCN) | `False` |
-| `aspect_ratios (list)`        | List of aspect ratios of candidate boxes | `[0.5, 1.0, 2.0]` |
-| `anchor_sizes (list)`         | A list of sizes of candidate boxes expressed as base sizes on each feature map | `[[32], [64], [128], [256], [512]]` |
-| `keep_top_k (int)`            | Number of predicted boxes to keep before NMS operation | `100` |
-| `nms_threshold (float)`       | The non-maximum suppression (NMS) threshold to use | `0.5` |
-| `score_threshold (float)`     | Score threshold for filtering predicted boxes | `0.05` |
-| `fpn_num_channels (int)`      | The number of channels for each pyramid layer in the FPN network | `256` |
-| `rpn_batch_size_per_im (int)` | The ratio of positive and negative samples per image in the RPN network | `256` |
-| `rpn_fg_fraction (float)`     | Fraction of foreground samples in RPN network | `0.5` |
-| `test_pre_nms_top_n (int)`    | The number of predicted boxes to keep before NMS operation when testing. If not specified, `keep_top_k` is used. | `None` |
-| `test_post_nms_top_n (int)`   | The number of predicted boxes to keep after NMS operation at test time | `1000` |
+| Parameter name                | Description                                                                                                  | Default value |
+|-------------------------------|--------------------------------------------------------------------------------------------------------------| --- |
+| `num_classes (int)`           | Number of target classes                                                                                     | `80` |
+| `backbone (str)`              | Backbone network model to use                                                                                | `'ResNet50'` |
+| `with_fpn (bool)`             | Boolean indicating whether to use Feature Pyramid Network (FPN)                                              | `True` |
+| `with_dcn (bool)`             | Boolean indicating whether to use Deformable Convolutional Networks (DCN)                                    | `False` |
+| `aspect_ratios (list)`        | List of aspect ratios of candidate boxes                                                                     | `[0.5, 1.0, 2.0]` |
+| `anchor_sizes (list)`         | A list of sizes of candidate boxes expressed as base sizes on each feature map                               | `[[32], [64], [128], [256], [512]]` |
+| `keep_top_k (int)`            | Number of predicted boxes to keep before NMS operation                                                       | `100` |
+| `nms_threshold (float)`       | Non-maximum suppression (NMS) threshold to use                                                               | `0.5` |
+| `score_threshold (float)`     | Score threshold for filtering predicted boxes                                                                | `0.05` |
+| `fpn_num_channels (int)`      | Number of channels for each pyramid layer in the FPN network                                                 | `256` |
+| `rpn_batch_size_per_im (int)` | Ratio of positive and negative samples per image in the RPN network                                          | `256` |
+| `rpn_fg_fraction (float)`     | Fraction of foreground samples in RPN network                                                                | `0.5` |
+| `test_pre_nms_top_n (int)`    | Number of predicted boxes to keep before NMS operation when testing. If not specified, `keep_top_k` is used. | `None` |
+| `test_post_nms_top_n (int)`   | Number of predicted boxes to keep after NMS operation at test time                                           | `1000` |
 
 ## `PP-YOLO`
 
 The PP-YOLO implementation based on PaddlePaddle.
 
-| parameter name                   | description                                                        | default value |
+| Parameter name                   | Description                                                        | Default value |
 |----------------------------------|--------------------------------------------------------------------| --- |
 | `num_classes (int)`              | Number of target classes                                           | `80` |
 | `backbone (str)`                 | PPYOLO's backbone network                                          | `'ResNet50_vd_dcn'` |
@@ -336,7 +336,7 @@ The PP-YOLO implementation based on PaddlePaddle.
 
 The PP-YOLO Tiny implementation based on PaddlePaddle.
 
-| parameter name                   | description                                                 | default value |
+| Parameter name                   | Description                                                 | Default value |
 |----------------------------------|-------------------------------------------------------------| --- |
 | `num_classes (int)`              | Number of target classes                                    | `80` |
 | `backbone (str)`                 | Backbone network model name to use                          | `'MobileNetV3'` |
@@ -359,7 +359,7 @@ The PP-YOLO Tiny implementation based on PaddlePaddle.
 
 The PP-YOLOv2 implementation based on PaddlePaddle.
 
-| parameter name                   | description | default value |
+| Parameter name                   | Description | Default value |
 |----------------------------------| --- | --- |
 | `num_classes (int)`              | Number of target classes | `80` |
 | `backbone (str)`                 | PPYOLO's backbone network | `'ResNet50_vd_dcn'` |
@@ -382,24 +382,24 @@ The PP-YOLOv2 implementation based on PaddlePaddle.
 
 The YOLOv3 implementation based on PaddlePaddle.
 
-| parameter name | description | default value |
-| --- | --- | --- |
-| `num_classes (int)` | Number of target classes | `80` |
-| `backbone (str)` | The name of the feature extraction network | `'MobileNetV1'` |
-| `anchors (list[list[int]])` | Sizes of all anchor boxes| `[[10, 13], [16, 30], [33, 23], [30, 61], [62, 45 ], [59, 119], [116, 90], [156, 198], [373, 326]]` |
-| `anchor_masks (list[list[int]])` | Which anchor boxes to use to predict the target box| `[[6, 7, 8], [3, 4, 5], [0, 1, 2]]` |
-| `ignore_threshold (float)` | The IoU threshold of the predicted box and the ground truth box, below which the threshold will be considered as the background | `0.7` |
-| `nms_score_threshold (float)` | In non-maximum suppression, score threshold below which boxes will be discarded | `0.01` |
-| `nms_topk (int)` | In non-maximum value suppression, the maximum number of scoring boxes to keep, if it is -1, all boxes are kept | `1000` |
-| `nms_keep_topk (int)` | In non-maximum value suppression, the maximum number of boxes to keep per image | `100` |
-| `nms_iou_threshold (float)` | In non-maximum value suppression, IoU threshold, boxes larger than this threshold will be discarded | `0.45` |
-| `label_smooth (bool)` | Whether to use label smoothing when computing loss | `False` |
+| Parameter name | Description                                                                                                                 | Default value |
+| --- |-----------------------------------------------------------------------------------------------------------------------------| --- |
+| `num_classes (int)` | Number of target classes                                                                                                    | `80` |
+| `backbone (str)` | Name of the feature extraction network                                                                                      | `'MobileNetV1'` |
+| `anchors (list[list[int]])` | Sizes of all anchor boxes                                                                                                   | `[[10, 13], [16, 30], [33, 23], [30, 61], [62, 45 ], [59, 119], [116, 90], [156, 198], [373, 326]]` |
+| `anchor_masks (list[list[int]])` | Which anchor boxes to use to predict the target box                                                                         | `[[6, 7, 8], [3, 4, 5], [0, 1, 2]]` |
+| `ignore_threshold (float)` | IoU threshold of the predicted box and the ground truth box, below which the threshold will be considered as the background | `0.7` |
+| `nms_score_threshold (float)` | In non-maximum suppression, score threshold below which boxes will be discarded                                             | `0.01` |
+| `nms_topk (int)` | In non-maximum value suppression, the maximum number of scoring boxes to keep, if it is -1, all boxes are kept              | `1000` |
+| `nms_keep_topk (int)` | In non-maximum value suppression, the maximum number of boxes to keep per image                                             | `100` |
+| `nms_iou_threshold (float)` | In non-maximum value suppression, IoU threshold, boxes larger than this threshold will be discarded                         | `0.45` |
+| `label_smooth (bool)` | Whether to use label smoothing when computing loss                                                                          | `False` |
 
 ##  `BiSeNet V2`
 
 The BiSeNet V2 implementation based on PaddlePaddle.
 
-| parameter name          | description | default value |
+| Parameter name          | Description | Default value |
 |-------------------------| --- | --- |
 | `in_channels (int)`     | Number of channels of the input image | `3` |
 | `num_classes (int)`     | Number of target classes | `2` |
@@ -411,18 +411,18 @@ The BiSeNet V2 implementation based on PaddlePaddle.
 
 The DeepLab V3+ implementation based on PaddlePaddle.
 
-| parameter name             | description                                                                        | default value |
-|----------------------------|------------------------------------------------------------------------------------| --- |
-| `in_channels (int)`        | Number of channels of the input image                                              | `3` |
-| `num_classes (int)`        | Number of target classes                                                           | `2` |
-| `backbone (str)`           | Backbone network type of neural network                                            | `ResNet50_vd` |
-| `use_mixed_loss (bool)`    | Whether to use mixed loss function                                                 | `False` |
-| `losses (list)`            | List of loss functions                                                             | `None` |
-| `output_stride (int)`      | The downsampling ratio of the output feature map relative to the input feature map | `8` |
-| `backbone_indices (tuple)` | Output the location indices of different stages of the backbone network            | `(0, 3)` |
-| `aspp_ratios (tuple)`      | Dilation ratio of dilated convolution                                              | `(1, 12, 24, 36)` |
-| `aspp_out_channels (int)`  | Number of ASPP module output channels                                              | `256` |
-| `align_corners (bool)`     | Whether to use the corner alignment method                                         | `False` |
+| Parameter name             | Description                                                                    | Default value |
+|----------------------------|--------------------------------------------------------------------------------| --- |
+| `in_channels (int)`        | Number of channels of the input image                                          | `3` |
+| `num_classes (int)`        | Number of target classes                                                       | `2` |
+| `backbone (str)`           | Backbone network type of neural network                                        | `ResNet50_vd` |
+| `use_mixed_loss (bool)`    | Whether to use mixed loss function                                             | `False` |
+| `losses (list)`            | List of loss functions                                                         | `None` |
+| `output_stride (int)`      | Downsampling ratio of the output feature map relative to the input feature map | `8` |
+| `backbone_indices (tuple)` | Output the location indices of different stages of the backbone network        | `(0, 3)` |
+| `aspp_ratios (tuple)`      | Dilation ratio of dilated convolution                                          | `(1, 12, 24, 36)` |
+| `aspp_out_channels (int)`  | Number of ASPP module output channels                                          | `256` |
+| `align_corners (bool)`     | Whether to use the corner alignment method                                     | `False` |
 
 
 ## `FactSeg`
@@ -431,7 +431,7 @@ The FactSeg implementation based on PaddlePaddle.
 
 The original article refers to  A. Ma, J. Wang, Y. Zhong and Z. Zheng, "FactSeg: Foreground Activation -Driven Small Object Semantic Segmentation in Large-Scale Remote Sensing Imagery,"in IEEE Transactions on Geoscience and Remote Sensing, vol. 60, pp. 1-16, 2022, Art no. 5606216.
 
-| parameter name          | description                                                                                                      | default value |
+| Parameter name          | Description                                                                                                      | Default value |
 |-------------------------|------------------------------------------------------------------------------------------------------------------| --- |
 | `in_channels (int)`     | Number of channels of the input image                                                                                   | `3` |
 | `num_classes (int)`     | Number of target classes                                                                  | `2` |
@@ -444,7 +444,7 @@ The FarSeg implementation based on PaddlePaddle.
 
 The original article refers to  Zheng Z, Zhong Y, Wang J, et al. Foreground-aware relation network for geospatial object segmentation in high spatial resolution remote sensing imagery[C]//Proceedings of the IEEE/CVF conference on computer vision and pattern recognition. 2020: 4096-4105.
 
-| parameter name          | description                                                                                                     | default value |
+| Parameter name          | Description                                                                                                     | Default value |
 |-------------------------|-----------------------------------------------------------------------------------------------------------------| --- |
 | `in_channels (int)`     | Number of channels of the input image                                                                           | `3` |
 | `num_classes (int)`     | Number of target classes                                                                                                                | `2` |
@@ -455,7 +455,7 @@ The original article refers to  Zheng Z, Zhong Y, Wang J, et al. Foreground-awar
 
 The Fast-SCNN implementation based on PaddlePaddle.
 
-| parameter name          | description                                | default value |
+| Parameter name          | Description                                | Default value |
 |-------------------------|--------------------------------------------| --- |
 | `in_channels (int)`     | Number of channels of the input image      | `3` |
 | `num_classes (int)`     | Number of target classes                   | `2` |
@@ -468,7 +468,7 @@ The Fast-SCNN implementation based on PaddlePaddle.
 
 The HRNet implementation based on PaddlePaddle.
 
-| parameter name          | description                                                                                                      | default value |
+| Parameter name          | Description                                                                                                      | Default value |
 |-------------------------|------------------------------------------------------------------------------------------------------------------| --- |
 | `in_channels (int)`     | Number of channels of the input image                                                                                 | `3` |
 | `num_classes (int)`     | Number of target classes                                                                  | `2` |

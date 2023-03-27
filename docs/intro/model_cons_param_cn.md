@@ -52,14 +52,14 @@
 
 该模型的原始文章见于 Wele Gedara Chaminda Bandara，Vishal M. Patel，“A TRANSFORMER-BASED SIAMESE NETWORK FOR CHANGE DETECTION”(https://arxiv.org/pdf/2201.01293.pdf)。
 
-| 参数名                         | 描述                          | 默认值       |
-|--------------------------------|-----------------------------|--------------|
-| `num_classes (int)`            | 目标类别数量                      | `2`          |
-| `use_mixed_loss (bool)`        | 是否使用混合损失函数                  | `False`      |
-| `losses (list)`                | 损失函数列表                      | `None`       |
-| `in_channels (int)`            | 输入图像的通道数                    | `3`          |
-| `decoder_softmax (bool)`       | 是否使用`softmax`作为解码器的最后一层激活函数 | `False`      |
-| `embed_dim (int)`              | Transformer 编码器的隐藏层维度       | `256`        |
+| 参数名                         | 描述                        | 默认值       |
+|--------------------------------|---------------------------|--------------|
+| `num_classes (int)`            | 目标类别数量                    | `2`          |
+| `use_mixed_loss (bool)`        | 是否使用混合损失函数                | `False`      |
+| `losses (list)`                | 损失函数列表                    | `None`       |
+| `in_channels (int)`            | 输入图像的通道数                  | `3`          |
+| `decoder_softmax (bool)`       | 是否使用softmax作为解码器的最后一层激活函数 | `False`      |
+| `embed_dim (int)`              | Transformer 编码器的隐藏层维度     | `256`        |
 
 
 ## `ChangeStar_FarSeg`
@@ -146,13 +146,13 @@
 
 该模型的原始文章见于 Rodrigo Caye Daudt, et al. "Fully convolutional siamese networks for change detection"(https://arxiv.org/abs/1810.08462).
 
-| 参数名 | 描述            | 默认值 |
-| --- |---------------|  --- |
-| `num_classes (int)` | 目标类别数量        | `2` |
-| `use_mixed_loss (bool)` | 是否使用混合损失函数    |`False` |
-| `losses (List)` | 损失函数列表        | `None` |
-| `in_channels (int)` | 模型的输入通道数      | int | `3` |
-| `use_dropout (bool)` | 是否使用`dropout` | `False` |
+| 参数名 | 描述          | 默认值 |
+| --- |-------------|  --- |
+| `num_classes (int)` | 目标类别数量      | `2` |
+| `use_mixed_loss (bool)` | 是否使用混合损失函数  |`False` |
+| `losses (List)` | 损失函数列表      | `None` |
+| `in_channels (int)` | 输入图像的通道数    | int | `3` |
+| `use_dropout (bool)` | 是否使用dropout | `False` |
 
 
 ## `FCCDN`
@@ -265,7 +265,7 @@
 |----------------------------------------|----------------------------------------------------------------------------------------|-------|
 | `losses (list)`                        | 损失函数列表                                                                                 | `None` |
 | `sr_factor (int)   `                   | 超分辨率的缩放因子，原始图像的大小将乘以此因子。例如，如果原始图像为 `H` x `W`，则输出图像将为 `sr_factor * H` x `sr_factor * W` | `4`   |
-| `min_max (None 或 tuple[float, float])` | 图像像素值的最小值和最大值                                                                          | `None` |
+| `min_max (None | tuple[float, float])` | 图像像素值的最小值和最大值                                                                          | `None` |
 | `scales (tuple[int, ...])`             | 缩放因子                                                                                   | `(2, 4)` |
 | `n_blocks (int)`                       | 残差块的数量                                                                                 | `30`  |
 | `n_feats (int)`                        | 残差块中的特征维度                                                                              | `16`  |
