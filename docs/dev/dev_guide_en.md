@@ -2,15 +2,15 @@
 
 ## 0 Catalog
 
-- [Add Remote Sensing Special Model](#1-Add Remote Sensing Special Model)
+- [Add Remote Sensing Special Model](#1-add-remote-sensing-special-model)
 
-- [Add Data Preprocessing Data Augmentation Function or Operator](#2-Add Data Preprocessing Data Augmentation Function or Operator)
+- [Add Data Preprocessing/Data Augmentation Function or Operator](#2-add-data-preprocessing/data-augmentation-function-or-operator)
 
-- [Add Remote Sensing Image Processing Tools](#3-Add Remote Sensing Image Processing Tools)
+- [Add Remote Sensing Image Processing Tools](#3-add-remote-sensing-image-processing-tools)
 
 ## 1 Add Remote Sensing Special Model
 
-### 1.1 Edit Model Definitions
+### 1.1 Write Model Definitions
 
 First, find the subdirectory (package) corresponding to the task in `paddlers/rs_models`. The mapping between the task and the subdirectory is as follows:
 
@@ -20,14 +20,14 @@ First, find the subdirectory (package) corresponding to the task in `paddlers/rs
 - Image Restoration：`res`；
 - Image Segmentation：`seg`。
 
-Create a new file in the subdirectory named `{model name lowercase}.py`.  Write the complete model definition in the file.
+Create a new file in the subdirectory and name it `{model name lowercase}.py`.  Write the complete model definition in the file.
 
-The new model must be a subclass of `paddle.nn.Layer`. For the tasks of image segmentation, object detection, scene classification and image restoration, relevant specifications formulated in Kit [PaddleSeg](https://github.com/PaddlePaddle/PaddleSeg)、[PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection)、[PaddleClas](https://github.com/PaddlePaddle/PaddleClas) and [PaddleGAN](https://github.com/PaddlePaddle/PaddleGAN) should be followed respectively. **For change detection, scene classification and image segmentation tasks, the `num_classes` parameter must be passed in the model construction to specify the number of output categories. For image restoration tasks, the `rs_factor` parameter must be passed in during model construction to specify the super resolution scaling ratio (for non-super resolution models, this parameter is set to `None`).** For the change detection task, the model definition should follow the same specification as the segmentation model, but with the following differences:
+The new model must be a subclass of `paddle.nn.Layer`. For the tasks of image segmentation, object detection, scene classification and image restoration, relevant specifications formulated in development kit [PaddleSeg](https://github.com/PaddlePaddle/PaddleSeg)、[PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection)、[PaddleClas](https://github.com/PaddlePaddle/PaddleClas) and [PaddleGAN](https://github.com/PaddlePaddle/PaddleGAN) should be followed respectively. **For change detection, scene classification and image segmentation tasks, the `num_classes` argument must be passed in the model construction to specify the number of output categories. For image restoration tasks, the `rs_factor` argument must be passed in during model construction to specify the super resolution scaling ratio (for non-super resolution models, this argument is set to `None`).** For the change detection task, the model definition should follow the same specification as the segmentation model, but with the following differences:
 
-- The `forward()` method accepts three input parameters, namely `self`, `t1` and `t2`, where `t1` and `t2` represent the input image of the first and last two phases respectively.
-- For a multi-task change detection model (for example, the model outputs both change detection results and building extraction results of two phases), the class `USE_MULTITASK_DECODER` attribute needs to be specified as `True`. Also in the `OUT_TYPES` attribute set the label type for each element in the list of model forward output. Refer to the definition of `ChangeStar` model.
+- The `forward()` method accepts three input parameters, namely `self`, `t1` and `t2`, where `t1` and `t2` represent the input image of the first and second two phases respectively.
+- For a multi-task change detection model (for example, the model outputs both change detection results and building extraction results of two phases), the class attribute `USE_MULTITASK_DECODER` needs to be specified as `True`. Also in the `OUT_TYPES` attribute set the label type for each element in the list of model forward output. Refer to the definition of `ChangeStar` model.
 
-Note that if a common component exists in a subdirectory, For example, contents in `paddlers/rs_models/cd/layers`, `paddlers/rs_models/cd/backbones` and `paddlers/rs_models/seg/layers` should be reused as much as possible.
+Note that if a common component exists in a subdirectory. For example, contents in `paddlers/rs_models/cd/layers`, `paddlers/rs_models/cd/backbones` and `paddlers/rs_models/seg/layers` should be reused as much as possible.
 
 ### 1.2 Add docstring
 
@@ -79,7 +79,7 @@ It should be noted that for the image restoration task, the forward and reverse 
 
 See `ESRGAN` for specific examples of GAN trainers.
 
-## 2 Add Data Preprocessing Data Augmentation Function or Operator
+## 2 Add Data Preprocessing/Data Augmentation Function or Operator
 
 ### 2.1 Add Data Preprocessing/Data Augmentation Functions
 

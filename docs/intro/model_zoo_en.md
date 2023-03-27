@@ -4,7 +4,7 @@ PaddleRS' base model library comes from the PaddleCV development kits: [PaddleCl
 
 ## List of PaddleRS Supported Models
 
-All PaddleRS currently supported models are as follows (those marked \* are dedicated models for remote sensing) :
+All models currently supported by PaddleRS are as follows (those marked \* are dedicated models for remote sensing) :
 
 | Task | Model | Multiband Support |
 |--------|---------|------|

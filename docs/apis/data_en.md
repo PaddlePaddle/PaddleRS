@@ -160,7 +160,7 @@ The `__call__` method of the `Transform` object takes a unique argument `sample`
 |`'image2'`|Second phase image data in change detection task.|
 |`'image_t1'`|First phase image path in change detection task.|
 |`'image_t2'`|Second phase image path in change detection task.|
-|`'mask'`|Ground-Truth label path or data in image segmentation/change detection task.|
+|`'mask'`|Ground-truth label path or data in image segmentation/change detection task.|
 |`'aux_masks'`|Auxiliary label path or data in image segmentation/change detection tasks.|
 |`'gt_bbox'`|Detection box labeling data in object detection task.|
 |`'gt_poly'`|Polygon labeling data in object detection task.|
@@ -190,7 +190,7 @@ train_transforms = T.Compose([
 
 Generally, in the list of data transform operators accepted by a `Compose` object, the first element is `paddlers.Transforms.DecodeImg` object, used to read image data; the last element is [`Arrange` Operator](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/transforms/operators.py, used to extract and arrange information from the `sample` dictionary.
 
-For the validation dataset of image segmentation task and change detection task, the `ReloadMask` operator can be inserted before the `Arrange` operator to reload the Ground-Truth label. The following is an example:
+For the validation dataset of image segmentation task and change detection task, the `ReloadMask` operator can be inserted before the `Arrange` operator to reload the Ground-truth label. The following is an example:
 
 ```python
 eval_transforms = T.Compose([

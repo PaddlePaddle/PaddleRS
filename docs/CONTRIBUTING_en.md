@@ -89,7 +89,7 @@ To ensure code quality, you need to write unit test scripts for the new function
 #### 4.1 model Single Test
 
 1. Find the test case definition file corresponding to the task of the model in `tests/rs_models/`, for example, the change detection task corresponding to `tests/rs_models/test_cd_models.py`.
-2. Define a Test class for the new Model that inherits from `Test{task name}Model` and sets its `MODEL_CLASS` property to the new model, following the example already in the file.
+2. Define a test class for the new model that inherits from `Test{task name}Model` and sets its `MODEL_CLASS` property to the new model, following the example already in the file.
 3. Override the new test class's `test_specs()` method. This method sets `self.specs` to a list with each item in the list as a dictionary whose key-value pairs are used as configuration items for the constructor model. That is, each item in `self.specs` corresponds to a set of test cases, each of which tests the model constructed with a particular parameter.
 
 #### 4.2 Data Preprocessing/Data Augmentation Single Test

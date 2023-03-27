@@ -1,8 +1,8 @@
-# Dataset Preprocessing Script
+# Dataset Preprocessing Scripts
 
 ## List of PaddleRS Supported Data Set Preprocessing Scripts
 
-| Task | Dataset Name | Dataset Urls | Preprocessing Script |
+| Task | Dataset Name | Dataset URLs | Preprocessing Script |
 |-----|-----------|----------|----------|
 | Change Detection | LEVIR-CD | https://justchenhao.github.io/LEVIR/ | [prepare_levircd.py](https://github.com/PaddlePaddle/PaddleRS/blob/develop/tools/prepare_dataset/prepare_levircd.py) |
 | Change Detection | Season-varying | https://paperswithcode.com/dataset/cdd-dataset-season-varying | [prepare_svcd.py](https://github.com/PaddlePaddle/PaddleRS/blob/develop/tools/prepare_dataset/prepare_svcd.py) |

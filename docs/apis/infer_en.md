@@ -8,7 +8,7 @@ The dynamic graph inference and static graph inference of PaddleRS are provided 
 
 #### `BaseChangeDetector.predict()`
 
-Interface format:
+Interface:
 
 ```python
 def predict(self, img_file, transforms=None):
@@ -19,7 +19,7 @@ Input parameters:
 |Parameter Name|Type|Parameter Description|Default Value|
 |-------|----|--------|-----|
 |`img_file`|`list[tuple]` \| `tuple[str \| np.ndarray]`|Input image pair data (in NumPy array form) or input image pair path. If only one image pair is predicted, a tuple is used to sequentially contain the first phase image data/path and the second phase image data/path. If a group of image pairs need to be predicted at once, the list contains the data or paths of those image pairs (one tuple from the list for each image pair).||
-|`transforms`|`paddlers.transforms.Compose` \| `None`|Apply data transformation operators to input data. If `None`, the data transformation operator of trainer in the validation phase is used.|`None`|
+|`transforms`|`paddlers.transforms.Compose` \| `None`|Apply data transformation operators to input data. If `None`, the data transformation operators of trainer in the validation phase is used.|`None`|
 
 Return format:
 
@@ -33,7 +33,7 @@ If `img_file` is a list, return an list as long as `img_file`, where each item i
 
 #### `BaseClassifier.predict()`
 
-Interface format:
+Interface:
 
 ```python
 def predict(self, img_file, transforms=None):
@@ -44,7 +44,7 @@ Input parameters:
 |Parameter Name|Type|Parameter Description|Default Value|
 |-------|----|--------|-----|
 |`img_file`|`list[str\|np.ndarray]` \| `str` \| `np.ndarray`|input image data (in the form of NumPy array) or input image path. If a group of images need to be predicted at once, the list contains the data or paths for those images (one element in the list for each image).||
-|`transforms`|`paddlers.transforms.Compose` \| `None`|Apply data transformation operator to input data. If `None`, the data transformation operator of trainer in the validation phase is used.|`None`|
+|`transforms`|`paddlers.transforms.Compose` \| `None`|Apply data transformation operators to input data. If `None`, the data transformation operators of trainer in the validation phase is used.|`None`|
 
 Return format:
 
@@ -60,7 +60,7 @@ If `img_file` is a list, return a list as long as `img_file`, where each item is
 
 #### `BaseDetector.predict()`
 
-Interface format:
+Interface:
 
 ```python
 def predict(self, img_file, transforms=None):
@@ -71,7 +71,7 @@ Input parameters:
 |Parameter Name|Type|Parameter Description|Default Value|
 |-------|----|--------|-----|
 |`img_file`|`list[str\|np.ndarray]` \| `str` \| `np.ndarray`|input image data (in the form of NumPy array) or input image path. If a group of images need to be predicted at once, the list contains the data or paths for those images (one element in the list for each image).||
-|`transforms`|`paddlers.transforms.Compose` \| `None`|Apply data transformation operator to input data. If `None`, the data transformation operator of trainer in the validation phase is used.|`None`|
+|`transforms`|`paddlers.transforms.Compose` \| `None`|Apply data transformation operators to input data. If `None`, the data transformation operators of trainer in the validation phase is used.|`None`|
 
 Return format:
 
@@ -89,7 +89,7 @@ If `img_file` is a list, return a list as long as `img_file`, where each item is
 
 #### `BaseRestorer.predict()`
 
-Interface format:
+Interface:
 
 ```python
 def predict(self, img_file, transforms=None):
@@ -100,7 +100,7 @@ Input parameters:
 |Parameter Name|Type|Parameter Description|Default Value|
 |-------|----|--------|-----|
 |`img_file`|`list[str\|np.ndarray]` \| `str` \| `np.ndarray`|input image data (in the form of NumPy array) or input image path. If a group of images need to be predicted at once, the list contains the data or paths for those images (one element in the list for each image).||
-|`transforms`|`paddlers.transforms.Compose` \| `None`|Apply data transformation operator to input data. If `None`, the data transformation operator of trainer in the validation phase is used.|`None`|
+|`transforms`|`paddlers.transforms.Compose` \| `None`|Apply data transformation operators to input data. If `None`, the data transformation operators of trainer in the validation phase is used.|`None`|
 
 Return format:
 
@@ -114,7 +114,7 @@ If `img_file` is a list, return a list as long as `img_file`, where each item is
 
 #### `BaseSegmenter.predict()`
 
-Interface format:
+Interface:
 
 ```python
 def predict(self, img_file, transforms=None):
@@ -125,7 +125,7 @@ Input parameters:
 |Parameter Name|Type|Parameter Description|Default Value|
 |-------|----|--------|-----|
 |`img_file`|`list[str\|np.ndarray]` \| `str` \| `np.ndarray`|input image data (in the form of NumPy array) or input image path. If a group of images need to be predicted at once, the list contains the data or paths for those images (one element in the list for each image).||
-|`transforms`|`paddlers.transforms.Compose` \| `None`|Apply data transformation operator to input data. If `None`, the data transformation operator of trainer in the validation phase is used.|`None`|
+|`transforms`|`paddlers.transforms.Compose` \| `None`|Apply data transformation operators to input data. If `None`, the data transformation operators of trainer in the validation phase is used.|`None`|
 
 Return format:
 
@@ -139,15 +139,15 @@ If `img_file` is a list, return a list as long as `img_file`, where each item is
 
 ### Sliding Window Inference
 
-Considering the large format property of remote sensing image, PaddleRS provides sliding window inference support for some tasks. PaddleRS 'sliding window inference features the following:
+Considering the large-scale nature of remote sensing image, PaddleRS provides sliding window inference support for some tasks. The sliding window inference feature of PaddleRS has the following characteristics:
 
-1. In order to solve the problem of insufficient memory caused by reading the whole large image at once, PaddleRS adopted the lazy loading memory technology, which only read and processed the image blocks in one window at a time.
-2. Users can customize the size and step of the slide window. Supports sliding window overlap. PaddleRS will automatically merge model prediction results for the overlapped parts between Windows.
-3. The inference results can be saved in GeoTiff format, and the reading and writing of geographic transformation information and geographic projection information can be supported.
+1. In order to solve the problem of insufficient memory caused by reading the whole large image at once, PaddleRS has adopted the lazy loading memory technology, which only read and processed the image blocks in one window at a time.
+2. Users can customize the size and stride of the sliding window. Meanwhile, PaddleRS supports sliding window overlapping. For the overlapping parts between windows, PaddleRS will automatically fuse the model's predicted results.
+3. The inference results can be saved in GeoTiff format, and the reading and writing of geographic transformation information and geographic projection information is supported.
 
 Currently, the image segmentation trainer ([`BaseSegmenter`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/segmenter.py) and sub-classes) and change detection trainer ([`BaseChangeDetector`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/change_detector.py) and sub-classes)have dynamic graph sliding window inference API. Take the API of image segmentation task as an example, the explanation is as follows:
 
-Interface format:
+Interface:
 
 ```python
 def slider_predict(self,
@@ -168,12 +168,12 @@ Input parameter list:
 |Parameter Name|Type|Parameter Description|Default Value|
 |-------|----|--------|-----|
 |`img_file`|`str`|Input image path.||
-|`save_dir`|`str`|Predict results output path.||
-|`block_size`|`list[int]` \| `tuple[int]` \| `int`|The size of the slide window (specifying the width, height in a list or tuple, or the same width and height in an integer).||
-|`overlap`|`list[int]` \| `tuple[int]` \| `int`|The slide step size of the slide window (specifying the width, height in a list or tuple, or the same width and height in an integer).|`36`|
-|`transforms`|`paddlers.transforms.Compose` \| `None`|Apply data transformation operator to input data. If `None`, the data transformation operator of trainer in the validation phase is used.|`None`|
+|`save_dir`|`str`|Predicted results output path.||
+|`block_size`|`list[int]` \| `tuple[int]` \| `int`|The size of the sliding window (specifying the width, height in a list or tuple, or the same width and height in an integer).||
+|`overlap`|`list[int]` \| `tuple[int]` \| `int`|The sliding step size of the sliding window (specifying the width, height in a list or tuple, or the same width and height in an integer).|`36`|
+|`transforms`|`paddlers.transforms.Compose` \| `None`|Apply data transformation operators to input data. If `None`, the data transformation operators of trainer in the validation phase is used.|`None`|
 |`invalid_value`|`int`|The value used to mark invalid pixels in the output image.|`255`|
-|`merge_strategy`|`str`|Strategies used to merge sliding window overlapping areas.`'keep_first'` represents the prediction category that retains the most advanced window in the traversal order (left to right, top to bottom, column first); `'keep_last'` stands for keeping the prediction category of the last window in the traversal order;`'accum'` means to calculate the final prediction category by summing the prediction probabilities given by each window in the overlapping area. It should be noted that when intensive reasoning with high `overlap` is carried out for large size images, the use of `'accum'` strategy may lead to longer reasoning time, but generally it can achieve better performance at the window interface.|`'keep_last'`|
+|`merge_strategy`|`str`|Strategies used to merge sliding window overlapping areas.`'keep_first'` represents the prediction category that retains the most advanced window in the traversal order (left to right, top to bottom, column first); `'keep_last'` stands for keeping the prediction category of the last window in the traversal order;`'accum'` means to calculate the final prediction category by summing the prediction probabilities given by each window in the overlapping area. It should be noted that when dense inference with large `overlap` is carried out for large size images, the use of `'accum'` strategy may lead to longer inference time, but generally it can achieve better performance at the window boundary.|`'keep_last'`|
 |`batch_size`|`int`|The mini-batch size used for prediction.|`1`|
 |`eager_load`|`bool`|If `True`, instead of using lazy memory loading, the entire image is loaded into memory at once at the beginning of the prediction.|`False`|
 |`quiet`|`bool`|If `True`, the predicted progress is not displayed.|`False`|
@@ -195,8 +195,8 @@ The sliding window inference API of the change detection task is similar to that
 |`model_dir`|`str`|Model path (must be an exported deployed or quantified model).||
 |`use_gpu`|`bool`|Whether to use GPU.|`False`|
 |`gpu_id`|`int`|ID of the GPU used.|`0`|
-|`cpu_thread_num`|`int`|The number of threads when inference is performed using the CPU.|`1`|
-|`use_mkl`|`bool`|Whether to use MCL-DNN compute library (This option takes effect only when inference is performed using the CPU).|`False`|
+|`cpu_thread_num`|`int`|The number of threads when inference is performed using CPUs.|`1`|
+|`use_mkl`|`bool`|Whether to use MCL-DNN compute library (This option takes effect only when inference is performed using CPUs).|`False`|
 |`mkl_thread_num`|`int`|Count the threads of MKL-DNN.|`4`|
 |`use_trt`|`bool`|Whether to use TensorRT.|`False`|
 |`use_glog`|`bool`|Whether to enable glog logs.|`False`|
@@ -206,7 +206,7 @@ The sliding window inference API of the change detection task is similar to that
 
 #### `Predictor.predict()`
 
-Interface format:
+Interface:
 
 ```python
 def predict(self,
@@ -221,9 +221,9 @@ Input parameter list:
 
 |Parameter Name|Type|Parameter Description|Default Value|
 |-------|----|--------|-----|
-|`img_file`|`list[str\|tuple\|np.ndarray]` \| `str` \| `tuple` \| `np.ndarray`|For scene classification, object detection, image restoration and image segmentation tasks, this parameter can be a single image path, or a decoded image data in [h, w, c] with a float32 type (expressed as NumPy array), or a list of image paths or np.ndarray objects. For the change detection task, the parameter can be a binary group of image path (representing the two time phase image paths respectively), or a binary group composed of two decoded images, or a list composed of one of the above two binary groups.||
+|`img_file`|`list[str\|tuple\|np.ndarray]` \| `str` \| `tuple` \| `np.ndarray`|For scene classification, object detection, image restoration and image segmentation tasks, this parameter can be a single image path, or a decoded image data in [h, w, c] with a float32 type (expressed as NumPy array), or a list of image paths or np.ndarray objects. For the change detection task, the parameter can be a two-tuple of image path (representing the two time phase image paths respectively), or a two-tuple composed of two decoded images, or a list composed of one of the above two two-tuples.||
 |`topk`|`int`|It is used in scenario classification model prediction, indicating that the category with the top `topk` in the output probability of the model is selected as the final result.|`1`|
-|`transforms`|`paddlers.transforms.Compose`\|`None`|Apply data transformation operator to input data. If `None`, the operators read from 'model.yml' is used.|`None`|
+|`transforms`|`paddlers.transforms.Compose`\|`None`|Apply data transformation operators to input data. If `None`, the operators read from 'model.yml' is used.|`None`|
 |`warmup_iters`|`int`|Number of warm-up rounds used to evaluate model inference and pre- and post-processing speed. If it is greater than 1, the `warmup_iters` inference is repeated in advance before being formally predicted and its speed assessed.|`0`|
 |`repeats`|`int`|The number of repetitions used to assess model reasoning and pre- and post-processing speed. If it is greater than 1, repeats the prediction and averages the time.|`1`|
 |`quiet`|`bool`|If `True`, no timing information is printed.|`False`|
@@ -232,4 +232,4 @@ Input parameter list:
 
 ### `Predictor.slider_predict()`
 
-Realize the sliding window inference function. It is used in the same way as `BaseSegmenter` and `slider_predict()` of `BaseChangeDetector`.
+Implements the sliding window inference function. It is used in the same way as `BaseSegmenter` and `slider_predict()` of `BaseChangeDetector`.

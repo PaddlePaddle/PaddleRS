@@ -1,6 +1,6 @@
-# PaddleRS Code Annotation Specification
+# PaddleRS Specification for Code Annotation
 
-## 1 Annotation Specification
+## 1 Specification for Docstrings
 
 The docstring of the function consists of five modules:
 
@@ -20,7 +20,7 @@ Class docstring also consists of five modules:
 
 The specifications for each module are described in detail below.
 
-### 1.1 Function/Class Function Description
+### 1.1 Description on Functionality of Function/Class Function
 
 The goal is for the user to understand it quickly. The module can be disassembled into 3 parts, function description + calculation formula + annotation.
 
@@ -51,9 +51,9 @@ Note:
 - If a parameter has a variety of optional type, use `|` to separate;
 - A space should be left between the parameter name and the type.
 - A list or tuple containing an object of a certain type can be represented by `list[{type name}]` and `tuple[{type name}]`. For example, `list[int]` represents a list containing an element of type int. `tuple[int|float]` equivalent to `tuple[int]| tuple[float]`;
-- When using the description of `list[{type name}]` and `tuple[{type name}]`, the default assumption is that the list or tuple parameters are homogeneous (that is, all elements contained in them have the same type). If the list or tuple parameters are heterogeneous, it needs to be explained in the literal description.
-- Separated type if it is a simple type such as `int`, `Tensor` etc, then `|` don't need to add a space before and after, if it is a more complex types such as `list[int]` and `tuple[float]` requires to add a space before and after `|`;
-- For parameters that have a default value, at least explain the logic of taking the default value, not just what the parameter is and what the default value is.
+- When using the description of `list[{type name}]` and `tuple[{type name}]`, the default assumption is that the list or tuple parameters are homogeneous (that is, all elements contained in the list or tuple have the same type). If the list or tuple parameters are heterogeneous, it needs to be explained in the literal description.
+- If the separated type is a simple type such as `int`, `Tensor`, etc., there is no need to add a space before and after the `|`. However, if it is multiple complex types such as `list[int]` and `tuple[float]`, a space should be added before and after the `|`.
+- For parameters that have a default value, please explain why we use that default value, not just what the parameter is and what the default value is.
 
 Example:
 
@@ -116,7 +116,7 @@ Example:
 
 Provide as many examples as possible for various usage scenarios of the function or class, and give the expected results of executing the code in the comments.
 
-Requirement: The user copies the sample code to the script to run. Note the need to add the necessary `import`.
+Requirement: Users can run the script by copying the sample code. Note that the necessary `import` statements need to be added.
 
 Single example:
 
@@ -191,13 +191,13 @@ Multi examples:
 ### 1.7 Other Points to Note
 
 - Different modules are separated by **1** blank lines.
-- Pay attention to capitalizing the first letter and punctuation (especially period **.**) in accordance with English grammar rules.
+- Pay attention to capitalization and punctuation rules in acoordance with English grammer.
 - Blank lines can be placed appropriately in the content of the code sample for a sense of hierarchy.
-- For the **input parameter name**, **the property or method of the input parameter**, and the **file path** that appear in the comment, surround it with `\`.
-- Line breaks and indentation are required between each module's title/subtitle and the concrete content, and **1** blank lines are inserted between the `Examples:` title and the sample code content.
+- For the **input parameter name**, **the property or method of the input parameter**, and the **file path** that appear in the comment, surround it with \`.
+- Line breaks and indentation are required between each module's title/subtitle and the concrete content, and **1** blank lines should be inserted between the `Examples:` title and the sample code content.
 - Suspension indentation is required when a single paragraph description spans lines.
 
-## 2 Complete docstring Example
+## 2 Complete Docstring Example
 
 ```python
 class Activation(nn.Layer):
