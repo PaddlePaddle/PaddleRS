@@ -1,6 +1,6 @@
 # PaddleRS Inference API Description
 
-The dynamic graph inference and static graph inference of PaddleRS are provided by the trainer ([`BaseModel`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/base.py) and sub-classes) and **predictor** (`paddlers.deploy.Predictor`) respectively.
+The dynamic graph inference and static graph inference of PaddleRS are provided by the trainer ([`BaseModel`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/base.py) and subclasses) and **predictor** (`paddlers.deploy.Predictor`) respectively.
 
 ## Dynamic Graph Inference API
 
@@ -145,7 +145,7 @@ Considering the large-scale nature of remote sensing image, PaddleRS provides sl
 2. Users can customize the size and stride of the sliding window. Meanwhile, PaddleRS supports sliding window overlapping. For the overlapping parts between windows, PaddleRS will automatically fuse the model's predicted results.
 3. The inference results can be saved in GeoTiff format, and the reading and writing of geographic transformation information and geographic projection information is supported.
 
-Currently, the image segmentation trainer ([`BaseSegmenter`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/segmenter.py) and sub-classes) and change detection trainer ([`BaseChangeDetector`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/change_detector.py) and sub-classes)have dynamic graph sliding window inference API. Take the API of image segmentation task as an example, the explanation is as follows:
+Currently, the image segmentation trainer ([`BaseSegmenter`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/segmenter.py) and subclasses) and change detection trainer ([`BaseChangeDetector`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/change_detector.py) and subclasses)have dynamic graph sliding window inference API. Take the API of image segmentation task as an example, the explanation is as follows:
 
 Interface:
 

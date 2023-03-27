@@ -1,44 +1,44 @@
 # PaddleRS Training API Description
 
-**Trainer** encapsulates model training, validation, quantization, and dynamic graph inference, defined in files of `paddlers/tasks/` directory. For user convenience, PaddleRS provides trainer that inherits from the parent class [`BaseModel`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/base.py) for all supported models, and provides several apis externally. The types of trainers corresponding to change detection, scene classification, target detection, image restoration and image segmentation tasks are respectively `BaseChangeDetector`、`BaseClassifier`、`BaseDetector`、`BaseRestorer` and `BaseSegmenter`。This document describes the initialization function of the trainer and `train()`、`evaluate()` API。
+**Trainer** encapsulates model training, validation, quantization, and dynamic graph inference, defined in files of `paddlers/tasks/` directory. For user convenience, PaddleRS provides trainers that inherits from the parent class [`BaseModel`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/base.py) for all supported models, and provides several apis externally. The types of trainers corresponding to change detection, scene classification, target detection, image restoration and image segmentation tasks are respectively `BaseChangeDetector`、`BaseClassifier`、`BaseDetector`、`BaseRestorer` and `BaseSegmenter`。This document describes the initialization function of the trainer and `train()`、`evaluate()` API。
 
 ## Initialize the Trainer
 
 All trainers support default parameter construction (that is, no parameters are passed in when the object is constructed), in which case the constructed trainer object applies to three-channel RGB data.
 
-### Initialize `BaseChangeDetector` Sub-Class Object
+### Initialize `BaseChangeDetector` Subclass Object
 
-- The `num_classes`、`use_mixed_loss` and `in_channels` parameters are generally supported, indicating the number of model output categories, whether to use preset mixing losses, and the number of input channels, respectively. Some sub-classes, such as `DSIFN`, do not yet support `in_channels`.
+- The `num_classes`、`use_mixed_loss` and `in_channels` parameters are generally supported, indicating the number of model output categories, whether to use preset mixing losses, and the number of input channels, respectively. Some subclasses, such as `DSIFN`, do not yet support `in_channels`.
 - `use_mixed_loss` will be deprecated in the future, so it is not recommended.
 - Specify the loss function used during model training through the `losses` parameter. `losses` needs to be a dictionary, where the values for the keys `types` and `coef` are two equal-length lists representing the loss function object (a callable object) and the weight of the loss function, respectively. For example: `losses={'types': [LossType1(), LossType2()], 'coef': [1.0, 0.5]}`. It is equivalent to calculating the following loss function in the training process: `1.0*LossType1()(logits, labels)+0.5*LossType2()(logits, labels)`, where `logits` and `labels` are model output and GT labels, respectively.
-- Different sub-classes support model-related input parameters, for details, refer to [Model definition](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/rs_models/cd) and [Trainer definition](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/change_detector.py).
+- Different subclasses support model-related input parameters. For details, you can refer to [model definitions](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/rs_models/cd) and [trainer definitions](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/change_detector.py).
 
-### Initialize `BaseClassifier` Sub-Class Object
+### Initialize `BaseClassifier` Subclass Object
 
 - The `num_classes` and `use_mixed_loss` parameters are generally supported, indicating the number of model output categories, whether to use preset mixing losses.
 - `use_mixed_loss` will be deprecated in the future, so it is not recommended.
 - Specify the loss function used during model training through the `losses` parameter. The passed argument needs to be an object of type `paddlers.models.clas_losses.CombinedLoss`.
-- Different sub-classes support model-related input parameters, for details, refer to [Model definition](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/rs_models/clas) and [Trainer definition](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/classifier.py).
+- Different subclasses support model-related input parameters. For details, you can refer to [model definitions](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/rs_models/clas) and [trainer definitions](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/classifier.py).
 
-### Initialize `BaseDetector` Sub-Class Object
+### Initialize `BaseDetector` Subclass Object
 
-- Generally, the `num_classes` and `backbone` parameters can be set to indicate the number of output categories of the model and the type of backbone network used respectively. Compared with other tasks, the trainer of object detection task supports more initialization parameters, including network structure, loss function, post-processing strategy and so on.
+- Generally, the `num_classes` and `backbone` parameters can be set to indicate the number of output categories of the model and the type of backbone network used, respectively. Compared with other tasks, the trainer of object detection task supports more initialization parameters, including network structure, loss function, post-processing strategy and so on.
 - Different from tasks such as segmentation, classification and change detection, detection tasks do not support the loss function specified through the `losses` parameter. However, for some trainers such as `PPYOLO`, the loss function can be customized by `use_iou_loss` and other parameters.
-- Different sub-classes support model-related input parameters, for details, refer to [Model definition](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/rs_models/det) and [Trainer definition](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/object_detector.py).
+- Different subclasses support model-related input parameters. For details, you can refer to [model definitions](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/rs_models/det) and [trainer definitions](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/object_detector.py).
 
-### Initialize `BaseRestorer` Sub-Class Object
+### Initialize `BaseRestorer` Subclass Object
 
-- Generally support setting `sr_factor` parameter, representing super resolution multiple; for models that do not support super resolution rebuild tasks, `sr_factor` is set to `None`.
-- Specify the loss function used during model training through the `losses` parameter. `losses` needs to be a callable object or dictionary. `losses` specified manually must have the same format as the the sub-class `default_loss()` method.
+- Generally support setting `sr_factor` parameter, representing the scaling factor in image super resolution; for models that do not support super resolution rebuild tasks, `sr_factor` is set to `None`.
+- Specify the loss function used during model training through the `losses` parameter. `losses` needs to be a callable object or dictionary. `losses` specified manually must have the same format as the the subclass `default_loss()` method.
 - The `min_max` parameter can specify the numerical range of model input and output. If `None`, the default range of values for the class is used.
-- Different sub-classes support model-related input parameters, for details, refer to [Model definition](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/rs_models/res) and [Trainer definition](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/restorer.py).
+- Different subclasses support model-related input parameters. For details, you can refer to [model definitions](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/rs_models/res) and [trainer definitions](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/restorer.py).
 
-### Initialize `BaseSegmenter` Sub-Class Object
+### Initialize `BaseSegmenter` Subclass Object
 
 - The parameters `in_channels`, `num_classes`, and  `use_mixed_loss` are generally supported, indicating the number of input channels, the number of output categories, and whether the preset mixing loss is used.
 - `use_mixed_loss` will be deprecated in the future, so it is not recommended.
 - Specify the loss function used during model training through the `losses` parameter. `losses` needs to be a dictionary, where the values for the keys `types` and `coef` are two equal-length lists representing the loss function object (a callable object) and the weight of the loss function, respectively. For example: `losses={'types': [LossType1(), LossType2()], 'coef': [1.0, 0.5]}`. It is equivalent to calculating the following loss function in the training process: `1.0*LossType1()(logits, labels)+0.5*LossType2()(logits, labels)`, where `logits` and `labels` are model output and GT labels, respectively.
-- Different sub-classes support model-related input parameters, for details, refer to [Model definition](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/rs_models/seg) and [Trainer definition](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/segmentor.py).
+- Different subclasses support model-related input parameters. For details, you can refer to [model definitions](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/rs_models/seg) and [trainer definitions](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/segmentor.py).
 
 ## `train()`
 

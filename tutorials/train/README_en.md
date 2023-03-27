@@ -43,7 +43,7 @@ Sample code using the PaddleRS training model is curated in this directory. The 
 
 + PaddleRS installation
 
-The PaddleRS code will be updated as the development progresses. You can install code for the develop branch to use the latest features as follows:
+The PaddleRS code will be updated as the development progresses. You can install the develop branch to use the latest features as follows:
 
 ```shell
 git clone https://github.com/PaddlePaddle/PaddleRS
