@@ -224,7 +224,7 @@ Input parameter list:
 |`img_file`|`list[str\|tuple\|np.ndarray]` \| `str` \| `tuple` \| `np.ndarray`|For scene classification, object detection, image restoration and image segmentation tasks, this parameter can be a single image path, or a decoded image data in [h, w, c] with a float32 type (expressed as NumPy array), or a list of image paths or np.ndarray objects. For the change detection task, the parameter can be a two-tuple of image path (representing the two time phase image paths respectively), or a two-tuple composed of two decoded images, or a list composed of one of the above two two-tuples.||
 |`topk`|`int`|It is used in scenario classification model prediction, indicating that the category with the top `topk` in the output probability of the model is selected as the final result.|`1`|
 |`transforms`|`paddlers.transforms.Compose`\|`None`|Apply data transformation operators to input data. If `None`, the operators read from 'model.yml' is used.|`None`|
-|`warmup_iters`|`int`|Number of warm-up rounds used to evaluate model inference and pre- and post-processing speed. If it is greater than 1, the `warmup_iters` inference is repeated in advance before being formally predicted and its speed assessed.|`0`|
+|`warmup_iters`|`int`|The number of warm-up rounds used to evaluate model inference and pre- and post-processing speed. If it is greater than 1, the `warmup_iters` inference is repeated in advance before being formally predicted and its speed assessed.|`0`|
 |`repeats`|`int`|The number of repetitions used to assess model reasoning and pre- and post-processing speed. If it is greater than 1, repeats the prediction and averages the time.|`1`|
 |`quiet`|`bool`|If `True`, no timing information is printed.|`False`|
 
