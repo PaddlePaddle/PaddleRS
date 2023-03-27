@@ -17,7 +17,7 @@ openpyxl
 # paddlepaddle-gpu >= 2.2.0
 paddleslim >= 2.2.1, < 2.3.5
 pandas
-protobuf >= 3.1.0, <= 3.20.0
+protobuf >= 3.1.0, <= 4.22.1
 pycocotools
 # pydensecrf
 scikit-learn
