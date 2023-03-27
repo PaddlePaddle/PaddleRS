@@ -69,7 +69,7 @@ python ./coco_tools/json_InfoShow.py \
 | Parameter Name| Description                                                | Default value |
 | ------------- | -----------------------------------------------------------| ------------- |
 | `--json_path` | Path of the json file whose statistics are to be collected.|               |
-| `--show_num`  | (Optional) The number of top elements in the output value. | `5`           |
+| `--show_num`  | (Optional) Number of top elements in the output value. | `5`           |
 | `--Args_show` | (Optional) Whether to print input parameter information.   | `True`        |
 
 #### 3.2.3 Result Presentation
@@ -189,10 +189,10 @@ python ./coco_tools/json_ImgSta.py \
 | Parameter Name         | Description                                                                | Default Value    |
 | ---------------------- | --------------------------------------------------------------------- | -------- |
 | `--json_path`          | Path of the json file whose statistics are to be collected.|          |
-| `--csv_path`           | (Optional) path for the statistics table.| `None`   |
+| `--csv_path`           | (Optional) Path for the statistics table.| `None`   |
 | `--png_shape_path`     | (Optional) png image saving path. The image content is a two-dimensional distribution of all image shapes.                   | `5`      |
 | `--png_shapeRate_path` | (Optional) png image saving path. The image content is a one-dimensional distribution of shape ratio (width/height) of all images.           | `5`      |
-| `--image_keyname`      | (Optional) The key corresponding to the image in the json file.|`'images'`|
+| `--image_keyname`      | (Optional) Key corresponding to the image in the json file.|`'images'`|
 | `--Args_show`          | (Optional) Whether to print input parameter information.       |`True`    |
 
 #### 3.3.3 Result Presentation
@@ -269,7 +269,7 @@ python ./coco_tools/json_AnnoSta.py \
 | `--png_cat_path`       | (Optional) png Image saving path. The image content is the quantity distribution of objects in each category.                                                      | `None`        |
 | `--png_objNum_path`    | (Optional) png Image saving path. The image content is the quantity distribution of annotated objects in a single image.                                           | `None`        |
 | `--get_relative`       | (Optional) Whether to generate the shape of the image target detection frame and the relative ratio of the coordinates of the upper left corner and lower right corner of the object detection frame (horizontal axis coordinates/image length, vertical axis coordinates/image width).| `None`        |
-| `--image_keyname`      | (Optional) The key corresponding to the image in the json file                                                                                                     | `'images'`    |
+| `--image_keyname`      | (Optional) Key corresponding to the image in the json file                                                                                                     | `'images'`    |
 | `--anno_keyname`       | (Optional) Annotate the corresponding key in the json file                                                                                                         | `'annotations'`|
 | `--Args_show`          | (Optional) Whether to print input parameter information                                                                                                            | `True`        |
 
@@ -370,8 +370,8 @@ python ./coco_tools/json_Img2Json.py \
 | `--test_image_path` | The image directory path that need to count                       |              |
 | `--json_train_path` | json file path of the training set for reference                  |              |
 | `--json_test_path`  | Path to the generated json file of the test set                   |              |
-| `--image_keyname`   | (Optional) The key corresponding to the image in the json file    | `'images'`    |
-| `--cat_keyname`     | (Optional) key corresponding to the category in the json file     | `'categories'`|
+| `--image_keyname`   | (Optional) Key corresponding to the image in the json file    | `'images'`    |
+| `--cat_keyname`     | (Optional) Key corresponding to the category in the json file     | `'categories'`|
 | `--Args_show`       | (Optional) Whether to print input parameter information           | `True`        |
 
 #### 3.5.3 Result Presentation
@@ -455,13 +455,13 @@ python ./coco_tools/json_Split.py \
 | Parameter Name       | Description                                                                                                               | Default Value |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------- | ------------  |
 | `--json_all_path`    | Path to the json file that need to split                                                                                  |               |
-| `--json_train_path`  | The generated json file for the train set                                                                                 |               |
-| `--json_val_path`    | The generated json file for the val set                                                                                   |               |
-| `--val_split_rate`   | (Optional) The proportion of files in the val set during the split                                                        | `0.1`         |
+| `--json_train_path`  | Generated json file for the train set                                                                                 |               |
+| `--json_val_path`    | Generated json file for the val set                                                                                   |               |
+| `--val_split_rate`   | (Optional) Proportion of files in the val set during the split                                                        | `0.1`         |
 | `--val_split_num`    | (Optional) Number of val set files during the split. If this parameter is set, the `--val_split_rate` parameter is invalid| `None`        |
 | `--keep_val_inTrain` | (Optional) Whether to keep the val part in the train during the split                                                     | `False`       |
-| `--image_keyname`    | (Optional) The key corresponding to the image in the json file                                                            | `'images'`    |
-| `--cat_keyname`      | (Optional) The key corresponding to the category in the json file                                                         | `'categories'`|
+| `--image_keyname`    | (Optional) Key corresponding to the image in the json file                                                            | `'images'`    |
+| `--cat_keyname`      | (Optional) Key corresponding to the category in the json file                                                         | `'categories'`|
 | `--Args_show`        | (Optional) Whether to print input parameter information                                                                   | `'True'`      |
 
 #### 3.6.3 Result Presentation
@@ -510,8 +510,8 @@ python ./coco_tools/json_Merge.py \
 | -------------- | ---------------------------------------------------------------- | --------------------------- |
 | `--json1_path` | json file1 path to merge                                         |                             |
 | `--json2_path` | json file2 path to merge                                         |                             |
-| `--save_path`  | generated json file                                              |                             |
-| `--merge_keys` | (Optional) The keys to be merged during the merging process      | `['images', 'annotations']` |
+| `--save_path`  | Generated json file                                              |                             |
+| `--merge_keys` | (Optional) Keys to be merged during the merging process      | `['images', 'annotations']` |
 | `--Args_show`  | (Optional) Whether to print input parameter information          | `True`                      |
 
 #### 3.7.3 Result Presentation

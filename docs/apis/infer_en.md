@@ -169,12 +169,12 @@ Input parameter list:
 |-------|----|--------|-----|
 |`img_file`|`str`|Input image path.||
 |`save_dir`|`str`|Predicted results output path.||
-|`block_size`|`list[int]` \| `tuple[int]` \| `int`|The size of the sliding window (specifying the width, height in a list or tuple, or the same width and height in an integer).||
-|`overlap`|`list[int]` \| `tuple[int]` \| `int`|The sliding step size of the sliding window (specifying the width, height in a list or tuple, or the same width and height in an integer).|`36`|
+|`block_size`|`list[int]` \| `tuple[int]` \| `int`|Size of the sliding window (specifying the width, height in a list or tuple, or the same width and height in an integer).||
+|`overlap`|`list[int]` \| `tuple[int]` \| `int`|Sliding step size of the sliding window (specifying the width, height in a list or tuple, or the same width and height in an integer).|`36`|
 |`transforms`|`paddlers.transforms.Compose` \| `None`|Apply data transformation operators to input data. If `None`, the data transformation operators of trainer in the validation phase is used.|`None`|
-|`invalid_value`|`int`|The value used to mark invalid pixels in the output image.|`255`|
+|`invalid_value`|`int`|Value used to mark invalid pixels in the output image.|`255`|
 |`merge_strategy`|`str`|Strategies used to merge sliding window overlapping areas.`'keep_first'` represents the prediction category that retains the most advanced window in the traversal order (left to right, top to bottom, column first); `'keep_last'` stands for keeping the prediction category of the last window in the traversal order;`'accum'` means to calculate the final prediction category by summing the prediction probabilities given by each window in the overlapping area. It should be noted that when dense inference with large `overlap` is carried out for large size images, the use of `'accum'` strategy may lead to longer inference time, but generally it can achieve better performance at the window boundary.|`'keep_last'`|
-|`batch_size`|`int`|The mini-batch size used for prediction.|`1`|
+|`batch_size`|`int`|Mini-batch size used for prediction.|`1`|
 |`eager_load`|`bool`|If `True`, instead of using lazy memory loading, the entire image is loaded into memory at once at the beginning of the prediction.|`False`|
 |`quiet`|`bool`|If `True`, the predicted progress is not displayed.|`False`|
 

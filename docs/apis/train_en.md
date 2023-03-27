@@ -74,11 +74,11 @@ The meanings of each parameter are as follows:
 |`train_batch_size`|`int`|Batch size used during training.|`2`|
 |`eval_dataset`|`paddlers.datasets.CDDataset` \| `None`|Validation dataset.|`None`|
 |`optimizer`|`paddle.optimizer.Optimizer` \| `None`|Optimizer used during training. If `None`, the optimizer defined by default is used.|`None`|
-|`save_interval_epochs`|`int`|The number of intervals epochs of the model stored during training.|`1`|
-|`log_interval_steps`|`int`|The number of steps (i.e., the number of iterations) between printing logs during training.|`2`|
-|`save_dir`|`str`|The path to save the model.|`'output'`|
-|`pretrain_weights`|`str` \| `None`|The name/path of the pre-training weight. If `None`, the pre-training weight is not used.|`None`|
-|`learning_rate`|`float`|The learning rate used during training, for default optimizer.|`0.01`|
+|`save_interval_epochs`|`int`|Number of intervals epochs of the model stored during training.|`1`|
+|`log_interval_steps`|`int`|Number of steps (i.e., the number of iterations) between printing logs during training.|`2`|
+|`save_dir`|`str`|Path to save the model.|`'output'`|
+|`pretrain_weights`|`str` \| `None`|Name/path of the pre-training weight. If `None`, the pre-training weight is not used.|`None`|
+|`learning_rate`|`float`|Learning rate used during training, for default optimizer.|`0.01`|
 |`lr_decay_power`|`float`|Learning rate attenuation coefficient, for default optimizer.|`0.9`|
 |`early_stop`|`bool`|Whether the early stop policy is enabled during training.|`False`|
 |`early_stop_patience`|`int`|`patience` parameters when the early stop policy is enabled (refer to [`EarlyStop`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/utils/utils.py)).|`5`|
@@ -117,11 +117,11 @@ The meanings of each parameter are as follows:
 |`train_batch_size`|`int`|Batch size used during training.|`2`|
 |`eval_dataset`|`paddlers.datasets.ClasDataset` \| `None`|Validation dataset.|`None`|
 |`optimizer`|`paddle.optimizer.Optimizer` \| `None`|Optimizer used during training. If `None`, the optimizer defined by default is used.|`None`|
-|`save_interval_epochs`|`int`|The number of intervals epochs of the model stored during training.|`1`|
-|`log_interval_steps`|`int`|The number of steps (i.e., the number of iterations) between printing logs during training.|`2`|
-|`save_dir`|`str`|The path to save the model.|`'output'`|
-|`pretrain_weights`|`str` \| `None`|The name/path of the pre-training weight. If `None`, the pre-training weight is not used.|`'IMAGENET'`|
-|`learning_rate`|`float`|The learning rate used during training, for default optimizer.|`0.1`|
+|`save_interval_epochs`|`int`|Number of intervals epochs of the model stored during training.|`1`|
+|`log_interval_steps`|`int`|Number of steps (i.e., the number of iterations) between printing logs during training.|`2`|
+|`save_dir`|`str`|Path to save the model.|`'output'`|
+|`pretrain_weights`|`str` \| `None`|Name/path of the pre-training weight. If `None`, the pre-training weight is not used.|`'IMAGENET'`|
+|`learning_rate`|`float`|Learning rate used during training, for default optimizer.|`0.1`|
 |`lr_decay_power`|`float`|Learning rate attenuation coefficient, for default optimizer.|`0.9`|
 |`early_stop`|`bool`|Whether the early stop policy is enabled during training.|`False`|
 |`early_stop_patience`|`int`|`patience` parameters when the early stop policy is enabled (refer to [`EarlyStop`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/utils/utils.py)).|`5`|
@@ -165,14 +165,14 @@ The meanings of each parameter are as follows:
 |`train_batch_size`|`int`|Batch size used during training.(For multi-card training, total batch size for all equipment).|`64`|
 |`eval_dataset`|`paddlers.datasets.COCODetDataset` \| `paddlers.datasets.VOCDetDataset` \| `None`|Validation dataset.|`None`|
 |`optimizer`|`paddle.optimizer.Optimizer` \| `None`|Optimizer used during training. If `None`, the optimizer defined by default is used.|`None`|
-|`save_interval_epochs`|`int`|The number of intervals epochs of the model stored during training.|`1`|
-|`log_interval_steps`|`int`|The number of steps (i.e., the number of iterations) between printing logs during training.|`10`|
-|`save_dir`|`str`|The path to save the model.|`'output'`|
-|`pretrain_weights`|`str` \| `None`|The name/path of the pre-training weight. If `None`, the pre-training weight is not used.|`'IMAGENET'`|
-|`learning_rate`|`float`|The learning rate used during training, for default optimizer.|`0.001`|
-|`warmup_steps`|`int`|The number of [warm-up](https://www.mdpi.com/2079-9292/10/16/2029/htm) rounds used by the default optimizer.|`0`|
+|`save_interval_epochs`|`int`|Number of intervals epochs of the model stored during training.|`1`|
+|`log_interval_steps`|`int`|Number of steps (i.e., the number of iterations) between printing logs during training.|`10`|
+|`save_dir`|`str`|Path to save the model.|`'output'`|
+|`pretrain_weights`|`str` \| `None`|Name/path of the pre-training weight. If `None`, the pre-training weight is not used.|`'IMAGENET'`|
+|`learning_rate`|`float`|Learning rate used during training, for default optimizer.|`0.001`|
+|`warmup_steps`|`int`|Number of [warm-up](https://www.mdpi.com/2079-9292/10/16/2029/htm) rounds used by the default optimizer.|`0`|
 |`warmup_start_lr`|`int`|Default initial learning rate used by the warm-up phase of the optimizer.|`0`|
-|`lr_decay_epochs`|`list` \| `tuple`|milestones of learning rate decline of the default optimizer, in terms of epoch. That is, which epoch the decay of the learning rate occurs.|`(216, 243)`|
+|`lr_decay_epochs`|`list` \| `tuple`|Milestones of learning rate decline of the default optimizer, in terms of epoch. That is, which epoch the decay of the learning rate occurs.|`(216, 243)`|
 |`lr_decay_gamma`|`float`|Learning rate attenuation coefficient, for default optimizer.|`0.1`|
 |`metric`|`str` \| `None`|Evaluation metrics, can be `'VOC'`、`COCO` or `None`. If `None`, the evaluation index to be used is automatically determined according to the format of the dataset.|`None`|
 |`use_ema`|`bool`|Whether to enable [exponential moving average strategy](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/models/ppdet/optimizer.py) to update model weight parameters.|`False`|
@@ -213,11 +213,11 @@ The meanings of each parameter are as follows:
 |`train_batch_size`|`int`|Batch size used during training.|`2`|
 |`eval_dataset`|`paddlers.datasets.ResDataset` \| `None`|Validation dataset.|`None`|
 |`optimizer`|`paddle.optimizer.Optimizer` \| `None`|Optimizer used during training. If `None`, the optimizer defined by default is used.|`None`|
-|`save_interval_epochs`|`int`|The number of intervals epochs of the model stored during training.|`1`|
-|`log_interval_steps`|`int`|The number of steps (i.e., the number of iterations) between printing logs during training.|`2`|
-|`save_dir`|`str`|The path to save the model.|`'output'`|
-|`pretrain_weights`|`str` \| `None`|The name/path of the pre-training weight. If `None`, the pre-training weight is not used.|`'CITYSCAPES'`|
-|`learning_rate`|`float`|The learning rate used during training, for default optimizer.|`0.01`|
+|`save_interval_epochs`|`int`|Number of intervals epochs of the model stored during training.|`1`|
+|`log_interval_steps`|`int`|Number of steps (i.e., the number of iterations) between printing logs during training.|`2`|
+|`save_dir`|`str`|Path to save the model.|`'output'`|
+|`pretrain_weights`|`str` \| `None`|Name/path of the pre-training weight. If `None`, the pre-training weight is not used.|`'CITYSCAPES'`|
+|`learning_rate`|`float`|Learning rate used during training, for default optimizer.|`0.01`|
 |`lr_decay_power`|`float`|Learning rate attenuation coefficient, for default optimizer.|`0.9`|
 |`early_stop`|`bool`|Whether the early stop policy is enabled during training.|`False`|
 |`early_stop_patience`|`int`|`patience` parameters when the early stop policy is enabled (refer to [`EarlyStop`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/utils/utils.py)).|`5`|
@@ -256,11 +256,11 @@ The meanings of each parameter are as follows:
 |`train_batch_size`|`int`|Batch size used during training.|`2`|
 |`eval_dataset`|`paddlers.datasets.SegDataset` \| `None`|Validation dataset.|`None`|
 |`optimizer`|`paddle.optimizer.Optimizer` \| `None`|Optimizer used during training. If `None`, the optimizer defined by default is used.|`None`|
-|`save_interval_epochs`|`int`|The number of intervals epochs of the model stored during training.|`1`|
-|`log_interval_steps`|`int`|The number of steps (i.e., the number of iterations) between printing logs during training.|`2`|
-|`save_dir`|`str`|The path to save the model.|`'output'`|
-|`pretrain_weights`|`str` \| `None`|The name/path of the pre-training weight. If `None`, the pre-training weight is not used.|`'CITYSCAPES'`|
-|`learning_rate`|`float`|The learning rate used during training, for default optimizer.|`0.01`|
+|`save_interval_epochs`|`int`|Number of intervals epochs of the model stored during training.|`1`|
+|`log_interval_steps`|`int`|Number of steps (i.e., the number of iterations) between printing logs during training.|`2`|
+|`save_dir`|`str`|Path to save the model.|`'output'`|
+|`pretrain_weights`|`str` \| `None`|Name/path of the pre-training weight. If `None`, the pre-training weight is not used.|`'CITYSCAPES'`|
+|`learning_rate`|`float`|Learning rate used during training, for default optimizer.|`0.01`|
 |`lr_decay_power`|`float`|Learning rate attenuation coefficient, for default optimizer.|`0.9`|
 |`early_stop`|`bool`|Whether the early stop policy is enabled during training.|`False`|
 |`early_stop_patience`|`int`|`patience` parameters when the early stop policy is enabled (refer to [`EarlyStop`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/utils/utils.py)).|`5`|
@@ -282,7 +282,7 @@ The meanings of each parameter are as follows:
 |Parameter Name|Type|Parameter Description|Default Value|
 |-------|----|--------|-----|
 |`eval_dataset`|`paddlers.datasets.CDDataset`|Validation dataset.||
-|`batch_size`|`int`|The batch size used in the evaluation (for multi-card training, the batch size is totaled for all devices).|`1`|
+|`batch_size`|`int`|Batch size used in the evaluation (for multi-card training, the batch size is totaled for all devices).|`1`|
 |`return_details`|`bool`|Whether to return detailed information.|`False`|
 
 If `return_details` is `False`(default), output a `collections.OrderedDict` object. For the 2-category change detection task, the output contains the following key-value pairs:
@@ -322,7 +322,7 @@ The meanings of each parameter are as follows:
 |Parameter Name|Type|Parameter Description|Default Value|
 |-------|----|--------|-----|
 |`eval_dataset`|`paddlers.datasets.ClasDataset`|Validation dataset.||
-|`batch_size`|`int`|The batch size used in the evaluation (for multi-card training, the batch size is totaled for all devices).|`1`|
+|`batch_size`|`int`|Batch size used in the evaluation (for multi-card training, the batch size is totaled for all devices).|`1`|
 |`return_details`|`bool`|*Do not manually set this parameter in the current version.*|`False`|
 
 output a `collections.OrderedDict` object, including the following key-value pairs:
@@ -349,7 +349,7 @@ The meanings of each parameter are as follows:
 |Parameter Name|Type|Parameter Description|Default Value|
 |-------|----|--------|-----|
 |`eval_dataset`|`paddlers.datasets.COCODetDataset` \| `paddlers.datasets.VOCDetDataset`|Validation dataset.||
-|`batch_size`|`int`|The batch size used in the evaluation (for multi-card training, the batch size is totaled for all devices).|`1`|
+|`batch_size`|`int`|Batch size used in the evaluation (for multi-card training, the batch size is totaled for all devices).|`1`|
 |`metric`|`str` \| `None`|Evaluation metrics, can be `'VOC'`、`COCO` or `None`. If `None`, the evaluation index to be used is automatically determined according to the format of the dataset.|`None`|
 |`return_details`|`bool`|Whether to return detailed information.|`False`|
 
@@ -380,7 +380,7 @@ The meanings of each parameter are as follows:
 |Parameter Name|Type|Parameter Description|Default Value|
 |-------|----|--------|-----|
 |`eval_dataset`|`paddlers.datasets.ResDataset`|Validation dataset.||
-|`batch_size`|`int`|The batch size used in the evaluation (for multi-card training, the batch size is totaled for all devices).|`1`|
+|`batch_size`|`int`|Batch size used in the evaluation (for multi-card training, the batch size is totaled for all devices).|`1`|
 |`return_details`|`bool`|*Do not manually set this parameter in the current version.*|`False`|
 
 Output a `collections.OrderedDict` object, including the following key-value pairs:
@@ -403,7 +403,7 @@ The meanings of each parameter are as follows:
 |Parameter Name|Type|Parameter Description|Default Value|
 |-------|----|--------|-----|
 |`eval_dataset`|`paddlers.datasets.SegDataset`|Validation dataset.||
-|`batch_size`|`int`|The batch size used in the evaluation (for multi-card training, the batch size is totaled for all devices).|`1`|
+|`batch_size`|`int`|Batch size used in the evaluation (for multi-card training, the batch size is totaled for all devices).|`1`|
 |`return_details`|`bool`|Whether to return detailed information.|`False`|
 
 If `return_details` is `False`(default), return a `collections.OrderedDict` object, including the following key-value pairs:
