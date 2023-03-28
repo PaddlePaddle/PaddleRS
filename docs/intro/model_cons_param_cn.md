@@ -107,7 +107,7 @@
 | `num_classes (int)`      | 目标类别数量             | `2`    |
 | `use_mixed_loss (bool)`  | 是否使用混合损失函数         | `False`|
 | `losses (list)`          | 损失函数列表             | `None` |
-| `use_dropout (bool)`     | 是否使用`dropout`        | `False`|
+| `use_dropout (bool)`     | 是否使用 dropout        | `False`|
 
 ## `FC-EF`
 
@@ -121,7 +121,7 @@
 | `use_mixed_loss (bool)` | 是否使用混合损失函数             | `False`|
 | `losses (list)`         | 损失函数列表                  | `None` |
 | `in_channels (int)`     | 输入图像的通道数              | `6`    |
-| `use_dropout (bool)`    | 是否使用`dropout`              | `False`|
+| `use_dropout (bool)`    | 是否使用 dropout              | `False`|
 
 
 
@@ -137,7 +137,7 @@
 | `use_mixed_loss (bool)` | 是否使用混合损失函数            | `False`|
 | `losses (list)`         | 损失函数列表                  | `None` |
 | `in_channels (int)`     | 输入图像的通道数              | `3`    |
-| `use_dropout (bool)`    | 是否使用`dropout`               | `False`|
+| `use_dropout (bool)`    | 是否使用 dropout               | `False`|
 
 
 ## `FC-Siam-diff`
@@ -152,7 +152,7 @@
 | `use_mixed_loss (bool)` | 是否使用混合损失函数  |`False` |
 | `losses (List)` | 损失函数列表      | `None` |
 | `in_channels (int)` | 输入图像的通道数    | int | `3` |
-| `use_dropout (bool)` | 是否使用dropout | `False` |
+| `use_dropout (bool)` | 是否使用 dropout | `False` |
 
 
 ## `FCCDN`
@@ -286,7 +286,7 @@
 | `min_max (tuple)`    | 输入图像的像素值的最小值和最大值。如果未指定，则使用数据类型的默认最小值和最大值。                                              | `None` |
 | `use_gan (bool)`     | 布尔值，指示是否在训练过程中使用 GAN (生成对抗网络)。如果是，将使用 GAN。                                             | `True` |
 | `in_channels (int)`  | 输入图像的通道数                                                                               | `3` |
-| `out_channels (int)` | 输出图像的通道数。默认为 3。                                                                        | `3` |
+| `out_channels (int)` | 输出图像的通道数。                                                                        | `3` |
 | `nf (int)`           | 模型第一层卷积层的滤波器数量。                                                                        | `64` |
 | `nb (int)`           | 模型中残差块的数量。                                                                             | `23` |
 
