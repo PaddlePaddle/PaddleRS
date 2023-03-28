@@ -9,8 +9,8 @@ Append remote sensing index to input image(s).
 | Parameter Name             | Description                                                                                                                                        | Default Value       |
 |-----------------|----------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
 |`index_type (str)`| Type of remote sensinng index. See supported index types in https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/indices.py . |           |
-|`band_indexes (dict，optional)`|Mapping of band names to band indices (starting from 1)`. See band names in  https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/indices.py。                                           | None      |
-|`satellite (str，optional)`|Type of satellite. If set, band indices will be automatically determined accordingly. See supported satellites in https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/satellites.py。                               | None      |
+|`band_indexes (dict，optional)`|Mapping of band names to band indices (starting from 1)`. See band names in  https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/indices.py。                                           | `None`      |
+|`satellite (str，optional)`|Type of satellite. If set, band indices will be automatically determined accordingly. See supported satellites in https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/satellites.py。                               | `None`      |
 
 
 ## `CenterCrop`
