@@ -155,8 +155,8 @@ Resize input to random sizes.
 
 | Parameter Name            | Description                                                          | Default Value                 |
 |---------------------------|----------------------------------------------------------------------|---------------------|
-| `Target_sizes (list[int] \| list[list | tuple] | tuple [list | tuple])` | Multiple target sizes, each of which should be int, list, or tuple.  | `.5`                  |
-| `interp (str，optional)`   | Interpolation method for resizing image(s)`. One of {`'NEAREST'`, `'LINEAR'`, `'CUBIC'`, `'AREA'`, `'LANCZOS4'`, `'RANDOM'`}. |   `'LINEAR'`                  ||
+| `Target_sizes (list[int] \| list[list \| tuple] \| tuple [list \| tuple])` | Multiple target sizes, each of which should be int, list, or tuple.  | `.5`                  |
+| `interp (str，optional)`   | Interpolation method for resizing image(s). One of {`'NEAREST'`, `'LINEAR'`, `'CUBIC'`, `'AREA'`, `'LANCZOS4'`, `'RANDOM'`}. |   `'LINEAR'`                  ||
 
 
 ## `RandomResizeByShort`
