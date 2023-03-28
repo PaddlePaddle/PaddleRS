@@ -58,26 +58,26 @@ PaddleRS所支持的数据变换算子可见(https://github.com/PaddlePaddle/Pad
   - 2. Im = Im - mean
   - 3. Im = Im / STD
 
-| 参数名                                       | 描述                               | 默认值                          |
-|-------------------------------------------|----------------------------------|------------------------------|
-| `mean (list[float]| tuple[float]，可选)`    | 输入图像的均值                          | `[0.485,0.456,0.406]` |
-| `std (list[float]| tuple[float]，可选)`     | 输入图像的标准差                         | `[0.229,0.224,0.225]` |
-| `min_val (list[float] | tuple[float]，可选)` | 输入图像的最小值。如果为`None`，则对所有通道使用`0`   |    `None`      |
-| `max_val (list[float] | tuple[float]，可选)` | 输入图像的最大值。如果为`None`，则所有通道均使用`255` |  `None`        |
-| `apply_to_tar (bool，可选)`                  | 是否对目标图像应用数据变换算子                  | `True`                         |
+| 参数名                 | 描述                               | 默认值                          |
+|---------------------|----------------------------------|------------------------------|
+| `mean (list[float] \| tuple[float]，可选)`    | 输入图像的均值                          | `[0.485,0.456,0.406]` |
+| `std (list[float]   \| tuple[float]，可选)`     | 输入图像的标准差                         | `[0.229,0.224,0.225]` |
+| `min_val (list[float] \| tuple[float]，可选)` | 输入图像的最小值。如果为`None`，则对所有通道使用`0`   |    `None`      |
+| `max_val (list[float]    \| tuple[float]，可选)` | 输入图像的最大值。如果为`None`，则所有通道均使用`255` |  `None`        |
+| `apply_to_tar (bool，可选)` | 是否对目标图像应用数据变换算子                  | `True`                         |
 
 ## `Pad`
 
 将输入影像填充到指定的大小
 
-| 参数名                                          | 描述                                                         | 默认值                |
-| ----------------------------------------------- | ------------------------------------------------------------ | --------------------- |
-| `target_size (list[int] | tuple[int]，可选)`    | 图像目标大小                                                 | `None`                |
-| `pad_mode (int，可选)`                          | 填充模式。目前只支持四种模式:[-1,0,1,2]。如果是`-1`，使用指定的偏移量。若为`0`，只向右和底部填充;若为`1`，按中心填充。如果`2`，只填充左侧和顶部 | `0`                   |
-| `offset (list[int]| None，可选)`                | 填充偏移量                                                   | `None`                |
-| `im_padding_value (list[float] | tuple[float])` | 填充区域的 RGB 值                                            | `(127.5,127.5,127.5)` |
-| `label_padding_value (int，可选)`               | 掩码的填充值                                                 | `255`                 |
-| `size_divisor (int)`                            | 填充后的图像宽度和高度将是`'size_divisor'`的倍数             |                       |
+| 参数名                      | 描述                                                         | 默认值                |
+|--------------------------| ------------------------------------------------------------ | --------------------- |
+| `target_size (list[int] \| tuple[int]，可选)`    | 图像目标大小                                                 | `None`                |
+| `pad_mode (int，可选)`      \| 填充模式。目前只支持四种模式:[-1,0,1,2]。如果是`-1`，使用指定的偏移量。若为`0`，只向右和底部填充;若为`1`，按中心填充。如果`2`，只填充左侧和顶部 | `0`                   |
+| `offset (list[int]             \| None，可选)`                | 填充偏移量                                                   | `None`                |
+| `im_padding_value (list[float]   \| tuple[float])` | 填充区域的 RGB 值                                            | `(127.5,127.5,127.5)` |
+| `label_padding_value (int，可选)` | 掩码的填充值                                                 | `255`                 |
+| `size_divisor (int)`     | 填充后的图像宽度和高度将是`'size_divisor'`的倍数             |                       |
 
 ## `RandomBlur`
 
@@ -98,15 +98,15 @@ PaddleRS所支持的数据变换算子可见(https://github.com/PaddlePaddle/Pad
   - 3. 裁剪图像。
   - 4. 调整裁剪区域的大小为' crop_size ' x ' crop_size '。
 
-| 参数名                                    | 描述                               | 默认值                     |
-|----------------------------------------|----------------------------------|-------------------------|
-| `crop_size (int | list[int] | tuple[int])` | 裁剪区域的目标大小。如果为`None`，裁剪区域将不会被调整大小 | `None`                    |
-| `aspect_ratio (list[float]，可选)`          | 以[min, max]格式显示裁剪区域的纵横比          | `[.5, 2.]`                |
-| `thresholds (list[float]，可选)`            | IoU 阈值，用于决定有效的 bbox 裁剪           | `[.0,.1， .3， .5， .7， .9]` |
-| `scaling (list[float], 可选)`              | 裁剪区域与原始图像之间的比例，格式为[min, max]     | `[.3, 1.]`                |
-| `num_attempts (int，可选)`          | 放弃前的最大尝试次数                       | `50`                      |
-| `allow_no_crop (bool，可选)`           | 是否允许不进行裁剪而返回                     | `True`                    |
-| `cover_all_box (bool，可选)`        | 是否强制覆盖整个目标框    | `False`                   |
+| 参数名              | 描述         | 默认值                     |
+|------------------|------------|-------------------------|
+| `crop_size (int \| list[int] \| tuple[int])` | 裁剪区域的目标大小。如果为`None`，裁剪区域将不会被调整大小 | `None`                    |
+| `aspect_ratio (list[float]，可选)` | 以[min, max]格式显示裁剪区域的纵横比 | `[.5, 2.]`                |
+| `thresholds (list[float]，可选)` | IoU 阈值，用于决定有效的 bbox 裁剪 | `[.0,.1， .3， .5， .7， .9]` |
+| `scaling (list[float], 可选)` | 裁剪区域与原始图像之间的比例，格式为[min, max] | `[.3, 1.]`                |
+| `num_attempts (int，可选)` | 放弃前的最大尝试次数 | `50`                      |
+| `allow_no_crop (bool，可选)` | 是否允许不进行裁剪而返回 | `True`                    |
+| `cover_all_box (bool，可选)` | 是否强制覆盖整个目标框 | `False`                   |
 
 ## `RandomDistort`
 
@@ -128,12 +128,12 @@ PaddleRS所支持的数据变换算子可见(https://github.com/PaddlePaddle/Pad
 
 根据随机偏移扩展输入影像。
 
-| 参数名                                              | 描述           | 默认值                 |
-|--------------------------------------------------|--------------|---------------------|
-| `upper_ratio (float，可选)`                           | 原始图像扩展到的最大比例 | `4`                   |
-| `prob (float，可选)`                                 | 应用扩展的概率      | `.5`                  |
-| `im_padding_value (list[float] | tuple[float]，可选)` | 图像的 RGB 填充值  | `(127.5,127.5,127.5)` |
-| `label_padding_value (int，可选)` | 掩码的填充值       | `255`    |
+| 参数名                             | 描述           | 默认值                 |
+|---------------------------------|--------------|---------------------|
+| `upper_ratio (float，可选)`        | 原始图像扩展到的最大比例 | `4`                   |
+| `prob (float，可选)`               | 应用扩展的概率      | `.5`                  |
+| `im_padding_value (list[float] \| tuple[float]，可选)` | 图像的 RGB 填充值  | `(127.5,127.5,127.5)` |
+| `label_padding_value (int，可选)`  | 掩码的填充值       | `255`    |
 
 ## `RandomHorizontalFlip`
 
@@ -147,10 +147,10 @@ PaddleRS所支持的数据变换算子可见(https://github.com/PaddlePaddle/Pad
 
 随机调整输入影像大小。
 
-| 参数名                                                       | 描述                                                         | 默认值     |
-| ------------------------------------------------------------ | ------------------------------------------------------------ | ---------- |
-| `Target_sizes (list[int] | list[list|tuple] | tuple[list | tuple])` | 多个目标大小，每个目标大小应该是`int`、`list`或`tuple`       |            |
-| `interp (str，可选)`                                         | 调整图像大小的插值方法。{`'NEAREST'`, `'LINEAR'`, `'CUBIC'`, `'AREA'`, `'LANCZOS4'`, `'RANDOM'`}之一 | `'LINEAR'` |
+| 参数名                       | 描述                                                         | 默认值     |
+|---------------------------| ------------------------------------------------------------ | ---------- |
+| `Target_sizes (list[int] \| list[list|tuple] | tuple[list | tuple])` | 多个目标大小，每个目标大小应该是`int`、`list`或`tuple`       |            |
+| `interp (str，可选)`         | 调整图像大小的插值方法。{`'NEAREST'`, `'LINEAR'`, `'CUBIC'`, `'AREA'`, `'LANCZOS4'`, `'RANDOM'`}之一 | `'LINEAR'` |
 
 ## `RandomResizeByShort`
 
@@ -204,11 +204,11 @@ PaddleRS所支持的数据变换算子可见(https://github.com/PaddlePaddle/Pad
     -如果' target_size '是一个列表或元组，将图像大小调整为' target_size '。
     注意:如果' interp '为'RANDOM'，则插值方法将随机选择。
 
-| 参数名                                        | 描述        | 默认值      |
-|--------------------------------------------|-----------|----------|
-| `target_size (int | list[int] | tuple[int])` |目标大小。如果它是一个整数，目标高度和宽度都将被设置为`'target_size'`。否则，`'target_size'`表示[目标高度，目标宽度]|          |
-| `interp (str，可选)`                    | 调整图像大小的插值方法。{`'NEAREST'`, `'LINEAR'`, `'CUBIC'`, `'AREA'`, `'LANCZOS4'`, `'RANDOM'`}之一 | `'LINEAR'` |
-| `keep_ratio (bool，可选)`           |  如果为`True`，宽度和高度的比例因子将被设置为相同的值，调整图像的高度/宽度将不大于目标宽度/高度        | `False`    |
+| 参数名                | 描述         | 默认值      |
+|--------------------|------------|----------|
+| `target_size (int \| list[int] \| tuple[int])` |目标大小。如果它是一个整数，目标高度和宽度都将被设置为`'target_size'`。否则，`'target_size'`表示[目标高度，目标宽度]|          |
+| `interp (str，可选)`  | 调整图像大小的插值方法。{`'NEAREST'`, `'LINEAR'`, `'CUBIC'`, `'AREA'`, `'LANCZOS4'`, `'RANDOM'`}之一 | `'LINEAR'` |
+| `keep_ratio (bool，可选)` | 如果为`True`，宽度和高度的比例因子将被设置为相同的值，调整图像的高度/宽度将不大于目标宽度/高度 | `False`    |
 
 ## `ResizeByLong`
 
