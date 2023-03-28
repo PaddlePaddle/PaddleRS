@@ -149,7 +149,7 @@ PaddleRS所支持的数据变换算子可见(https://github.com/PaddlePaddle/Pad
 
 | 参数名                       | 描述                                                         | 默认值     |
 |---------------------------| ------------------------------------------------------------ | ---------- |
-| `Target_sizes (list[int] \| list[list|tuple] | tuple[list | tuple])` | 多个目标大小，每个目标大小应该是`int`、`list`或`tuple`       |            |
+| `Target_sizes (list[int] \| list[list|tuple] \| tuple[list \| tuple])` | 多个目标大小，每个目标大小应该是`int`、`list`或`tuple`       |            |
 | `interp (str，可选)`         | 调整图像大小的插值方法。{`'NEAREST'`, `'LINEAR'`, `'CUBIC'`, `'AREA'`, `'LANCZOS4'`, `'RANDOM'`}之一 | `'LINEAR'` |
 
 ## `RandomResizeByShort`
