@@ -1,6 +1,6 @@
-# PaddleRS Data Transform Operator Construct Parameter
+# PaddleRS Data Transformation Operator Construct Parameters
 
-This document describes the parameters of each PaddleRS data transform operator in detail, including the operator name, operator purpose, parameter name, parameter type, parameter meaning, and parameter Default Value value of each operator.
+This document describes the parameters of each PaddleRS data transformation operator in detail, including the operator name, operator purpose, parameter name, parameter type, parameter meaning, and parameter default value of each operator.
 
 ## `AppendIndex`
 
