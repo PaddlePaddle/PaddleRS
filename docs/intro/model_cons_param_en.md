@@ -142,7 +142,7 @@ The original article refers to Rodrigo Caye Daudt, et al. "Fully convolutional s
 | `use_mixed_loss (bool)` | Whether to use mixed loss function                       |`False` |
 | `losses (list)`         | List of loss functions                                       | `None` |
 | `in_channels (int)`     | Number of channels of the input image                                                          | int | `3` |
-| `use_dropout (bool)`    | Boolean indicating whether to use dropout regularization                                         | `False` |
+| `use_dropout (bool)`    | Whether to use dropout                                         | `False` |
 
 ## `FCCDN`
 
