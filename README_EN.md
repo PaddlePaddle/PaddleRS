@@ -270,7 +270,7 @@ PaddleRS is an end-to-end high-efficent development toolkit for remote sensing a
 ## <img src="./docs/images/teach.png" width="30"/> Tutorials and Documents
 
 * Quick Start
-  * [Quick start](./tutorials/train/README.md)
+  * [Quick start](./docs/quick_start.md)
 * Data Preparation
   * [Open-source remote sensing datasets](./docs/data/dataset.md)
   * [Efficient interactive segmentation tool EISeg](https://github.com/PaddlePaddle/PaddleSeg/tree/release/2.7/EISeg)

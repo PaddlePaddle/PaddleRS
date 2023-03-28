@@ -167,7 +167,7 @@ Resize input to random sizes while keeping the aspect ratio.
 
 | Parameter name                  | Description        | Default |
 |---------------------------|-----------|-----|
-| `short_sizes (list[int])` | Target size of the shorter side of the image(s).| `.5`  |
+| `short_sizes (int | list[int])` | Target size of the shorter side of the image(s).| `.5`  |
 | `max_size (int，optional)` |Upper bound of longer side of the image(s). If `max_size` is -1, no upper bound will be applied.    | `-1`  |
 | `interp (str，optional)`    |  Interpolation method for resizing image(s). One of {'`NEAREST'`, `'LINEAR'`, `'CUBIC'`, `'AREA'`, `'LANCZOS4'`, `'RANDOM'`}.  | `'LINEAR'`    |
 
