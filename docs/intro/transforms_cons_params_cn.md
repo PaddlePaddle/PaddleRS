@@ -61,9 +61,9 @@ PaddleRS所支持的数据变换算子可见(https://github.com/PaddlePaddle/Pad
 | 参数名                 | 描述                               | 默认值                          |
 |---------------------|----------------------------------|------------------------------|
 | `mean (list[float] \| tuple[float]，可选)`    | 输入图像的均值                          | `[0.485,0.456,0.406]` |
-| `std (list[float]   \| tuple[float]，可选)`     | 输入图像的标准差                         | `[0.229,0.224,0.225]` |
+| `std (list[float] \| tuple[float]，可选)`     | 输入图像的标准差                         | `[0.229,0.224,0.225]` |
 | `min_val (list[float] \| tuple[float]，可选)` | 输入图像的最小值。如果为`None`，则对所有通道使用`0`   |    `None`      |
-| `max_val (list[float]    \| tuple[float]，可选)` | 输入图像的最大值。如果为`None`，则所有通道均使用`255` |  `None`        |
+| `max_val (list[float] \| tuple[float]，可选)` | 输入图像的最大值。如果为`None`，则所有通道均使用`255` |  `None`        |
 | `apply_to_tar (bool，可选)` | 是否对目标图像应用数据变换算子                  | `True`                         |
 
 ## `Pad`
@@ -73,9 +73,9 @@ PaddleRS所支持的数据变换算子可见(https://github.com/PaddlePaddle/Pad
 | 参数名                      | 描述                                                         | 默认值                |
 |--------------------------| ------------------------------------------------------------ | --------------------- |
 | `target_size (list[int] \| tuple[int]，可选)`    | 图像目标大小                                                 | `None`                |
-| `pad_mode (int，可选)`      \| 填充模式。目前只支持四种模式:[-1,0,1,2]。如果是`-1`，使用指定的偏移量。若为`0`，只向右和底部填充;若为`1`，按中心填充。如果`2`，只填充左侧和顶部 | `0`                   |
-| `offset (list[int]             \| None，可选)`                | 填充偏移量                                                   | `None`                |
-| `im_padding_value (list[float]   \| tuple[float])` | 填充区域的 RGB 值                                            | `(127.5,127.5,127.5)` |
+| `pad_mode (int，可选)` | 填充模式。目前只支持四种模式:[-1,0,1,2]。如果是`-1`，使用指定的偏移量。若为`0`，只向右和底部填充;若为`1`，按中心填充。如果`2`，只填充左侧和顶部 | `0`                   |
+| `offset (list[int] \| None，可选)`                | 填充偏移量                                                   | `None`                |
+| `im_padding_value (list[float] \| tuple[float])` | 填充区域的 RGB 值                                            | `(127.5,127.5,127.5)` |
 | `label_padding_value (int，可选)` | 掩码的填充值                                                 | `255`                 |
 | `size_divisor (int)`     | 填充后的图像宽度和高度将是`'size_divisor'`的倍数             |                       |
 
