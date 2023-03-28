@@ -2,7 +2,7 @@
 
 ## 环境准备
 
-环境准备可参考：[使用教程——环境准备](../tutorials/train/README.md)
+环境准备可参考：[使用教程——训练模型](../tutorials/train/README.md)
 
 ## 模型训练
 
