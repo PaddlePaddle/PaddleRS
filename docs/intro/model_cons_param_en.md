@@ -142,7 +142,7 @@ The original article refers to Rodrigo Caye Daudt, et al. "Fully convolutional s
 | `use_mixed_loss (bool)` | Whether to use mixed loss function                       |`False` |
 | `losses (list)`         | List of loss functions                                       | `None` |
 | `in_channels (int)`     | Number of channels of the input image                                                          | int | `3` |
-| `use_dropout (bool)`    | Boolean indicating whether to use dropout regularization                                         | `False` |
+| `use_dropout (bool)`    | Whether to use dropout                                         | `False` |
 
 ## `FCCDN`
 
@@ -250,7 +250,7 @@ The DRN implementation based on PaddlePaddle.
 | `losses (list)`                                                   | List of loss functions                                                                                                                                                                                              | `None` |
 | `sr_factor (int)`                                                 | Scaling factor for super-resolution, the size of the original image will be multiplied by this factor. For example, if the original image is `H` x `W`, the output image will be `sr_factor * H` x `sr_factor * W`. | `4` |
 | `min_max (None \| tuple[float, float])`                                                                                                                                                                                               | Minimum and maximum image pixel values                                                                                                                                                                              | `None` |
-| `scales (tuple[int, ...])`                                        | Scaling factor                                                                                                                                                                                                      | `(2, 4)` |
+| `scales (tuple[int])`                                        | Scaling factor                                                                                                                                                                                                      | `(2, 4)` |
 | `n_blocks (int)`                                                  | Number of residual blocks                                                                                                                                                                                           | `30` |
 | `n_feats (int)`                                                   | Number of features in the residual block                                                                                                                                                                            | `16` |
 | `n_colors (int)`                                                  | Number of image channels                                                                                                                                                                                            | `3` |

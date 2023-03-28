@@ -9,8 +9,8 @@ Append remote sensing index to input image(s).
 | Parameter Name             | Description                                                                                                                                        | Default Value       |
 |-----------------|----------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
 |`index_type (str)`| Type of remote sensinng index. See supported index types in https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/indices.py . |           |
-|`band_indexes (dict，optional)`|Mapping of band names to band indices (starting from 1)`. See band names in  https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/indices.py。                                           | None      |
-|`satellite (str，optional)`|Type of satellite. If set, band indices will be automatically determined accordingly. See supported satellites in https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/satellites.py。                               | None      |
+|`band_indexes (dict，optional)`|Mapping of band names to band indices (starting from 1)`. See band names in  https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/indices.py。                                           | `None`      |
+|`satellite (str，optional)`|Type of satellite. If set, band indices will be automatically determined accordingly. See supported satellites in https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/satellites.py。                               | `None`      |
 
 
 ## `CenterCrop`
@@ -63,10 +63,10 @@ Mixup two images and their gt_bbbox/gt_score.
 | Parameter Name      | Description                                                              | Default Value                          |
 |---------------------|--------------------------------------------------------------------------|------------------------------|
 | `mean (list[float] \| tuple[float]，optional)`  | Mean of input image(s)                                                   | `[0.485,0.456,0.406]` |
-| `std (list[float]   \| tuple[float]，optional)`   | Standard deviation of input image(s)                                     | `[0.229,0.224,0.225]` |
-| `min_val (list[float]          \| tuple[float]，optional)` | Inimum value of input image(s). If `None`, use `0` for all channels.     |    `None`      |
-| `max_val (list[float]            \| tuple[float]，optional)` | Maximum value of input image(s). If `None`, use `255`. for all channels. |  `None`        |
-| `apply_to_tar (bool，optional)`     \| Whether to apply transformation to the target image                      | `True`                         |
+| `std (list[float] \| tuple[float]，optional)`   | Standard deviation of input image(s)                                     | `[0.229,0.224,0.225]` |
+| `min_val (list[float] \| tuple[float]，optional)` | Inimum value of input image(s). If `None`, use `0` for all channels.     |    `None`      |
+| `max_val (list[float] \| tuple[float]，optional)` | Maximum value of input image(s). If `None`, use `255`. for all channels. |  `None`        |
+| `apply_to_tar (bool，optional)` \| Whether to apply transformation to the target image                      | `True`                         |
 
 ## `Pad`
 
@@ -76,8 +76,8 @@ Pad image to a specified size or multiple of `size_divisor`.
 |--------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------|
 | `target_size (list[int] \| tuple[int]，optional)`     | Image target size, if `None`, pad to multiple of size_divisor.                                                                                                                                                         | `None`               |
 | `pad_mode (int，optional)` | Currently only four modes are supported:[-1, 0, 1, 2]. if `-1`, use specified offsets. If `0`, only pad to right and bottom If `1`, pad according to center. If `2`, only pad left and top.   | `0`                  |
-| `offset (list[int]                   \| None，optional)`                |  Padding offsets.                                                                                                                                                                                                              | `None`               |
-| `im_padding_value (list[float]         \| tuple[float])` | RGB value of padded area.                                                                                                                                                                                                        | `（127.5,127.5,127.5)` |
+| `offset (list[int] \| None，optional)`                |  Padding offsets.                                                                                                                                                                                                              | `None`               |
+| `im_padding_value (list[float] \| tuple[float])` | RGB value of padded area.                                                                                                                                                                                                        | `（127.5,127.5,127.5)` |
 | `label_padding_value (int，optional)` |Filling value for the mask.                                                                                                                                                                                                              | `255`                  |
 | `size_divisor (int)`     | Image width and height after padding will be a multiple of `size_divisor`.                                                                                                                                                                       |                      |
 
@@ -155,8 +155,8 @@ Resize input to random sizes.
 
 | Parameter Name            | Description                                                          | Default Value                 |
 |---------------------------|----------------------------------------------------------------------|---------------------|
-| `Target_sizes (list[int] \| list[list | tuple] | tuple [list | tuple])` | Multiple target sizes, each of which should be int, list, or tuple.  | `.5`                  |
-| `interp (str，optional)`   | Interpolation method for resizing image(s)`. One of {`'NEAREST'`, `'LINEAR'`, `'CUBIC'`, `'AREA'`, `'LANCZOS4'`, `'RANDOM'`}. |   `'LINEAR'`                  ||
+| `Target_sizes (list[int] \| list[list \| tuple] \| tuple [list \| tuple])` | Multiple target sizes, each of which should be int, list, or tuple.  | `.5`                  |
+| `interp (str，optional)`   | Interpolation method for resizing image(s). One of {`'NEAREST'`, `'LINEAR'`, `'CUBIC'`, `'AREA'`, `'LANCZOS4'`, `'RANDOM'`}. |   `'LINEAR'`                  ||
 
 
 ## `RandomResizeByShort`

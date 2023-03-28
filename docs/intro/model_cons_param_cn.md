@@ -107,7 +107,7 @@
 | `num_classes (int)`      | 目标类别数量             | `2`    |
 | `use_mixed_loss (bool)`  | 是否使用混合损失函数         | `False`|
 | `losses (list)`          | 损失函数列表             | `None` |
-| `use_dropout (bool)`     | 是否使用`dropout`        | `False`|
+| `use_dropout (bool)`     | 是否使用 dropout        | `False`|
 
 ## `FC-EF`
 
@@ -121,7 +121,7 @@
 | `use_mixed_loss (bool)` | 是否使用混合损失函数             | `False`|
 | `losses (list)`         | 损失函数列表                  | `None` |
 | `in_channels (int)`     | 输入图像的通道数              | `6`    |
-| `use_dropout (bool)`    | 是否使用`dropout`              | `False`|
+| `use_dropout (bool)`    | 是否使用 dropout              | `False`|
 
 
 
@@ -137,7 +137,7 @@
 | `use_mixed_loss (bool)` | 是否使用混合损失函数            | `False`|
 | `losses (list)`         | 损失函数列表                  | `None` |
 | `in_channels (int)`     | 输入图像的通道数              | `3`    |
-| `use_dropout (bool)`    | 是否使用`dropout`               | `False`|
+| `use_dropout (bool)`    | 是否使用 dropout               | `False`|
 
 
 ## `FC-Siam-diff`
@@ -152,7 +152,7 @@
 | `use_mixed_loss (bool)` | 是否使用混合损失函数  |`False` |
 | `losses (List)` | 损失函数列表      | `None` |
 | `in_channels (int)` | 输入图像的通道数    | int | `3` |
-| `use_dropout (bool)` | 是否使用dropout | `False` |
+| `use_dropout (bool)` | 是否使用 dropout | `False` |
 
 
 ## `FCCDN`
@@ -266,13 +266,13 @@
 | `losses (list)`         | 损失函数列表                                                                                 | `None` |
 | `sr_factor (int)`       | 超分辨率的缩放因子，原始图像的大小将乘以此因子。例如，如果原始图像为 `H` x `W`，则输出图像将为 `sr_factor * H` x `sr_factor * W` | `4`   |
 | `min_max (None \| tuple[float, float])` | 图像像素值的最小值和最大值                                                                          | `None` |
-| `scales (tuple[int, ...])` | 缩放因子                                                                                   | `(2, 4)` |
-| `n_blocks (int)`        | 残差块的数量                                                                                 | `30`  |
-| `n_feats (int)`         | 残差块中的特征维度                                                                              | `16`  |
-| `n_colors (int)`        | 图像通道数                                                                                  | `3`   |
-| `rgb_range (float)`     | 图像像素值的范围                                                                               | `1.0` |
-| `negval (float)`        | 用于激活函数中的负数值的处理                                                                         | `0.2` |
-| `lq_loss_weight (float)` | 低质量图像损失的权重，用来控制将低分辨率的输入图像恢复成高分辨率的输出图像的重构损失对于总体损失的影响程度。                                            | `0.1` |
+| `scales (tuple[int])` | 缩放因子                                                                                   | `(2, 4)` |
+| `n_blocks (int)`           | 残差块的数量                                                                                 | `30`  |
+| `n_feats (int)`            | 残差块中的特征维度                                                                              | `16`  |
+| `n_colors (int)`           | 图像通道数                                                                                  | `3`   |
+| `rgb_range (float)`        | 图像像素值的范围                                                                               | `1.0` |
+| `negval (float)`           | 用于激活函数中的负数值的处理                                                                         | `0.2` |
+| `lq_loss_weight (float)`   | 低质量图像损失的权重，用来控制将低分辨率的输入图像恢复成高分辨率的输出图像的重构损失对于总体损失的影响程度。                                            | `0.1` |
 | `dual_loss_weight (float)` | 双重损失的权重                                                                                | `0.1` |
 
 ## `ESRGAN`
@@ -286,7 +286,7 @@
 | `min_max (tuple)`    | 输入图像的像素值的最小值和最大值。如果未指定，则使用数据类型的默认最小值和最大值。                                              | `None` |
 | `use_gan (bool)`     | 布尔值，指示是否在训练过程中使用 GAN (生成对抗网络)。如果是，将使用 GAN。                                             | `True` |
 | `in_channels (int)`  | 输入图像的通道数                                                                               | `3` |
-| `out_channels (int)` | 输出图像的通道数。默认为 3。                                                                        | `3` |
+| `out_channels (int)` | 输出图像的通道数。                                                                        | `3` |
 | `nf (int)`           | 模型第一层卷积层的滤波器数量。                                                                        | `64` |
 | `nb (int)`           | 模型中残差块的数量。                                                                             | `23` |
 
