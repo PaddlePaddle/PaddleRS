@@ -128,7 +128,7 @@ Remote sensing images come from various sources and their data formats are very 
 
 Depending on the practical demands, the user can choose `paddlers.transforms.decode_image()` or `paddlers.transforms.DecodeImg` to read data. `DecodeImg` is one of [Data transformation operators](#Data transformation operators), can be combined with other operators. `decode_image` is the encapsulation of `DecodeImg` operator, which is convenient use in the way of function calls.
 
-The argument list of `decode_image()` function is as follows:
+The parameter list of `decode_image()` function is as follows:
 
 |Parameter Name|Type|Parameter Description|Default Value|
 |-------|----|--------|-----|

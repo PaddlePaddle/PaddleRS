@@ -192,7 +192,7 @@ The sliding window inference API of the change detection task is similar to that
 
 |Parameter Name|Type|Parameter Description|Default Value|
 |-------|----|--------|-----|
-|`model_dir`|`str`|Model path (must be an exported deployed or quantified model).||
+|`model_dir`|`str`|Model path (must be an exported deployed or quantized model).||
 |`use_gpu`|`bool`|Whether to use GPU.|`False`|
 |`gpu_id`|`int`|ID of the GPU used.|`0`|
 |`cpu_thread_num`|`int`|Number of threads when inference is performed using CPUs.|`1`|

@@ -55,7 +55,7 @@ Args:
 """
 ```
 
-### 1.3 Edit Trainer
+### 1.3 Write Trainer Definitions
 
 Please follow these steps:
 
@@ -70,12 +70,12 @@ Please follow these steps:
 
 4. Add the class name of the new trainer to the global variable `__all__`.
 
-It should be noted that for the image restoration task, the forward and reverse logic of the model are implemented in the trainer definition. For GAN and other models that need to use multiple networks, please refer to the following specifications for the preparation of the trainer:
+It should be noted that for the image restoration task, the forward and backward logic of the model are implemented in the trainer definition. For GAN and other models that need to use multiple networks, please refer to the following specifications for the preparation of the trainer:
 - Override the `build_net()` method to maintain all networks using the `GANAdapter`. The `GANAdapter` object takes two lists as input when it is constructed: the first list contains all generators, where the first element is the main generator; the second list contains all discriminators.
 - Override the `default_loss()` method to build the loss function. If more than one loss function is required in the training process, it is recommended to organize in the form of a dictionary.
 - Override the `default_optimizer()` method to build one or more optimizers. When `build_net()` returns a value of type `GANAdapter`, `parameters` is a dictionary. Where, `parameters['params_g']` is a list containing the state dict of the various generators in order; `parameters['params_d']` is a list that contains the state dict of the individual discriminators in order. If you build more than one optimizer, you should use the `OptimizerAdapter` wrapper on return.
 - Override the `run_gan()` method that accepts four parameters: `net`, `inputs`, `mode`, and `gan_mode` for one of the subtasks in the training process, e.g. forward calculation of generator, forward calculation of discriminator, etc.
-- Rewrite `train_step()` method to write the specific logic of one iteration during model training. The usual approach is to call `run_gan()` over and over again, constructing different `inputs` to work in different `gan_mode` as needed each time, extracting useful fields (e.g. losses) from the `outputs` dictionary returned each time and summarizing them into the final result.
+- Rewrite `train_step()` method to write the specific logic of one iteration during model training. The usual approach is to call `run_gan()` multiple times, constructing different `inputs` to work in different `gan_mode` as needed each time, extracting useful fields (e.g. losses) from the `outputs` dictionary returned each time and summarizing them into the final result.
 
 See `ESRGAN` for specific examples of GAN trainers.
 
@@ -87,11 +87,11 @@ Define new function in `paddlers/transforms/functions.py`. If the function needs
 
 ### 2.2 Add Data Preprocessing/Data Augmentation Operators
 
-Define new operators in `paddlers/transforms/operators.py`, all operators are inherited from `paddlers.transforms.Transform`. The operator's `apply()` method receives a dictionary `sample` as input, takes out the related objects stored in it, and makes in-place modifications to the dictionary after processing, and finally returns the modified dictionary. Only in rare cases do we need to override the `apply()` method when defining an operator. In most cases, you just need to override the `apply_im()`, `apply_mask()`, `apply_bbox()`, and `apply_segm()` methods to handle the image, split label, target box, and target polygon, respectively.
+Define new operators in `paddlers/transforms/operators.py`, all operators inherit from `paddlers.transforms.Transform`. The operator's `apply()` method receives a dictionary `sample` as input, takes out the related objects stored in it, and makes in-place modifications to the dictionary after processing, and finally returns the modified dictionary. Only in rare cases do we need to override the `apply()` method when defining an operator. In most cases, you just need to override the `apply_im()`, `apply_mask()`, `apply_bbox()`, and `apply_segm()` methods to handle the image, split label, target box, and target polygon, respectively.
 
-If processing logic is more complicated, it is recommended that the encapsulated in the first function, added to the `paddlers/transforms/functions.py`, then call the function in the `apply*()` of operators.
+If the operator has a complicated implementation, it is recommended to define functions in `paddlers/transforms/functions.py` and call them in `apply*()` of operators.
 
-After writing the implementation of the operator, **must write docstring and add the class name in `__all__`.**
+After writing the implementation of the operator, **you must write docstring and add the class name in `__all__`.**
 
 ## 3 Add Remote Sensing Image Processing Tools
 
