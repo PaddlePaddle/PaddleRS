@@ -266,7 +266,7 @@
 | `losses (list)`            | 损失函数列表                                                                                 | `None` |
 | `sr_factor (int)   `       | 超分辨率的缩放因子，原始图像的大小将乘以此因子。例如，如果原始图像为 `H` x `W`，则输出图像将为 `sr_factor * H` x `sr_factor * W` | `4`   |
 | `min_max (None \| tuple[float, float])` | 图像像素值的最小值和最大值                                                                          | `None` |
-| `scales (tuple[int, ...])` | 缩放因子                                                                                   | `(2, 4)` |
+| `scales (tuple[int])` | 缩放因子                                                                                   | `(2, 4)` |
 | `n_blocks (int)`           | 残差块的数量                                                                                 | `30`  |
 | `n_feats (int)`            | 残差块中的特征维度                                                                              | `16`  |
 | `n_colors (int)`           | 图像通道数                                                                                  | `3`   |
