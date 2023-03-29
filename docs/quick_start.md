@@ -43,4 +43,4 @@ print(result)
 
 ### Python部署
 
-python部署可参考：[Python部署](../deploy/README.md)
+Python部署可参考：[Python部署](../deploy/README.md)

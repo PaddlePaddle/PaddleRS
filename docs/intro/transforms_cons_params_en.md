@@ -1,4 +1,4 @@
-# PaddleRS Data Transformation Operator Construct Parameters
+# PaddleRS Data Transformation Operator Construction Parameters
 
 This document describes the parameters of each PaddleRS data transformation operator in detail, including the operator name, operator purpose, parameter name, parameter type, parameter meaning, and parameter default value of each operator.
 
