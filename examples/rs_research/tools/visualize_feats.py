@@ -145,7 +145,7 @@ def parse_args():
         type=str,
         help="Layers that accepts or produces the features to visualize.")
     parser.add_argument(
-        "--im_paths", nargs='+', type=str, help="Paths of input images.")
+        "--image_paths", nargs='+', type=str, help="Paths of input images.")
     parser.add_argument(
         "--save_dir",
         type=str,
