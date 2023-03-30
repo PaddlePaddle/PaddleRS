@@ -39,6 +39,7 @@ if __name__ == '__main__':
         setuptools.find_namespace_packages(include=['paddlers', 'paddlers.*']),
         python_requires='>=3.7',
         setup_requires=['cython', 'numpy'],
+        include_package_data=True,
         install_requires=REQUIRED_PACKAGES,
         classifiers=[
             "Programming Language :: Python :: 3.7",
