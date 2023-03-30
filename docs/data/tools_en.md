@@ -45,7 +45,7 @@ Among them:
 - `srcimg_path`: Path to the original image with geographic information, which is required to provide the shapefile with geoprojection coordinate system information.
 - `mask_path`: Path to the .png format segmentation result obtained by the model inference.
 - `save_path`: Path to save the shapefile. The default value is `output`.
-- `ignore_index`: Index values to be ignored in the shapefile, such as the background class in segmentation tasks. The default value is `255`.
+- `ignore_index`: Index value to be ignored in the shapefile, such as the background class in segmentation tasks. The default value is `255`.
 
 ### Geojson2mask
 
