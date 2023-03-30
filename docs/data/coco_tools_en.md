@@ -2,7 +2,7 @@
 
 ## 1 Tool Description
 
-coco_tools is a set of tools provided by PaddleRS for handling COCO annotated files. It is located in the `tools/coco_tools/` directory. Because [pycocotools library] (https://pypi.org/project/pycocotools/) can't install in some environment, PaddleRS provides coco_tools as an alternative for some simple file processing.
+coco_tools is a set of tools provided by PaddleRS for handling COCO annotation files. It is located in the `tools/coco_tools/` directory. Because [pycocotools library] (https://pypi.org/project/pycocotools/) can't install in some environment, PaddleRS provides coco_tools as an alternative for some simple file processing.
 
 *Please note that coco_tools is an experimental function at present, if you encounter problems in the process, please timely feedback to us.*
 
@@ -162,11 +162,11 @@ contributor : COCO Consortium
 ```
 Among them,
 
-- The `info` key is a dictionary, there are 6 key-value pairs, the output shows the first 5 pairs;
-- The `licenses` key is a list with eight elements, and the output shows the first five;
-- The `images` key is a list with 5000 elements, and the output shows the first 5;
-- The `annotations` key is a list with 36,781 elements, and the output shows the first five;
-- The `categories` key is a list of 80 elements, with the output showing the first five.
+- `info`: A dictionary. There are 6 key-value pairs, the output shows the first 5 pairs;
+- `licenses`: A list with eight elements, and the output shows the first five;
+- `images`: A list with 5000 elements, and the output shows the first 5;
+- `annotations`: A list with 36,781 elements, and the output shows the first five;
+- `categories`: A list of 80 elements, and the output shows the first five.
 
 ### 3.3 Statistical Image Information
 
@@ -263,11 +263,11 @@ python ./coco_tools/json_AnnoSta.py \
 | `--json_path`          | (Optional) Path of the json file whose statistics you want to collect.                                                    |               |
 | `--csv_path`           | (Optional) Save path for the statistics table.                                                                            | `None`        |
 | `--png_shape_path`     | (Optional) png image saving path. The image content is the two-dimensional distribution of the shape of all target detection frames.| `None`        |
-| `--png_shapeRate_path` | (Optional) png Image saving path. The image content is a one-dimensional distribution of shape ratio (width/height) of all target detection boxes.| `None`        |
-| `--png_pos_path`       | (Optional) png Image saving path. The image content is the two-dimensional distribution of the coordinates in the upper left corner of all target detection boxes. | `None`        |
-| `--png_posEnd_path`    | (Optional) png Image saving path. The image content is the two-dimensional distribution of the coordinates at the lower right corner of all target detection boxes.| `None`        |
-| `--png_cat_path`       | (Optional) png Image saving path. The image content is the quantity distribution of objects in each category.                                                      | `None`        |
-| `--png_objNum_path`    | (Optional) png Image saving path. The image content is the quantity distribution of annotated objects in a single image.                                           | `None`        |
+| `--png_shapeRate_path` | (Optional) png image saving path. The image content is a one-dimensional distribution of shape ratio (width/height) of all target detection boxes.| `None`        |
+| `--png_pos_path`       | (Optional) png image saving path. The image content is the two-dimensional distribution of the coordinates in the upper left corner of all target detection boxes. | `None`        |
+| `--png_posEnd_path`    | (Optional) png image saving path. The image content is the two-dimensional distribution of the coordinates at the lower right corner of all target detection boxes.| `None`        |
+| `--png_cat_path`       | (Optional) png image saving path. The image content is the quantity distribution of objects in each category.                                                      | `None`        |
+| `--png_objNum_path`    | (Optional) png image saving path. The image content is the quantity distribution of annotated objects in a single image.                                           | `None`        |
 | `--get_relative`       | (Optional) Whether to generate the shape of the image target detection frame and the relative ratio of the coordinates of the upper left corner and lower right corner of the object detection frame (horizontal axis coordinates/image length, vertical axis coordinates/image width).| `None`        |
 | `--image_keyname`      | (Optional) Key corresponding to the image in the json file                                                                                                     | `'images'`    |
 | `--anno_keyname`       | (Optional) Annotate the corresponding key in the json file                                                                                                         | `'annotations'`|

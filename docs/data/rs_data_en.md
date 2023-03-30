@@ -8,7 +8,7 @@ Compared with aerial images, satellite images cover a wider area, so they are us
 
 ## 2 Characteristics of Remote Sensing Images
 
-Remote sensing technology has the characteristics of macro, multi-band, periodicity and economy. Macro refers to that the higher the remote sensing platform is, the wider the perspective will be, and the wider the ground can be synchronously detected. The multi-band property means that the sensor can detect and record information in different bands such as ultraviolet, visible light, near infrared and microwave. Periodicity means that the remote sensing satellite has the characteristic of acquiring images repeatedly in a certain period, which can carry out repeated observation of the same area in a short time. Economic means that remote sensing technology can be used as a way to obtain large area of surface information without spending too much manpower and material resources.
+Remote sensing technology has the characteristics of macro, multi-band, periodicity and economic. Macro refers to that the higher the remote sensing platform is, the wider the perspective will be, and the wider the ground can be synchronously detected. The multi-band property means that the sensor can detect and record information in different bands such as ultraviolet, visible light, near infrared and microwave. Periodicity means that the remote sensing satellite has the characteristic of acquiring images repeatedly in a certain period, which can carry out repeated observation of the same area in a short time. Economic means that remote sensing technology can be used as a way to obtain large area of surface information without spending too much manpower and material resources.
 
 The characteristics of remote sensing technology determine that remote sensing image has the following characteristics:
 
@@ -59,7 +59,7 @@ The following takes the image of Beijing Daxing Airport taken by Tiangong-1 hype
 
 Band combination refers to the result obtained by selecting three band data in MSI/HSI to combine and replace the three RGB channels, which is called the color graph (*The result synthesized using the real RGB three bands is called the true color graph, otherwise it is called the false color graph*). The combination of different bands can highlight different features of ground objects. The following figure shows the visual effects of several different combinations:
 
-![图片3](../images/band_combination.jpg)
+![Figure 3](../images/band_combination.jpg)
 
 **Spectral Curve Interpretation**
 
