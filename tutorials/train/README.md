@@ -98,10 +98,10 @@ docker build -t <imageName> .  # 默认为2.4.1的cpu版本
 # 其余Tag可以参考：https://hub.docker.com/r/paddlepaddle/paddle/tags
 ```
 
-2. 启动镜像
+2. 启动容器
 
 ```shell
-docker iamges  # 查看镜像的ID
+docker images  # 查看镜像的ID
 docker run -it <imageID>
 ```
 
