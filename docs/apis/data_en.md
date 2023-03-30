@@ -152,7 +152,7 @@ In PaddleRS a series of classes are defined that, when instantiated, perform cer
 
 ### `Transform`
 
-The `__call__` method of the `Transform` object takes a unique argument `sample`. `sample` must be a dictionary or a sequence of dictionaries. When `sample` is a sequence, perform data transformations for each dictionary in `sample` and return the results sequentially stored in a python build-in list; when `sample` is a dictionary, the `Transform` object extracts input from some of its key-value pairs (these keys are called "input keys"), performs the transformation, and writes the results as key-value pairs into `sample`(these keys are called "output keys"). It should be noted that many of the `Transform` objects in PaddleRS overwrite key-value pairs, that is, there is an intersection between the input key and the output key. The common keys in `sample` and their meanings are as follows:
+The `__call__` method of the `Transform` object takes a unique argument `sample`. `sample` must be a dictionary or a sequence of dictionaries. When `sample` is a sequence, perform data transformations for each dictionary in `sample` and return the results sequentially stored in a Python build-in list; when `sample` is a dictionary, the `Transform` object extracts input from some of its key-value pairs (these keys are called "input keys"), performs the transformation, and writes the results as key-value pairs into `sample`(these keys are called "output keys"). It should be noted that many of the `Transform` objects in PaddleRS overwrite key-value pairs, that is, there is an intersection between the input key and the output key. The common keys in `sample` and their meanings are as follows:
 
 |Key Name|Description|
 |----|----|

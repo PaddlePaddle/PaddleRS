@@ -49,7 +49,7 @@ Among them:
 
 ### geojson2mask
 
-The main function of `geojson2mask.py` is to convert the GeoJson-formatted labels to a .tif raster format. The usage is as follows:
+The main function of `geojson2mask.py` is to convert the GeoJSON-formatted labels to a .tif raster format. The usage is as follows:
 
 ```shell
 python geojson2mask.py --srcimg_path {path to the original image with geographic information} --geojson_path {input segmentation label path} --save_path {output path}

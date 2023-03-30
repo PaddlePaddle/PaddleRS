@@ -97,4 +97,4 @@ After writing the implementation of the operator, **you must write docstring and
 
 Remote sensing image processing tools are stored in the `tools/` directory. Each tool should be a relatively independent script, independent of the contents of the `paddlers/` directory, which can be executed by the user without installing PaddleRS.
 
-When writing the script, use the python standard library `argparse` to process the command-line arguments entered by the user and execute the specific logic in the `if __name__ == '__main__':` code block. If you have multiple tools that use the same function or class, define these common components in `tools/utils`.
+When writing the script, use the Python standard library `argparse` to process the command-line arguments entered by the user and execute the specific logic in the `if __name__ == '__main__':` code block. If you have multiple tools that use the same function or class, define these common components in `tools/utils`.
