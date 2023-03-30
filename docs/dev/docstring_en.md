@@ -166,7 +166,7 @@ Multi examples:
 
     Examples 2:
 
-        # Use it as a Python decorator.
+        # Use it as a python decorator.
         from paddleseg.cvlibs.manager import ComponentManager
 
         model_manager = ComponentManager()

@@ -101,7 +101,7 @@ The initialization parameter list is as follows:
 
 The requirements of `ResDataset` for the file list are as follows:
 
-- Each line in the file list should contain two space-separated items representing, in turn, representing The path of the input image (such as a low-resolution image in a super-resolution reconstruction task) relative to the `data_dir` and the path of the target image (such as a high-resolution image in a super-resolution reconstruction task) relative to the `data_dir`.
+- Each line in the file list should contain two space-separated items representing, in turn, representing the path of the input image (such as a low-resolution image in a super-resolution reconstruction task) relative to the `data_dir` and the path of the target image (such as a high-resolution image in a super-resolution reconstruction task) relative to the `data_dir`.
 
 ### Image Segmentation Dataset `SegDataset`
 
@@ -152,7 +152,7 @@ In PaddleRS a series of classes are defined that, when instantiated, perform cer
 
 ### `Transform`
 
-The `__call__` method of the `Transform` object takes a unique argument `sample`. `sample` must be a dictionary or a sequence of dictionaries. When `sample` is a sequence, perform data transformations for each dictionary in `sample` and return the results sequentially stored in a Python build-in list; when `sample` is a dictionary, the `Transform` object extracts input from some of its key-value pairs (these keys are called "input keys"), performs the transformation, and writes the results as key-value pairs into `sample`(these keys are called "output keys"). It should be noted that many of the `Transform` objects in PaddleRS overwrite key-value pairs, that is, there is an intersection between the input key and the output key. The common keys in `sample` and their meanings are as follows:
+The `__call__` method of the `Transform` object takes a unique argument `sample`. `sample` must be a dictionary or a sequence of dictionaries. When `sample` is a sequence, perform data transformations for each dictionary in `sample` and return the results sequentially stored in a python build-in list; when `sample` is a dictionary, the `Transform` object extracts input from some of its key-value pairs (these keys are called "input keys"), performs the transformation, and writes the results as key-value pairs into `sample`(these keys are called "output keys"). It should be noted that many of the `Transform` objects in PaddleRS overwrite key-value pairs, that is, there is an intersection between the input key and the output key. The common keys in `sample` and their meanings are as follows:
 
 |Key Name|Description|
 |----|----|
@@ -190,7 +190,7 @@ train_transforms = T.Compose([
 
 Generally, in the list of data transform operators accepted by a `Compose` object, the first element is `paddlers.Transforms.DecodeImg` object, used to read image data; the last element is [`Arrange` Operator](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/transforms/operators.py, used to extract and arrange information from the `sample` dictionary.
 
-For the validation dataset of image segmentation task and change detection task, the `ReloadMask` operator can be inserted before the `Arrange` operator to reload the Ground-truth label. The following is an example:
+For the validation dataset of image segmentation task and change detection task, the `ReloadMask` operator can be inserted before the `Arrange` operator to reload the ground-truth label. The following is an example:
 
 ```python
 eval_transforms = T.Compose([

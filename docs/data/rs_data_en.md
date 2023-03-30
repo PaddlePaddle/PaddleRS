@@ -2,13 +2,13 @@
 
 ## 1 Definition of Remote Sensing and Remote Sensing Images
 
-In a broad sense, remote sensing refers to "remote perception", that is, the remote detection and perception of objects or natural phenomena without direct contact. Remote sensing in the narrow sense generally refers to electromagnetic wave remote sensing technology, that is, the process of detecting electromagnetic wave reflection characteristics by using sensors on a certain platform (such as aircraft or satellite) and extracting information from it. The image data from this process is known as remote sensing imagery and generally includes satellite and aerial imagery. Remote sensing data are widely used in GIS tasks such as spatial analysis, as well as Computer Vision (CV) fields including scene classification, image segmentation and object detection.
+In a broad sense, remote sensing refers to "remote perception", that is, the remote detection and perception of objects or natural phenomena without direct contact. Remote sensing in the narrow sense generally refers to electromagnetic wave remote sensing technology, that is, the process of detecting electromagnetic wave reflection characteristics by using sensors on a certain platform (such as aircraft or satellite) and extracting information from it. The image data from this process is known as remote sensing imagery and generally includes satellite and aerial imagery. Remote sensing data are widely used in GIS tasks such as spatial analysis, as well as computer vision (CV) fields including scene classification, image segmentation and object detection.
 
 Compared with aerial images, satellite images cover a wider area, so they are used more widely. Common satellite images may be taken by commercial satellites or come from open databases of agencies such as NASA and ESA.
 
 ## 2 Characteristics of Remote Sensing Images
 
-Remote sensing technology has the characteristics of macro, multi-band, periodicity and economic. Macro refers to that the higher the remote sensing platform is, the wider the perspective will be, and the wider the ground can be synchronously detected. The multi-band property means that the sensor can detect and record information in different bands such as ultraviolet, visible light, near infrared and microwave. Periodicity means that the remote sensing satellite has the characteristic of acquiring images repeatedly in a certain period, which can carry out repeated observation of the same area in a short time. Economic means that remote sensing technology can be used as a way to obtain large area of surface information without spending too much manpower and material resources.
+Remote sensing technology has the characteristics of macroscopic, multi-band, periodicity and economic. Macroscopic refers to that the higher the remote sensing platform is, the wider the perspective will be, and the wider the ground can be synchronously detected. The multi-band property means that the sensor can detect and record information in different bands such as ultraviolet, visible light, near infrared and microwave. Periodicity means that the remote sensing satellite has the characteristic of acquiring images repeatedly in a certain period, which can carry out repeated observation of the same area in a short time. Economic means that remote sensing technology can be used as a way to obtain large area of surface information without spending too much manpower and material resources.
 
 The characteristics of remote sensing technology determine that remote sensing image has the following characteristics:
 
@@ -20,16 +20,16 @@ The characteristics of remote sensing technology determine that remote sensing i
 
 In order to introduce the imaging principle of remote sensing image, the concept of raster should be introduced first. Raster is a pixel-based data format that effectively represents continuous surfaces. The information in the raster is stored in a grid structure, and each information cell or pixel has the same size and shape, but different values. Digital photographs, orthophoto images and satellite images can all be stored in this format.
 
-Raster formats are ideal for analysis that looks at spatial and temporal changes because each data value has a grid-based accessible location. This allows us to access the same geographic location in two or more different grids and compare their values.
+Raster formats are ideal for analysis that concentrates on spatial and temporal changes because each data value has a grid-based accessible location. This allows us to access the same geographic location in two or more different grids and compare their values.
 
-When the Earth observation satellite takes a picture, the sensor will record the DN value (Digital Number) of different wavelength electromagnetic wave in the grid pixel. Through DN value, the irradiance rate and reflectance of ground objects can be inversely calculated. The relationship between them is shown in the following formula, where $gain$ and $bias$ refer to the gain and offset of the sensor respectively; $L$ is irradiance, also known as radiant brightness value; $\rho$ is the reflectance of ground objects; $d_{s}$、$E_{0}$ and $\theta$ respectively represent the distance between solar and earth astronomical units, solar irradiance and solar zenith Angle.
+When the earth observation satellite takes a picture, the sensor will record the DN (Digital Number) value of different wavelength electromagnetic wave in the grid pixel. Through DN, the irradiance and reflectance of ground objects can be inversely calculated. The relationship between them is shown in the following formula, where $gain$ and $bias$ refer to the gain and offset of the sensor respectively; $L$ is irradiance, also known as radiant brightness value; $\rho$ is the reflectance of ground objects; $d_{s}$、$E_{0}$ and $\theta$ respectively represent the distance between solar and earth astronomical units, solar irradiance and solar zenith angle.
 
 $$
 L = gain * DN + bias \\
 \rho = \pi Ld^{2}_{s}/(E_{0}\cos{\theta})
 $$
 
-Electromagnetic spectrum is the result of human beings according to the order of wave length or frequency, wave number, energy, etc. The human eye perceives only a small range of wavelengths in the electromagnetic spectrum, known as visible light, in the range of 0.38 to 0.76μm. That's because our vision evolved to be most sensitive where the sun emits the most light, and is broadly limited to the wavelengths that make up what we call red, green, and blue. But satellite sensors can sense a much wider range of the electromagnetic spectrum, which allows us to sense a much wider range of the spectrum with the help of sensors.
+The electromagnetic spectrum is the result of human beings according to the order of wave length or frequency, wave number, energy, etc. The human eye perceives only a small range of wavelengths in the electromagnetic spectrum, known as visible light, in the range of 0.38 to 0.76μm. That's because our vision evolved to be most sensitive where the sun emits the most light, and is broadly limited to the wavelengths that make up what we call red, green, and blue. But satellite sensors can sense a much wider range of the electromagnetic spectrum, which allows us to sense a much wider range of the spectrum with the help of sensors.
 
 ![band](../images/band.jpg)
 
@@ -45,11 +45,11 @@ RGB images are similar to common natural images in daily life. The features disp
 
 ![rgb](../images/rgb.jpg)
 
-Since most of the current CV task processing processes are designed based on natural images, remote sensing data sets of RGB type are widely used in CV field.
+Since the data processing pipelines of most CV tasks are designed based on natural images, remote sensing data sets of RGB type are widely used in CV field.
 
 ### 4.2 MSI/HSI Image
 
-MSI (Multispectral Image) and HSI (Hyperspectral Image) usually consist of several to hundreds of bands, The two are distinguished by different spectral resolution (*spectral resolution refers to the value of a specific wavelength range in the electromagnetic spectrum that can be recorded by the sensor; the wider the wavelength range, the lower the spectral resolution*). Usually the spectral resolution in the order of 1/10 of the wavelength is called multispectral. Compared with HSI, MSI has less band number, wider band and higher spatial resolution. However, HSI has more bands, narrower bands and higher spectral resolution.
+MSI (Multispectral Image) and HSI (Hyperspectral Image) usually consist of several to hundreds of bands. The two are distinguished by different spectral resolution (*spectral resolution refers to the value of a specific wavelength range in the electromagnetic spectrum that can be recorded by the sensor; the wider the wavelength range, the lower the spectral resolution*). Usually the spectral resolution in the order of 1/10 of the wavelength is called multispectral. MSI has fewer bands, wider band, and higher spatial resolution, while HSI has more bands, narrower bands, and higher spectral resolution. However, HSI has more bands, narrower bands and higher spectral resolution.
 
 In practice, some specific bands of MSI/HSI are often selected according to application requirements: for example, the transmittance of mid-infrared band is 60%-70%, including ground object reflection and emission spectrum, which can be used to detect high temperature targets such as fire. The red-edge band (*the point where the reflectance of green plants increases fastest between 0.67 and 0.76μm, and is also the inflection point of the first derivative spectrum in this region*) is a sensitive band indicating the growth status of green plants. It can effectively monitor the growth status of vegetation and be used to study plant nutrients, health monitoring, vegetation identification, physiological and biochemical parameters and other information.
 
@@ -83,25 +83,25 @@ Due to the special imaging mechanism of SAR image, its resolution is relatively 
 
 ### 4.4 RGBD Image
 
-The difference between RGBD image and RGB image is that there is an extra D channel, namely depth. Depth images are similar to grayscale images, except that each pixel value represents the actual distance of the sensor from the object. Generally, RGB data and depth data in RGBD images are registered with each other. Depth image provides height information that RGB image does not have, and can distinguish some ground objects with similar spectral characteristics in some downstream tasks.
+The difference between RGBD images and RGB images is that there is an extra D channel in RGBD images, namely the depth. Depth images are similar to grayscale images, except that each pixel value represents the actual distance of the sensor from the object. Generally, RGB data and depth data in RGBD images are registered with each other. Depth image provides height information that RGB image does not have, and can distinguish some ground objects with similar spectral characteristics in some downstream tasks.
 
 ## 5 The Preprocessing of Remote Sensing Image
 
-Compared with natural images, the preprocessing of remote sensing images is very complicated. Specifically, it can be divided into the following steps:
+Compared with natural images, the preprocessing of remote sensing images is rather complicated. Specifically, it can be divided into the following steps:
 
-1. **Radiometric Calibration**: The DN value is converted into radiation brightness value or reflectivity and other physical quantities.
+1. **Radiometric Calibration**: The DN is converted into radiation brightness value or reflectivity and other physical quantities.
 2. **Atmospheric Correction**: The radiation error caused by atmospheric influence is eliminated and the real surface reflectance of surface objects is retrieved. This step together with radiometric calibration is called **Radiometric Correction**.
 3. **Orthographic Correction**: The oblique correction and projection difference correction were carried out at the same time, and the image was resampled to orthophoto.
-4. **Image Registration**: Match and overlay two or more images taken at different times, from different sensors (imaging equipment) or under different conditions (weather, illumination, camera position and Angle, etc.).
+4. **Image Registration**: Match and overlay two or more images taken at different times, from different sensors (imaging equipment) or under different conditions (weather, illumination, camera position and angle, etc.).
 5. **Image Fusion**: The image data of the same object collected by multiple source channels are synthesized into high quality image.
 6. **Image Clipping**: The large remote sensing image was cut into small pieces to extract the region of interest.
-7. **Defined Projection**: Define projection information (a geographic coordinate system) on the data.
+7. **Define Projection**: Define projection information (a geographic coordinate system) on the data.
 
 It should be noted that in practical application, the above steps are not all necessary, and some of them can be performed selectively according to needs.
 
 ## Reference Material
 
-- [Remote sensing in Wikipedia](https://en.wikipedia.org/wiki/Remote_sensing)
-- [Introduction to Surveying and Mapping by Ning Jinsheng et al.](https://book.douban.com/subject/3116967/)
-- [Principles and Applications of Remote Sensing by Sun Jia-liu.](https://book.douban.com/subject/3826668/)
-- [Steps of Remote Sensing Image Preprocessing](https://blog.csdn.net/qq_35093027/article/details/119808941)
+- [Remote Sensing in Wikipedia](https://en.wikipedia.org/wiki/Remote_sensing).
+- [Introduction to Surveying and Mapping by Ning Jinsheng et al.](https://book.douban.com/subject/3116967/).
+- [Principles and Applications of Remote Sensing by Sun Jia-liu.](https://book.douban.com/subject/3826668/).
+- [Steps of Remote Sensing Image Preprocessing](https://blog.csdn.net/qq_35093027/article/details/119808941).

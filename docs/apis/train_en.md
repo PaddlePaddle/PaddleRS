@@ -10,7 +10,7 @@ All trainers support default parameter construction (that is, no parameters are 
 
 - The `num_classes`、`use_mixed_loss` and `in_channels` parameters are generally supported, indicating the number of model output categories, whether to use preset mixing losses, and the number of input channels, respectively. Some subclasses, such as `DSIFN`, do not yet support `in_channels`.
 - `use_mixed_loss` will be deprecated in the future, so it is not recommended.
-- Specify the loss function used during model training through the `losses` parameter. `losses` needs to be a dictionary, where the values for the keys `types` and `coef` are two equal-length lists representing the loss function object (a callable object) and the weight of the loss function, respectively. For example: `losses={'types': [LossType1(), LossType2()], 'coef': [1.0, 0.5]}`. It is equivalent to calculating the following loss function in the training process: `1.0*LossType1()(logits, labels)+0.5*LossType2()(logits, labels)`, where `logits` and `labels` are model output and GT labels, respectively.
+- Specify the loss function used during model training through the `losses` parameter. `losses` needs to be a dictionary, where the values for the keys `types` and `coef` are two equal-length lists representing the loss function object (a callable object) and the weight of the loss function, respectively. For example: `losses={'types': [LossType1(), LossType2()], 'coef': [1.0, 0.5]}`. It is equivalent to calculating the following loss function in the training process: `1.0*LossType1()(logits, labels)+0.5*LossType2()(logits, labels)`, where `logits` and `labels` are model output and ground-truth labels, respectively.
 - Different subclasses support model-related input parameters. For details, you can refer to [model definitions](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/rs_models/cd) and [trainer definitions](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/change_detector.py).
 
 ### Initialize `BaseClassifier` Subclass Object
@@ -37,7 +37,7 @@ All trainers support default parameter construction (that is, no parameters are 
 
 - The parameters `in_channels`, `num_classes`, and  `use_mixed_loss` are generally supported, indicating the number of input channels, the number of output categories, and whether the preset mixing loss is used.
 - `use_mixed_loss` will be deprecated in the future, so it is not recommended.
-- Specify the loss function used during model training through the `losses` parameter. `losses` needs to be a dictionary, where the values for the keys `types` and `coef` are two equal-length lists representing the loss function object (a callable object) and the weight of the loss function, respectively. For example: `losses={'types': [LossType1(), LossType2()], 'coef': [1.0, 0.5]}`. It is equivalent to calculating the following loss function in the training process: `1.0*LossType1()(logits, labels)+0.5*LossType2()(logits, labels)`, where `logits` and `labels` are model output and GT labels, respectively.
+- Specify the loss function used during model training through the `losses` parameter. `losses` needs to be a dictionary, where the values for the keys `types` and `coef` are two equal-length lists representing the loss function object (a callable object) and the weight of the loss function, respectively. For example: `losses={'types': [LossType1(), LossType2()], 'coef': [1.0, 0.5]}`. It is equivalent to calculating the following loss function in the training process: `1.0*LossType1()(logits, labels)+0.5*LossType2()(logits, labels)`, where `logits` and `labels` are model output and ground-truth labels, respectively.
 - Different subclasses support model-related input parameters. For details, you can refer to [model definitions](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/rs_models/seg) and [trainer definitions](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/segmentor.py).
 
 ## `train()`
@@ -305,7 +305,7 @@ For the multi-category change detection task, the output contains the following 
  "category_F1score": F1 score of each category}
 ```
 
-If `return_details` is `True`, return a binary set of two dictionaries in which the first element is the metric mentioned above and the second element is a dictionary containing only one key, and the value of the `'confusion_matrix'` key is the confusion matrix stored in the Python build-in list.
+If `return_details` is `True`, return a binary set of two dictionaries in which the first element is the metric mentioned above and the second element is a dictionary containing only one key, and the value of the `'confusion_matrix'` key is the confusion matrix stored in the python build-in list.
 
 
 
@@ -417,4 +417,4 @@ If `return_details` is `False`(default), return a `collections.OrderedDict` obje
  "category_F1score": F1 score of each category}
 ```
 
-If `return_details` is `True`, return a binary set of two dictionaries in which the first element is the metric mentioned above and the second element is a dictionary containing only one key, and the value of the `'confusion_matrix'` key is the confusion matrix stored in the Python build-in list.
+If `return_details` is `True`, return a binary set of two dictionaries in which the first element is the metric mentioned above and the second element is a dictionary containing only one key, and the value of the `'confusion_matrix'` key is the confusion matrix stored in the python build-in list.

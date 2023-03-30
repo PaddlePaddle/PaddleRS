@@ -11,7 +11,7 @@ PaddleRS uses [git](https://git-scm.com/doc) as a version control tool and is ho
 The steps to contribute code to PaddleRS are as follows:
 
 1. Fork the official PaddleRS repository on GitHub, clone the code locally, and pull the latest version of the develop branch.
-2. Write code according to [dev Guide](dev/dev_guide.md) (it is recommended to develop on a new feature branch).
+2. Write code according to [Dev Guide](dev/dev_guide.md) (it is recommended to develop on a new feature branch).
 3. Install pre-commit hooks to perform code style checks before each commit. Refer to [Code style specification](#3-Code style specification).
 4. Write unit tests for the new code and make sure all the tests are successful. Refer to [Test related steps](#4-Test related steps)。
 5. Create a new PR for your branch and ensure that the CLA protocol is signed and the CI/CE passes. After that, a PaddleRS team member will review the code you contributed.

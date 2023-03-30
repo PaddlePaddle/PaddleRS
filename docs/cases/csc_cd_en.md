@@ -2,7 +2,7 @@
 
 ## Competition Introduction
 
-"China Software Cup" College Students Software Design Competition is a public welfare competition for Chinese students. It is a competition in the 2021 National College Students Competition list. The competition is co-sponsored by the Ministry of Industry and Information Technology, the Ministry of Education and the People's Government of Jiangsu Province. It is committed to guiding Chinese school students to actively participate in software scientific research activities, enhancing self-innovation and practical ability, and cultivating more high-end and outstanding talents for Chinese software and information technology service industry. In 2022, Baidu Paddle will host Group A and Group B. This race is called Group A.
+"China Software Cup" College Students Software Design Competition is a public welfare competition for chinese students. It is a competition in the 2021 National College Students Competition list. The competition is co-sponsored by the Ministry of Industry and Information Technology, the Ministry of Education and the People's Government of Jiangsu Province. It is committed to guiding Chinese school students to actively participate in software scientific research activities, enhancing self-innovation and practical ability, and cultivating more high-end and outstanding talents for Chinese software and information technology service industry. In 2022, Baidu Paddle will host Group A and Group B. This race is called Group A.
 
 [Competition official website link](https://aistudio.baidu.com/aistudio/competition/detail/151/0/introduction)
 
@@ -12,13 +12,13 @@ Mastering the utilization of land resources and the types of land cover is an im
 
 At present, the field of remote sensing has stepped into the fast lane of high resolution image, and the demand for remote sensing data analysis and application services is increasing with each passing day. The traditional method is poor in characterizing features of high-resolution satellite remote sensing images and relies heavily on manual experience. With the rise of artificial intelligence technology, especially the image recognition method based on deep learning has been greatly developed, and related technologies have also promoted the changes in the field of remote sensing. Compared with the traditional visual interpretation method based on human crowd tactics, remote sensing image recognition technology based on deep learning can automatically analyze the types of ground objects in images, showing great potential in terms of accuracy and efficiency.
 
-The problem from baidu OARS and [buaa LEVIR team](http://levir.buaa.edu.cn/) set together, require participants to use baidu AI Studio platform for training framework based on the localization of AI -- baidu fly oar PaddlePaddle framework for development, Design and develop a WEB system which can realize automatic interpretation of remote sensing images by deep learning technology.
+The problem from baidu OARS and [buaa LEVIR team](http://levir.buaa.edu.cn/) set together, require participants to use baidu aistudio platform for training framework based on the localization of ai -- baidu PaddlePaddle framework for development, Design and develop a web system which can realize automatic interpretation of remote sensing images by deep learning technology.
 
 ### Task Description
 
 In the part of change detection, participants are required to realize building change detection in multi-temporal images by using the training data provided. Specifically, the task of building change detection in multi-temporal remote sensing images is given two remote sensing images of the same position (geographic registration) taken at different times, which requires locating the area of building change.
 
-Reference link:[What is Remote sensing image change detection?](https://baike.baidu.com/item/%E5%8F%98%E5%8C%96%E6%A3%80%E6%B5%8B/8636264)
+Reference link:[What is remote sensing image change detection?](https://baike.baidu.com/item/%E5%8F%98%E5%8C%96%E6%A3%80%E6%B5%8B/8636264)
 
 ### Dataset Introduction
 
@@ -79,14 +79,14 @@ print("Dataset partitioning completed.")
 
 ## Model Training and Inference
 
-This project USES [PaddleRS](https://github.com/PaddlePaddle/PaddleRS) suite building model training and inference framework. PaddleRS is a remote sensing processing platform developed based on flying paddlers, which supports common remote sensing tasks such as remote sensing image classification, target detection, image segmentation and change detection, and can help developers more easily complete the whole process of remote sensing deep learning applications from training to deployment. In terms of change detection, PaddleRS currently supports nine state-of-the-art (SOTA) models, and complex training and reasoning processes are encapsulated in several apis to provide an out-of-the-box user experience.
+This project uses [PaddleRS](https://github.com/PaddlePaddle/PaddleRS) suite building model training and inference framework. PaddleRS is a remote sensing processing platform developed based on flying paddlers, which supports common remote sensing tasks such as remote sensing image classification, target detection, image segmentation and change detection, and can help developers more easily complete the whole process of remote sensing deep learning applications from training to deployment. In terms of change detection, PaddleRS currently supports nine state-of-the-art (SOTA) models, and complex training and reasoning processes are encapsulated in several apis to provide an out-of-the-box user experience.
 
 ```python
 # Installing third-party libraries
 !pip install scikit-image > /dev/null
 !pip install matplotlib==3.4 > /dev/null
 
-# Install PaddleRS (cached version on AI Studio)
+# Install PaddleRS (cached version on aistudio)
 !unzip -o -d /home/aistudio/ /home/aistudio/data/data135375/PaddleRS-develop.zip > /dev/null
 !mv /home/aistudio/PaddleRS-develop /home/aistudio/PaddleRS
 !pip install -e /home/aistudio/PaddleRS > /dev/null
@@ -270,11 +270,11 @@ eval_dataset = pdrs.datasets.CDDataset(
 
 With AI Studio Premium hardware configuration (16G V100) and default hyperparameters, the total training time is about 50 minutes.
 
-If the VisualDL logging function is enabled during training (enabled by default), you can view the visualized results on the Data Model Visualization TAB. Set logdir to the vdl_log subdirectory in the `EXP_DIR` directory. A tutorial on using VisualDL in a notebook is available [here](https://ai.baidu.com/ai-doc/AISTUDIO/Dk3e2vxg9#visualdl%E5%B7%A5%E5%85%B7).
+If the VisualDL logging function is enabled during training (enabled by default), you can view the visualized results on the data model visualization tab. Set logdir to the vdl_log subdirectory in the `EXP_DIR` directory. A tutorial on using VisualDL in a notebook is available [here](https://ai.baidu.com/ai-doc/AISTUDIO/Dk3e2vxg9#visualdl%E5%B7%A5%E5%85%B7).
 
 It should be noted that PaddleRS used mIoU to evaluate the optimal model on the verification set by default, while F1 scores were selected as the evaluation index by the race official.
 
-In addition, PaddleRS reports indicators for each category in the verification set. Therefore, for Category 2 change detection, category_acc, category_F1-score and other indicators have two data items, which are reflected in the form of lists. Since the change detection task focuses on the change classes, it makes more sense to observe and compare the second data item of each metric (the second element of the list).
+In addition, PaddleRS reports indicators for each category in the verification set. Therefore, for category 2 change detection, category_acc, category_F1-score and other indicators have two data items, which are reflected in the form of lists. Since the change detection task focuses on the change classes, it makes more sense to observe and compare the second data item of each metric (the second element of the list).
 
 ```python
 # If the lab directory does not exist, create a new one (recursively create the directory)

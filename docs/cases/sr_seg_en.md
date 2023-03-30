@@ -19,7 +19,7 @@ plt.imshow(output), plt.axis('off')
 
 - The results of the training were very good. The UDD6 data was collected from four cities of Beijing, Huludao, Cangzhou and Zhengzhou with DJI Spirit Four UAV at a height of 60m-100m. However, **In the actual production process, the city, the altitude of the flight, the quality of the image will change**
 - A larger area of data can be obtained in the same time with the increase of flight altitude, but the resolution will be reduced. **For low-quality data, the prediction effect of directly using the previously trained data is not ideal, and it will be a large workload to mark the data and train the model.** The solution is to improve the generalization ability of the model. Also consider using image super-resolution to reconstruct low-quality drone images and then make predictions
-- In this project, the UAV remote sensing image super-resolution module provided by PaddleRS was used to carry out the real low-quality UAV image data **super-resolution**, and then the Segformer model trained by UDD6 was used to predict, and the low-resolution model was compared with that directly used. Index cannot be calculated because low quality data is not marked. However, human eyes judged that the prediction results after the super-resolution were better. **The left side was the artificially labeled label, the middle was the prediction result of low resolution, and the right side was the result after the super resolution reconstruction**
+- In this project, the UAV remote sensing image super-resolution module provided by PaddleRS was used to carry out the real low-quality UAV image data **super-resolution**, and then the segformer model trained by UDD6 was used to predict, and the low-resolution model was compared with that directly used. Index cannot be calculated because low quality data is not marked. However, human eyes judged that the prediction results after the super-resolution were better. **The left side was the artificially labeled label, the middle was the prediction result of low resolution, and the right side was the result after the super resolution reconstruction**
 
 ```python
 img = Image.open(r"work/example/Seg/gt_result/data_05_2_14.png")
@@ -132,7 +132,7 @@ for i in range(show_num):
 
 ## 4 Comparison of Image Segmentation Effect Before and After Super-Resolution
 
-- The model used was Segformer_b3, which was trained 40,000 times with the UDD6 dataset
+- The model used was segformer_b3, which was trained 40,000 times with the UDD6 dataset
 - The best performing models and.yml files have been placed in the work folder
 - Run the following command to make predictions about the images in the specified folder
 - Firstly, the model is used to predict the low-quality UAV data, and then the image reconstructed by the super-resolution is used to predict. Finally, the prediction effect is compared

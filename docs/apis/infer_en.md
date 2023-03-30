@@ -145,7 +145,7 @@ Considering the large-scale nature of remote sensing image, PaddleRS provides sl
 2. Users can customize the size and stride of the sliding window. Meanwhile, PaddleRS supports sliding window overlapping. For the overlapping parts between windows, PaddleRS will automatically fuse the model's predicted results.
 3. The inference results can be saved in GeoTiff format, and the reading and writing of geographic transformation information and geographic projection information is supported.
 
-Currently, the image segmentation trainer ([`BaseSegmenter`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/segmenter.py) and subclasses) and change detection trainer ([`BaseChangeDetector`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/change_detector.py) and subclasses)have dynamic graph sliding window inference API. Take the API of image segmentation task as an example, the explanation is as follows:
+Currently, the image segmentation trainer ([`BaseSegmenter`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/segmenter.py) and subclasses) and change detection trainer ([`BaseChangeDetector`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/change_detector.py) and subclasses)have dynamic graph sliding window inference api. Take the api of image segmentation task as an example, the explanation is as follows:
 
 Interface:
 
@@ -178,7 +178,7 @@ Input parameter list:
 |`eager_load`|`bool`|If `True`, instead of using lazy memory loading, the entire image is loaded into memory at once at the beginning of the prediction.|`False`|
 |`quiet`|`bool`|If `True`, the predicted progress is not displayed.|`False`|
 
-The sliding window inference API of the change detection task is similar to that of the image segmentation task, but it should be noted that the information stored in the output results, such as geographic transformation and projection, is subject to the information read from the first phase image, and the file name stored in the sliding window inference results is the same as that of the first phase image file.
+The sliding window inference api of the change detection task is similar to that of the image segmentation task, but it should be noted that the information stored in the output results, such as geographic transformation and projection, is subject to the information read from the first phase image, and the file name stored in the sliding window inference results is the same as that of the first phase image file.
 
 ## Static Graph Inference API
 

@@ -162,9 +162,9 @@ contributor : COCO Consortium
 ```
 Among them,
 
-- `info`: A dictionary. There are 6 key-value pairs, the output shows the first 5 pairs;
+- `info`: A dictionary. There are 6 key-value pairs, and the output shows the first five pairs;
 - `licenses`: A list with eight elements, and the output shows the first five;
-- `images`: A list with 5000 elements, and the output shows the first 5;
+- `images`: A list with 5000 elements, and the output shows the first five;
 - `annotations`: A list with 36,781 elements, and the output shows the first five;
 - `categories`: A list of 80 elements, and the output shows the first five.
 
