@@ -74,7 +74,7 @@ python ./coco_tools/json_InfoShow.py \
 
 #### 3.2.3 Result Presentation
 
-After the preceding command is executed, the following information is displayed:
+After the preceding command is executed, the following information will be displayed:
 
 ```
 ------------------------------------------------Args------------------------------------------------
