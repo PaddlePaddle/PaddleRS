@@ -430,7 +430,7 @@ def to_uint8(im, norm=True, stretch=False):
         return stretched_img
 
     dtype = im.dtype.name
-    if dtype[:-2] == "uint" and np.max(dtype) < 256:
+    if dtype[:-2] == "uint" and np.max(im) < 256:
         pass
     else:
         if norm:
