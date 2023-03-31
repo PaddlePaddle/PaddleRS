@@ -139,7 +139,7 @@ PaddleRS具有以下五大特色：
           <li>ResizeByLong</li>
           <li>ResizeByShort</li>
           <li>SelectBand（波段选择）</li>
-          <li><a href="./docs/intro/transforms.md">...</a></li>
+          <li><a href="./docs/intro/transforms_cn.md">...</a></li>
         </ul>
         </details>
         <details><summary><b>数据增强</b></summary>
@@ -156,7 +156,7 @@ PaddleRS具有以下五大特色：
           <li>RandomScaleAspect</li>
           <li>RandomSwap（随机时序交换）</li>
           <li>RandomVerticalFlip</li>
-          <li><a href="./docs/intro/transforms.md">...</a></li>
+          <li><a href="./docs/intro/transforms_cn.md">...</a></li>
         </ul>
         </details>
         <details><summary><b>遥感指数</b></summary>
@@ -208,7 +208,7 @@ PaddleRS具有以下五大特色：
           <li>WI1</li>
           <li>WI2</li>
           <li>WRI</li>
-          <li><a href="./docs/intro/indices.md">...</a></li>
+          <li><a href="./docs/intro/indices_cn.md">...</a></li>
         </ul>
         </details>
       </td>
@@ -248,7 +248,7 @@ PaddleRS具有以下五大特色：
           <li><a href="./tools/prepare_dataset/prepare_ucmerced.py">UC Merced</a></li>
           <li><a href="./tools/prepare_dataset/prepare_rsod.py">RSOD</a></li>
           <li><a href="./tools/prepare_dataset/prepare_isaid.py">iSAID</a></li>
-          <li><a href="./docs/intro/data_prep.md">...</a></li>
+          <li><a href="./docs/intro/data_prep_cn.md">...</a></li>
         </ul>
       </td>
       <td>
@@ -272,27 +272,27 @@ PaddleRS具有以下五大特色：
 ## <img src="./docs/images/teach.png" width="30"/> 教程与文档
 
 * 快速上手
-  * [快速上手PaddleRS](./docs/quick_start.md)
+  * [快速上手PaddleRS](./docs/quick_start_cn.md)
 * 数据准备
-  * [快速了解遥感与遥感数据](./docs/data/rs_data.md)
-  * [开源遥感数据集汇总表](./docs/data/dataset.md)
+  * [快速了解遥感与遥感数据](./docs/data/rs_data_cn.md)
+  * [开源遥感数据集汇总表](./docs/data/dataset_cn.md)
   * [智能标注工具EISeg](https://github.com/PaddlePaddle/PaddleSeg/tree/release/2.7/EISeg)
-  * [遥感影像处理工具集](./docs/data/tools.md)
+  * [遥感影像处理工具集](./docs/data/tools_cn.md)
 * 组件介绍
-  * [数据集预处理脚本](./docs/intro/data_prep.md)
-  * [模型库](./docs/intro/model_zoo.md)
-  * [遥感指数](./docs/intro/indices.md)
-  * [数据变换算子](./docs/intro/transforms.md)
-* [模型训练](./tutorials/train/README.md)
+  * [数据集预处理脚本](./docs/intro/data_prep_cn.md)
+  * [模型库](./docs/intro/model_zoo_cn.md)
+  * [遥感指数](./docs/intro/indices_cn.md)
+  * [数据变换算子](./docs/intro/transforms_cn.md)
+* [模型训练](./tutorials/train/README_CN.md)
 * 模型部署
   * [模型导出](./deploy/export/README.md)
   * [Python部署](./deploy/README.md)
 * 代码贡献
-  * [贡献指南](./docs/CONTRIBUTING.md)
-  * [开发指南](./docs/dev/dev_guide.md)
-  * [代码注释规范](./docs/dev/docstring.md)
-  * [模型训练API说明](./docs/apis/train.md)
-  * [模型推理API说明](./docs/apis/infer.md)
+  * [贡献指南](./docs/CONTRIBUTING_CN.md)
+  * [开发指南](./docs/dev/dev_guide_cn.md)
+  * [代码注释规范](./docs/dev/docstring_cn.md)
+  * [模型训练API说明](./docs/apis/train_cn.md)
+  * [模型推理API说明](./docs/apis/infer_cn.md)
 
 ## <img src="./docs/images/anli.png" width="30"/> 实践案例
 

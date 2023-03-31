@@ -1,6 +1,8 @@
+[简体中文](train_cn.md) | English
+
 # PaddleRS Training API Description
 
-**Trainer** encapsulates model training, validation, quantization, and dynamic graph inference, defined in files of `paddlers/tasks/` directory. For user convenience, PaddleRS provides trainers that inherits from the parent class [`BaseModel`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/base.py) for all supported models, and provides several apis externally. The types of trainers corresponding to change detection, scene classification, target detection, image restoration and image segmentation tasks are respectively `BaseChangeDetector`、`BaseClassifier`、`BaseDetector`、`BaseRestorer` and `BaseSegmenter`。This document describes the initialization function of the trainer and `train()`、`evaluate()` API。
+**Trainers** (or model trainers) encapsulate model training, validation, quantization, and dynamic graph inference, defined in files of `paddlers/tasks/` directory. For user convenience, PaddleRS provides trainers that inherits from the parent class [`BaseModel`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/base.py) for all supported models, and provides several apis externally. The types of trainers corresponding to change detection, scene classification, target detection, image restoration and image segmentation tasks are respectively `BaseChangeDetector`、`BaseClassifier`、`BaseDetector`、`BaseRestorer` and `BaseSegmenter`。This document describes the initialization function of the trainer and `train()`、`evaluate()` API。
 
 ## Initialize the Trainer
 

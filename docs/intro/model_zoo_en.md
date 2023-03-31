@@ -1,12 +1,14 @@
+[简体中文](model_zoo_cn.md) | English
+
 # Model Zoo
 
-PaddleRS' base model library comes from the PaddleCV development kits: [PaddleClas](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/en/algorithm_introduction/ImageNet_models_en.md), [PaddleSeg](https://github.com/PaddlePaddle/PaddleSeg/blob/release/2.4/docs/model_zoo_overview.md), [PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.3/README_en.md) and [PaddleGAN](https://github.com/PaddlePaddle/PaddleGAN/blob/develop/README.md). In addition, PaddleRS also contains a series of remote sensing feature models, which can be used for remote sensing image segmentation and change detection.
+PaddleRS' base model library originates from the PaddleCV development kits: [PaddleClas](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/en/algorithm_introduction/ImageNet_models_en.md), [PaddleSeg](https://github.com/PaddlePaddle/PaddleSeg/blob/release/2.4/docs/model_zoo_overview.md), [PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.3/README_en.md) and [PaddleGAN](https://github.com/PaddlePaddle/PaddleGAN/blob/develop/README.md). In addition, PaddleRS also contains a series of models specially designed for remote sensing tasks, which can be used for remote sensing image segmentation, change detection, etc.
 
 ## List of PaddleRS Supported Models
 
-All models currently supported by PaddleRS are as follows (those marked \* are dedicated models for remote sensing) :
+All models currently supported by PaddleRS are listed below (those marked \* are dedicated models for remote sensing) :
 
-| Task | Model | Multiband Support |
+| Task | Model | Multi-band Support |
 |--------|---------|------|
 | Change Detection | \*BIT | Yes |
 | Change Detection | \*CDNet | Yes |
@@ -40,3 +42,7 @@ All models currently supported by PaddleRS are as follows (those marked \* are d
 | Image Segmentation | Fast-SCNN | Yes |
 | Image Segmentation | HRNet | Yes |
 | Image Segmentation | UNet | Yes |
+
+## Model Trainer Construction
+
+See [this document](model_cons_params_en.md).

@@ -1,6 +1,8 @@
-# Remote Sensing Index
+[简体中文](indices_cn.md) | English
 
-Through `paddlers.transforms.AppendIndex` operator remote sensing index can be calculated and appended to the input image of the last band. When you build the `AppendIndex` object, you need to pass in the remote sensing index name and a dictionary containing the band-index correspondence (the key in the dictionary is the band name and the index number counts from 1).
+# Remote Sensing Indices
+
+Through `paddlers.transforms.AppendIndex` operator remote sensing index can be calculated and appended to the input image in the last band. When you build the `AppendIndex` object, you need to pass in the remote sensing index name and a dictionary containing the band-index correspondence (the key in the dictionary is the band name and the index number counts from 1).
 
 ## List of PaddleRS Supported Remote Sensing Indices
 

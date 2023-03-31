@@ -1,3 +1,5 @@
+简体中文 | [English](tools_en.md)
+
 # 遥感影像处理工具集
 
 PaddleRS在`tools`目录中提供了丰富的遥感影像处理工具，包括：
@@ -103,7 +105,7 @@ python split.py --image_path {输入影像路径} [--mask_path {真值标签路�
 - `json_Split.py`：       将json文件中的内容划分为train set和val set；
 - `json_Merge.py`：       将多个json文件合并为一个。
 
-详细使用方法请参见[coco_tools使用说明](coco_tools.md)。
+详细使用方法请参见[coco_tools使用说明](coco_tools_cn.md)。
 
 ### prepare_dataset
 
@@ -124,7 +126,7 @@ python prepare_dataset/prepare_levircd.py --help
 - `--seed`：随机种子。可用于固定随机数生成器产生的伪随机数序列，从而得到固定的数据集划分结果。示例：`--seed 1919810`
 - `--ratios`：对于支持子集随机划分的数据集，指定需要划分的各个子集的样本比例。示例：`--ratios 0.7 0.2 0.1`。
 
-您可以在[此文档](https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/intro/data_prep.md)中查看PaddleRS提供哪些数据集的预处理脚本。
+您可以在[此文档](https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/intro/data_prep_cn.md)中查看PaddleRS提供哪些数据集的预处理脚本。
 
 ### extract_ms_patches
 

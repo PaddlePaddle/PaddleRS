@@ -1,3 +1,5 @@
+简体中文 | [English](infer_en.md)
+
 # PaddleRS推理API说明
 
 PaddleRS的动态图推理和静态图推理能力分别由训练器（[`BaseModel`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/base.py)及其子类）和**预测器**（`paddlers.deploy.Predictor`）提供。

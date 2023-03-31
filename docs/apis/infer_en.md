@@ -1,3 +1,5 @@
+[简体中文](infer_cn.md) | English
+
 # PaddleRS Inference API Description
 
 The dynamic graph inference and static graph inference of PaddleRS are provided by the trainer ([`BaseModel`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/base.py) and subclasses) and **predictor** (`paddlers.deploy.Predictor`) respectively.
