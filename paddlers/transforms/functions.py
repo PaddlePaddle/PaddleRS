@@ -430,13 +430,13 @@ def to_uint8(im, norm=True, stretch=False):
         return stretched_img
 
     dtype = im.dtype.name
-    if dtype != "uint8" and norm:
-        im = _sample_norm(im)
-        im *= 255
-    if stretch:
-        im = _two_percent_linear(im)
-        im *= 255
-    return np.uint8(im)
+    if dtype != "uint8":
+        if norm:
+            im = _sample_norm(im)
+        if stretch:
+            im = _two_percent_linear(im)
+        im = np.uint8(im * 255)
+    return im
 
 
 def to_intensity(im):
