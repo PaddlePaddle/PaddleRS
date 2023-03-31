@@ -34,7 +34,7 @@ PaddleRS has organically integrated the data preprocessing/data augmentation (co
 
 ## Combinatorial Operator
 
-During the model training process, it is often necessary to combine a variety of data preprocessing and data augmentation strategies. PaddleRS provides `paddlers.transforms.Compose` to easily combine multiple data transformation operators so that they can be executed serially. For the specific usage of the `paddlers.transforms.Compose` please see [API Description](https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/data_en.md).
+During the model training process, it is often necessary to combine a variety of data preprocessing and data augmentation strategies. PaddleRS provides `paddlers.transforms.Compose` to easily combine multiple data transformation operators so that they can be executed serially. For the specific usage of the `paddlers.transforms.Compose` please see [API Description](../apis/data_en.md).
 
 ## Operator Construction
 
