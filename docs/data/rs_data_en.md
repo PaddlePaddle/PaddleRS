@@ -24,7 +24,7 @@ In order to introduce the imaging principle of remote sensing image, the concept
 
 Raster formats are ideal for analysis that concentrates on spatial and temporal changes because each data value has a grid-based accessible location. This allows us to access the same geographic location in two or more different grids and compare their values.
 
-When the earth observation satellite takes a picture, the sensor will record the DN (Digital Number) value of different wavelength electromagnetic wave in the grid pixel. Through DN, the irradiance and reflectance of ground objects can be inversely calculated. The relationship between them is shown in the following formula, where $gain$ and $bias$ refer to the gain and offset of the sensor respectively; $L$ is irradiance, also known as radiant brightness value; $\rho$ is the reflectance of ground objects; $d_{s}$、$E_{0}$ and $\theta$ respectively represent the distance between solar and earth astronomical units, solar irradiance and solar zenith angle.
+When the earth observation satellite takes a picture, the sensor will record the DN (Digital Number) value of different wavelength electromagnetic wave in the grid pixel. Through DN, the irradiance and reflectance of ground objects can be inversely calculated. The relationship between them is shown in the following formula, where $gain$ and $bias$ refer to the gain and offset of the sensor respectively; $L$ is irradiance, also known as radiant brightness value; $\rho$ is the reflectance of ground objects; $d_{s}$, $E_{0}$ and $\theta$ respectively represent the distance between solar and earth astronomical units, solar irradiance and solar zenith angle.
 
 $$
 L = gain * DN + bias \\
