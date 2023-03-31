@@ -17,8 +17,6 @@ import argparse
 
 import pandas as pd
 
-from ..utils import time_it
-
 
 def _get_annno(df_image_split, df_anno):
     df_merge = pd.merge(
@@ -29,7 +27,6 @@ def _get_annno(df_image_split, df_anno):
     return df_anno_split
 
 
-@time_it
 def json_split(json_all_path, json_train_path, json_val_path, val_split_rate,
                val_split_num, keep_val_in_train, image_keyname, anno_keyname):
     print("Split".center(100, "-"))

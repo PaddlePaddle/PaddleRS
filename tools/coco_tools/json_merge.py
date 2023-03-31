@@ -15,10 +15,7 @@
 import json
 import argparse
 
-from ..utils import time_it
 
-
-@time_it
 def json_merge(json1_path, json2_path, save_path, merge_keys):
     print("Merge".center(100, "-"))
     print("json read...\n")

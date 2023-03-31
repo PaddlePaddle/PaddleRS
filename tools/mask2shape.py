@@ -80,7 +80,8 @@ def mask2shape(src_img_path, mask_path, save_path, ignore_index=255):
             "The extension of `save_path` must be 'json/geojson' or 'shp', not {}.".
             format(vec_ext))
     ras_ext = src_img_path.split(".")[-1].lower()
-    if osp.exists(src_img_path) and ras_ext in ["tif", "tiff", "geotiff", "img"]:
+    if osp.exists(
+            src_img_path) and ras_ext in ["tif", "tiff", "geotiff", "img"]:
         src = Raster(src_img_path)
         _polygonize_raster(mask_path, save_path, src.proj, src.geot,
                            ignore_index, vec_ext)

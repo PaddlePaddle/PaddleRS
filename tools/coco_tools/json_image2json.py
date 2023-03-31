@@ -19,12 +19,9 @@ import argparse
 import cv2
 from tqdm import tqdm
 
-from ..utils import time_it
 
-
-@time_it
-def json_image2json(image_dir, json_train_path, json_test_path,
-                    image_keyname, cat_keyname):
+def json_image2json(image_dir, json_train_path, json_test_path, image_keyname,
+                    cat_keyname):
     print("Image to Json".center(100, "-"))
     print("json read...\n")
     data = {}
@@ -63,5 +60,5 @@ if __name__ == "__main__":
     parser.add_argument("--cat_keyname", type=str, default="categories", \
                         help="Key name of categories in json, default categories")
     args = parser.parse_args()
-    json_image2json(args.image_dir, args.json_train_path,
-                    args.json_test_path, args.image_keyname, args.cat_keyname)
+    json_image2json(args.image_dir, args.json_train_path, args.result_path,
+                    args.image_keyname, args.cat_keyname)

@@ -1,3 +1,5 @@
+[简体中文](model_cons_param_cn.md) | English
+
 # PaddleRS Model Construction Parameters
 
 This document describes the construction parameters of each PaddleRS model trainer in detail, including their parameter names, parameter types, parameter descriptions and default values.

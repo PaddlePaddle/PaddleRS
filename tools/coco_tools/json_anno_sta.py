@@ -20,8 +20,6 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-from ..utils import time_it
-
 SHP_RATE_BINS = [
     0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5,
     1.6, 1.7, 1.8, 1.9, 2, 2.1, 2.2, 2.4, 2.6, 3, 3.5, 4, 5
@@ -39,7 +37,6 @@ def _check_dir(check_path, show=True):
             print("make dir:", check_directory)
 
 
-@time_it
 def json_anno_sta(json_path, csv_path, pic_shape_path, pic_shape_rate_path,
                   pic_pos_path, pic_pos_end_path, pic_cat_path,
                   pic_obj_num_path, get_relative, image_keyname, anno_keyname):
@@ -168,7 +165,8 @@ if __name__ == "__main__":
     parser.add_argument("--anno_keyname", type=str, default="annotations", \
                         help="Key name of annotation in json, default annotations")
     args = parser.parse_args()
-    json_anno_sta(args.json_path, args.csv_path, args.png_shape_path,
-                  args.png_shapeRate_path, args.png_pos_path,
-                  args.png_posEnd_path, args.png_cat_path, args.png_objNum_path,
-                  args.get_relative, args.image_keyname, args.anno_keyname)
+    json_anno_sta(args.json_path, args.csv_path, args.pic_shape_path,
+                  args.pic_shape_rate_path, args.pic_pos_path,
+                  args.pic_pos_end_path, args.pic_cat_path,
+                  args.pic_obj_num_path, args.get_relative, args.image_keyname,
+                  args.anno_keyname)

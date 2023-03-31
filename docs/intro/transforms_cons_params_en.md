@@ -1,6 +1,10 @@
+[简体中文](transforms_cons_params_cn.md) | English
+
 # PaddleRS Data Transformation Operator Construction Parameters
 
 This document describes the parameters of each PaddleRS data transformation operator in detail, including the operator name, operator purpose, parameter name, parameter type, parameter meaning, and parameter default value of each operator.
+
+You can check all data transformation operators supported by PaddleRS [here](https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/intro/transforms_en.md).
 
 ## `AppendIndex`
 

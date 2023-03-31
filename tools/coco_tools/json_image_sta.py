@@ -20,8 +20,6 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-from ..utils import time_it
-
 
 def _check_dir(check_path, show=False):
     if os.path.isdir(check_path):
@@ -34,7 +32,6 @@ def _check_dir(check_path, show=False):
             print("make dir:", check_directory)
 
 
-@time_it
 def json_image_sta(json_path, csv_path, pic_shape_path, pic_shape_rate_path,
                    image_keyname):
     print("json read...\n")

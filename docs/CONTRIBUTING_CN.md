@@ -1,3 +1,5 @@
+简体中文 | [English](CONTRIBUTING_EN.md)
+
 # PaddleRS贡献指南
 
 ## 贡献代码
@@ -6,12 +8,12 @@
 
 ### 1 代码贡献步骤
 
-PaddleRS使用[git](https://git-scm.com/doc)作为版本控制工具，并托管在GitHub平台。这意味着，在贡献代码前，您需要熟悉git相关操作，并且对以[pull request (PR)](https://docs.github.com/cn/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests)为基础的GitHub工作流有所了解。
+PaddleRS使用[Git](https://git-scm.com/doc)作为版本控制工具，并托管在GitHub平台。这意味着，在贡献代码前，您需要熟悉git相关操作，并且对以[pull request (PR)](https://docs.github.com/cn/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests)为基础的GitHub工作流有所了解。
 
 为PaddleRS贡献代码的具体步骤如下：
 
 1. 在GitHub上fork PaddleRS官方仓库，将代码克隆到本地，并拉取develop分支的最新版本。
-2. 根据[《开发指南》](dev/dev_guide.md)编写代码（建议在新建的功能分支上开发）。
+2. 根据[《开发指南》](dev/dev_guide_cn.md)编写代码（建议在新建的功能分支上开发）。
 3. 安装pre-commit钩子以便在每次commit前执行代码风格方面的检查。详见[代码风格规范](#3-代码风格规范)。
 4. 为新增的代码编写单元测试，并保证所有测试能够跑通。详见[测试相关步骤](#4-测试相关步骤)。
 5. 为您的分支新建一个PR，确保CLA协议签署且CI/CE通过。在这之后，会有PaddleRS团队人员对您贡献的代码进行review。
@@ -70,7 +72,7 @@ from paddlers.transforms import DecodeImg
 
 PaddleRS对代码风格的规范基本与[Google Python风格规范](https://zh-google-styleguide.readthedocs.io/en/latest/google-python-styleguide/python_style_rules/)一致，但PaddleRS对类型注解（即type hints，参见[PEP 483](https://peps.python.org/pep-0483/)与[PEP 484](https://peps.python.org/pep-0484/)）不做强制要求。较为重要的代码风格规范如下：
 
-- 空行：顶层定义（例如顶层的函数或者类的定义）之间空2行。类内部不同方法的定义之间、以及类名与第一个方法定义之间空1行。在函数内部需要注意在逻辑上有间断的地方添加1个空行。
+- 空行：顶层定义（例如顶层的函数或者类的定义）之间空2行。类内部不同方法的定义之间空1行。在函数内部需要注意在逻辑上有间断的地方添加1个空行。
 
 - 行长度：每行（无论是代码行还是注释行）不超过80个字符，对于docstring中的行尤其要注意这一点。
 
@@ -78,7 +80,7 @@ PaddleRS对代码风格的规范基本与[Google Python风格规范](https://zh-
 
 - 异常：抛出和捕获异常时使用尽可能具体的异常类型，几乎永远不要使用基类`Exception`（除非目的是捕获不限类型的任何异常）。
 
-- 注释：所有注释使用英文书写。所有提供给用户的API都必须添加docstring，且至少具有“API功能描述”和“API参数”两个部分。使用三双引号`"""`包围一个docstring。docstring书写的具体细节可参考[《代码注释规范》](dev/docstring.md)。
+- 注释：所有注释使用英文书写。所有提供给用户的API都必须添加docstring，且至少具有“API功能描述”和“API参数”两个部分。使用三双引号`"""`包围一个docstring。docstring书写的具体细节可参考[《代码注释规范》](dev/docstring_cn.md)。
 
 - 命名：不同类型的变量名适用的大小写规则如下：模块名：`module_name`；包名：`package_name`；类名：`ClassName`；方法名：`method_name`；函数名：`function_name`；全局常量（指程序运行期间值不发生改变的变量）名：`GLOBAL_CONSTANT_NAME`；全局变量名：`global_var_name`；实例名：`instance_var_name`；函数参数名：`function_param_name`；局部变量名：`local_var_name`。
 

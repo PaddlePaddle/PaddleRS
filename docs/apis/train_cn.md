@@ -1,6 +1,8 @@
+简体中文 | [English](train_en.md)
+
 # PaddleRS训练API说明
 
-**训练器**封装了模型训练、验证、量化以及动态图推理等逻辑，定义在`paddlers/tasks/`目录下的文件中。为了方便用户使用，PaddleRS为所有支持的模型均提供了继承自父类[`BaseModel`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/base.py)的训练器，并对外提供数个API。变化检测、场景分类、目标检测、图像复原以及图像分割任务对应的训练器类型分别为`BaseChangeDetector`、`BaseClassifier`、`BaseDetector`、`BaseRestorer`和`BaseSegmenter`。本文档介绍训练器的初始化函数以及`train()`、`evaluate()` API。
+**训练器**（或模型训练器）封装了模型训练、验证、量化以及动态图推理等逻辑，定义在`paddlers/tasks/`目录下的文件中。为了方便用户使用，PaddleRS为所有支持的模型均提供了继承自父类[`BaseModel`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/base.py)的训练器，并对外提供数个API。变化检测、场景分类、目标检测、图像复原以及图像分割任务对应的训练器类型分别为`BaseChangeDetector`、`BaseClassifier`、`BaseDetector`、`BaseRestorer`和`BaseSegmenter`。本文档介绍训练器的初始化函数以及`train()`、`evaluate()` API。
 
 ## 初始化训练器
 
@@ -174,7 +176,7 @@ def train(self,
 |`warmup_start_lr`|`int`|默认优化器warm-up阶段使用的初始学习率。|`0`|
 |`lr_decay_epochs`|`list` \| `tuple`|默认优化器学习率衰减的milestones，以epoch计。即，在第几个epoch执行学习率的衰减。|`(216, 243)`|
 |`lr_decay_gamma`|`float`|学习率衰减系数，适用于默认优化器。|`0.1`|
-|`metric`|`str` \| `None`|评价指标，可以为`'VOC'`、`COCO`或`None`。若为`Nnoe`，则根据数据集格式自动确定使用的评价指标。|`None`|
+|`metric`|`str` \| `None`|评价指标，可以为`'VOC'`、`COCO`或`None`。若为`None`，则根据数据集格式自动确定使用的评价指标。|`None`|
 |`use_ema`|`bool`|是否启用[指数滑动平均策略](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/models/ppdet/optimizer.py)更新模型权重参数。|`False`|
 |`early_stop`|`bool`|训练过程是否启用早停策略。|`False`|
 |`early_stop_patience`|`int`|启用早停策略时的`patience`参数（参见[`EarlyStop`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/utils/utils.py)）。|`5`|

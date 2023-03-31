@@ -15,10 +15,7 @@
 import json
 import argparse
 
-from ..utils import time_it
 
-
-@time_it
 def json_info_show(json_path, show_num):
     print("Info".center(100, "-"))
     print("json read...")
