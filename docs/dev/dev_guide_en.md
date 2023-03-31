@@ -1,14 +1,16 @@
+[简体中文](dev_guide_cn.md) | English
+
 # PaddleRS Development Guide
 
 ## 0 Catalog
 
-- [Add Remote Sensing Special Model](#1-add-remote-sensing-special-model)
+- [Add Remote Sensing Dedicated Model](#1-add-remote-sensing-dedicated-models)
 
-- [Add Data Preprocessing/Data Augmentation Function or Operator](#2-add-data-preprocessing/data-augmentation-function-or-operator)
+- [Add Data Preprocessing/Data Augmentation Function or Operator](#2-add-data-preprocessing/data-augmentation-functions-or-operators)
 
 - [Add Remote Sensing Image Processing Tools](#3-add-remote-sensing-image-processing-tools)
 
-## 1 Add Remote Sensing Special Model
+## 1 Add Remote Sensing Dedicated Models
 
 ### 1.1 Write Model Definitions
 
@@ -29,9 +31,9 @@ The new model must be a subclass of `paddle.nn.Layer`. For the tasks of image se
 
 Note that if a common component exists in a subdirectory. For example, contents in `paddlers/rs_models/cd/layers`, `paddlers/rs_models/cd/backbones` and `paddlers/rs_models/seg/layers` should be reused as much as possible.
 
-### 1.2 Add docstring
+### 1.2 Add Docstrings
 
-You have to add a docstring to the new model, with the original references and links in it (you don't have to be strict about the reference format, but you want to be as consistent as possible with the other models you already have for the task). For detailed annotation specifications, refer to the [Code Annotation Specification](docstring.md). An example is as follows:
+You have to add a docstring to the new model, with the original references and links in it (you don't have to be strict about the reference format, but you want to be as consistent as possible with the other models you already have for the task). For detailed annotation specifications, refer to the [Code Annotation Specification](docstring_en.md). An example is as follows:
 
 ```python
 """
@@ -79,7 +81,7 @@ It should be noted that for the image restoration task, the forward and backward
 
 See `ESRGAN` for specific examples of GAN trainers.
 
-## 2 Add Data Preprocessing/Data Augmentation Function or Operator
+## 2 Add Data Preprocessing/Data Augmentation Functions or Operators
 
 ### 2.1 Add Data Preprocessing/Data Augmentation Functions
 

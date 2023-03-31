@@ -1,3 +1,5 @@
+[简体中文](rs_data_cn.md) | English
+
 # Introduction to Remote Sensing Data
 
 ## 1 Definition of Remote Sensing and Remote Sensing Images

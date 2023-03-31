@@ -1,3 +1,5 @@
+[简体中文](docstring_cn.md) | English
+
 # PaddleRS Specification for Code Annotation
 
 ## 1 Specification for Docstrings
@@ -112,7 +114,7 @@ Example:
 """
 ```
 
-### 1.5 Usage Example
+### 1.5 Example on Usage
 
 Provide as many examples as possible for various usage scenarios of the function or class, and give the expected results of executing the code in the comments.
 
@@ -143,7 +145,7 @@ Single example:
 """
 ```
 
-Multi examples:
+Multi-examples:
 
 ```python
 """
@@ -184,8 +186,8 @@ Multi examples:
 
 ### 1.6 Grammar
 
-- Wording is accurate, using vocabulary and expressions common in deep learning.
-- The sentences are smooth and in line with English grammar.
+- Wording should be accurate, using vocabulary and expressions common in deep learning.
+- The sentences should be smooth and in line with English grammar.
 - The document should be consistent in the expression of the same thing, for example, avoid using label sometimes and ground truth sometimes.
 
 ### 1.7 Other Points to Note

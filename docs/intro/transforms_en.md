@@ -1,10 +1,12 @@
+[简体中文](transforms_cn.md) | English
+
 # Data Transformation Operator
 
 ## List of PaddleRS Supported Data Transformation Operators
 
-PaddleRS has organically integrated the data preprocessing/data augmentation (collectively called data transformation) strategies required by different remote sensing tasks, and designed a unified operator. Considering the multi-band characteristics of remote sensing images, most data processing operators of PaddleRS can process input of any number of bands. All data transformation operators currently provided by PaddleRS are listed as follows:
+PaddleRS has organically integrated the data preprocessing/data augmentation (collectively called data transformation) strategies required by different remote sensing tasks, and designed a unified operator. Considering the multi-band characteristics of remote sensing images, most data transformation operators of PaddleRS can process input of any number of bands. All data transformation operators currently provided by PaddleRS are listed as follows:
 
-| The name of the data transformation operator | Purpose                                                     | Task     | ... |
+| Name | Purpose                                                     | Task     | ... |
 | -------------------- | ------------------------------------------------- | -------- | ---- |
 | AppendIndex          | Calculate the remote sensing index and add it to the input image. | All tasks  | ... |  
 | CenterCrop           | Perform center cropping on the input image. | All tasks | ... |
@@ -32,4 +34,8 @@ PaddleRS has organically integrated the data preprocessing/data augmentation (co
 
 ## Combinatorial Operator
 
-In the actual model training process, it is often necessary to combine a variety of data preprocessing and data augmentation strategies. PaddleRS provides `paddlers.transforms.Compose` to easily combine multiple data transformation operators so that they can be executed serially. For the specific usage of the `paddlers.transforms.Compose` please see [API Description](https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/data.md).
+During the model training process, it is often necessary to combine a variety of data preprocessing and data augmentation strategies. PaddleRS provides `paddlers.transforms.Compose` to easily combine multiple data transformation operators so that they can be executed serially. For the specific usage of the `paddlers.transforms.Compose` please see [API Description](https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/data_en.md).
+
+## Operator Construction
+
+See [this document](transforms_cons_params_en.md).

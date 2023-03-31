@@ -1,3 +1,5 @@
+简体中文 | [English](model_cons_params_en.md)
+
 # PaddleRS模型构造参数
 
 本文档详细介绍了PaddleRS各个模型训练器的构造参数，包括其参数名、参数类型、参数描述及默认值。
