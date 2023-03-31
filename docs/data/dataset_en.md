@@ -1,3 +1,5 @@
+[简体中文](dataset_cn.md) | English
+
 # Remote Sensing Open Source Dataset
 
 PaddleRS has collected and summarized the most commonly used **open source** deep learning data sets in the field of remote sensing, providing the following information for each data set: dataset description, image information, annotation information, source address, and AI Studio backup link. According to the task type, these data sets can be divided into **image classification, image segmentation, change detection, object detection, object tracking, multi-label classification, image generation** and other types. Currently, the collected remote sensing datasets include:
@@ -12,7 +14,7 @@ PaddleRS has collected and summarized the most commonly used **open source** dee
 * 3 image caption datasets;
 * 8 image generation datasets.
 
-Visit [Remote Sensing Data Set Summary](./dataset_summary.md) for more information.
+Visit [Remote Sensing Data Set Summary](./dataset_summary_en.md) for more information.
 
 ## Dataset of Special Contribution
 

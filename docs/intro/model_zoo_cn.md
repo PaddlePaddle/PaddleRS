@@ -1,3 +1,5 @@
+简体中文 | [English](model_zoo_en.md)
+
 # 模型库
 
 PaddleRS的基础模型库来自Paddle-CV系列套件：[PaddleClas](https://github.com/PaddlePaddle/PaddleClas/blob/release/2.3/docs/zh_CN/algorithm_introduction/ImageNet_models.md)、[PaddleSeg](https://github.com/PaddlePaddle/PaddleSeg/blob/release/2.4/docs/model_zoo_overview_cn.md)、[PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.3/README_cn.md#模型库)以及[PaddleGAN](https://github.com/PaddlePaddle/PaddleGAN/blob/develop/README_cn.md#模型库)。除此之外，PaddleRS也包含一系列遥感特色模型，可用于遥感影像分割、变化检测等。
@@ -40,3 +42,7 @@ PaddleRS目前已支持的全部模型如下（标注\*的为遥感专用模型�
 | 图像分割 | Fast-SCNN | 是 |
 | 图像分割 | HRNet | 是 |
 | 图像分割 | UNet | 是 |
+
+## 构造模型训练器
+
+参见[此文档](model_cons_params_cn.md)。

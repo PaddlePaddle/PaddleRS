@@ -1,6 +1,8 @@
+简体中文 | [English](train_en.md)
+
 # PaddleRS训练API说明
 
-**训练器**封装了模型训练、验证、量化以及动态图推理等逻辑，定义在`paddlers/tasks/`目录下的文件中。为了方便用户使用，PaddleRS为所有支持的模型均提供了继承自父类[`BaseModel`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/base.py)的训练器，并对外提供数个API。变化检测、场景分类、目标检测、图像复原以及图像分割任务对应的训练器类型分别为`BaseChangeDetector`、`BaseClassifier`、`BaseDetector`、`BaseRestorer`和`BaseSegmenter`。本文档介绍训练器的初始化函数以及`train()`、`evaluate()` API。
+**训练器**（或模型训练器）封装了模型训练、验证、量化以及动态图推理等逻辑，定义在`paddlers/tasks/`目录下的文件中。为了方便用户使用，PaddleRS为所有支持的模型均提供了继承自父类[`BaseModel`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/base.py)的训练器，并对外提供数个API。变化检测、场景分类、目标检测、图像复原以及图像分割任务对应的训练器类型分别为`BaseChangeDetector`、`BaseClassifier`、`BaseDetector`、`BaseRestorer`和`BaseSegmenter`。本文档介绍训练器的初始化函数以及`train()`、`evaluate()` API。
 
 ## 初始化训练器
 

@@ -1,3 +1,5 @@
+简体中文 | [English](transforms_en.md)
+
 # 数据变换算子
 
 ## PaddleRS已支持的数据变换算子列表
@@ -32,4 +34,8 @@ PaddleRS对不同遥感任务需要的数据预处理/数据增强（合称为�
 
 ## 组合算子
 
-在实际的模型训练过程中，常常需要组合多种数据预处理与数据增强策略。PaddleRS提供了`paddlers.transforms.Compose`以便捷地组合多个数据变换算子，使这些算子能够串行执行。关于`paddlers.transforms.Compose`的具体用法请参见[API说明](https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/data.md)。
+在实际的模型训练过程中，常常需要组合多种数据预处理与数据增强策略。PaddleRS提供了`paddlers.transforms.Compose`以便捷地组合多个数据变换算子，使这些算子能够串行执行。关于`paddlers.transforms.Compose`的具体用法请参见[API说明](https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/data_cn.md)。
+
+## 构造算子
+
+参见[此文档](transforms_cons_params_cn.md)。

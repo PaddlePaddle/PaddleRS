@@ -1,8 +1,10 @@
-# Tutorial - Training Model
+[简体中文](README_CN.md) | English
+
+# Tutorials - Model Training
 
 Sample code using the PaddleRS training model is curated in this directory. The code provides automatic downloading of sample data, and uses GPU to train the model.
 
-|Sample code path | Task | Model |
+|Sample Code Path | Task | Model |
 |------|--------|---------|
 |change_detection/bit.py | Change Detection | BIT |
 |change_detection/cdnet.py | Change Detection | CDNet |
@@ -36,75 +38,6 @@ Sample code using the PaddleRS training model is curated in this directory. The 
 |semantic_segmentation/hrnet.py | Image Segmentation | HRNet |
 |semantic_segmentation/unet.py | Image Segmentation | UNet |
 
-## Environmental Preparation
-
-+ [PaddlePaddle installation](https://www.paddlepaddle.org.cn/install/quick)
-  - Version requirements: PaddlePaddle>=2.2.0
-
-+ PaddleRS installation
-
-The PaddleRS code will be updated as the development progresses. You can install the develop branch to use the latest features as follows:
-
-```shell
-git clone https://github.com/PaddlePaddle/PaddleRS
-cd PaddleRS
-git checkout develop
-pip install -r requirements.txt
-python setup.py install
-```
-
-If the downloading of dependencies is slow or times out when using `python setup.py install`, you can create `setup.cfg` in the same directory as `setup.py` and with the following content, then the download can be accelerated through Tsinghua source:
-
-```
-[easy_install]
-index-url=https://pypi.tuna.tsinghua.edu.cn/simple
-```
-
-+ (Optional) GDAL installation
-
-PaddleRS supports reading of various types of satellite data. To use the full data reading functionality of PaddleRS, you need to install GDAL as follows:
-
-  - Linux / MacOS
-
-conda is recommended for installation:
-
-```shell
-conda install gdal
-```
-
-  - Windows
-
-Windows users can download GDAL wheels from [this site](https://www.lfd.uci.edu/~gohlke/pythonlibs/#gdal). Please choose the wheel according to the Python version and the platform. Take *GDAL‑3.3.3‑cp39‑cp39‑win_amd64.whl* as an example, run the following command to install:
-
-```shell
-pip install GDAL‑3.3.3‑cp39‑cp39‑win_amd64.whl
-```
-
-### *Docker Installation
-
-1. Pull from dockerhub:
-
-```shell
-docker pull paddlepaddle/paddlers:1.0.0
-```
-
-- (Optional) Build from scratch. Select the base image for PaddlePaddle by setting `PPTAG`. You can build the image in a CPU-only environment or in GPU environments.
-
-```shell
-git clone https://github.com/PaddlePaddle/PaddleRS
-cd PaddleRS
-docker build -t <imageName> .  # default is 2.4.1-cpu version
-# docker build -t <imageName> . --build-arg PPTAG=2.4.1-gpu-cuda10.2-cudnn7.6-trt7.0  # One of the gpu versions of 2.4.1
-# Other Tag refer to: https://hub.docker.com/r/paddlepaddle/paddle/tags
-```
-
-2. Start a container
-
-```shell
-docker images  # View the ID of an image
-docker run -it <imageID>
-```
-
 ## Start Training
 
 + After PaddleRS is installed, run the following commands to launch training with a single GPU. The script will automatically download the training data. Take DeepLab V3+ image segmentation model as an example:
@@ -121,7 +54,7 @@ python tutorials/train/semantic_segmentation/deeplabv3p.py
 python -m paddle.distributed.launch --gpus 0,1 tutorials/train/semantic_segmentation/deeplabv3p.py
 ```
 
-## VisualDL Visual Training Metrics
+## Visualize Training Metrics via VisualDL
 
 Set the `use_vdl` argument passed to the `train()` method to `True`, and then the training log will be automatically saved in VisualDL format in a subdirectory named `vdl_log` under the directory specified by `save_dir`(a user-specified path) during the model training process. You can run the following command to start the VisualDL service and view the indicators and metrics. We also take DeepLab V3+ as an example:
 

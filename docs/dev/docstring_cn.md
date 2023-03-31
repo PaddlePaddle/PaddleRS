@@ -1,3 +1,5 @@
+简体中文 | [English](docstring_en.md)
+
 # PaddleRS代码注释规范
 
 ## 1 注释规范

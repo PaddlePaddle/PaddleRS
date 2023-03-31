@@ -1,8 +1,10 @@
+简体中文 | [English](transforms_cons_params_en.md)
+
 # PaddleRS数据变换算子构造参数
 
-本文档详细介绍了PaddleRS各个数据变化算子的构造参数，包括算子名称、算子用途、各个算子的参数名称、参数类型、参数意义以及参数默认值。
+本文档详细介绍了PaddleRS各个数据变换算子的构造参数，包括算子名称、算子用途、各个算子的参数名称、参数类型、参数意义以及参数默认值。
 
-PaddleRS所支持的数据变换算子可见(https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/intro/transforms.md)
+PaddleRS所支持的数据变换算子可见[此文档](https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/intro/transforms_cn.md)。
 
 ## `AppendIndex`
 

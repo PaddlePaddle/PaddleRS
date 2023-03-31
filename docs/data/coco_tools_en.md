@@ -1,3 +1,5 @@
+[简体中文](coco_tools_cn.md) | English
+
 # coco_tools Instructions
 
 ## 1 Tool Description

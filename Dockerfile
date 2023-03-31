@@ -1,5 +1,5 @@
 # 0. set args
-ARG PPTAG=2.4.1  # tags refers to https://hub.docker.com/r/paddlepaddle/paddle/tags
+ARG PPTAG=2.4.1  # tags refer to https://hub.docker.com/r/paddlepaddle/paddle/tags
 
 # 1. pull base image
 FROM paddlepaddle/paddle:${PPTAG}
