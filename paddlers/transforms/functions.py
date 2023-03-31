@@ -431,7 +431,7 @@ def to_uint8(im, norm=True, stretch=False):
 
     dtype = im.dtype.name
     if dtype[:-2] == "uint" and np.max(dtype) < 256:
-        return im
+        pass
     else:
         if norm:
             im = _sample_norm(im)
