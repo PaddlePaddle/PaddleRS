@@ -192,8 +192,8 @@ python ./coco_tools/json_ImgSta.py \
 | ---------------------- | --------------------------------------------------------------------- | -------- |
 | `--json_path`          | 需要统计的json文件路径                                                   |          |
 | `--csv_path`           | （可选）统计表格保存路径                                                  | `None`   |
-| `--png_shape_path`     | （可选）png图片保存路径，图片内容为所有图像shape的二维分布                     | `5`      |
-| `--png_shapeRate_path` | （可选）png图片保存路径，图片内容为所有图像shape比例(宽/高)的一维分布           | `5`      |
+| `--png_shape_path`     | （可选）.png图片保存路径，图片内容为所有图像shape的二维分布                     | `5`      |
+| `--png_shapeRate_path` | （可选）.png图片保存路径，图片内容为所有图像shape比例(宽/高)的一维分布           | `5`      |
 | `--image_keyname`      | （可选）json文件中，图像所对应的key                                        |`'images'`|
 | `--Args_show`          | （可选）是否打印输入参数信息                                               |`True`    |
 
@@ -263,12 +263,12 @@ python ./coco_tools/json_AnnoSta.py \
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------- | ------------- |
 | `--json_path`          | （可选）需要统计的json文件路径                                                                                                 |               |
 | `--csv_path`           | （可选）统计表格保存路径                                                                                                       | `None`        |
-| `--png_shape_path`     | （可选）png图片保存路径，图片内容为所有目标检测框shape的二维分布                                                                    | `None`        |
-| `--png_shapeRate_path` | （可选）png图片保存路径，图片内容为所有目标检测框shape比例(宽/高)的一维分布                                                           | `None`        |
-| `--png_pos_path`       | （可选）png图片保存路径，图片内容为所有目标检测框左上角坐标的二维分布                                                                 | `None`        |
-| `--png_posEnd_path`    | （可选）png图片保存路径，图片内容为所有目标检测框右下角坐标的二维分布                                                                 | `None`        |
-| `--png_cat_path`       | （可选）png图片保存路径，图片内容为各个类别的对象数量分布                                                                           | `None`        |
-| `--png_objNum_path`    | （可选）png图片保存路径，图片内容为单个图像中含有标注对象的数量分布                                                                   | `None`        |
+| `--png_shape_path`     | （可选）.png图片保存路径，图片内容为所有目标检测框shape的二维分布                                                                    | `None`        |
+| `--png_shapeRate_path` | （可选）.png图片保存路径，图片内容为所有目标检测框shape比例(宽/高)的一维分布                                                           | `None`        |
+| `--png_pos_path`       | （可选）.png图片保存路径，图片内容为所有目标检测框左上角坐标的二维分布                                                                 | `None`        |
+| `--png_posEnd_path`    | （可选）.png图片保存路径，图片内容为所有目标检测框右下角坐标的二维分布                                                                 | `None`        |
+| `--png_cat_path`       | （可选）.png图片保存路径，图片内容为各个类别的对象数量分布                                                                           | `None`        |
+| `--png_objNum_path`    | （可选）.png图片保存路径，图片内容为单个图像中含有标注对象的数量分布                                                                   | `None`        |
 | `--get_relative`       | （可选）是否生成图像目标检测框shape、目标检测框左上角坐标、右下角坐标的相对比例值<br />(横轴坐标/图片长，纵轴坐标/图片宽)                    | `None`        |
 | `--image_keyname`      | （可选）json文件中，图像所对应的key                                                                                             | `'images'`    |
 | `--anno_keyname`       | （可选）json文件中，标注所对应的key                                                                                             | `'annotations'`|
