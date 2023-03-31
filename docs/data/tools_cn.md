@@ -68,7 +68,7 @@ python geojson2mask.py --srcimg_path {带有地理信息的原始影像路径} -
 `match.py`的主要功能是在对两个时相的遥感影像进行空间配准。使用方式如下：
 
 ```shell
-python match.py --im1_path [时相1影像路径] --im2_path [时相2影像路径] --save_path [配准后时相2影像输出路径] [--im1_bands 1 2 3] [--im2_bands 1 2 3]
+python match.py --im1_path {时相1影像路径} --im2_path {时相2影像路径} --save_path {配准后时相2影像输出路径} [--im1_bands 1 2 3] [--im2_bands 1 2 3]
 ```
 
 其中：
@@ -126,7 +126,7 @@ python prepare_dataset/prepare_levircd.py --help
 - `--seed`：随机种子。可用于固定随机数生成器产生的伪随机数序列，从而得到固定的数据集划分结果。示例：`--seed 1919810`
 - `--ratios`：对于支持子集随机划分的数据集，指定需要划分的各个子集的样本比例。示例：`--ratios 0.7 0.2 0.1`。
 
-您可以在[此文档](https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/intro/data_prep_cn.md)中查看PaddleRS提供哪些数据集的预处理脚本。
+您可以在[此文档](../intro/data_prep_cn.md)中查看PaddleRS提供哪些数据集的预处理脚本。
 
 ### extract_ms_patches
 

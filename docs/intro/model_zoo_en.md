@@ -42,7 +42,3 @@ All models currently supported by PaddleRS are listed below (those marked \* are
 | Image Segmentation | Fast-SCNN | Yes |
 | Image Segmentation | HRNet | Yes |
 | Image Segmentation | UNet | Yes |
-
-## Model Trainer Construction
-
-See [this document](model_cons_params_en.md).

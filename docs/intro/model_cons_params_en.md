@@ -49,7 +49,7 @@ The original article refers to Pablo F. Alcantarilla, et al., "Street-View Chang
 
 The ChangeFormer implementation based on PaddlePaddle.
 
-The original article refers to Wele Gedara Chaminda Bandara，Vishal M. Patel，“A TRANSFORMER-BASED SIAMESE NETWORK FOR CHANGE DETECTION”(https://arxiv.org/pdf/2201.01293.pdf)。
+The original article refers to Wele Gedara Chaminda Bandara, Vishal M. Patel, “A TRANSFORMER-BASED SIAMESE NETWORK FOR CHANGE DETECTION”(https://arxiv.org/pdf/2201.01293.pdf).
 
 | Parameter Name | Description                                                                 | Default Value |
 |--------------------------------|-----------------------------------------------------------------------------|--------------|
@@ -182,8 +182,8 @@ The original article refers to S. Fang, et al., "SNUNet-CD: A Densely Connected 
 | arg_name               | Description                                     | default  |
 |------------------------|-------------------------------------------------|------|
 | `in_channels (int)`    | Number of channels of the input image           |      |
-| `num_classes（int)`      | Number of target classes                        |      |
-| `width (int，optional)` | Output channels of the first convolutional layer | 32   |
+| `num_classes (int)`      | Number of target classes                        |      |
+| `width (int, optional)` | Output channels of the first convolutional layer | 32   |
 
 ## `STANet`
 

@@ -42,7 +42,3 @@ PaddleRS目前已支持的全部模型如下（标注\*的为遥感专用模型�
 | 图像分割 | Fast-SCNN | 是 |
 | 图像分割 | HRNet | 是 |
 | 图像分割 | UNet | 是 |
-
-## 构造模型训练器
-
-参见[此文档](model_cons_params_cn.md)。

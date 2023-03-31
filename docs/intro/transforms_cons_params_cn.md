@@ -12,9 +12,9 @@ PaddleRS所支持的数据变换算子可见[此文档](https://github.com/Paddl
 
 | 参数名             | 描述                                                                                                                      | 默认值  |
 |-----------------|-------------------------------------------------------------------------------------------------------------------------|------|
-|`index_type (str)`| 遥感索引类型。受支持的索引类型 (https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/indices.py)。                 |      |
-|`band_indexes (dict，可选)`| 波段名称到波段索引的映射（从1开始） (https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/indices.py)。              | `None` |
-|`satellite (str，可选)`| 卫星类型。设置后，将自动确定相应的带指数。请参阅支援卫星 (https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/satellites.py)。 | `None` |
+|`index_type (str)`| 遥感指数类型。请在[此链接](https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/indices.py)查看PaddleRS支持的全部遥感指数类型。                |      |
+|`band_indexes (dict，可选)`| 波段名称到波段索引的映射（从1开始）。请在[此链接](https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/indices.py)查看PaddleRS支持的全部波段名称。              | `None` |
+|`satellite (str，可选)`| 卫星类型。设置后，将自动确定相应的带指数。请在[此链接](https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/satellites.py)查看PaddleRS支持的全部卫星类型。 | `None` |
 
 ## `CenterCrop`
 

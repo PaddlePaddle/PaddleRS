@@ -38,7 +38,7 @@
 
 该基于PaddlePaddle的CDNet实现。
 
-该模型的原始文章见于 Pablo F. Alcantarilla, et al., "Street-View Change Detection with Deconvolut ional Networks"(https://link.springer.com/article/10.1007/s10514-018-9734-5).
+该模型的原始文章见于 Pablo F. Alcantarilla, et al., "Street-View Change Detection with Deconvolut ional Networks"(https://link.springer.com/article/10.1007/s10514-018-9734-5)。
 
 | 参数名                     | 描述                              | 默认值     |
 |-------------------------| --------------------------------- | ---------- |
@@ -68,7 +68,7 @@
 
 基于PaddlePaddle实现的ChangeStar模型，其使用FarSeg编码器。
 
-该模型的原始文章见于 Z. Zheng, et al., "Change is Everywhere: Single-Temporal Supervised Object Change Detection in Remote Sensing Imagery"(https://arxiv.org/abs/2108.07002).
+该模型的原始文章见于 Z. Zheng, et al., "Change is Everywhere: Single-Temporal Supervised Object Change Detection in Remote Sensing Imagery"(https://arxiv.org/abs/2108.07002)。
 
 | 参数名                     | 描述                                | 默认值      |
 |-------------------------|-----------------------------------|-------------|
@@ -87,7 +87,7 @@
 
 基于PaddlePaddle实现的DSAMNet，用于遥感变化检测。
 
-该模型的原始文章见于 Q. Shi, et al., "A Deeply Supervised Attention Metric-Based Network and an Open Aerial Image Dataset for Remote Sensing Change Detection"(https://ieeexplore.ieee.org/document/9467555).
+该模型的原始文章见于 Q. Shi, et al., "A Deeply Supervised Attention Metric-Based Network and an Open Aerial Image Dataset for Remote Sensing Change Detection"(https://ieeexplore.ieee.org/document/9467555)。
 
 | 参数名                     | 描述                         | 默认值 |
 |-------------------------|----------------------------|--------|
@@ -102,7 +102,7 @@
 
 基于PaddlePaddle的DSIFN实现。
 
-该模型的原始文章见于 The original article refers to C. Zhang, et al., "A deeply supervised image fusion network for change detection in high resolution bi-temporal remote sensing images"(https://www.sciencedirect.com/science/article/pii/S0924271620301532).
+该模型的原始文章见于 The original article refers to C. Zhang, et al., "A deeply supervised image fusion network for change detection in high resolution bi-temporal remote sensing images"(https://www.sciencedirect.com/science/article/pii/S0924271620301532)。
 
 | 参数名                   | 描述                   | 默认值 |
 |-------------------------|----------------------|--------|
@@ -115,7 +115,7 @@
 
 基于PaddlePaddle的FC-EF实现。
 
-该模型的原始文章见于 The original article refers to Rodrigo Caye Daudt, et al. "Fully convolutional siamese networks for change detection"(https://arxiv.org/abs/1810.08462).
+该模型的原始文章见于 The original article refers to Rodrigo Caye Daudt, et al. "Fully convolutional siamese networks for change detection"(https://arxiv.org/abs/1810.08462)。
 
 | 参数名                     | 描述                          | 默认值 |
 |-------------------------|-------------------------------|--------|
@@ -131,7 +131,7 @@
 
 基于PaddlePaddle的FC-Siam-conc实现。
 
-该模型的原始文章见于 Rodrigo Caye Daudt, et al. "Fully convolutional siamese networks for change detection"(https://arxiv.org/abs/1810.08462).
+该模型的原始文章见于 Rodrigo Caye Daudt, et al. "Fully convolutional siamese networks for change detection"(https://arxiv.org/abs/1810.08462)。
 
 | 参数名                     | 描述                          | 默认值 |
 |-------------------------|-------------------------------|--------|
@@ -146,7 +146,7 @@
 
 基于PaddlePaddle的FC-Siam-diff实现。
 
-该模型的原始文章见于 Rodrigo Caye Daudt, et al. "Fully convolutional siamese networks for change detection"(https://arxiv.org/abs/1810.08462).
+该模型的原始文章见于 Rodrigo Caye Daudt, et al. "Fully convolutional siamese networks for change detection"(https://arxiv.org/abs/1810.08462)。
 
 | 参数名 | 描述          | 默认值 |
 | --- |-------------|  --- |
@@ -161,7 +161,7 @@
 
 基于PaddlePaddle的FCCDN实现。
 
-该模型的原始文章见于 Pan Chen, et al., "FCCDN: Feature Constraint Network for VHR Image Change Detection"(https://arxiv.org/pdf/2105.10860.pdf).
+该模型的原始文章见于 Pan Chen, et al., "FCCDN: Feature Constraint Network for VHR Image Change Detection"(https://arxiv.org/pdf/2105.10860.pdf)。
 
 | 参数名                    | 描述         | 默认值 |
 |--------------------------|------------|--------|
@@ -175,7 +175,7 @@
 
 基于PaddlePaddle的P2V-CD实现。
 
-该模型的原始文章见于 M. Lin, et al. "Transition Is a Process: Pair-to-Video Change Detection Networks for Very High Resolution Remote Sensing Images"(https://ieeexplore.ieee.org/document/9975266).
+该模型的原始文章见于 M. Lin, et al. "Transition Is a Process: Pair-to-Video Change Detection Networks for Very High Resolution Remote Sensing Images"(https://ieeexplore.ieee.org/document/9975266)。
 
 | 参数名                     | 描述         | 默认值 |
 |-------------------------|------------|--------|
@@ -188,7 +188,7 @@
 
 基于PaddlePaddle的SNUNet实现。
 
-该模型的原始文章见于 S. Fang, et al., "SNUNet-CD: A Densely Connected Siamese Network for Change Detection of VHR Images" (https://ieeexplore.ieee.org/document/9355573).
+该模型的原始文章见于 S. Fang, et al., "SNUNet-CD: A Densely Connected Siamese Network for Change Detection of VHR Images" (https://ieeexplore.ieee.org/document/9355573)。
 
 | 参数名                     | 描述         | 默认值 |
 |-------------------------|------------| --- |
@@ -203,7 +203,7 @@
 
 基于PaddlePaddle的STANet实现。
 
-该模型的原始文章见于 H. Chen and Z. Shi, "A Spatial-Temporal Attention-Based Method and a New Dataset for Remote Sensing Image Change Detection"(https://www.mdpi.com/2072-4292/12/10/1662).
+该模型的原始文章见于 H. Chen and Z. Shi, "A Spatial-Temporal Attention-Based Method and a New Dataset for Remote Sensing Image Change Detection"(https://www.mdpi.com/2072-4292/12/10/1662)。
 
 | 参数名                     | 描述                                                 | 默认值 |
 |-------------------------|----------------------------------------------------| --- |
@@ -217,7 +217,7 @@
 
 基于PaddlePaddle的CondenseNetV2实现。
 
-该模型的原始文章见于Yang L, Jiang H, Cai R, et al. “Condensenet v2: Sparse feature reactivation for deep networks” (https://arxiv.org/abs/2104.04382)
+该模型的原始文章见于Yang L, Jiang H, Cai R, et al. “Condensenet v2: Sparse feature reactivation for deep networks” (https://arxiv.org/abs/2104.04382)。
 
 | 参数名                     | 描述                         | 默认值 |
 |-------------------------|----------------------------| --- |
