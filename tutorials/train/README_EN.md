@@ -56,7 +56,7 @@ python -m paddle.distributed.launch --gpus 0,1 tutorials/train/semantic_segmenta
 
 ## Visualize Training Metrics via VisualDL
 
-Set the `use_vdl` argument passed to the `train()` method to `True`, and then the training log will be automatically saved in VisualDL format in a subdirectory named `vdl_log` under the directory specified by `save_dir`(a user-specified path) during the model training process. You can run the following command to start the VisualDL service and view the indicators and metrics. We also take DeepLab V3+ as an example:
+Set the `use_vdl` argument passed to the `train()` method to `True`, and then the training log will be automatically saved in VisualDL format in a subdirectory named `vdl_log` under the directory specified by `save_dir` (a user-specified path) during the model training process. You can run the following command to start the VisualDL service and view the indicators and metrics. We also take DeepLab V3+ as an example:
 
 ```shell
 # The specified port number is 8001
