@@ -272,7 +272,7 @@ PaddleRS具有以下五大特色：
 ## <img src="./docs/images/teach.png" width="30"/> 教程与文档
 
 * 快速上手
-  * [快速上手PaddleRS](./tutorials/train/README.md)
+  * [快速上手PaddleRS](./docs/quick_start.md)
 * 数据准备
   * [快速了解遥感与遥感数据](./docs/data/rs_data.md)
   * [开源遥感数据集汇总表](./docs/data/dataset.md)
