@@ -31,11 +31,3 @@ PaddleRS对不同遥感任务需要的数据预处理/数据增强（合称为�
 | ResizeByShort        | 调整输入影像大小，保持纵横比不变（根据短边计算缩放系数）。 | 所有任务 | ... |
 | SelectBand           | 对输入影像进行波段选择。 | 所有任务 | ... |
 | ...                  | ... | ... | ... |
-
-## 组合算子
-
-在实际的模型训练过程中，常常需要组合多种数据预处理与数据增强策略。PaddleRS提供了`paddlers.transforms.Compose`以便捷地组合多个数据变换算子，使这些算子能够串行执行。关于`paddlers.transforms.Compose`的具体用法请参见[API说明](../apis/data_cn.md)。
-
-## 构造算子
-
-参见[此文档](transforms_cons_params_cn.md)。

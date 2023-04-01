@@ -230,7 +230,7 @@ Input parameter list:
 |`repeats`|`int`|Number of repetitions used to assess model reasoning and pre- and post-processing speed. If it is greater than `1`, repeats the prediction and averages the time.|`1`|
 |`quiet`|`bool`|If `True`, no timing information will be printed.|`False`|
 
-`Predictor.predict()`returns exactly the same format as the graph inference API. For details, please refer to [Dynamic Graph Inference API](#dynamic-graph-inference-apis).
+`Predictor.predict()`returns exactly the same format as the graph inference API. For details, please refer to [Dynamic Graph Inference APIs](#dynamic-graph-inference-apis).
 
 ### `Predictor.slider_predict()`
 

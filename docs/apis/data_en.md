@@ -128,7 +128,7 @@ The requirements of `SegDataset` for the file list are as follows:
 
 Remote sensing images come from various sources and their data formats are very complicated. PaddleRS provides a unified interface for reading remote sensing images of different types and formats. At present, PaddleRS can read common file formats such as .png, .jpg, .bmp, and .npy, as well as handle GeoTiff, img, and other image formats commonly used in remote sensing.
 
-Depending on the practical demands, the user can choose `paddlers.transforms.decode_image()` or `paddlers.transforms.DecodeImg` to read data. `DecodeImg` is one of [Data transformation operators](#data-transformation-operators), can be combined with other operators. `decode_image` is the encapsulation of `DecodeImg` operator, which is convenient use in the way of function calls.
+Depending on the practical demands, the user can choose `paddlers.transforms.decode_image()` or `paddlers.transforms.DecodeImg` to read data. `DecodeImg` is one of [data transformation operators](#data-transformation-operators), can be combined with other operators. `decode_image` is the encapsulation of `DecodeImg` operator, which is convenient use in the way of function calls.
 
 The parameter list of `decode_image()` function is as follows:
 
@@ -148,7 +148,7 @@ The return format is as follows:
 - If `read_geo_info` is `False`, the image ([h, w, c] arrangement) is returned in the format of `numpy.ndarray`.
 - If `read_geo_info` is `True`, return a tuple consisting of two elements. The first element is the image data, and the second element is a dictionary containing the geographic information of the image, such as the geotransform information and geographic projection information.
 
-## Data Transformation Operator
+## Data Transformation Operators
 
 In PaddleRS a series of classes are defined that, when instantiated, perform certain data preprocessing or data augmentation operations by calling the `__call__` method. PaddleRS calls these classes data preprocessing/data augmentation operators, and collectively **Data Transform Operators**. All data transformation operators inherit from the parent class[`Transform`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/transforms/operators.py).
 
