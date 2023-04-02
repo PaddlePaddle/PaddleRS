@@ -18,4 +18,4 @@ PaddleRS搜集汇总了遥感领域常用的**开源**深度学习数据集，�
 
 ## 特别贡献数据集
 
-* 2020年中国典型城市道路样本数据CHN6-CUG，由中国地质大学[朱祺琪](http://grzy.cug.edu.cn/zhuqiqi)教授提供。相关介绍和下载方式请参考[此处](http://grzy.cug.edu.cn/zhuqiqi/zh_CN/yjgk/32368/content/1733.htm)。
+* 2020年中国典型城市道路样本数据CHN6-CUG由中国地质大学[朱祺琪](http://grzy.cug.edu.cn/zhuqiqi)教授提供。相关介绍和下载方式请参考[此处](http://grzy.cug.edu.cn/zhuqiqi/zh_CN/yjgk/32368/content/1733.htm)。
