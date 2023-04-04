@@ -232,6 +232,11 @@ PaddleRS is an end-to-end high-efficent development toolkit for remote sensing a
         <ul>
           <li><a href="./paddlers/utils/postprocs/connection.py">connecting road disconnection</a></li>
           <li><a href="./paddlers/utils/postprocs/regularization.py">regularizing building boundaries</a></li>
+          <li><a href="./paddlers/utils/postprocs/change_filter.py">filtering out pseudo changes</a></li>
+          <li><a href="./paddlers/utils/postprocs/connection.py">connecting road disconnection</a></li>
+          <li><a href="./paddlers/utils/postprocs/crf.py">refining segmentation result using a conditional random field</a></li>
+          <li><a href="./paddlers/utils/postprocs/mrf.py">refining segmentation result using a Markov random field</a></li>
+          <li><a href="./paddlers/utils/postprocs/regularization.py">regularizing building boundaries</a></li>
         </ul>
         </details>
         <details><summary><b>Data Visualization</b></summary>
