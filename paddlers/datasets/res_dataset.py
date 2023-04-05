@@ -36,6 +36,7 @@ class ResDataset(BaseDataset):
             restoration tasks. Defaults to None.
     """
 
+    _KEYS_TO_KEEP = ['image', 'target']
     _collate_trans_info = True
 
     def __init__(self,

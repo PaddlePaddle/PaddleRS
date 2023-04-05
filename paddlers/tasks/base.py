@@ -20,7 +20,6 @@ import math
 import json
 from functools import partial, wraps
 from inspect import signature
-from typing import Optional
 
 import yaml
 import paddle
@@ -30,7 +29,7 @@ from paddleslim.analysis import flops
 from paddleslim import L1NormFilterPruner, FPGMFilterPruner
 
 import paddlers
-from paddlers.transforms.operators import Compose, DecodeImg, Arrange
+from paddlers.transforms.operators import Compose
 import paddlers.utils.logging as logging
 from paddlers.utils import (
     seconds_to_hms, get_single_card_bs, dict2str, get_pretrain_weights,
@@ -63,7 +62,6 @@ class ModelMeta(type):
 
 
 class BaseModel(metaclass=ModelMeta):
-    _arrange: Optional[Arrange] = None
     find_unused_parameters = False
 
     def __init__(self, model_type):
@@ -97,12 +95,13 @@ class BaseModel(metaclass=ModelMeta):
                        resume_checkpoint=None,
                        is_backbone_weights=False,
                        load_optim_state=True):
+        # FIXME: Multi-process race?
         if pretrain_weights is not None and \
                 not osp.exists(pretrain_weights):
             if not osp.isdir(save_dir):
                 if osp.exists(save_dir):
                     os.remove(save_dir)
-                os.makedirs(save_dir)
+                os.makedirs(save_dir, exist_ok=True)
             # XXX: Hard-coding
             if self.model_type == 'classifier':
                 pretrain_weights = get_pretrain_weights(
@@ -206,11 +205,6 @@ class BaseModel(metaclass=ModelMeta):
                     else:
                         attr = op.__dict__
                     info['Transforms'].append({name: attr})
-                info['Transforms'].append({
-                    self._arrange.__name__: {
-                        'mode': 'test'
-                    }
-                })
         info['completed_epochs'] = self.completed_epochs
         return info
 
@@ -267,28 +261,11 @@ class BaseModel(metaclass=ModelMeta):
         open(osp.join(save_dir, '.success'), 'w').close()
         logging.info("Model saved in {}.".format(save_dir))
 
-    def _build_transforms(self, trans, mode):
-        if isinstance(trans, list):
-            trans = Compose(trans)
-        if not isinstance(trans.transforms[0], DecodeImg):
-            trans.transforms.insert(0, DecodeImg())
-        if self._arrange is Arrange or not issubclass(self._arrange, Arrange):
-            raise ValueError(
-                "`self._arrange` must be set to a concrete Arrange type.")
-        if trans.arrange is None:
-            # For backward compatibility, we only set `trans.arrange`
-            # when it is not set by user.
-            trans.arrange = self._arrange(mode)
-        return trans
-
     def build_data_loader(self,
                           dataset,
                           batch_size,
                           mode='train',
                           collate_fn=None):
-        # NOTE: Append `Arrange` to transforms
-        dataset.transforms = self._build_transforms(dataset.transforms, mode)
-
         if dataset.num_samples < batch_size:
             raise ValueError(
                 'The volume of dataset({}) must be larger than batch size({}).'
@@ -360,7 +337,7 @@ class BaseModel(metaclass=ModelMeta):
             log_writer = LogWriter(vdl_logdir)
 
         # task_id: refer to paddlers
-        task_id = getattr(paddlers, "task_id", "")
+        task_id = getattr(paddlers, 'task_id', '')
 
         thresh = .0001
         if early_stop:
@@ -368,7 +345,6 @@ class BaseModel(metaclass=ModelMeta):
 
         self.train_data_loader = self.build_data_loader(
             train_dataset, batch_size=train_batch_size, mode='train')
-        self._check_arrange(self.train_data_loader.dataset.transforms, 'train')
 
         if eval_dataset is not None:
             self.test_transforms = copy.deepcopy(eval_dataset.transforms)
@@ -543,7 +519,7 @@ class BaseModel(metaclass=ModelMeta):
                 saved. Otherwise, the pruned model will be saved at `save_dir`. 
                 Defaults to None.
         """
-        if self.status == "Pruned":
+        if self.status == 'Pruned':
             raise ValueError(
                 "A pruned model cannot be pruned for a second time!")
         pre_pruning_flops = flops(self.net, self.pruner.inputs)
@@ -636,8 +612,8 @@ class BaseModel(metaclass=ModelMeta):
                 "type": "Sink"
             }
         }]
-        pipeline_info["pipeline_nodes"] = nodes
-        pipeline_info["version"] = "1.0.0"
+        pipeline_info['pipeline_nodes'] = nodes
+        pipeline_info['version'] = '1.0.0'
         return pipeline_info
 
     def _build_inference_net(self):
@@ -704,15 +680,6 @@ class BaseModel(metaclass=ModelMeta):
         if not isinstance(transforms, Compose):
             raise TypeError(
                 "`transforms` must be `paddlers.transforms.Compose`.")
-
-    def _check_arrange(self, transforms, mode):
-        arrange_obj = transforms.arrange
-        if not isinstance(arrange_obj, Arrange):
-            raise TypeError("`transforms.arrange` must be an Arrange object.")
-        if arrange_obj.mode != mode:
-            raise ValueError(
-                f"Incorrect arrange mode! Expected {repr(mode)} but got {repr(arrange_obj.mode)}."
-            )
 
     def run(self, net, inputs, mode):
         raise NotImplementedError
