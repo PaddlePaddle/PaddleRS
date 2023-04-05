@@ -8,7 +8,7 @@
 
 ### 1 代码贡献步骤
 
-PaddleRS使用[Git](https://git-scm.com/doc)作为版本控制工具，并托管在GitHub平台。这意味着，在贡献代码前，您需要熟悉git相关操作，并且对以[pull request (PR)](https://docs.github.com/cn/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests)为基础的GitHub工作流有所了解。
+PaddleRS使用[Git](https://git-scm.com/doc)作为版本控制工具，并托管在GitHub平台。这意味着，在贡献代码前，您需要熟悉Git相关操作，并且对以[pull request (PR)](https://docs.github.com/cn/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests)为基础的GitHub工作流有所了解。
 
 为PaddleRS贡献代码的具体步骤如下：
 
@@ -78,7 +78,7 @@ PaddleRS对代码风格的规范基本与[Google Python风格规范](https://zh-
 
 - 括号：括号可以用于行连接，但是不要在`if`判断中使用没有必要的括号。
 
-- 异常：抛出和捕获异常时使用尽可能具体的异常类型，几乎永远不要使用基类`Exception`（除非目的是捕获不限类型的任何异常）。
+- 异常：抛出和捕获异常时使用尽可能具体的异常类型，几乎永远不要使用基类`Exception`和`BaseException`（除非目的是捕获不限类型的任何异常）。
 
 - 注释：所有注释使用英文书写。所有提供给用户的API都必须添加docstring，且至少具有“API功能描述”和“API参数”两个部分。使用三双引号`"""`包围一个docstring。docstring书写的具体细节可参考[《代码注释规范》](dev/docstring_cn.md)。
 

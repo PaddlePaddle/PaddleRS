@@ -1286,7 +1286,7 @@ class RandomExpand(Transform):
     Args:
         upper_ratio (float, optional): Maximum ratio to which the original image
             is expanded. Defaults to 4..
-        prob (float, optional): Probability of apply expanding. Defaults to .5.
+        prob (float, optional): Probability of expanding. Defaults to .5.
         im_padding_value (list[float] | tuple[float], optional): RGB filling value
             for the image. Defaults to (127.5, 127.5, 127.5).
         label_padding_value (int, optional): Filling value for the mask.
@@ -1345,7 +1345,7 @@ class Pad(Transform):
             target_size (list[int] | tuple[int], optional): Image target size, if None, pad to
                 multiple of size_divisor. Defaults to None.
             pad_mode (int, optional): Pad mode. Currently only four modes are supported:
-                [-1, 0, 1, 2]. if -1, use specified offsets. If 0, only pad to right and bottom
+                [-1, 0, 1, 2]. if -1, use specified offsets. If 0, only pad to right and bottom.
                 If 1, pad according to center. If 2, only pad left and top. Defaults to 0.
             offsets (list[int]|None, optional): Padding offsets. Defaults to None.
             im_padding_value (list[float] | tuple[float]): RGB value of padded area.
@@ -1578,10 +1578,10 @@ class RandomDistort(Transform):
             Defaults to .5.
         hue_range (float, optional): Range of hue distortion. Defaults to .5.
         hue_prob (float, optional): Probability of hue distortion. Defaults to .5.
-        random_apply (bool, optional): Apply the transformation in random (yolo) or
+        random_apply (bool, optional): Apply the transformation in random (YOLO) or
             fixed (SSD) order. Defaults to True.
         count (int, optional): Number of distortions to apply. Defaults to 4.
-        shuffle_channel (bool, optional): Whether to swap channels randomly.
+        shuffle_channel (bool, optional): Whether to permute channels randomly.
             Defaults to False.
     """
 

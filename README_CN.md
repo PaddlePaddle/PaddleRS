@@ -232,7 +232,10 @@ PaddleRS具有以下五大特色：
         </details>
         <details><summary><b>数据后处理</b></summary>
         <ul>
+          <li><a href="./paddlers/utils/postprocs/change_filter.py">变化检测误检点过滤</a></li>
           <li><a href="./paddlers/utils/postprocs/connection.py">道路断线连接</a></li>
+          <li><a href="./paddlers/utils/postprocs/crf.py">基于条件随机场的分割结果优化</a></li>
+          <li><a href="./paddlers/utils/postprocs/mrf.py">基于马尔可夫随机场的分割结果优化</a></li>
           <li><a href="./paddlers/utils/postprocs/regularization.py">建筑边界规则化</a></li>
         </ul>
         </details>
