@@ -29,7 +29,6 @@ import paddlers.utils.logging as logging
 from paddlers.models import res_losses
 from paddlers.models.ppgan.modules.init import init_weights
 from paddlers.transforms import Resize, decode_image, construct_sample
-from paddlers.transforms.operators import ArrangeRestorer
 from paddlers.transforms.functions import calc_hr_shape
 from paddlers.utils.checkpoint import res_pretrain_weights_dict
 from .base import BaseModel
@@ -40,7 +39,6 @@ __all__ = ["DRN", "LESRCNN", "ESRGAN"]
 
 
 class BaseRestorer(BaseModel):
-    _arrange = ArrangeRestorer
     MIN_MAX = (0., 1.)
     TEST_OUT_KEY = None
 
@@ -122,13 +120,13 @@ class BaseRestorer(BaseModel):
 
         if mode == 'test':
             if self.status == 'Infer':
-                net_out = net(inputs[0])
+                net_out = net(inputs['image'])
                 res_map_list = self.postprocess(net_out, batch_restore_list)
             else:
                 if isinstance(net, GANAdapter):
-                    net_out = net.generator(inputs[0])
+                    net_out = net.generator(inputs['image'])
                 else:
-                    net_out = net(inputs[0])
+                    net_out = net(inputs['image'])
                 if self.TEST_OUT_KEY is not None:
                     net_out = net_out[self.TEST_OUT_KEY]
                 pred = self.postprocess(net_out, batch_restore_list)
@@ -140,12 +138,12 @@ class BaseRestorer(BaseModel):
 
         if mode == 'eval':
             if isinstance(net, GANAdapter):
-                net_out = net.generator(inputs[0])
+                net_out = net.generator(inputs['image'])
             else:
-                net_out = net(inputs[0])
+                net_out = net(inputs['image'])
             if self.TEST_OUT_KEY is not None:
                 net_out = net_out[self.TEST_OUT_KEY]
-            tar = inputs[1]
+            tar = inputs['target']
             pred = self.postprocess(net_out, batch_restore_list)[0]  # NCHW
             pred = self._tensor_to_images(pred)
             outputs['pred'] = pred
@@ -155,8 +153,8 @@ class BaseRestorer(BaseModel):
         if mode == 'train':
             # This is used by non-GAN models.
             # For GAN models, self.run_gan() should be used.
-            net_out = net(inputs[0])
-            loss = self.losses(net_out, inputs[1])
+            net_out = net(inputs['image'])
+            loss = self.losses(net_out, inputs['target'])
             outputs['loss'] = loss
         return outputs
 
@@ -413,7 +411,6 @@ class BaseRestorer(BaseModel):
         if nranks < 2 or local_rank == 0:
             self.eval_data_loader = self.build_data_loader(
                 eval_dataset, batch_size=batch_size, mode='eval')
-            self._check_arrange(eval_dataset.transforms, 'eval')
             # XXX: Hard-code crop_border and test_y_channel
             psnr = metrics.PSNR(crop_border=4, test_y_channel=True)
             ssim = metrics.SSIM(crop_border=4, test_y_channel=True)
@@ -469,8 +466,6 @@ class BaseRestorer(BaseModel):
             images = [img_file]
         else:
             images = img_file
-        transforms = self._build_transforms(transforms, "test")
-        self._check_arrange(transforms, "test")
         data = self.preprocess(images, transforms, self.model_type)
         self.net.eval()
         outputs = self.run(self.net, data, 'test')
@@ -490,7 +485,7 @@ class BaseRestorer(BaseModel):
                 im = decode_image(im, read_raw=True)
             sample = construct_sample(image=im)
             data = transforms(sample)
-            im = data[0][0]
+            im = data[0]['image']
             trans_info = data[1]
             batch_im.append(im)
             batch_trans_info.append(trans_info)
@@ -499,7 +494,7 @@ class BaseRestorer(BaseModel):
         else:
             batch_im = np.asarray(batch_im)
 
-        return (batch_im, ), batch_trans_info
+        return {'image': batch_im}, batch_trans_info
 
     def postprocess(self, batch_pred, batch_restore_list):
         if self.status == 'Infer':
@@ -563,12 +558,6 @@ class BaseRestorer(BaseModel):
             res_map = self._normalize(res_map)
             res_maps.append(res_map.squeeze())
         return res_maps
-
-    def _check_arrange(self, transforms, mode):
-        super()._check_arrange(transforms, mode)
-        if not isinstance(transforms.arrange, ArrangeRestorer):
-            raise TypeError(
-                "`transforms.arrange` must be an `ArrangeRestorer` object.")
 
     def build_data_loader(self,
                           dataset,
@@ -712,7 +701,9 @@ class DRN(BaseRestorer):
 
     def train_step(self, step, data, net):
         outputs = self.run_gan(
-            net, data[0], mode='train', gan_mode='forward_primary')
+            net, (data[0]['image'], data[0]['target']),
+            mode='train',
+            gan_mode='forward_primary')
         outputs.update(
             self.run_gan(
                 net, (outputs['sr'], outputs['lr']),
@@ -872,14 +863,16 @@ class ESRGAN(BaseRestorer):
             optim_g, optim_d = self.optimizer
 
             outputs = self.run_gan(
-                net, data[0], mode='train', gan_mode='forward_g')
+                net, (data[0]['image'], data[0]['target']),
+                mode='train',
+                gan_mode='forward_g')
             optim_g.clear_grad()
             (outputs['loss_g_pps'] + outputs['loss_g_gan']).backward()
             optim_g.step()
 
             outputs.update(
                 self.run_gan(
-                    net, (outputs['g_pred'], data[0][1]),
+                    net, (outputs['g_pred'], data[0]['target']),
                     mode='train',
                     gan_mode='forward_d'))
             optim_d.clear_grad()

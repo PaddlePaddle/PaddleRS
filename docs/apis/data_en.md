@@ -21,7 +21,7 @@ The initialization parameter list is as follows:
 |`num_workers`|`int` \| `str`|Number of auxiliary processes used when loading data. If it is set to `'auto'`, use the following rules to determine the number of processes to use: When the number of CPU cores is greater than 16, 8 data read auxiliary processes are used; otherwise, the number of auxiliary processes is set to half the counts of CPU cores.|`'auto'`|
 |`shuffle`|`bool`|Whether to randomly shuffle the samples in the dataset.|`False`|
 |`with_seg_labels`|`bool`|Specify this option as `True` when the dataset contains segmentation labels for each phase.|`False`|
-|`binarize_labels`|`bool`|If it is `True`, the change labels (and the segmentation label) are binarized after all data transformation operators except `Arrange` are applied. For example, binarize labels valued in {0, 255} to {0, 1}.|`False`|
+|`binarize_labels`|`bool`|If it is `True`, the change labels (and the segmentation label) are binarized after all data transformation operators are applied. For example, binarize labels valued in {0, 255} to {0, 1}.|`False`|
 
 The requirements of `CDDataset` for the file list are as follows:
 
@@ -180,32 +180,24 @@ Use `paddlers.transforms.Compose` to combine a set of data transformation operat
 # Compose a variety of transformations using Compose.
 # The transformations contained in Compose will be executed sequentially in sequence
 train_transforms = T.Compose([
-    # Read Image
-    T.DecodeImg(),
     # Scale the image to 512x512
     T.Resize(target_size=512),
     # Perform a random horizontal flip with a 50% probability
     T.RandomHorizontalFlip(prob=0.5),
     # Normalize data to [-1,1]
     T.Normalize(
-        mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
-    # Select and organize the information that needs to be used later
-    T.ArrangeSegmenter('train')
+        mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
 ])
 ```
 
-Generally, in the list of data transform operators accepted by a `Compose` object, the first element is `paddlers.Transforms.DecodeImg` object, used to read image data; the last element is [`Arrange` Operator](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/transforms/operators.py, used to extract and arrange information from the `sample` dictionary.
-
-For the validation dataset of image segmentation task and change detection task, the `ReloadMask` operator can be inserted before the `Arrange` operator to reload the ground-truth label. The following is an example:
+For the validation dataset of image segmentation task and change detection task, a `ReloadMask` operator can be added to reload the ground-truth label. The following is an example:
 
 ```python
 eval_transforms = T.Compose([
-    T.DecodeImg(),
     T.Resize(target_size=512),
     T.Normalize(
         mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
     # Reload label
-    T.ReloadMask(),
-    T.ArrangeSegmenter('eval')
+    T.ReloadMask()
 ])
 ```

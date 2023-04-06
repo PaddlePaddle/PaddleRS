@@ -21,7 +21,7 @@
 |`num_workers`|`int` \| `str`|加载数据时使用的辅助进程数。若设置为`'auto'`，则按照如下规则确定使用进程数：当CPU核心数大于16时，使用8个数据读取辅助进程；否则，使用CPU核心数一半数量的辅助进程。|`'auto'`|
 |`shuffle`|`bool`|是否随机打乱数据集中的样本。|`False`|
 |`with_seg_labels`|`bool`|当数据集中包含每个时相的分割标签时，请指定此选项为`True`。|`False`|
-|`binarize_labels`|`bool`|若为`True`，则在除`Arrange`以外的所有数据变换算子处理完毕后对变化标签（和分割标签）进行二值化操作。例如，将取值为{0, 255}的标签二值化到{0, 1}。|`False`|
+|`binarize_labels`|`bool`|若为`True`，则在所有数据变换算子处理完毕后对变化标签（和分割标签）进行二值化操作。例如，将取值为{0, 255}的标签二值化到{0, 1}。|`False`|
 
 `CDDataset`对file list的要求如下：
 
@@ -179,32 +179,24 @@
 ```python
 # 使用Compose组合多种变换方式。Compose中包含的变换将按顺序串行执行
 train_transforms = T.Compose([
-    # 读取影像
-    T.DecodeImg(),
     # 将影像缩放到512x512大小
     T.Resize(target_size=512),
     # 以50%的概率实施随机水平翻转
     T.RandomHorizontalFlip(prob=0.5),
     # 将数据归一化到[-1,1]
     T.Normalize(
-        mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
-    # 挑选并排布后续需要使用的信息
-    T.ArrangeSegmenter('train')
+        mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
 ])
 ```
 
-一般来说，`Compose`对象接受的数据变换算子列表中，首个元素为`paddlers.transforms.DecodeImg`对象，用于读取影像数据；最后一个元素为[`Arrange`算子](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/transforms/operators.py)，用于从`sample`字典中抽取信息并排列。
-
-对于图像分割任务和变化检测任务的验证集而言，可在`Arrange`算子之前插入`ReloadMask`算子以重新加载真值标签。示例如下：
+对于图像分割任务和变化检测任务的验证集而言，可使用`ReloadMask`算子重新加载真值标签。示例如下：
 
 ```python
 eval_transforms = T.Compose([
-    T.DecodeImg(),
     T.Resize(target_size=512),
     T.Normalize(
         mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
     # 重新加载标签
-    T.ReloadMask(),
-    T.ArrangeSegmenter('eval')
+    T.ReloadMask()
 ])
 ```

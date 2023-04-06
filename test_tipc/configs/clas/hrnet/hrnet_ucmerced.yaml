@@ -5,6 +5,6 @@ _base_: ../_base_/ucmerced.yaml
 save_dir: ./test_tipc/output/clas/hrnet/
 
 model: !Node
-    type: HRNet
-    args:
-        num_classes: 21
+  type: HRNet
+  args:
+    num_classes: 21

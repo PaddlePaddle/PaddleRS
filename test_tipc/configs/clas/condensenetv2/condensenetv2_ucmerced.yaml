@@ -5,6 +5,6 @@ _base_: ../_base_/ucmerced.yaml
 save_dir: ./test_tipc/output/clas/condensenetv2/
 
 model: !Node
-    type: CondenseNetV2
-    args:
-        num_classes: 21
+  type: CondenseNetV2
+  args:
+    num_classes: 21

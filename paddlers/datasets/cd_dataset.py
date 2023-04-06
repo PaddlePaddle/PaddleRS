@@ -44,6 +44,7 @@ class CDDataset(BaseDataset):
             Defaults to False.
     """
 
+    _KEYS_TO_KEEP = ['image', 'image2', 'mask', 'aux_masks']
     _collate_trans_info = True
 
     def __init__(self,
@@ -132,7 +133,7 @@ class CDDataset(BaseDataset):
     def __getitem__(self, idx):
         sample = construct_sample_from_dict(self.file_list[idx])
         sample['trans_info'] = []
-        sample = self.transforms.apply_transforms(sample)
+        sample, trans_info = self.transforms(sample)
 
         if self.binarize_labels:
             # Requires 'mask' to exist
@@ -141,9 +142,7 @@ class CDDataset(BaseDataset):
                 sample['aux_masks'] = list(
                     map(self._binarize, sample['aux_masks']))
 
-        outputs = self.transforms.arrange_outputs(sample)
-
-        return outputs, sample['trans_info']
+        return sample, trans_info
 
     def __len__(self):
         return len(self.file_list)

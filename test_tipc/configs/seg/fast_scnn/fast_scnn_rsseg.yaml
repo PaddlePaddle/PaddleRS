@@ -5,7 +5,7 @@ _base_: ../_base_/rsseg.yaml
 save_dir: ./test_tipc/output/seg/fast_scnn/
 
 model: !Node
-    type: FastSCNN
-    args:
-        in_channels: 3
-        num_classes: 5
+  type: FastSCNN
+  args:
+    in_channels: 3
+    num_classes: 5
