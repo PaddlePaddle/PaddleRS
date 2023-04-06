@@ -5,6 +5,6 @@ _base_: ../_base_/rsod.yaml
 save_dir: ./test_tipc/output/det/ppyolo_tiny/
 
 model: !Node
-    type: PPYOLOTiny
-    args:
-        num_classes: 4
+  type: PPYOLOTiny
+  args:
+    num_classes: 4

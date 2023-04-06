@@ -152,22 +152,6 @@ class Predictor(object):
     def preprocess(self, images, transforms):
         preprocessed_samples, batch_trans_info = self._model.preprocess(
             images, transforms, to_tensor=False)
-        if self.model_type == 'classifier':
-            preprocessed_samples = {'image': preprocessed_samples}
-        elif self.model_type == 'segmenter':
-            preprocessed_samples = {'image': preprocessed_samples[0]}
-        elif self.model_type == 'detector':
-            pass
-        elif self.model_type == 'change_detector':
-            preprocessed_samples = {
-                'image': preprocessed_samples[0],
-                'image2': preprocessed_samples[1]
-            }
-        elif self.model_type == 'restorer':
-            preprocessed_samples = {'image': preprocessed_samples[0]}
-        else:
-            logging.error(
-                "Invalid model type {}".format(self.model_type), exit=True)
         return preprocessed_samples, batch_trans_info
 
     def postprocess(self, net_outputs, batch_restore_list, topk=1):

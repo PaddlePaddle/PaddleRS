@@ -27,10 +27,10 @@ import imghdr
 from PIL import Image
 from joblib import load
 
-import paddlers
 import paddlers.transforms.functions as F
 import paddlers.transforms.indices as indices
 import paddlers.transforms.satellites as satellites
+from paddlers.utils import logging
 
 __all__ = [
     "construct_sample",
@@ -92,43 +92,67 @@ def construct_sample_from_dict(dict_like_obj):
 
 class Compose(object):
     """
-    Apply a series of data augmentation strategies to the input.
+    Apply a series of data transformation operators to the input.
     All input images should be in Height-Width-Channel ([H, W, C]) format.
 
     Args:
-        transforms (list[paddlers.transforms.Transform]): List of data preprocess or
-            augmentation operators.
+        transforms (list[paddlers.transforms.Transform]): List of data preprocessing 
+            or augmentation operators.
+        auto_decode (bool, optional): Whether to automatically decode image(s) before
+            any data transformation operator is applied. If an image decoding operator 
+            is detected in `transforms`, no auto-decoding operation will be done. 
+            Defaults to True.
+        auto_permute(bool, optional): Whether to automatically permute the processed
+            image(s). Defaults to True.
 
     Raises:
-        TypeError: Invalid type of transforms.
-        ValueError: Invalid length of transforms.
+        TypeError: `transforms` has an unsupported type.
+        ValueError: `transforms` has an illegal length.
     """
 
-    def __init__(self, transforms):
+    def __init__(self, transforms, auto_decode=True, auto_permute=True):
         super(Compose, self).__init__()
         if not isinstance(transforms, list):
             raise TypeError(
-                "Type of transforms is invalid. Must be a list, but received is {}."
+                "`transforms` has an unsupported type. Must be a list, but received is {}."
                 .format(type(transforms)))
         if len(transforms) < 1:
             raise ValueError(
-                "Length of transforms must not be less than 1, but received is {}."
+                "Length of `transforms` must not be less than 1, but received is {}."
                 .format(len(transforms)))
-        transforms = copy.deepcopy(transforms)
-        # We will have to do a late binding of `self.arrange`
-        self.arrange = None
         self.transforms = transforms
+        # Deprecation warning
+        for op in self.transforms:
+            if isinstance(op, Arrange):
+                logging.warning(
+                    "Including an `Arrange` object in the transformation operator list is deprecated and will not take effect."
+                )
+                # We only trigger this warning once for each `Compose` object
+                break
+
+        self.auto_decode = auto_decode
+        self.auto_permute = auto_permute
 
     def __call__(self, sample):
-        """
-        This is equivalent to sequentially calling compose_obj.apply_transforms()
-            and compose_obj.arrange_outputs().
-        """
         if 'trans_info' not in sample:
             sample['trans_info'] = []
+
+        if self.auto_decode:
+            for op in self.transforms:
+                if isinstance(op, DecodeImg):
+                    break
+            else:
+                # Initialize the decoder with default parameters
+                decoder = DecodeImg()
+                sample = decoder(sample)
+
         sample = self.apply_transforms(sample)
+
+        if self.auto_permute:
+            permute_op = _Permute()
+            sample = permute_op(sample)
+
         trans_info = sample['trans_info']
-        sample = self.arrange_outputs(sample)
         return sample, trans_info
 
     def apply_transforms(self, sample):
@@ -136,12 +160,12 @@ class Compose(object):
             # Skip batch transforms
             if getattr(op, 'is_batch_transform', False):
                 continue
+            # For backward compatibility, we bypass `Arrange` objects
+            # here and leave the arrangement operation to the 
+            # training/evaluation APIs.
+            if isinstance(op, Arrange):
+                continue
             sample = op(sample)
-        return sample
-
-    def arrange_outputs(self, sample):
-        if self.arrange is not None:
-            sample = self.arrange(sample)
         return sample
 
 
@@ -1928,11 +1952,12 @@ class _Permute(Transform):
         super(_Permute, self).__init__()
 
     def apply(self, sample):
-        sample['image'] = F.permute(sample['image'], False)
+        sample['image'] = F.permute(sample['image'])
         if 'image2' in sample:
-            sample['image2'] = F.permute(sample['image2'], False)
+            sample['image2'] = F.permute(sample['image2'])
         if 'target' in sample:
-            sample['target'] = F.permute(sample['target'], False)
+            sample['target'] = F.permute(sample['target'])
+        sample['permuted'] = True
         return sample
 
 

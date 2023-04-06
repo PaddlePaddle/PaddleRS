@@ -5,7 +5,7 @@ _base_: ../_base_/rsseg.yaml
 save_dir: ./test_tipc/output/seg/bisenetv2/
 
 model: !Node
-    type: BiSeNetV2
-    args:
-        in_channels: 3
-        num_classes: 5
+  type: BiSeNetV2
+  args:
+    in_channels: 3
+    num_classes: 5

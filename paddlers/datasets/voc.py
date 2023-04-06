@@ -324,8 +324,8 @@ class VOCDetDataset(BaseDataset):
                 DecodeImg(to_rgb=False)(sample),
                 DecodeImg(to_rgb=False)(sample_mix)
             ])
-        sample = self.transforms(sample)
-        return sample
+        sample, trans_info = self.transforms(sample)
+        return sample, trans_info
 
     def __len__(self):
         return self.num_samples

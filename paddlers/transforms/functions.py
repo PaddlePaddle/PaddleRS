@@ -37,11 +37,9 @@ def normalize(im, mean, std, min_value=[0, 0, 0], max_value=[255, 255, 255]):
     return im
 
 
-def permute(im, to_bgr=False):
+def permute(im):
     im = np.swapaxes(im, 1, 2)
     im = np.swapaxes(im, 1, 0)
-    if to_bgr:
-        im = im[[2, 1, 0], :, :]
     return im
 
 
