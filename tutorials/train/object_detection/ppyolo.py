@@ -26,7 +26,7 @@ pdrs.utils.download_and_decompress(
 # 定义训练和验证时使用的数据变换（数据增强、预处理等）
 # 使用Compose组合多种变换方式。Compose中包含的变换将按顺序串行执行
 # API说明：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/data.md
-train_transforms = [
+train_transforms = T.Compose([
     # 随机裁剪，裁块大小在一定范围内变动
     T.RandomCrop(),
     # 随机水平翻转
@@ -37,16 +37,16 @@ train_transforms = [
     # 影像归一化
     T.Normalize(
         mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-]
+])
 
-eval_transforms = [
+eval_transforms = T.Compose([
     # 使用双三次插值将输入影像缩放到固定大小
     T.Resize(
         target_size=608, interp='CUBIC'),
     # 验证阶段与训练阶段的归一化方式必须相同
     T.Normalize(
         mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-]
+])
 
 # 分别构建训练和验证所用的数据集
 train_dataset = pdrs.datasets.VOCDetDataset(
