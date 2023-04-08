@@ -139,7 +139,7 @@ class BaseChangeDetector(BaseModel):
                 pred = paddle.unsqueeze(net_out[0], axis=1)  # NCHW
             else:
                 pred = paddle.argmax(logit, axis=1, keepdim=True, dtype='int32')
-            label = inputs['mask']
+            label = inputs['mask'].astype('int64')
             if label.ndim == 3:
                 paddle.unsqueeze_(label, axis=1)
             if label.ndim != 4:
@@ -160,7 +160,7 @@ class BaseChangeDetector(BaseModel):
                 if 'aux_masks' not in inputs:
                     raise ValueError("Auxiliary masks not found.")
                 labels_list = [
-                    inputs['aux_masks'][idx]
+                    inputs['aux_masks'][idx].astype('int64')
                     for idx in map(attrgetter('value'), net.OUT_TYPES)
                 ]
                 loss_list = metrics.multitask_loss_computation(
@@ -170,7 +170,7 @@ class BaseChangeDetector(BaseModel):
             else:
                 loss_list = metrics.loss_computation(
                     logits_list=net_out,
-                    labels=inputs['mask'],
+                    labels=inputs['mask'].astype('int64'),
                     losses=self.losses)
             loss = sum(loss_list)
             outputs['loss'] = loss
