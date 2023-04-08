@@ -230,8 +230,9 @@ class BaseModel(metaclass=ModelMeta):
         model_info['status'] = self.status
 
         paddle.save(self.net.state_dict(), osp.join(save_dir, 'model.pdparams'))
-        paddle.save(self.optimizer.state_dict(),
-                    osp.join(save_dir, 'model.pdopt'))
+        if self.optimizer is not None:
+            paddle.save(self.optimizer.state_dict(),
+                        osp.join(save_dir, 'model.pdopt'))
 
         with open(
                 osp.join(save_dir, 'model.yml'), encoding='utf-8',
