@@ -35,7 +35,7 @@ from .base import BaseModel
 from .utils.res_adapters import GANAdapter, OptimizerAdapter
 from .utils.infer_nets import InferResNet
 
-__all__ = ["DRN", "LESRCNN", "ESRGAN"]
+__all__ = ["DRN", "LESRCNN", "ESRGAN", "NAFNet", "SwinIR"]
 
 
 class BaseRestorer(BaseModel):
@@ -924,3 +924,82 @@ class RCAN(BaseRestorer):
             sr_factor=sr_factor,
             min_max=min_max,
             **params)
+
+
+class NAFNet(BaseRestorer):
+    def __init__(self,
+                 losses=None,
+                 sr_factor=None,
+                 min_max=None,
+                 use_tlsc=False,
+                 in_channels=3,
+                 width=32,
+                 middle_blk_num=1,
+                 enc_blk_nums=None,
+                 dec_blk_nums=None,
+                 **params):
+        if sr_factor != None:
+            raise ValueError(f"`sr_factor` must be `None`.")
+        params.update({
+            'img_channel': in_channels,
+            'width': width,
+            'middle_blk_num': middle_blk_num,
+            'enc_blk_nums': enc_blk_nums,
+            'dec_blk_nums': dec_blk_nums
+        })
+        self.use_tlsc = use_tlsc
+        super(NAFNet, self).__init__(
+            model_name='NAFNet',
+            losses=losses,
+            sr_factor=sr_factor,
+            min_max=min_max,
+            **params)
+
+    def build_net(self, **params):
+        if not self.use_tlsc:
+            net = ppgan.models.generators.NAFNet(**params)
+        else:
+            net = ppgan.models.generators.NAFNetLocal(**params)
+        return net
+
+    def default_loss(self):
+        return res_losses.PSNRLoss()
+
+
+class SwinIR(BaseRestorer):
+    def __init__(self,
+                 losses=None,
+                 sr_factor=1,
+                 min_max=None,
+                 in_channels=3,
+                 img_size=128,
+                 window_size=8,
+                 depths=[6, 6, 6, 6, 6, 6],
+                 embed_dim=180,
+                 num_heads=[6, 6, 6, 6, 6, 6],
+                 mlp_ratio=2,
+                 **params):
+
+        params.update({
+            'in_chans': in_channels,
+            'upscale': sr_factor,
+            'img_size': img_size,
+            'window_size': window_size,
+            'depths': depths,
+            'embed_dim': embed_dim,
+            'num_heads': num_heads,
+            'mlp_ratio': mlp_ratio
+        })
+        super(SwinIR, self).__init__(
+            model_name='SwinIR',
+            losses=losses,
+            sr_factor=sr_factor,
+            min_max=min_max,
+            **params)
+
+    def build_net(self, **params):
+        net = ppgan.models.generators.SwinIR(**params)
+        return net
+
+    def default_loss(self):
+        return res_losses.CharbonnierLoss(eps=0.000000001, reduction='mean')
