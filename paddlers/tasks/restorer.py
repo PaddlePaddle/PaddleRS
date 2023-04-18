@@ -938,8 +938,9 @@ class NAFNet(BaseRestorer):
                  enc_blk_nums=None,
                  dec_blk_nums=None,
                  **params):
-        if sr_factor != None:
-            raise ValueError(f"`sr_factor` must be `None`.")
+        if sr_factor is not None:
+            raise ValueError(f"`sr_factor` must be set to None.")
+
         params.update({
             'img_channel': in_channels,
             'width': width,
@@ -948,6 +949,7 @@ class NAFNet(BaseRestorer):
             'dec_blk_nums': dec_blk_nums
         })
         self.use_tlsc = use_tlsc
+
         super(NAFNet, self).__init__(
             model_name='NAFNet',
             losses=losses,
