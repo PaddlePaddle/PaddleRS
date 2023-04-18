@@ -311,6 +311,42 @@
 | `group (int)`        | 卷积操作的分组数量                                        | `1` |
 
 
+## `NAFNet`
+
+基于PaddlePaddle的NAFNet实现。
+
+| 参数名                  | 描述                                                                                      | 默认值 |
+|----------------------|-----------------------------------------------------------------------------------------| --- |
+| `losses (list)`      | 损失函数列表                                                                                  | `None` |
+| `sr_factor (int)`    | 图像复原的缩放因子。NAFNet不适用于图像超分辨率重建任务，不改变图像的大小，请设置`sr_factor`为`None` | `None` |
+| `min_max (tuple)`    | 输入图像的像素值的最小值和最大值。如果未指定，则使用数据类型的默认最小值和最大值                                               | `None` |
+| `use_tlsc (bool)` | 是否在推理时使用tlsc技术                                                | `False` |
+| `in_channels (int)`  | 输入图像的通道数                                                | `3` |
+| `width (int)`        | NAFBlock的通道数                                        | `32` |
+| `middle_blk_num (int)`        | 过渡模块中NAFBlock的数量                                        | `1` |
+| `enc_blk_nums (list[int])`         | 不同层编码器中NAFBlock的数量                                        | `None` |
+| `dec_blk_nums (list[int])`         | 不同层解码器中NAFBlock的数量                                        | `None` |
+
+
+## `SwinIR`
+
+基于PaddlePaddle的SwinIR实现。
+
+| 参数名                  | 描述                                                                                      | 默认值 |
+|----------------------|-----------------------------------------------------------------------------------------| --- |
+| `losses (list)`      | 损失函数列表                                                                                  | `None` |
+| `sr_factor (int)`    | 图像复原的缩放因子。如果原始图像大小为 `H` x `W`，则输出图像大小将为 `sr_factor * H` x `sr_factor * W`  | `1` |
+| `min_max (tuple)`    | 输入图像的像素值的最小值和最大值。如果未指定，则使用数据类型的默认最小值和最大值                                               | `None` |
+| `in_channels (int)`  | 输入图像的通道数                                                | `3` |
+| `img_size (int)`        | 输入图像块的大小                                       | `128` |
+| `window_size (int)`        | 窗口大小                                        | `8` |
+| `depths (list[int])`         | 每个Swin Transformer 层的深度                                     | `[6, 6, 6, 6, 6, 6]` |
+| `num_heads (list[int])`         | 不同层中注意力头的数量                                       | `[6, 6, 6, 6]` |
+| `embed_dim (int)`        | Patch embedding 的维度                                       | `96` |
+| `window_size (int)`        | MLP中隐藏维度与编码维度的比率                                        | `4` |
+
+
+
 ## `FasterRCNN`
 
 基于PaddlePaddle的Faster R-CNN实现。

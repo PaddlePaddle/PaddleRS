@@ -306,6 +306,42 @@ The LESRCNN implementation based on PaddlePaddle.
 | `group (int)`        | Number of groups used in convolution operations.                                                                    | `1` |
 
 
+## `NAFNet`
+
+The NAFNet implementation based on PaddlePaddle.
+
+| Parameter Name       | Description                                                                                                                                                                                                        | Default Value |
+|----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| --- |
+| `losses (list)`      | List of loss functions                                                                                                                                                                                             | `None` |
+| `sr_factor (int)`    | Scaling factor for image restoration. NAFNet is not suitable for image super-resolution tasks and does not change the size of the image. Please set the `sr factor` to `None` | `None` |
+| `min_max (tuple)`    | Minimum and maximum pixel values of the input image. If not specified, the data type's default minimum and maximum values are used                                                                                 | `None` |
+| `use_tlsc (bool)`     | Whether to use tlsc (test-time local statistics converter) during testing. If yes, tlsc will be used                                                                                                   | `False` |
+| `in_channels (int)`  | Number of channels of the input image                                         | `3` |
+| `width (int)`        | Number of channels of NAFBlock                                      | `32` |
+| `middle_blk_num (int)`        | Number of NAFBlocks in middle block                                        | `1` |
+| `enc_blk_nums (list[int])`         | Number of NAFBlocks in different layers of the encoder                                   | `None` |
+| `dec_blk_nums (list[int])`         | Number of NAFBlocks in different layers of the decoder                                   | `None` |
+
+
+## `SwinIR`
+
+The SwinIR implementation based on PaddlePaddle.
+
+| 参数名                  | 描述                                                                                      | 默认值 |
+|----------------------|-----------------------------------------------------------------------------------------| --- |
+| `losses (list)`      | List of loss functions                                                                                  | `None` |
+| `sr_factor (int)`    | Scaling factor for image restoration. The output image size will be the original image size multiplied by this factor. For example, if the original image is `H` x `W`, the output image will be `sr_factor * H` x `sr_factor * W` | `1` |
+| `min_max (tuple)`    | Minimum and maximum pixel values of the input image. If not specified, the data type's default minimum and maximum values are used                                                                                 | `None` |
+| `in_channels (int)`  | Number of channels of the input image                                                 | `3` |
+| `img_size (int)`        |  Input image size                                       | `128` |
+| `window_size (int)`        | Window size                                        | `8` |
+| `depths (list[int])`         | Depth of each Swin Transformer layer                                    | `[6, 6, 6, 6, 6, 6]` |
+| `num_heads (list[int])`         | Number of attention heads in different layers  | `[6, 6, 6, 6]` |
+| `embed_dim (int)`        | Patch embedding dimension    | `96` |
+| `window_size (int)`        | Ratio of MLP hidden dim to embedding dim                                   | `4` |
+
+
+
 ##  `FasterRCNN`
 
 The Faster R-CNN implementation based on PaddlePaddle.

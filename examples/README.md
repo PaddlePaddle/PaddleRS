@@ -42,10 +42,10 @@ PaddleRS提供从科学研究到产业应用的丰富示例，希望帮助遥感
 |[手把手教你PaddleRS实现变化检测](https://aistudio.baidu.com/aistudio/projectdetail/3737991)|奔向未来的样子|入门教程|变化检测|
 |[【PPSIG】PaddleRS变化检测模型部署：以BIT为例](https://aistudio.baidu.com/aistudio/projectdetail/4184759)|古代飞|入门教程|变化检测，模型部署|
 |[【PPSIG】PaddleRS实现遥感影像场景分类](https://aistudio.baidu.com/aistudio/projectdetail/4198965)|古代飞|入门教程|场景分类|
-|[PaddleRS：使用超分模型提高真实的低分辨率无人机影像的分割精度](https://aistudio.baidu.com/aistudio/projectdetail/3696814)|KeyK-小胡之父|应用案例|超分辨率重建，无人机影像|
+|[PaddleRS：使用超分模型提高真实的低分辨率无人机影像的分割精度](https://aistudio.baidu.com/aistudio/projectdetail/3696814)|不爱做科研的KeyK|应用案例|超分辨率重建，无人机影像|
 |[PaddleRS：无人机汽车识别](https://aistudio.baidu.com/aistudio/projectdetail/3713122)|geoyee|应用案例|目标检测，无人机影像|
 |[PaddleRS：高光谱卫星影像场景分类](https://aistudio.baidu.com/aistudio/projectdetail/3711240)|geoyee|应用案例|场景分类，高光谱影像|
-|[PaddleRS：利用卫星影像与数字高程模型进行滑坡识别](https://aistudio.baidu.com/aistudio/projectdetail/4066570)|KeyK-小胡之父|应用案例|图像分割，DEM|
+|[PaddleRS：利用卫星影像与数字高程模型进行滑坡识别](https://aistudio.baidu.com/aistudio/projectdetail/4066570)|不爱做科研的KeyK|应用案例|图像分割，DEM|
 |[为PaddleRS添加一个袖珍配置系统](https://aistudio.baidu.com/aistudio/projectdetail/4203534)|古代飞|创意开发||
 |[万丈高楼平地起 基于PaddleGAN与PaddleRS的建筑物生成](https://aistudio.baidu.com/aistudio/projectdetail/3716885)|奔向未来的样子|创意开发|超分辨率重建|
 |[【官方】第十一届 “中国软件杯”百度遥感赛项：变化检测功能](https://aistudio.baidu.com/aistudio/projectdetail/3684588)|古代飞|竞赛打榜|变化检测，比赛基线|
@@ -55,3 +55,4 @@ PaddleRS提供从科学研究到产业应用的丰富示例，希望帮助遥感
 |[【十一届软件杯】遥感解译赛道：变化检测任务——预赛第四名方案分享](https://aistudio.baidu.com/aistudio/projectdetail/4116895)|lzzzzzm|竞赛打榜|变化检测，高分方案|
 |[【方案分享】第十一届 “中国软件杯”大学生软件设计大赛遥感解译赛道 比赛方案分享](https://aistudio.baidu.com/aistudio/projectdetail/4146154)|trainer|竞赛打榜|变化检测，高分方案|
 |[遥感变化检测助力信贷场景下工程进度管控](https://aistudio.baidu.com/aistudio/projectdetail/4543160)|古代飞|产业范例|变化检测，金融风控|
+|[使用PaddleRS进行单幅遥感影像的薄云去除](https://aistudio.baidu.com/aistudio/projectdetail/5955630)|不爱做科研的KeyK|应用案例|云雾去除|
