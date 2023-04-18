@@ -101,6 +101,8 @@ PaddleRS is an end-to-end high-efficent development toolkit for remote sensing a
           <li><a href="./tutorials/train/image_restoration/drn.py">DRN</a></li>
           <li><a href="./tutorials/train/image_restoration/esrgan.py">ESRGAN</a></li>
           <li><a href="./tutorials/train/image_restoration/lesrcnn.py">LESRCNN</a></li>
+           <li><a href="./tutorials/train/image_restoration/nafnet.py">NAFNet</a></li>
+          <li><a href="./tutorials/train/image_restoration/swinir.py">SwinIR</a></li>
         </ul>
         </details>
         <details><summary><b>Object Detection</b></summary>

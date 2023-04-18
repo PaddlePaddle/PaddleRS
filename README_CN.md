@@ -103,6 +103,8 @@ PaddleRS具有以下五大特色：
           <li><a href="./tutorials/train/image_restoration/drn.py">DRN</a></li>
           <li><a href="./tutorials/train/image_restoration/esrgan.py">ESRGAN</a></li>
           <li><a href="./tutorials/train/image_restoration/lesrcnn.py">LESRCNN</a></li>
+          <li><a href="./tutorials/train/image_restoration/nafnet.py">NAFNet</a></li>
+          <li><a href="./tutorials/train/image_restoration/swinir.py">SwinIR</a></li>
         </ul>
         </details>
         <details><summary><b>目标检测</b></summary>

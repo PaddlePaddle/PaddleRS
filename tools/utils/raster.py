@@ -87,7 +87,7 @@ class Raster:
                 self._src_data = gdal_obj
             else:
                 raise ValueError(
-                    "At least one of `path` and `gdal_obj` is not None.")
+                    "At least one of `path` and `gdal_obj` should not be None.")
         self.to_uint8 = to_uint8
         self._getInfo()
         self.setBands(band_list)
