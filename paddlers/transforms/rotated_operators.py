@@ -212,6 +212,10 @@ class RandomRRotate(Transform):
             rotate_prob=1.0,
             auto_bound=True, ):
         super(RandomRRotate, self).__init__()
+        assert not angle_mode or angle_mode in [
+            "range",
+            "value",
+        ], "angle mode should be in [range, value, None]"
         self.scale = scale
         self.scale_mode = scale_mode
         self.angle = angle
@@ -220,40 +224,24 @@ class RandomRRotate(Transform):
         self.rotate_prob = rotate_prob
         self.auto_bound = auto_bound
 
-    def get_angle(self, angle, angle_mode):
-        assert not angle_mode or angle_mode in [
-            "range",
-            "value",
-        ], "angle mode should be in [range, value, None]"
-        if not angle_mode:
-            return angle
-        elif angle_mode == "range":
-            low, high = angle
+    def get_value(self, value_list, value_mode):
+        if not value_mode:
+            return value_list
+        elif value_mode == "range":
+            low, high = value_list
             return np.random.rand() * (high - low) + low
-        elif angle_mode == "value":
-            return np.random.choice(angle)
-
-    def get_scale(self, scale, scale_mode):
-        assert not scale_mode or scale_mode in [
-            "range",
-            "value",
-        ], "scale mode should be in [range, value, None]"
-        if not scale_mode:
-            return scale
-        elif scale_mode == "range":
-            low, high = scale
-            return np.random.rand() * (high - low) + low
-        elif scale_mode == "value":
-            return np.random.choice(scale)
+        elif value_mode == "value":
+            return np.random.choice(value_list)
 
     def apply(self, sample):
         if np.random.rand() > self.rotate_prob:
             return sample
 
-        angle = self.get_angle(self.angle, self.angle_mode)
-        scale = self.get_scale(self.scale, self.scale_mode)
+        angle = self.get_value(self.angle, self.angle_mode)
+        scale = self.get_value(self.scale, self.scale_mode)
         rotator = RRotate(scale, angle, self.fill_value, self.auto_bound)
         return rotator(sample)
+
 
 
 class RResize(Transform):

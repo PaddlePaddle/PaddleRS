@@ -25,7 +25,7 @@ import math
 from paddlers.models.ppdet.core.workspace import register
 from ..shape_spec import ShapeSpec
 
-__all__ = ['HRNet']
+__all__ = ['HRNet', 'HRNet_W18']
 
 
 class ConvNormLayer(nn.Layer):
@@ -725,3 +725,6 @@ class HRNet(nn.Layer):
                 channels=self._out_channels[i], stride=self._out_strides[i])
             for i in self.return_idx
         ]
+
+def HRNet_W18(**kwargs):
+    return HRNet(width=18, **kwargs)

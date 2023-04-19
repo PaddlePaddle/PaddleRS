@@ -74,6 +74,13 @@ eval_dataset = pdrs.datasets.VOCDetDataset(
 model = pdrs.tasks.det.YOLOv3(
     num_classes=len(train_dataset.labels), backbone='DarkNet53')
 
+
+# 设置学习率衰减策略, 初始学习率大小以及学习率预热的步数和初始大小
+model.default_scheduler(scheduler='Piecewise',
+                        learning_rate=0.0001,
+                        warmup_steps=0,
+                        warmup_start_lr=0.0)
+
 # 执行模型训练
 model.train(
     num_epochs=10,
@@ -85,10 +92,5 @@ model.train(
     # 每多少次迭代记录一次日志
     log_interval_steps=4,
     save_dir=EXP_DIR,
-    # 初始学习率大小
-    learning_rate=0.0001,
-    # 学习率预热（learning rate warm-up）步数与初始值
-    warmup_steps=0,
-    warmup_start_lr=0.0,
     # 是否启用VisualDL日志功能
     use_vdl=True)

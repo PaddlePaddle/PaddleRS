@@ -154,8 +154,7 @@ class COCODetDataset(BaseDataset):
             gt_bboxs = []
             gt_scores = []
             gt_poly = []
-            difficults = []
-            segmentations = []
+            difficulties = []
 
             for inst in instances:
                 # Check gt bbox
@@ -196,7 +195,7 @@ class COCODetDataset(BaseDataset):
                 gt_classes.append([inst['category_id']])
                 gt_bboxs.append(inst['clean_bbox'])
                 gt_scores.append([1.])
-                difficults.append(inst.get('difficult', 0.))
+                difficulties.append(inst.get('difficult', 0.))
                 annotations['annotations'].append({
                     'iscrowd': inst['iscrowd'],
                     'image_id': int(inst['image_id']),
@@ -214,7 +213,7 @@ class COCODetDataset(BaseDataset):
                 'gt_class': np.array(gt_classes),
                 'gt_bbox': np.array(gt_bboxs).astype(np.float32),
                 'gt_score': np.array(gt_scores).astype(np.float32),
-                'difficult': np.array(difficults),
+                'difficult': np.array(difficulties),
                 'gt_poly': np.array(gt_poly),
             }
 
