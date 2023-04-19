@@ -111,7 +111,7 @@ class BaseChangeDetector(BaseModel):
 
     def run(self, net, inputs, mode):
         inputs, batch_restore_list = inputs
-        net_out = net(inputs[0], inputs[1])
+        net_out = net(inputs['image'], inputs['image2'])
         logit = net_out[0]
         outputs = OrderedDict()
         if mode == 'test':
@@ -139,12 +139,12 @@ class BaseChangeDetector(BaseModel):
                 pred = paddle.unsqueeze(net_out[0], axis=1)  # NCHW
             else:
                 pred = paddle.argmax(logit, axis=1, keepdim=True, dtype='int32')
-            label = inputs[2]
+            label = inputs['mask'].astype('int64')
             if label.ndim == 3:
                 paddle.unsqueeze_(label, axis=1)
             if label.ndim != 4:
-                raise ValueError("Expected label.ndim == 4 but got {}".format(
-                    label.ndim))
+                raise ValueError(
+                    "Expected `label.ndim` == 4 but got {}.".format(label.ndim))
             pred = self.postprocess(pred, batch_restore_list)[0]  # NCHW
             intersect_area, pred_area, label_area = ppseg.utils.metrics.calculate_area(
                 pred, label, self.num_classes)
@@ -157,12 +157,10 @@ class BaseChangeDetector(BaseModel):
             if hasattr(net, 'USE_MULTITASK_DECODER') and \
                 net.USE_MULTITASK_DECODER is True:
                 # CD+Seg
-                if len(inputs) != 5:
-                    raise ValueError(
-                        "Cannot perform loss computation with {} inputs.".
-                        format(len(inputs)))
+                if 'aux_masks' not in inputs:
+                    raise ValueError("Auxiliary masks not found.")
                 labels_list = [
-                    inputs[2 + idx]
+                    inputs['aux_masks'][idx].astype('int64')
                     for idx in map(attrgetter('value'), net.OUT_TYPES)
                 ]
                 loss_list = metrics.multitask_loss_computation(
@@ -171,7 +169,9 @@ class BaseChangeDetector(BaseModel):
                     losses=self.losses)
             else:
                 loss_list = metrics.loss_computation(
-                    logits_list=net_out, labels=inputs[2], losses=self.losses)
+                    logits_list=net_out,
+                    labels=inputs['mask'].astype('int64'),
+                    losses=self.losses)
             loss = sum(loss_list)
             outputs['loss'] = loss
         return outputs
@@ -426,7 +426,7 @@ class BaseChangeDetector(BaseModel):
                     "category_F1-score": F1 score}.
         """
 
-        self._check_transforms(eval_dataset.transforms, 'eval')
+        self._check_transforms(eval_dataset.transforms)
 
         self.net.eval()
         nranks = paddle.distributed.get_world_size()
@@ -597,7 +597,7 @@ class BaseChangeDetector(BaseModel):
             overlap (list[int] | tuple[int] | int, optional):
                 Overlap between two blocks. If `overlap` is a list or tuple, it should
                 be in (W, H) format. Defaults to 36.
-            transforms (paddlers.transforms.Compose|None, optional): Transforms for 
+            transforms (paddlers.transforms.Compose|list|None, optional): Transforms for 
                 inputs. If None, the transforms for evaluation process will be used. 
                 Defaults to None.
             invalid_value (int, optional): Value that marks invalid pixels in output 
@@ -618,7 +618,7 @@ class BaseChangeDetector(BaseModel):
                        eager_load, not quiet)
 
     def preprocess(self, images, transforms, to_tensor=True):
-        self._check_transforms(transforms, 'test')
+        self._check_transforms(transforms)
         batch_im1, batch_im2 = list(), list()
         batch_trans_info = list()
         for im1, im2 in images:
@@ -628,7 +628,7 @@ class BaseChangeDetector(BaseModel):
             # XXX: sample do not contain 'image_t1' and 'image_t2'.
             sample = construct_sample(image=im1, image2=im2)
             data = transforms(sample)
-            im1, im2 = data[0][:2]
+            im1, im2 = data[0]['image'], data[0]['image2']
             trans_info = data[1]
             batch_im1.append(im1)
             batch_im2.append(im2)
@@ -640,7 +640,7 @@ class BaseChangeDetector(BaseModel):
             batch_im1 = np.asarray(batch_im1)
             batch_im2 = np.asarray(batch_im2)
 
-        return (batch_im1, batch_im2), batch_trans_info
+        return {'image': batch_im1, 'image2': batch_im2}, batch_trans_info
 
     def postprocess(self, batch_pred, batch_restore_list):
         if isinstance(batch_pred, (tuple, list)) and self.status == 'Infer':
@@ -712,13 +712,6 @@ class BaseChangeDetector(BaseModel):
             label_maps.append(label_map.squeeze())
             score_maps.append(score_map.squeeze())
         return label_maps, score_maps
-
-    def _check_transforms(self, transforms, mode):
-        super()._check_transforms(transforms, mode)
-        if not isinstance(transforms.arrange,
-                          paddlers.transforms.ArrangeChangeDetector):
-            raise TypeError(
-                "`transforms.arrange` must be an ArrangeChangeDetector object.")
 
     def set_losses(self, losses, weights=None):
         if weights is None:

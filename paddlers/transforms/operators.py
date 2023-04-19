@@ -27,10 +27,10 @@ import imghdr
 from PIL import Image
 from joblib import load
 
-import paddlers
 import paddlers.transforms.functions as F
 import paddlers.transforms.indices as indices
 import paddlers.transforms.satellites as satellites
+from paddlers.utils import logging
 
 __all__ = [
     "construct_sample",
@@ -92,42 +92,67 @@ def construct_sample_from_dict(dict_like_obj):
 
 class Compose(object):
     """
-    Apply a series of data augmentation strategies to the input.
+    Apply a series of data transformation operators to the input.
     All input images should be in Height-Width-Channel ([H, W, C]) format.
 
     Args:
-        transforms (list[paddlers.transforms.Transform]): List of data preprocess or
-            augmentation operators.
+        transforms (list[paddlers.transforms.Transform]): List of data preprocessing 
+            or augmentation operators.
+        auto_decode (bool, optional): Whether to automatically decode image(s) before
+            any data transformation operator is applied. If an image decoding operator 
+            is detected in `transforms`, no auto-decoding operation will be done. 
+            Defaults to True.
+        auto_permute(bool, optional): Whether to automatically permute the processed
+            image(s). Defaults to True.
 
     Raises:
-        TypeError: Invalid type of transforms.
-        ValueError: Invalid length of transforms.
+        TypeError: `transforms` has an unsupported type.
+        ValueError: `transforms` has an illegal length.
     """
 
-    def __init__(self, transforms):
+    def __init__(self, transforms, auto_decode=True, auto_permute=True):
         super(Compose, self).__init__()
         if not isinstance(transforms, list):
             raise TypeError(
-                "Type of transforms is invalid. Must be a list, but received is {}."
+                "`transforms` has an unsupported type. Must be a list, but received is {}."
                 .format(type(transforms)))
         if len(transforms) < 1:
             raise ValueError(
-                "Length of transforms must not be less than 1, but received is {}."
+                "Length of `transforms` must not be less than 1, but received is {}."
                 .format(len(transforms)))
-        transforms = copy.deepcopy(transforms)
-        self.arrange = self._pick_arrange(transforms)
         self.transforms = transforms
+        # Deprecation warning
+        for op in self.transforms:
+            if isinstance(op, Arrange):
+                logging.warning(
+                    "Including an `Arrange` object in the transformation operator list is deprecated and will not take effect."
+                )
+                # We only trigger this warning once for each `Compose` object
+                break
+
+        self.auto_decode = auto_decode
+        self.auto_permute = auto_permute
 
     def __call__(self, sample):
-        """
-        This is equivalent to sequentially calling compose_obj.apply_transforms() 
-            and compose_obj.arrange_outputs().
-        """
         if 'trans_info' not in sample:
             sample['trans_info'] = []
+
+        if self.auto_decode:
+            for op in self.transforms:
+                if isinstance(op, DecodeImg):
+                    break
+            else:
+                # Initialize the decoder with default parameters
+                decoder = DecodeImg()
+                sample = decoder(sample)
+
         sample = self.apply_transforms(sample)
+
+        if self.auto_permute:
+            permute_op = _Permute()
+            sample = permute_op(sample)
+
         trans_info = sample['trans_info']
-        sample = self.arrange_outputs(sample)
         return sample, trans_info
 
     def apply_transforms(self, sample):
@@ -135,24 +160,13 @@ class Compose(object):
             # Skip batch transforms
             if getattr(op, 'is_batch_transform', False):
                 continue
+            # For backward compatibility, we bypass `Arrange` objects
+            # here and leave the arrangement operation to the 
+            # training/evaluation APIs.
+            if isinstance(op, Arrange):
+                continue
             sample = op(sample)
         return sample
-
-    def arrange_outputs(self, sample):
-        if self.arrange is not None:
-            sample = self.arrange(sample)
-        return sample
-
-    def _pick_arrange(self, transforms):
-        arrange = None
-        for idx, op in enumerate(transforms):
-            if isinstance(op, Arrange):
-                if idx != len(transforms) - 1:
-                    raise ValueError(
-                        "Arrange operator must be placed at the end of the list."
-                    )
-                arrange = transforms.pop(idx)
-        return arrange
 
 
 class Transform(object):
@@ -210,20 +224,20 @@ class Transform(object):
 class DecodeImg(Transform):
     """
     Decode image(s) in input.
-    
+
     Args:
-        to_rgb (bool, optional): If True, convert input image(s) from BGR format to 
+        to_rgb (bool, optional): If True, convert input image(s) from BGR format to
             RGB format. Defaults to True.
-        to_uint8 (bool, optional): If True, quantize and convert decoded image(s) to 
+        to_uint8 (bool, optional): If True, quantize and convert decoded image(s) to
             uint8 type. Defaults to True.
-        decode_bgr (bool, optional): If True, automatically interpret a non-geo image 
+        decode_bgr (bool, optional): If True, automatically interpret a non-geo image
             (e.g., jpeg images) as a BGR image. Defaults to True.
-        decode_sar (bool, optional): If True, automatically interpret a single-channel 
-            geo image (e.g. geotiff images) as a SAR image, set this argument to 
+        decode_sar (bool, optional): If True, automatically interpret a single-channel
+            geo image (e.g. geotiff images) as a SAR image, set this argument to
             True. Defaults to True.
-        read_geo_info (bool, optional): If True, read geographical information from 
+        read_geo_info (bool, optional): If True, read geographical information from
             the image. Deafults to False.
-        use_stretch (bool, optional): Whether to apply 2% linear stretch. Valid only if 
+        use_stretch (bool, optional): Whether to apply 2% linear stretch. Valid only if
             `to_uint8` is True. Defaults to False.
     """
 
@@ -408,13 +422,13 @@ class Resize(Transform):
 
     Args:
         target_size (int | list[int] | tuple[int]): Target size. If it is an integer, the
-            target height and width will be both set to `target_size`. Otherwise, 
+            target height and width will be both set to `target_size`. Otherwise,
             `target_size` represents [target height, target width].
-        interp (str, optional): Interpolation method for resizing image(s). One of 
-            {'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}. 
+        interp (str, optional): Interpolation method for resizing image(s). One of
+            {'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}.
             Defaults to 'LINEAR'.
-        keep_ratio (bool, optional): If True, the scaling factor of width and height will 
-            be set to same value, and height/width of the resized image will be not 
+        keep_ratio (bool, optional): If True, the scaling factor of width and height will
+            be set to same value, and height/width of the resized image will be not
             greater than the target width/height. Defaults to False.
 
     Raises:
@@ -543,8 +557,8 @@ class RandomResize(Transform):
     Args:
         target_sizes (list[int] | list[list|tuple] | tuple[list|tuple]):
             Multiple target sizes, each of which should be int, list, or tuple.
-        interp (str, optional): Interpolation method for resizing image(s). One of 
-            {'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}. 
+        interp (str, optional): Interpolation method for resizing image(s). One of
+            {'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}.
             Defaults to 'LINEAR'.
 
     Raises:
@@ -583,8 +597,8 @@ class ResizeByShort(Transform):
         short_size (int): Target size of the shorter side of the image(s).
         max_size (int, optional): Upper bound of longer side of the image(s). If
             `max_size` is -1, no upper bound will be applied. Defaults to -1.
-        interp (str, optional): Interpolation method for resizing image(s). One of 
-            {'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}. 
+        interp (str, optional): Interpolation method for resizing image(s). One of
+            {'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}.
             Defaults to 'LINEAR'.
 
     Raises:
@@ -623,10 +637,10 @@ class RandomResizeByShort(Transform):
 
     Args:
         short_sizes (list[int]): Target size of the shorter side of the image(s).
-        max_size (int, optional): Upper bound of longer side of the image(s). 
+        max_size (int, optional): Upper bound of longer side of the image(s).
             If `max_size` is -1, no upper bound will be applied. Defaults to -1.
-        interp (str, optional): Interpolation method for resizing image(s). One of 
-            {'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}. 
+        interp (str, optional): Interpolation method for resizing image(s). One of
+            {'NEAREST', 'LINEAR', 'CUBIC', 'AREA', 'LANCZOS4', 'RANDOM'}.
             Defaults to 'LINEAR'.
 
     Raises:
@@ -680,12 +694,12 @@ class RandomFlipOrRotate(Transform):
     Flip or Rotate an image in different directions with a certain probability.
 
     Args:
-        probs (list[float]): Probabilities of performing flipping and rotation. 
+        probs (list[float]): Probabilities of performing flipping and rotation.
             Default: [0.35,0.25].
-        probsf (list[float]): Probabilities of 5 flipping modes (horizontal, 
-            vertical, both horizontal and vertical, diagonal, anti-diagonal). 
+        probsf (list[float]): Probabilities of 5 flipping modes (horizontal,
+            vertical, both horizontal and vertical, diagonal, anti-diagonal).
             Default: [0.3, 0.3, 0.2, 0.1, 0.1].
-        probsr (list[float]): Probabilities of 3 rotation modes (90°, 180°, 270° 
+        probsr (list[float]): Probabilities of 3 rotation modes (90°, 180°, 270°
             clockwise). Default: [0.25, 0.5, 0.25].
 
     Examples:
@@ -955,13 +969,13 @@ class Normalize(Transform):
     3. im = im / std
 
     Args:
-        mean (list[float] | tuple[float], optional): Mean of input image(s). 
+        mean (list[float] | tuple[float], optional): Mean of input image(s).
             Defaults to [0.485, 0.456, 0.406].
-        std (list[float] | tuple[float], optional): Standard deviation of input 
+        std (list[float] | tuple[float], optional): Standard deviation of input
             image(s). Defaults to [0.229, 0.224, 0.225].
-        min_val (list[float] | tuple[float], optional): Minimum value of input 
+        min_val (list[float] | tuple[float], optional): Minimum value of input
             image(s). If None, use 0 for all channels. Defaults to None.
-        max_val (list[float] | tuple[float], optional): Maximum value of input 
+        max_val (list[float] | tuple[float], optional): Maximum value of input
             image(s). If None, use 255. for all channels. Defaults to None.
         apply_to_tar (bool, optional): Whether to apply transformation to the target
             image. Defaults to True.
@@ -1021,7 +1035,7 @@ class CenterCrop(Transform):
     2. Crop the image.
 
     Args:
-        crop_size (int, optional): Target size of the cropped image(s). 
+        crop_size (int, optional): Target size of the cropped image(s).
             Defaults to 224.
     """
 
@@ -1055,26 +1069,26 @@ class CenterCrop(Transform):
 class RandomCrop(Transform):
     """
     Randomly crop the input.
-    1. Compute the height and width of cropped area according to `aspect_ratio` and 
+    1. Compute the height and width of cropped area according to `aspect_ratio` and
         `scaling`.
     2. Locate the upper left corner of cropped area randomly.
     3. Crop the image(s).
     4. Resize the cropped area to `crop_size` x `crop_size`.
 
     Args:
-        crop_size (int | list[int] | tuple[int]): Target size of the cropped area. If 
+        crop_size (int | list[int] | tuple[int]): Target size of the cropped area. If
             None, the cropped area will not be resized. Defaults to None.
-        aspect_ratio (list[float], optional): Aspect ratio of cropped region in 
+        aspect_ratio (list[float], optional): Aspect ratio of cropped region in
             [min, max] format. Defaults to [.5, 2.].
-        thresholds (list[float], optional): Iou thresholds to decide a valid bbox 
+        thresholds (list[float], optional): Iou thresholds to decide a valid bbox
             crop. Defaults to [.0, .1, .3, .5, .7, .9].
-        scaling (list[float], optional): Ratio between the cropped region and the 
+        scaling (list[float], optional): Ratio between the cropped region and the
             original image in [min, max] format. Defaults to [.3, 1.].
-        num_attempts (int, optional): Max number of tries before giving up. 
+        num_attempts (int, optional): Max number of tries before giving up.
             Defaults to 50.
-        allow_no_crop (bool, optional): Whether returning without doing crop is 
+        allow_no_crop (bool, optional): Whether returning without doing crop is
             allowed. Defaults to True.
-        cover_all_box (bool, optional): Whether to ensure all bboxes be covered in 
+        cover_all_box (bool, optional): Whether to ensure all bboxes be covered in
             the final crop. Defaults to False.
     """
 
@@ -1268,7 +1282,7 @@ class RandomScaleAspect(Transform):
     """
     Crop input image(s) and resize back to original sizes.
 
-    Args: 
+    Args:
         min_scale (float): Minimum ratio between the cropped region and the original
             image. If 0, image(s) will not be cropped. Defaults to .5.
         aspect_ratio (float): Aspect ratio of cropped region. Defaults to .33.
@@ -1296,12 +1310,12 @@ class RandomExpand(Transform):
     Randomly expand the input by padding according to random offsets.
 
     Args:
-        upper_ratio (float, optional): Maximum ratio to which the original image 
+        upper_ratio (float, optional): Maximum ratio to which the original image
             is expanded. Defaults to 4..
-        prob (float, optional): Probability of apply expanding. Defaults to .5.
-        im_padding_value (list[float] | tuple[float], optional): RGB filling value 
+        prob (float, optional): Probability of expanding. Defaults to .5.
+        im_padding_value (list[float] | tuple[float], optional): RGB filling value
             for the image. Defaults to (127.5, 127.5, 127.5).
-        label_padding_value (int, optional): Filling value for the mask. 
+        label_padding_value (int, optional): Filling value for the mask.
             Defaults to 255.
 
     See Also:
@@ -1354,17 +1368,17 @@ class Pad(Transform):
         Pad image to a specified size or multiple of `size_divisor`.
 
         Args:
-            target_size (list[int] | tuple[int], optional): Image target size, if None, pad to 
+            target_size (list[int] | tuple[int], optional): Image target size, if None, pad to
                 multiple of size_divisor. Defaults to None.
             pad_mode (int, optional): Pad mode. Currently only four modes are supported:
-                [-1, 0, 1, 2]. if -1, use specified offsets. If 0, only pad to right and bottom
+                [-1, 0, 1, 2]. if -1, use specified offsets. If 0, only pad to right and bottom.
                 If 1, pad according to center. If 2, only pad left and top. Defaults to 0.
             offsets (list[int]|None, optional): Padding offsets. Defaults to None.
-            im_padding_value (list[float] | tuple[float]): RGB value of padded area. 
+            im_padding_value (list[float] | tuple[float]): RGB value of padded area.
                 Defaults to (127.5, 127.5, 127.5).
-            label_padding_value (int, optional): Filling value for the mask. 
+            label_padding_value (int, optional): Filling value for the mask.
                 Defaults to 255.
-            size_divisor (int): Image width and height after padding will be a multiple of 
+            size_divisor (int): Image width and height after padding will be a multiple of
                 `size_divisor`.
         """
         super(Pad, self).__init__()
@@ -1443,7 +1457,7 @@ class Pad(Transform):
             h, w = self.target_size
             assert (
                     im_h <= h and im_w <= w
-            ), 'target size ({}, {}) cannot be less than image size ({}, {})'\
+            ), 'target size ({}, {}) cannot be less than image size ({}, {})' \
                 .format(h, w, im_h, im_w)
         else:
             h = (np.ceil(im_h / self.size_divisor) *
@@ -1494,11 +1508,12 @@ class MixupImage(Transform):
         Mixup two images and their gt_bbbox/gt_score.
 
         Args:
-            alpha (float, optional): Alpha parameter of beta distribution. 
+            alpha (float, optional): Alpha parameter of beta distribution.
                 Defaults to 1.5.
-            beta (float, optional): Beta parameter of beta distribution. 
+            beta (float, optional): Beta parameter of beta distribution.
                 Defaults to 1.5.
         """
+
         super(MixupImage, self).__init__()
         if alpha <= 0.0:
             raise ValueError("`alpha` should be positive in MixupImage.")
@@ -1575,24 +1590,24 @@ class RandomDistort(Transform):
     Random color distortion.
 
     Args:
-        brightness_range (float, optional): Range of brightness distortion. 
+        brightness_range (float, optional): Range of brightness distortion.
             Defaults to .5.
-        brightness_prob (float, optional): Probability of brightness distortion. 
+        brightness_prob (float, optional): Probability of brightness distortion.
             Defaults to .5.
-        contrast_range (float, optional): Range of contrast distortion. 
+        contrast_range (float, optional): Range of contrast distortion.
             Defaults to .5.
-        contrast_prob (float, optional): Probability of contrast distortion. 
+        contrast_prob (float, optional): Probability of contrast distortion.
             Defaults to .5.
-        saturation_range (float, optional): Range of saturation distortion. 
+        saturation_range (float, optional): Range of saturation distortion.
             Defaults to .5.
-        saturation_prob (float, optional): Probability of saturation distortion. 
+        saturation_prob (float, optional): Probability of saturation distortion.
             Defaults to .5.
         hue_range (float, optional): Range of hue distortion. Defaults to .5.
         hue_prob (float, optional): Probability of hue distortion. Defaults to .5.
-        random_apply (bool, optional): Apply the transformation in random (yolo) or
+        random_apply (bool, optional): Apply the transformation in random (YOLO) or
             fixed (SSD) order. Defaults to True.
         count (int, optional): Number of distortions to apply. Defaults to 4.
-        shuffle_channel (bool, optional): Whether to swap channels randomly. 
+        shuffle_channel (bool, optional): Whether to permute channels randomly.
             Defaults to False.
     """
 
@@ -1739,7 +1754,7 @@ class RandomBlur(Transform):
     """
     Randomly blur input image(s).
 
-    Args: 
+    Args:
         prob (float): Probability of blurring.
     """
 
@@ -1775,7 +1790,7 @@ class Dehaze(Transform):
     """
     Dehaze input image(s).
 
-    Args: 
+    Args:
         gamma (bool, optional): Use gamma correction or not. Defaults to False.
     """
 
@@ -1798,7 +1813,7 @@ class ReduceDim(Transform):
     """
     Use PCA to reduce the dimension of input image(s).
 
-    Args: 
+    Args:
         joblib_path (str): Path of *.joblib file of PCA.
         apply_to_tar (bool, optional): Whether to apply transformation to the target
             image. Defaults to True.
@@ -1833,8 +1848,8 @@ class SelectBand(Transform):
     """
     Select a set of bands of input image(s).
 
-    Args: 
-        band_list (list, optional): Bands to select (band index starts from 1). 
+    Args:
+        band_list (list, optional): Bands to select (band index starts from 1).
             Defaults to [1, 2, 3].
         apply_to_tar (bool, optional): Whether to apply transformation to the target
             image. Defaults to True.
@@ -1948,11 +1963,12 @@ class _Permute(Transform):
         super(_Permute, self).__init__()
 
     def apply(self, sample):
-        sample['image'] = F.permute(sample['image'], False)
+        sample['image'] = F.permute(sample['image'])
         if 'image2' in sample:
-            sample['image2'] = F.permute(sample['image2'], False)
+            sample['image2'] = F.permute(sample['image2'])
         if 'target' in sample:
-            sample['target'] = F.permute(sample['target'], False)
+            sample['target'] = F.permute(sample['target'])
+        sample['permuted'] = True
         return sample
 
 
@@ -1961,7 +1977,7 @@ class RandomSwap(Transform):
     Randomly swap multi-temporal images.
 
     Args:
-        prob (float, optional): Probability of swapping the input images. 
+        prob (float, optional): Probability of swapping the input images.
             Default: 0.2.
     """
 
@@ -1993,15 +2009,15 @@ class AppendIndex(Transform):
     Append remote sensing index to input image(s).
 
     Args:
-        index_type (str): Type of remote sensinng index. See supported 
-            index types in 
+        index_type (str): Type of remote sensinng index. See supported
+            index types in
             https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/indices.py .
-        band_indices (dict, optional): Mapping of band names to band indices 
-            (starting from 1). See band names in 
+        band_indices (dict, optional): Mapping of band names to band indices
+            (starting from 1). See band names in
             https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/indices.py .
             Default: None.
-        satellite (str, optional): Type of satellite. If set, 
-            band indices will be automatically determined accordingly. See supported satellites in 
+        satellite (str, optional): Type of satellite. If set,
+            band indices will be automatically determined accordingly. See supported satellites in
             https://github.com/PaddlePaddle/PaddleRS/tree/develop/paddlers/transforms/satellites.py .
             Default: None.
     """
@@ -2051,8 +2067,8 @@ class MatchRadiance(Transform):
 
     Args:
         method (str, optional): Method used to match the radiance of the
-            bi-temporal images. Choices are {'hist', 'lsr', 'fft}. 'hist' 
-            stands for histogram matching, 'lsr' stands for least-squares 
+            bi-temporal images. Choices are {'hist', 'lsr', 'fft}. 'hist'
+            stands for histogram matching, 'lsr' stands for least-squares
             regression, and 'fft' replaces the low-frequency components of
             the image to match the reference image. Default: 'hist'.
     """

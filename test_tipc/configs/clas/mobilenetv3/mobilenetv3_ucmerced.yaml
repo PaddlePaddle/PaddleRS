@@ -5,6 +5,6 @@ _base_: ../_base_/ucmerced.yaml
 save_dir: ./test_tipc/output/clas/mobilenetv3/
 
 model: !Node
-    type: MobileNetV3
-    args:
-        num_classes: 21
+  type: MobileNetV3
+  args:
+    num_classes: 21

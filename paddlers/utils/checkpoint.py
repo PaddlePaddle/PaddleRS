@@ -563,5 +563,6 @@ def load_checkpoint(model,
         pretrain_weights=osp.join(checkpoint, 'model.pdparams'),
         model_name=model_name)
     if load_optim_state:
-        load_optimizer(
-            optimizer, state_dict_path=osp.join(checkpoint, "model.pdopt"))
+        optim_path = osp.join(checkpoint, 'model.pdopt')
+        if osp.exists(optim_path):
+            load_optimizer(optimizer, state_dict_path=optim_path)

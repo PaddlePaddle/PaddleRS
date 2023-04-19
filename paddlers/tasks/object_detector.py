@@ -139,6 +139,8 @@ class BaseDetector(BaseModel):
         return backbone_module
 
     def run(self, net, inputs, mode):
+        if mode == 'eval' and 'gt_poly' in inputs:
+            del inputs['gt_poly']
         net_out = net(inputs)
         if mode in ['train', 'eval']:
             outputs = net_out
@@ -533,8 +535,8 @@ class BaseDetector(BaseModel):
 
         eval_dataset.batch_transforms = self._compose_batch_transform(
             mode='eval', batch_transforms=batch_transforms)
-        self._check_transforms(eval_dataset.transforms, 'eval')
 
+        self._check_transforms(eval_dataset.transforms)
         self.net.eval()
         nranks = paddle.distributed.get_world_size()
         local_rank = paddle.distributed.get_rank()
@@ -575,6 +577,7 @@ class BaseDetector(BaseModel):
                     coco_gt=copy.deepcopy(eval_dataset.coco_gt),
                     classwise=False)
             scores = collections.OrderedDict()
+
             logging.info(
                 "Start to evaluate(total_samples={}, total_steps={})...".format(
                     eval_dataset.num_samples, eval_dataset.num_samples))
@@ -627,7 +630,6 @@ class BaseDetector(BaseModel):
             images = [img_file]
         else:
             images = img_file
-
         batch_samples, _ = self.preprocess(images, transforms, batch_transforms=batch_transforms)
         self.net.eval()
         outputs = self.run(self.net, batch_samples, 'test')
@@ -645,8 +647,8 @@ class BaseDetector(BaseModel):
                 im = decode_image(im, read_raw=True)
             sample = construct_sample(image=im)
             sample = transforms(sample)
-            data = sample[0]
-            batch_samples.append(data)
+            data = transforms(sample)
+            batch_samples.append(data[0])
         batch_transforms = self._compose_batch_transform(batch_transforms, 'test')
         batch_samples = batch_transforms(batch_samples)
         if to_tensor:
@@ -722,13 +724,6 @@ class BaseDetector(BaseModel):
             start = end
 
         return results
-
-    def _check_transforms(self, transforms, mode):
-        super()._check_transforms(transforms, mode)
-        if not isinstance(transforms.arrange,
-                          paddlers.transforms.ArrangeDetector):
-            raise TypeError(
-                "`transforms.arrange` must be an ArrangeDetector object.")
 
     def get_pruning_info(self):
         info = super().get_pruning_info()

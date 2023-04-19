@@ -5,6 +5,6 @@ _base_: ../_base_/ucmerced.yaml
 save_dir: ./test_tipc/output/clas/resnet50_vd/
 
 model: !Node
-    type: ResNet50_vd
-    args:
-        num_classes: 21
+  type: ResNet50_vd
+  args:
+    num_classes: 21

@@ -114,7 +114,7 @@ class BaseSegmenter(BaseModel):
 
     def run(self, net, inputs, mode):
         inputs, batch_restore_list = inputs
-        net_out = net(inputs[0])
+        net_out = net(inputs['image'])
         logit = net_out[0]
         outputs = OrderedDict()
         if mode == 'test':
@@ -142,7 +142,7 @@ class BaseSegmenter(BaseModel):
                 pred = paddle.unsqueeze(net_out[0], axis=1)  # NCHW
             else:
                 pred = paddle.argmax(logit, axis=1, keepdim=True, dtype='int32')
-            label = inputs[1]
+            label = inputs['mask'].astype('int64')
             if label.ndim == 3:
                 paddle.unsqueeze_(label, axis=1)
             if label.ndim != 4:
@@ -158,7 +158,9 @@ class BaseSegmenter(BaseModel):
                                                            self.num_classes)
         if mode == 'train':
             loss_list = metrics.loss_computation(
-                logits_list=net_out, labels=inputs[1], losses=self.losses)
+                logits_list=net_out,
+                labels=inputs['mask'].astype('int64'),
+                losses=self.losses)
             loss = sum(loss_list)
             outputs['loss'] = loss
         return outputs
@@ -406,7 +408,7 @@ class BaseSegmenter(BaseModel):
 
         """
 
-        self._check_transforms(eval_dataset.transforms, 'eval')
+        self._check_transforms(eval_dataset.transforms)
         self.net.eval()
         nranks = paddle.distributed.get_world_size()
         local_rank = paddle.distributed.get_rank()
@@ -585,7 +587,7 @@ class BaseSegmenter(BaseModel):
                        eager_load, not quiet)
 
     def preprocess(self, images, transforms, to_tensor=True):
-        self._check_transforms(transforms, 'test')
+        self._check_transforms(transforms)
         batch_im = list()
         batch_trans_info = list()
         for im in images:
@@ -593,7 +595,7 @@ class BaseSegmenter(BaseModel):
                 im = decode_image(im, read_raw=True)
             sample = construct_sample(image=im)
             data = transforms(sample)
-            im = data[0][0]
+            im = data[0]['image']
             trans_info = data[1]
             batch_im.append(im)
             batch_trans_info.append(trans_info)
@@ -602,7 +604,7 @@ class BaseSegmenter(BaseModel):
         else:
             batch_im = np.asarray(batch_im)
 
-        return (batch_im, ), batch_trans_info
+        return {'image': batch_im}, batch_trans_info
 
     def postprocess(self, batch_pred, batch_restore_list):
         if isinstance(batch_pred, (tuple, list)) and self.status == 'Infer':
@@ -674,13 +676,6 @@ class BaseSegmenter(BaseModel):
             label_maps.append(label_map.squeeze())
             score_maps.append(score_map.squeeze())
         return label_maps, score_maps
-
-    def _check_transforms(self, transforms, mode):
-        super()._check_transforms(transforms, mode)
-        if not isinstance(transforms.arrange,
-                          paddlers.transforms.ArrangeSegmenter):
-            raise TypeError(
-                "`transforms.arrange` must be an ArrangeSegmenter object.")
 
     def set_losses(self, losses, weights=None):
         if weights is None:
@@ -919,15 +914,14 @@ class C2FNet(BaseSegmenter):
     def run(self, net, inputs, mode):
         inputs, batch_restore_list = inputs
         with paddle.no_grad():
-            pre_coarse = self.coarse_model(inputs[0])
+            pre_coarse = self.coarse_model(inputs['image'])
             pre_coarse = pre_coarse[0]
             heatmaps = pre_coarse
 
         if mode == 'test':
-            net_out = net(inputs[0], heatmaps)
+            net_out = net(inputs['image'], heatmaps)
             logit = net_out[0]
             outputs = OrderedDict()
-            origin_shape = inputs[1]
             if self.status == 'Infer':
                 label_map_list, score_map_list = self.postprocess(
                     net_out, batch_restore_list)
@@ -948,19 +942,19 @@ class C2FNet(BaseSegmenter):
             outputs['score_map'] = score_map_list
 
         if mode == 'eval':
-            net_out = net(inputs[0], heatmaps)
+            net_out = net(inputs['image'], heatmaps)
             logit = net_out[0]
             outputs = OrderedDict()
             if self.status == 'Infer':
                 pred = paddle.unsqueeze(net_out[0], axis=1)  # NCHW
             else:
                 pred = paddle.argmax(logit, axis=1, keepdim=True, dtype='int32')
-            label = inputs[1]
+            label = inputs['mask'].astype('int64')
             if label.ndim == 3:
                 paddle.unsqueeze_(label, axis=1)
             if label.ndim != 4:
-                raise ValueError("Expected label.ndim == 4 but got {}".format(
-                    label.ndim))
+                raise ValueError(
+                    "Expected `label.ndim` == 4 but got {}.".format(label.ndim))
             pred = self.postprocess(pred, batch_restore_list)[0]  # NCHW
             intersect_area, pred_area, label_area = ppseg.utils.metrics.calculate_area(
                 pred, label, self.num_classes)
@@ -970,7 +964,8 @@ class C2FNet(BaseSegmenter):
             outputs['conf_mat'] = metrics.confusion_matrix(pred, label,
                                                            self.num_classes)
         if mode == 'train':
-            net_out = net(inputs[0], heatmaps, inputs[1])
+            net_out = net(inputs['image'], heatmaps,
+                          inputs['mask'].astype('int64'))
             logit = [net_out[0], ]
             labels = net_out[1]
             outputs = OrderedDict()

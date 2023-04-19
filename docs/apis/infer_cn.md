@@ -1,3 +1,5 @@
+简体中文 | [English](infer_en.md)
+
 # PaddleRS推理API说明
 
 PaddleRS的动态图推理和静态图推理能力分别由训练器（[`BaseModel`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/base.py)及其子类）和**预测器**（`paddlers.deploy.Predictor`）提供。
@@ -18,7 +20,7 @@ def predict(self, img_file, transforms=None):
 
 |参数名称|类型|参数说明|默认值|
 |-------|----|--------|-----|
-|`img_file`|`list[tuple]` \| `tuple[str\|np.ndarray]`|输入影像对数据（NumPy数组形式）或输入影像对路径。若仅预测一个影像对，使用一个元组顺序包含第一时相影像数据/路径以及第二时相影像数据/路径。若需要一次性预测一组影像对，以列表包含这些影像对的数据或路径（每个影像对对应列表中的一个元组）。||
+|`img_file`|`list[tuple]` \| `tuple[str\|numpy.ndarray]`|输入影像对数据（NumPy数组形式）或输入影像对路径。若仅预测一个影像对，使用一个元组顺序包含第一时相影像数据/路径以及第二时相影像数据/路径。若需要一次性预测一组影像对，以列表包含这些影像对的数据或路径（每个影像对对应列表中的一个元组）。||
 |`transforms`|`paddlers.transforms.Compose` \| `None`|对输入数据应用的数据变换算子。若为`None`，则使用训练器在验证阶段使用的数据变换算子。|`None`|
 
 返回格式：
@@ -43,7 +45,7 @@ def predict(self, img_file, transforms=None):
 
 |参数名称|类型|参数说明|默认值|
 |-------|----|--------|-----|
-|`img_file`|`list[str\|np.ndarray]` \| `str` \| `np.ndarray`|输入影像数据（NumPy数组形式）或输入影像路径。若需要一次性预测一组影像，以列表包含这些影像的数据或路径（每幅影像对应列表中的一个元素）。||
+|`img_file`|`list[str\|numpy.ndarray]` \| `str` \| `numpy.ndarray`|输入影像数据（NumPy数组形式）或输入影像路径。若需要一次性预测一组影像，以列表包含这些影像的数据或路径（每幅影像对应列表中的一个元素）。||
 |`transforms`|`paddlers.transforms.Compose` \| `None`|对输入数据应用的数据变换算子。若为`None`，则使用训练器在验证阶段使用的数据变换算子。|`None`|
 
 返回格式：
@@ -70,7 +72,7 @@ def predict(self, img_file, transforms=None):
 
 |参数名称|类型|参数说明|默认值|
 |-------|----|--------|-----|
-|`img_file`|`list[str\|np.ndarray]` \| `str` \| `np.ndarray`|输入影像数据（NumPy数组形式）或输入影像路径。若需要一次性预测一组影像，以列表包含这些影像的数据或路径（每幅影像对应列表中的一个元素）。||
+|`img_file`|`list[str\|numpy.ndarray]` \| `str` \| `numpy.ndarray`|输入影像数据（NumPy数组形式）或输入影像路径。若需要一次性预测一组影像，以列表包含这些影像的数据或路径（每幅影像对应列表中的一个元素）。||
 |`transforms`|`paddlers.transforms.Compose` \| `None`|对输入数据应用的数据变换算子。若为`None`，则使用训练器在验证阶段使用的数据变换算子。|`None`|
 
 返回格式：
@@ -99,7 +101,7 @@ def predict(self, img_file, transforms=None):
 
 |参数名称|类型|参数说明|默认值|
 |-------|----|--------|-----|
-|`img_file`|`list[str\|np.ndarray]` \| `str` \| `np.ndarray`|输入影像数据（NumPy数组形式）或输入影像路径。若需要一次性预测一组影像，以列表包含这些影像的数据或路径（每幅影像对应列表中的一个元素）。||
+|`img_file`|`list[str\|numpy.ndarray]` \| `str` \| `numpy.ndarray`|输入影像数据（NumPy数组形式）或输入影像路径。若需要一次性预测一组影像，以列表包含这些影像的数据或路径（每幅影像对应列表中的一个元素）。||
 |`transforms`|`paddlers.transforms.Compose` \| `None`|对输入数据应用的数据变换算子。若为`None`，则使用训练器在验证阶段使用的数据变换算子。|`None`|
 
 返回格式：
@@ -124,7 +126,7 @@ def predict(self, img_file, transforms=None):
 
 |参数名称|类型|参数说明|默认值|
 |-------|----|--------|-----|
-|`img_file`|`list[str\|np.ndarray]` \| `str` \| `np.ndarray`|输入影像数据（NumPy数组形式）或输入影像路径。若需要一次性预测一组影像，以列表包含这些影像的数据或路径（每幅影像对应列表中的一个元素）。||
+|`img_file`|`list[str\|numpy.ndarray]` \| `str` \| `numpy.ndarray`|输入影像数据（NumPy数组形式）或输入影像路径。若需要一次性预测一组影像，以列表包含这些影像的数据或路径（每幅影像对应列表中的一个元素）。||
 |`transforms`|`paddlers.transforms.Compose` \| `None`|对输入数据应用的数据变换算子。若为`None`，则使用训练器在验证阶段使用的数据变换算子。|`None`|
 
 返回格式：
@@ -221,11 +223,11 @@ def predict(self,
 
 |参数名称|类型|参数说明|默认值|
 |-------|----|--------|-----|
-|`img_file`|`list[str\|tuple\|np.ndarray]` \| `str` \| `tuple` \| `np.ndarray`|对于场景分类、目标检测、图像复原和图像分割任务来说，该参数可为单一图像路径，或是解码后的、排列格式为[h, w, c]且具有float32类型的图像数据（表示为NumPy数组形式），或者是一组图像路径或np.ndarray对象构成的列表；对于变化检测任务来说，该参数可以为图像路径二元组（分别表示前后两个时相影像路径），或是解码后的两幅图像组成的二元组，或者是上述两种二元组之一构成的列表。||
+|`img_file`|`list[str\|tuple\|numpy.ndarray]` \| `str` \| `tuple` \| `numpy.ndarray`|对于场景分类、目标检测、图像复原和图像分割任务来说，该参数可为单一图像路径，或是解码后的、排列格式为[h, w, c]且具有float32类型的图像数据（表示为NumPy数组形式），或者是一组图像路径或`numpy.ndarray`对象构成的列表；对于变化检测任务来说，该参数可以为图像路径二元组（分别表示前后两个时相影像路径），或是解码后的两幅图像组成的二元组，或者是上述两种二元组之一构成的列表。||
 |`topk`|`int`|场景分类模型预测时使用，表示选取模型输出概率大小排名前`topk`的类别作为最终结果。|`1`|
 |`transforms`|`paddlers.transforms.Compose`\|`None`|对输入数据应用的数据变换算子。若为`None`，则使用从`model.yml`中读取的算子。|`None`|
-|`warmup_iters`|`int`|预热轮数，用于评估模型推理以及前后处理速度。若大于1，将预先重复执行`warmup_iters`次推理，而后才开始正式的预测及其速度评估。|`0`|
-|`repeats`|`int`|重复次数，用于评估模型推理以及前后处理速度。若大于1，将执行`repeats`次预测并取时间平均值。|`1`|
+|`warmup_iters`|`int`|预热轮数，用于评估模型推理以及前后处理速度。若大于`1`，将预先重复执行`warmup_iters`次推理，而后才开始正式的预测及其速度评估。|`0`|
+|`repeats`|`int`|重复次数，用于评估模型推理以及前后处理速度。若大于`1`，将执行`repeats`次预测并取时间平均值。|`1`|
 |`quiet`|`bool`|若为`True`，不打印计时信息。|`False`|
 
 `Predictor.predict()`的返回格式与相应的动态图推理API的返回格式完全相同，详情请参考[动态图推理API](#动态图推理api)。

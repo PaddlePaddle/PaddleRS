@@ -60,7 +60,7 @@ PaddleRS is an end-to-end high-efficent development toolkit for remote sensing a
         <b>Models</b>
       </td>
       <td>
-        <b>Data Transforming Operators</b>
+        <b>Data Transformation Operators</b>
       </td>
       <td>
         <b>Remote Sensing Data Tools</b>
@@ -101,6 +101,8 @@ PaddleRS is an end-to-end high-efficent development toolkit for remote sensing a
           <li><a href="./tutorials/train/image_restoration/drn.py">DRN</a></li>
           <li><a href="./tutorials/train/image_restoration/esrgan.py">ESRGAN</a></li>
           <li><a href="./tutorials/train/image_restoration/lesrcnn.py">LESRCNN</a></li>
+           <li><a href="./tutorials/train/image_restoration/nafnet.py">NAFNet</a></li>
+          <li><a href="./tutorials/train/image_restoration/swinir.py">SwinIR</a></li>
         </ul>
         </details>
         <details><summary><b>Object Detection</b></summary>
@@ -137,7 +139,7 @@ PaddleRS is an end-to-end high-efficent development toolkit for remote sensing a
           <li>ResizeByLong</li>
           <li>ResizeByShort</li>
           <li>SelectBand</li>
-          <li><a href="./docs/intro/transforms.md">...</a></li>
+          <li><a href="./docs/intro/transforms_en.md">...</a></li>
         </ul>
         </details>
         <details><summary><b>Data Augmentation</b></summary>
@@ -154,7 +156,7 @@ PaddleRS is an end-to-end high-efficent development toolkit for remote sensing a
           <li>RandomScaleAspect</li>
           <li>RandomSwap</li>
           <li>RandomVerticalFlip</li>
-          <li><a href="./docs/intro/transforms.md">...</a></li>
+          <li><a href="./docs/intro/transforms_en.md">...</a></li>
         </ul>
         </details>
         <details><summary><b>Remote Sensing Indices</b></summary>
@@ -206,7 +208,7 @@ PaddleRS is an end-to-end high-efficent development toolkit for remote sensing a
           <li>WI1</li>
           <li>WI2</li>
           <li>WRI</li>
-          <li><a href="./docs/intro/indices.md">...</a></li>
+          <li><a href="./docs/intro/indices_en.md">...</a></li>
         </ul>
         </details>
       </td>
@@ -232,6 +234,11 @@ PaddleRS is an end-to-end high-efficent development toolkit for remote sensing a
         <ul>
           <li><a href="./paddlers/utils/postprocs/connection.py">connecting road disconnection</a></li>
           <li><a href="./paddlers/utils/postprocs/regularization.py">regularizing building boundaries</a></li>
+          <li><a href="./paddlers/utils/postprocs/change_filter.py">filtering out pseudo changes</a></li>
+          <li><a href="./paddlers/utils/postprocs/connection.py">connecting road disconnection</a></li>
+          <li><a href="./paddlers/utils/postprocs/crf.py">refining segmentation result using a conditional random field</a></li>
+          <li><a href="./paddlers/utils/postprocs/mrf.py">refining segmentation result using a Markov random field</a></li>
+          <li><a href="./paddlers/utils/postprocs/regularization.py">regularizing building boundaries</a></li>
         </ul>
         </details>
         <details><summary><b>Data Visualization</b></summary>
@@ -246,7 +253,7 @@ PaddleRS is an end-to-end high-efficent development toolkit for remote sensing a
           <li><a href="./tools/prepare_dataset/prepare_ucmerced.py">UC Merced</a></li>
           <li><a href="./tools/prepare_dataset/prepare_rsod.py">RSOD</a></li>
           <li><a href="./tools/prepare_dataset/prepare_isaid.py">iSAID</a></li>
-          <li><a href="./docs/intro/data_prep.md">...</a></li>
+          <li><a href="./docs/intro/data_prep_en.md">...</a></li>
         </ul>
       </td>
       <td>
@@ -270,26 +277,26 @@ PaddleRS is an end-to-end high-efficent development toolkit for remote sensing a
 ## <img src="./docs/images/teach.png" width="30"/> Tutorials and Documents
 
 * Quick Start
-  * [Quick start](./tutorials/train/README.md)
+  * [Quick start](./docs/quick_start_en.md)
 * Data Preparation
-  * [Open-source remote sensing datasets](./docs/data/dataset.md)
+  * [Open-source remote sensing datasets](./docs/data/dataset_en.md)
   * [Efficient interactive segmentation tool EISeg](https://github.com/PaddlePaddle/PaddleSeg/tree/release/2.7/EISeg)
-  * [Remote sensing data tools](./docs/data/tools.md)
+  * [Remote sensing data tools](./docs/data/tools_en.md)
 * Introduction on Components
-  * [Data preprocessing tools](./docs/intro/data_prep.md)
-  * [Models](./docs/intro/model_zoo.md)
-  * [Remote sensing indices](./docs/intro/indices.md)
-  * [Data transforming operators](./docs/intro/transforms.md)
-* [Model Training](./tutorials/train/README.md)
+  * [Data preprocessing tools](./docs/intro/data_prep_en.md)
+  * [Models](./docs/intro/model_zoo_en.md)
+  * [Remote sensing indices](./docs/intro/indices_en.md)
+  * [Data transforming operators](./docs/intro/transforms_en.md)
+* [Model Training](./tutorials/train/README_EN.md)
 * Model Deployment
   * [Model export](./deploy/export/README.md)
   * [Paddle Inference (Python)](./deploy/README.md)
 * Development and Contribution
-  * [Contributing guides](./docs/CONTRIBUTING.md)
-  * [Development manual](./docs/dev/dev_guide.md)
-  * [Code style guides](./docs/dev/docstring.md)
-  * [Training APIs](./docs/apis/train.md)
-  * [Inference APIs](./docs/apis/infer.md)
+  * [Contributing guides](./docs/CONTRIBUTING_EN.md)
+  * [Development manual](./docs/dev/dev_guide_en.md)
+  * [Code style guides](./docs/dev/docstring_en.md)
+  * [Training APIs](./docs/apis/train_en.md)
+  * [Inference APIs](./docs/apis/infer_en.md)
 
 ## <img src="./docs/images/anli.png" width="30"/> Application Examples
 

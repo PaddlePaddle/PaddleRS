@@ -232,10 +232,7 @@ class _TestSliderPredictNamespace:
 class TestSegSliderPredict(_TestSliderPredictNamespace.TestSliderPredict):
     def setUp(self):
         self.model = pdrs.tasks.seg.UNet(in_channels=10)
-        self.transforms = T.Compose([
-            T.DecodeImg(), T.Normalize([0.5] * 10, [0.5] * 10),
-            T.ArrangeSegmenter('test')
-        ])
+        self.transforms = T.Compose([T.Normalize([0.5] * 10, [0.5] * 10)])
         self.image_path = "data/ssst/multispectral.tif"
         self.ref_path = self.image_path
         self.basename = osp.basename(self.ref_path)
@@ -244,10 +241,7 @@ class TestSegSliderPredict(_TestSliderPredictNamespace.TestSliderPredict):
 class TestCDSliderPredict(_TestSliderPredictNamespace.TestSliderPredict):
     def setUp(self):
         self.model = pdrs.tasks.cd.BIT(in_channels=10)
-        self.transforms = T.Compose([
-            T.DecodeImg(), T.Normalize([0.5] * 10, [0.5] * 10),
-            T.ArrangeChangeDetector('test')
-        ])
+        self.transforms = T.Compose([T.Normalize([0.5] * 10, [0.5] * 10)])
         self.image_path = ("data/ssmt/multispectral_t1.tif",
                            "data/ssmt/multispectral_t2.tif")
         self.ref_path = self.image_path[0]

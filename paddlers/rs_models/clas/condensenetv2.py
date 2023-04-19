@@ -287,6 +287,30 @@ class _Transition(nn.Layer):
 
 
 class CondenseNetV2(nn.Layer):
+    """
+    The CondenseNetV2 implementation based on PaddlePaddle.
+
+    The original article refers to
+        Yang L, Jiang H, Cai R, et al. "Condensenet v2: Sparse feature reactivation for deep networks"
+            (https://arxiv.org/abs/2104.04382)
+
+    Args:
+        stages (list[int]): Lists the number of stages containing Dense blocks.
+        growth (list[int]): Contains a list of the output channels of the convolutional layer in the Dense Block.
+        HS_start_block (int): Which Dense Block starts with the initial bangs (Hard-Swish) activation function.
+        SE_start_block (int): Which Dense Block to start with is the Squeeze-and-Excitation (SE) module.
+        fc_channel (int): Indicates the number of output channels of the full connection layer.
+        group_1x1 (int): Indicates the number of groups in the 1x1 convolution layer.
+        group_3x3 (int): Number of groups of 3x3 convolution layers.
+        group_trans (int): The number of groups of 1x1 convolution layers in the Transition Layer.
+        bottleneck (bool): Specifies whether to use a bottleneck structure in the Dense Block, which means that a 1x1
+            convolution layer is used to reduce the number of input channels, and then 3x3 convolution is done.
+        last_se_reduction (int): Indicates the proportion of channel reduction in SE module in the last Dense Block.
+        in_channels (int): Indicates the number of channels to input the image. The default value is 3, which represents
+            an RGB image.
+        class_num (int) : Indicates the number of categories of a class task.
+    """
+
     def __init__(
             self,
             stages,

@@ -29,6 +29,7 @@ from paddlers.models import clas_losses
 from paddlers.models.ppcls.data.postprocess import build_postprocess
 from paddlers.utils.checkpoint import cls_pretrain_weights_dict
 from paddlers.transforms import Resize, decode_image, construct_sample
+
 from .base import BaseModel
 
 __all__ = ["ResNet50_vd", "MobileNetV3", "HRNet", "CondenseNetV2"]
@@ -118,13 +119,13 @@ class BaseClassifier(BaseModel):
         return input_spec
 
     def run(self, net, inputs, mode):
-        net_out = net(inputs[0])
+        net_out = net(inputs['image'])
 
         if mode == 'test':
             return self.postprocess(net_out)
 
         outputs = OrderedDict()
-        label = paddle.to_tensor(inputs[1], dtype="int64")
+        label = paddle.to_tensor(inputs['label'], dtype="int64")
 
         if mode == 'eval':
             label = paddle.unsqueeze(label, axis=-1)
@@ -380,7 +381,7 @@ class BaseClassifier(BaseModel):
                  "top5": acc of top5}.
         """
 
-        self._check_transforms(eval_dataset.transforms, 'eval')
+        self._check_transforms(eval_dataset.transforms)
 
         self.net.eval()
         nranks = paddle.distributed.get_world_size()
@@ -408,7 +409,6 @@ class BaseClassifier(BaseModel):
             top5s = []
             with paddle.no_grad():
                 for step, data in enumerate(self.eval_data_loader):
-                    data.append(eval_dataset.transforms.transforms)
                     outputs = self.run(self.net, data, 'eval')
                     top1s.append(outputs["top1"])
                     top5s.append(outputs["top5"])
@@ -480,28 +480,21 @@ class BaseClassifier(BaseModel):
         return prediction
 
     def preprocess(self, images, transforms, to_tensor=True):
-        self._check_transforms(transforms, 'test')
+        self._check_transforms(transforms)
         batch_im = list()
         for im in images:
             if isinstance(im, str):
                 im = decode_image(im, read_raw=True)
             sample = construct_sample(image=im)
             data = transforms(sample)
-            im = data[0][0]
+            im = data[0]['image']
             batch_im.append(im)
         if to_tensor:
             batch_im = paddle.to_tensor(batch_im)
         else:
             batch_im = np.asarray(batch_im)
 
-        return batch_im, None
-
-    def _check_transforms(self, transforms, mode):
-        super()._check_transforms(transforms, mode)
-        if not isinstance(transforms.arrange,
-                          paddlers.transforms.ArrangeClassifier):
-            raise TypeError(
-                "`transforms.arrange` must be an ArrangeClassifier object.")
+        return {'image': batch_im}, None
 
     def build_data_loader(self,
                           dataset,

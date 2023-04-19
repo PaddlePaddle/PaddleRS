@@ -1,3 +1,5 @@
+简体中文 | [English](tools_en.md)
+
 # 遥感影像处理工具集
 
 PaddleRS在`tools`目录中提供了丰富的遥感影像处理工具，包括：
@@ -66,15 +68,15 @@ python geojson2mask.py --srcimg_path {带有地理信息的原始影像路径} -
 `match.py`的主要功能是在对两个时相的遥感影像进行空间配准。使用方式如下：
 
 ```shell
-python match.py --im1_path [时相1影像路径] --im2_path [时相2影像路径] --save_path [配准后时相2影像输出路径] [--im1_bands 1 2 3] [--im2_bands 1 2 3]
+python match.py --im1_path {时相1影像路径} --im2_path {时相2影像路径} --save_path {配准后时相2影像输出路径} [--im1_bands 1 2 3] [--im2_bands 1 2 3]
 ```
 
 其中：
 
 - `im1_path`：时相1影像路径。该影像必须包含地理信息，且配准过程中以该影像为基准影像。
 - `im2_path`：时相2影像路径。该影像的地理信息将不被用到。配准过程中将该影像配准到时相1影像。
-- `im1_bands`：时相1影像用于配准的波段，指定为三通道（分别代表R、G、B）或单通道，默认为[1, 2, 3]。
-- `im2_bands`：时相2影像用于配准的波段，指定为三通道（分别代表R、G、B）或单通道，默认为[1, 2, 3]。
+- `im1_bands`：时相1影像用于配准的波段，指定为三通道（分别代表R、G、B）或单通道，默认为`[1, 2, 3]`。
+- `im2_bands`：时相2影像用于配准的波段，指定为三通道（分别代表R、G、B）或单通道，默认为`[1, 2, 3]`。
 - `save_path`： 配准后时相2影像输出路径。
 
 ### split
@@ -89,7 +91,7 @@ python split.py --image_path {输入影像路径} [--mask_path {真值标签路�
 
 - `image_path`：需要切分的影像的路径。
 - `mask_path`：一同切分的标签影像路径，默认为`None`。
-- `block_size`：切分影像块大小，默认为512。
+- `block_size`：切分影像块大小，默认为`512`。
 - `save_dir`：保存切分后结果的文件夹路径，默认为`output`。
 
 ### coco_tools
@@ -103,7 +105,7 @@ python split.py --image_path {输入影像路径} [--mask_path {真值标签路�
 - `json_Split.py`：       将json文件中的内容划分为train set和val set；
 - `json_Merge.py`：       将多个json文件合并为一个。
 
-详细使用方法请参见[coco_tools使用说明](coco_tools.md)。
+详细使用方法请参见[coco_tools使用说明](coco_tools_cn.md)。
 
 ### prepare_dataset
 
@@ -124,7 +126,7 @@ python prepare_dataset/prepare_levircd.py --help
 - `--seed`：随机种子。可用于固定随机数生成器产生的伪随机数序列，从而得到固定的数据集划分结果。示例：`--seed 1919810`
 - `--ratios`：对于支持子集随机划分的数据集，指定需要划分的各个子集的样本比例。示例：`--ratios 0.7 0.2 0.1`。
 
-您可以在[此文档](https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/intro/data_prep.md)中查看PaddleRS提供哪些数据集的预处理脚本。
+您可以在[此文档](../intro/data_prep_cn.md)中查看PaddleRS提供哪些数据集的预处理脚本。
 
 ### extract_ms_patches
 

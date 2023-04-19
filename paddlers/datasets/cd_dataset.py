@@ -31,7 +31,7 @@ class CDDataset(BaseDataset):
             the change mask. When `with_seg_labels` is True, each line in the file contains the paths of the
             bi-temporal images, the path of the change mask, and the paths of the segmentation masks in both
             temporal phases.
-        transforms (paddlers.transforms.Compose): Data preprocessing and data augmentation operators to apply.
+        transforms (paddlers.transforms.Compose|list): Data preprocessing and data augmentation operators to apply.
         label_list (str|None, optional): Path of the file that contains the category names. Defaults to None.
         num_workers (int|str, optional): Number of processes used for data loading. If `num_workers` is 'auto',
             the number of workers will be automatically determined according to the number of CPU cores: If 
@@ -44,6 +44,7 @@ class CDDataset(BaseDataset):
             Defaults to False.
     """
 
+    _KEYS_TO_KEEP = ['image', 'image2', 'mask', 'aux_masks']
     _collate_trans_info = True
 
     def __init__(self,
@@ -132,7 +133,7 @@ class CDDataset(BaseDataset):
     def __getitem__(self, idx):
         sample = construct_sample_from_dict(self.file_list[idx])
         sample['trans_info'] = []
-        sample = self.transforms.apply_transforms(sample)
+        sample, trans_info = self.transforms(sample)
 
         if self.binarize_labels:
             # Requires 'mask' to exist
@@ -141,9 +142,7 @@ class CDDataset(BaseDataset):
                 sample['aux_masks'] = list(
                     map(self._binarize, sample['aux_masks']))
 
-        outputs = self.transforms.arrange_outputs(sample)
-
-        return outputs, sample['trans_info']
+        return sample, trans_info
 
     def __len__(self):
         return len(self.file_list)

@@ -29,6 +29,7 @@ from paddleslim.analysis import flops
 from paddleslim import L1NormFilterPruner, FPGMFilterPruner
 
 import paddlers
+from paddlers.transforms.operators import Compose
 import paddlers.utils.logging as logging
 from paddlers.utils import (
     seconds_to_hms, get_single_card_bs, dict2str, get_pretrain_weights,
@@ -61,7 +62,6 @@ class ModelMeta(type):
 
 
 class BaseModel(metaclass=ModelMeta):
-
     find_unused_parameters = False
 
     def __init__(self, model_type):
@@ -95,12 +95,13 @@ class BaseModel(metaclass=ModelMeta):
                        resume_checkpoint=None,
                        is_backbone_weights=False,
                        load_optim_state=True):
+        # FIXME: Multi-process race?
         if pretrain_weights is not None and \
                 not osp.exists(pretrain_weights):
             if not osp.isdir(save_dir):
                 if osp.exists(save_dir):
                     os.remove(save_dir)
-                os.makedirs(save_dir)
+                os.makedirs(save_dir, exist_ok=True)
             # XXX: Hard-coding
             if self.model_type == 'classifier':
                 pretrain_weights = get_pretrain_weights(
@@ -204,13 +205,6 @@ class BaseModel(metaclass=ModelMeta):
                     else:
                         attr = op.__dict__
                     info['Transforms'].append({name: attr})
-                arrange = self.test_transforms.arrange
-                if arrange is not None:
-                    info['Transforms'].append({
-                        arrange.__class__.__name__: {
-                            'mode': 'test'
-                        }
-                    })
         info['completed_epochs'] = self.completed_epochs
         return info
 
@@ -236,8 +230,9 @@ class BaseModel(metaclass=ModelMeta):
         model_info['status'] = self.status
 
         paddle.save(self.net.state_dict(), osp.join(save_dir, 'model.pdparams'))
-        paddle.save(self.optimizer.state_dict(),
-                    osp.join(save_dir, 'model.pdopt'))
+        if self.optimizer is not None:
+            paddle.save(self.optimizer.state_dict(),
+                        osp.join(save_dir, 'model.pdopt'))
 
         with open(
                 osp.join(save_dir, 'model.yml'), encoding='utf-8',
@@ -315,7 +310,7 @@ class BaseModel(metaclass=ModelMeta):
                    early_stop=False,
                    early_stop_patience=5,
                    use_vdl=True):
-        self._check_transforms(train_dataset.transforms, 'train')
+        self._check_transforms(train_dataset.transforms)
 
         # XXX: Hard-coding
         if self.model_type == 'detector' and 'RCNN' in self.__class__.__name__ and train_dataset.pos_num < len(
@@ -343,7 +338,7 @@ class BaseModel(metaclass=ModelMeta):
             log_writer = LogWriter(vdl_logdir)
 
         # task_id: refer to paddlers
-        task_id = getattr(paddlers, "task_id", "")
+        task_id = getattr(paddlers, 'task_id', '')
 
         thresh = .0001
         if early_stop:
@@ -493,7 +488,7 @@ class BaseModel(metaclass=ModelMeta):
 
         assert criterion in {'l1_norm', 'fpgm'}, \
             "Pruning criterion {} is not supported. Please choose from {'l1_norm', 'fpgm'}."
-        self._check_transforms(dataset.transforms, 'eval')
+        self._check_transforms(dataset.transforms)
         # XXX: Hard-coding
         if self.model_type == 'detector':
             self.net.eval()
@@ -525,7 +520,7 @@ class BaseModel(metaclass=ModelMeta):
                 saved. Otherwise, the pruned model will be saved at `save_dir`. 
                 Defaults to None.
         """
-        if self.status == "Pruned":
+        if self.status == 'Pruned':
             raise ValueError(
                 "A pruned model cannot be pruned for a second time!")
         pre_pruning_flops = flops(self.net, self.pruner.inputs)
@@ -618,8 +613,8 @@ class BaseModel(metaclass=ModelMeta):
                 "type": "Sink"
             }
         }]
-        pipeline_info["pipeline_nodes"] = nodes
-        pipeline_info["version"] = "1.0.0"
+        pipeline_info['pipeline_nodes'] = nodes
+        pipeline_info['version'] = '1.0.0'
         return pipeline_info
 
     def _build_inference_net(self):
@@ -681,17 +676,11 @@ class BaseModel(metaclass=ModelMeta):
 
         return outputs
 
-    def _check_transforms(self, transforms, mode):
-        # NOTE: Check transforms and transforms.arrange and give user-friendly error messages.
-        if not isinstance(transforms, paddlers.transforms.Compose):
-            raise TypeError("`transforms` must be paddlers.transforms.Compose.")
-        arrange_obj = transforms.arrange
-        if not isinstance(arrange_obj, paddlers.transforms.operators.Arrange):
-            raise TypeError("`transforms.arrange` must be an Arrange object.")
-        if arrange_obj.mode != mode:
-            raise ValueError(
-                f"Incorrect arrange mode! Expected {mode} but got {arrange_obj.mode}."
-            )
+    def _check_transforms(self, transforms):
+        # NOTE: Check transforms
+        if not isinstance(transforms, Compose):
+            raise TypeError(
+                "`transforms` must be `paddlers.transforms.Compose`.")
 
     def run(self, net, inputs, mode):
         raise NotImplementedError

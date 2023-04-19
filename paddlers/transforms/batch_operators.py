@@ -15,17 +15,21 @@
 import traceback
 import random
 
-try:
-    from collections.abc import Sequence
-except Exception:
-    from collections import Sequence
-
 import numpy as np
 from paddle.fluid.dataloader.collate import default_collate_fn
 
 from .operators import Transform, Resize, ResizeByShort, _Permute, interp_dict
 from .box_utils import jaccard_overlap
 from paddlers.utils import logging
+
+
+class _IPermute(Transform):
+    def __init__(self):
+        super(_IPermute, self).__init__()
+
+    def apply_im(self, image):
+        image = np.moveaxis(image, 0, 2)
+        return image
 
 
 class BatchTransform(Transform):
@@ -39,6 +43,17 @@ class BatchCompose(BatchTransform):
         self.collate_batch = collate_batch
 
     def __call__(self, samples):
+        iperm_op = _IPermute()
+        perm_status_list = []
+        for i, sample in enumerate(samples):
+            permuted = sample.pop('permuted', False)
+            if permuted:
+                # If a sample is permuted, we apply the inverse-permute
+                # operator, such that it is possible to reuse non-batched data 
+                # transformation operators later.
+                samples[i] = iperm_op(sample)
+            perm_status_list.append(permuted)
+
         if self.batch_transforms is not None:
             for op in self.batch_transforms:
                 try:
@@ -50,7 +65,11 @@ class BatchCompose(BatchTransform):
                                         op, e, str(stack_info)))
                     raise e
 
-        samples = _Permute()(samples)
+        # Recover permutation status
+        perm_op = _Permute()
+        for i, permuted in enumerate(perm_status_list):
+            if permuted:
+                samples[i] = perm_op(samples[i])
 
 
         extra_key = ['h', 'w', 'flipped', 'trans_info']

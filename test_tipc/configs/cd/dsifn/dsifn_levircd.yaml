@@ -5,4 +5,4 @@ _base_: ../_base_/levircd.yaml
 save_dir: ./test_tipc/output/cd/dsifn/
 
 model: !Node
-    type: DSIFN
+  type: DSIFN
