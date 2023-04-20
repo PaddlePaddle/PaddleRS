@@ -21,7 +21,7 @@ import numpy as np
 import paddle
 import paddle.nn.functional as F
 
-from ppdet.core.workspace import register, serializable
+from paddlers.models.ppdet.core.workspace import register, serializable
 
 __all__ = ['ProbIoULoss']
 
