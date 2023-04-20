@@ -25,7 +25,7 @@ from paddlers.models.ppdet.core.workspace import register, serializable
 from numbers import Integral
 from ..shape_spec import ShapeSpec
 
-__all__ = ['MobileNet', 'MobileNetV1']
+__all__ = ['MobileNet']
 
 
 class ConvBNLayer(nn.Layer):
@@ -400,5 +400,3 @@ class MobileNet(nn.Layer):
     @property
     def out_shape(self):
         return [ShapeSpec(channels=c) for c in self._out_channels]
-
-MobileNetV1 = MobileNet

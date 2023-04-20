@@ -38,7 +38,7 @@ from paddlers.models.ppdet.optimizer import ModelEMA
 from paddlers.models.ppdet.core.workspace import create
 from paddlers.models.ppdet.utils.checkpoint import load_weight, load_pretrain_weight
 from paddlers.models.ppdet.utils.visualizer import visualize_results, save_result
-from paddlers.models.ppdet.metrics import Metric, COCOMetric, VOCMetric, WiderFaceMetric, get_infer_results, KeyPointTopDownCOCOEval, KeyPointTopDownMPIIEval
+from paddlers.models.ppdet.metrics import Metric, COCOMetric, VOCMetric, WiderFaceMetric, get_infer_results, KeyPointTopDownCOCOEval, KeyPointTopDownMPIIEval, Pose3DEval
 from paddlers.models.ppdet.metrics import RBoxMetric, JDEDetMetric, SNIPERCOCOMetric
 from paddlers.models.ppdet.data.source.sniper_coco import SniperCOCODataSet
 from paddlers.models.ppdet.data.source.category import get_categories
@@ -48,7 +48,7 @@ from paddlers.models.ppdet.utils import profiler
 from paddlers.models.ppdet.modeling.post_process import multiclass_nms
 
 from .callbacks import Callback, ComposeCallback, LogPrinter, Checkpointer, WiferFaceEval, VisualDLWriter, SniperProposalsGenerator, WandbCallback
-from .export_utils import _dump_infer_config, _prune_input_spec
+from .export_utils import _dump_infer_config, _prune_input_spec, apply_to_static
 
 from paddle.distributed.fleet.utils.hybrid_parallel_util import fused_allreduce_gradients
 
@@ -57,12 +57,12 @@ logger = setup_logger('ppdet.engine')
 
 __all__ = ['Trainer']
 
-MOT_ARCH = ['DeepSORT', 'JDE', 'FairMOT', 'ByteTrack']
+MOT_ARCH = ['JDE', 'FairMOT', 'DeepSORT', 'ByteTrack', 'CenterTrack']
 
 
 class Trainer(object):
     def __init__(self, cfg, mode='train'):
-        self.cfg = cfg
+        self.cfg = cfg.copy()
         assert mode.lower() in ['train', 'eval', 'test'], \
                 "mode should be 'train', 'eval' or 'test'"
         self.mode = mode.lower()
@@ -72,10 +72,14 @@ class Trainer(object):
         self.amp_level = self.cfg.get('amp_level', 'O1')
         self.custom_white_list = self.cfg.get('custom_white_list', None)
         self.custom_black_list = self.cfg.get('custom_black_list', None)
+        if 'slim' in cfg and cfg['slim_type'] == 'PTQ':
+            self.cfg['TestDataset'] = create('TestDataset')()
 
         # build data loader
         capital_mode = self.mode.capitalize()
-        if cfg.architecture in MOT_ARCH and self.mode in ['eval', 'test']:
+        if cfg.architecture in MOT_ARCH and self.mode in [
+                'eval', 'test'
+        ] and cfg.metric not in ['COCO', 'VOC']:
             self.dataset = self.cfg['{}MOTDataset'.format(
                 capital_mode)] = create('{}MOTDataset'.format(capital_mode))()
         else:
@@ -95,12 +99,12 @@ class Trainer(object):
                 self.dataset, cfg.worker_num)
 
         if cfg.architecture == 'JDE' and self.mode == 'train':
-            cfg['JDEEmbeddingHead'][
+            self.cfg['JDEEmbeddingHead'][
                 'num_identities'] = self.dataset.num_identities_dict[0]
             # JDE only support single class MOT now.
 
         if cfg.architecture == 'FairMOT' and self.mode == 'train':
-            cfg['FairMOTEmbeddingHead'][
+            self.cfg['FairMOTEmbeddingHead'][
                 'num_identities_dict'] = self.dataset.num_identities_dict
             # FairMOT support single class and multi-class MOT now.
 
@@ -136,16 +140,29 @@ class Trainer(object):
         if self.mode == 'eval':
             if cfg.architecture == 'FairMOT':
                 self.loader = create('EvalMOTReader')(self.dataset, 0)
+            elif cfg.architecture == "METRO_Body":
+                reader_name = '{}Reader'.format(self.mode.capitalize())
+                self.loader = create(reader_name)(self.dataset, cfg.worker_num)
             else:
                 self._eval_batch_sampler = paddle.io.BatchSampler(
                     self.dataset, batch_size=self.cfg.EvalReader['batch_size'])
                 reader_name = '{}Reader'.format(self.mode.capitalize())
                 # If metric is VOC, need to be set collate_batch=False.
                 if cfg.metric == 'VOC':
-                    cfg[reader_name]['collate_batch'] = False
+                    self.cfg[reader_name]['collate_batch'] = False
                 self.loader = create(reader_name)(self.dataset, cfg.worker_num,
                                                   self._eval_batch_sampler)
         # TestDataset build after user set images, skip loader creation here
+
+        # get Params
+        print_params = self.cfg.get('print_params', False)
+        if print_params:
+            params = sum([
+                p.numel() for n, p in self.model.named_parameters()
+                if all([x not in n for x in ['_mean', '_variance', 'aux_']])
+            ])  # exclude BatchNorm running status
+            logger.info('Model Params : {} M.'.format((params / 1e6).numpy()[
+                0]))
 
         # build optimizer in train mode
         if self.mode == 'train':
@@ -172,12 +189,14 @@ class Trainer(object):
             ema_decay_type = self.cfg.get('ema_decay_type', 'threshold')
             cycle_epoch = self.cfg.get('cycle_epoch', -1)
             ema_black_list = self.cfg.get('ema_black_list', None)
+            ema_filter_no_grad = self.cfg.get('ema_filter_no_grad', False)
             self.ema = ModelEMA(
                 self.model,
                 decay=ema_decay,
                 ema_decay_type=ema_decay_type,
                 cycle_epoch=cycle_epoch,
-                ema_black_list=ema_black_list)
+                ema_black_list=ema_black_list,
+                ema_filter_no_grad=ema_filter_no_grad)
 
         self._nranks = dist.get_world_size()
         self._local_rank = dist.get_rank()
@@ -342,6 +361,13 @@ class Trainer(object):
                     self.cfg.save_dir,
                     save_prediction_only=save_prediction_only)
             ]
+        elif self.cfg.metric == 'Pose3DEval':
+            save_prediction_only = self.cfg.get('save_prediction_only', False)
+            self._metrics = [
+                Pose3DEval(
+                    self.cfg.save_dir,
+                    save_prediction_only=save_prediction_only)
+            ]
         elif self.cfg.metric == 'MOTDet':
             self._metrics = [JDEDetMetric(), ]
         else:
@@ -378,7 +404,8 @@ class Trainer(object):
     def load_weights_sde(self, det_weights, reid_weights):
         if self.model.detector:
             load_weight(self.model.detector, det_weights)
-            load_weight(self.model.reid, reid_weights)
+            if self.model.reid:
+                load_weight(self.model.reid, reid_weights)
         else:
             load_weight(self.model.reid, reid_weights)
 
@@ -400,15 +427,19 @@ class Trainer(object):
                 "EvalDataset")()
 
         model = self.model
-        sync_bn = (getattr(self.cfg, 'norm_type', None) == 'sync_bn' and
-                   self.cfg.use_gpu and self._nranks > 1)
+        if self.cfg.get('to_static', False):
+            model = apply_to_static(self.cfg, model)
+        sync_bn = (
+            getattr(self.cfg, 'norm_type', None) == 'sync_bn' and
+            (self.cfg.use_gpu or self.cfg.use_npu or self.cfg.use_mlu) and
+            self._nranks > 1)
         if sync_bn:
             model = paddle.nn.SyncBatchNorm.convert_sync_batchnorm(model)
 
         # enabel auto mixed precision mode
         if self.use_amp:
             scaler = paddle.amp.GradScaler(
-                enable=self.cfg.use_gpu or self.cfg.use_npu,
+                enable=self.cfg.use_gpu or self.cfg.use_npu or self.cfg.use_mlu,
                 init_loss_scaling=self.cfg.get('init_loss_scaling', 1024))
         # get distributed model
         if self.cfg.get('fleet', False):
@@ -463,7 +494,8 @@ class Trainer(object):
                             DataParallel) and use_fused_allreduce_gradients:
                         with model.no_sync():
                             with paddle.amp.auto_cast(
-                                    enable=self.cfg.use_gpu,
+                                    enable=self.cfg.use_gpu or
+                                    self.cfg.use_npu or self.cfg.use_mlu,
                                     custom_white_list=self.custom_white_list,
                                     custom_black_list=self.custom_black_list,
                                     level=self.amp_level):
@@ -477,7 +509,8 @@ class Trainer(object):
                             list(model.parameters()), None)
                     else:
                         with paddle.amp.auto_cast(
-                                enable=self.cfg.use_gpu,
+                                enable=self.cfg.use_gpu or self.cfg.use_npu or
+                                self.cfg.use_mlu,
                                 custom_white_list=self.custom_white_list,
                                 custom_black_list=self.custom_black_list,
                                 level=self.amp_level):
@@ -527,7 +560,7 @@ class Trainer(object):
             if self.cfg.get('unstructured_prune'):
                 self.pruner.update_params()
 
-            is_snapshot = (self._nranks < 2 or self._local_rank == 0) \
+            is_snapshot = (self._nranks < 2 or (self._local_rank == 0 or self.cfg.metric == "Pose3DEval")) \
                        and ((epoch_id + 1) % self.cfg.snapshot_epoch == 0 or epoch_id == self.end_epoch - 1)
             if is_snapshot and self.use_ema:
                 # apply ema weight on model
@@ -548,10 +581,14 @@ class Trainer(object):
                     # If metric is VOC, need to be set collate_batch=False.
                     if self.cfg.metric == 'VOC':
                         self.cfg['EvalReader']['collate_batch'] = False
-                    self._eval_loader = create('EvalReader')(
-                        self._eval_dataset,
-                        self.cfg.worker_num,
-                        batch_sampler=self._eval_batch_sampler)
+                    if self.cfg.metric == "Pose3DEval":
+                        self._eval_loader = create('EvalReader')(
+                            self._eval_dataset, self.cfg.worker_num)
+                    else:
+                        self._eval_loader = create('EvalReader')(
+                            self._eval_dataset,
+                            self.cfg.worker_num,
+                            batch_sampler=self._eval_batch_sampler)
                 # if validation in training is enabled, metrics should be re-init
                 # Init_mark makes sure this code will only execute once
                 if validate and Init_mark == False:
@@ -575,6 +612,7 @@ class Trainer(object):
         tic = time.time()
         self._compose_callback.on_epoch_begin(self.status)
         self.status['mode'] = 'eval'
+
         self.model.eval()
         if self.cfg.get('print_flops', False):
             flops_loader = create('{}Reader'.format(self.mode.capitalize()))(
@@ -586,7 +624,8 @@ class Trainer(object):
             # forward
             if self.use_amp:
                 with paddle.amp.auto_cast(
-                        enable=self.cfg.use_gpu,
+                        enable=self.cfg.use_gpu or self.cfg.use_npu or
+                        self.cfg.use_mlu,
                         custom_white_list=self.custom_white_list,
                         custom_black_list=self.custom_black_list,
                         level=self.amp_level):
@@ -617,6 +656,15 @@ class Trainer(object):
         self._reset_metrics()
 
     def evaluate(self):
+        # get distributed model
+        if self.cfg.get('fleet', False):
+            self.model = fleet.distributed_model(self.model)
+            self.optimizer = fleet.distributed_optimizer(self.optimizer)
+        elif self._nranks > 1:
+            find_unused_parameters = self.cfg[
+                'find_unused_parameters'] if 'find_unused_parameters' in self.cfg else False
+            self.model = paddle.DataParallel(
+                self.model, find_unused_parameters=find_unused_parameters)
         with paddle.no_grad():
             self._eval_with_loader(self.loader)
 
@@ -644,7 +692,8 @@ class Trainer(object):
             # forward
             if self.use_amp:
                 with paddle.amp.auto_cast(
-                        enable=self.cfg.use_gpu,
+                        enable=self.cfg.use_gpu or self.cfg.use_npu or
+                        self.cfg.use_mlu,
                         custom_white_list=self.custom_white_list,
                         custom_black_list=self.custom_black_list,
                         level=self.amp_level):
@@ -722,10 +771,50 @@ class Trainer(object):
                       output_dir='output',
                       save_results=False,
                       visualize=True):
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+
         self.dataset.set_slice_images(images, slice_size, overlap_ratio)
         loader = create('TestReader')(self.dataset, 0)
-
         imid2path = self.dataset.get_imid2path()
+
+        def setup_metrics_for_loader():
+            # mem
+            metrics = copy.deepcopy(self._metrics)
+            mode = self.mode
+            save_prediction_only = self.cfg[
+                'save_prediction_only'] if 'save_prediction_only' in self.cfg else None
+            output_eval = self.cfg[
+                'output_eval'] if 'output_eval' in self.cfg else None
+
+            # modify
+            self.mode = '_test'
+            self.cfg['save_prediction_only'] = True
+            self.cfg['output_eval'] = output_dir
+            self.cfg['imid2path'] = imid2path
+            self._init_metrics()
+
+            # restore
+            self.mode = mode
+            self.cfg.pop('save_prediction_only')
+            if save_prediction_only is not None:
+                self.cfg['save_prediction_only'] = save_prediction_only
+
+            self.cfg.pop('output_eval')
+            if output_eval is not None:
+                self.cfg['output_eval'] = output_eval
+
+            self.cfg.pop('imid2path')
+
+            _metrics = copy.deepcopy(self._metrics)
+            self._metrics = metrics
+
+            return _metrics
+
+        if save_results:
+            metrics = setup_metrics_for_loader()
+        else:
+            metrics = []
 
         anno_file = self.dataset.get_anno()
         clsid2catid, catid2name = get_categories(
@@ -772,6 +861,9 @@ class Trainer(object):
                 merged_bboxs = []
                 data['im_id'] = data['ori_im_id']
 
+                for _m in metrics:
+                    _m.update(data, merged_results)
+
                 for key in ['im_shape', 'scale_factor', 'im_id']:
                     if isinstance(data, typing.Sequence):
                         merged_results[key] = data[0][key]
@@ -782,23 +874,36 @@ class Trainer(object):
                         merged_results[key] = value.numpy()
                 results.append(merged_results)
 
+        for _m in metrics:
+            _m.accumulate()
+            _m.reset()
+
         if visualize:
             for outs in results:
                 batch_res = get_infer_results(outs, clsid2catid)
                 bbox_num = outs['bbox_num']
+
                 start = 0
                 for i, im_id in enumerate(outs['im_id']):
                     image_path = imid2path[int(im_id)]
                     image = Image.open(image_path).convert('RGB')
                     image = ImageOps.exif_transpose(image)
                     self.status['original_image'] = np.array(image.copy())
+
                     end = start + bbox_num[i]
                     bbox_res = batch_res['bbox'][start:end] \
                             if 'bbox' in batch_res else None
-                    mask_res, segm_res, keypoint_res = None, None, None
+                    mask_res = batch_res['mask'][start:end] \
+                            if 'mask' in batch_res else None
+                    segm_res = batch_res['segm'][start:end] \
+                            if 'segm' in batch_res else None
+                    keypoint_res = batch_res['keypoint'][start:end] \
+                            if 'keypoint' in batch_res else None
+                    pose3d_res = batch_res['pose3d'][start:end] \
+                            if 'pose3d' in batch_res else None
                     image = visualize_results(
                         image, bbox_res, mask_res, segm_res, keypoint_res,
-                        int(im_id), catid2name, draw_threshold)
+                        pose3d_res, int(im_id), catid2name, draw_threshold)
                     self.status['result_image'] = np.array(image.copy())
                     if self._compose_callback:
                         self._compose_callback.on_step_end(self.status)
@@ -808,6 +913,7 @@ class Trainer(object):
                     logger.info("Detection bbox results save in {}".format(
                         save_name))
                     image.save(save_name, quality=95)
+
                     start = end
 
     def predict(self,
@@ -921,9 +1027,11 @@ class Trainer(object):
                             if 'segm' in batch_res else None
                     keypoint_res = batch_res['keypoint'][start:end] \
                             if 'keypoint' in batch_res else None
+                    pose3d_res = batch_res['pose3d'][start:end] \
+                            if 'pose3d' in batch_res else None
                     image = visualize_results(
                         image, bbox_res, mask_res, segm_res, keypoint_res,
-                        int(im_id), catid2name, draw_threshold)
+                        pose3d_res, int(im_id), catid2name, draw_threshold)
                     self.status['result_image'] = np.array(image.copy())
                     if self._compose_callback:
                         self._compose_callback.on_step_end(self.status)
@@ -935,6 +1043,7 @@ class Trainer(object):
                     image.save(save_name, quality=95)
 
                     start = end
+        return results
 
     def _get_save_image_name(self, output_dir, image_path):
         """
@@ -975,6 +1084,10 @@ class Trainer(object):
             for layer in self.model.sublayers():
                 if hasattr(layer, 'convert_to_deploy'):
                     layer.convert_to_deploy()
+
+        if hasattr(self.cfg, 'export') and 'fuse_conv_bn' in self.cfg[
+                'export'] and self.cfg['export']['fuse_conv_bn']:
+            self.model = fuse_conv_bn(self.model)
 
         export_post_process = self.cfg['export'].get(
             'post_process', False) if hasattr(self.cfg, 'export') else True
@@ -1045,11 +1158,11 @@ class Trainer(object):
         return static_model, pruned_input_spec
 
     def export(self, output_dir='output_inference'):
+        if hasattr(self.model, 'aux_neck'):
+            self.model.__delattr__('aux_neck')
+        if hasattr(self.model, 'aux_head'):
+            self.model.__delattr__('aux_head')
         self.model.eval()
-
-        if hasattr(self.cfg, 'export') and 'fuse_conv_bn' in self.cfg[
-                'export'] and self.cfg['export']['fuse_conv_bn']:
-            self.model = fuse_conv_bn(self.model)
 
         model_name = os.path.splitext(os.path.split(self.cfg.filename)[-1])[0]
         save_dir = os.path.join(output_dir, model_name)
@@ -1095,6 +1208,10 @@ class Trainer(object):
         logger.info("Export Post-Quant model and saved in {}".format(save_dir))
 
     def _flops(self, loader):
+        if hasattr(self.model, 'aux_neck'):
+            self.model.__delattr__('aux_neck')
+        if hasattr(self.model, 'aux_head'):
+            self.model.__delattr__('aux_head')
         self.model.eval()
         try:
             import paddleslim

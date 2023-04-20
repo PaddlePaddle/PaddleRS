@@ -20,7 +20,9 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 from paddle import ParamAttr
-from paddle.nn import Conv2D, MaxPool2D, AdaptiveAvgPool2D
+from paddle.nn import Conv2D, MaxPool2D, AdaptiveAvgPool2D, BatchNorm
+from paddle.nn.initializer import KaimingNormal
+from paddle.regularizer import L2Decay
 
 from paddlers.models.ppdet.core.workspace import register, serializable
 from numbers import Integral
@@ -286,29 +288,3 @@ class ESNet(nn.Layer):
     @property
     def out_shape(self):
         return [ShapeSpec(channels=c) for c in self._out_channels]
-
-def ESNet_s():
-    return ESNet(scale=0.75,
-                 act="hard_swish",
-                 feature_maps=[4, 11, 14],
-                 channel_ratio=[
-                    0.875, 0.5, 0.5, 0.5, 0.625, 0.5, 0.625, 0.5, 0.5, 0.5,
-                    0.5, 0.5, 0.5])
-
-
-def ESNet_m():
-    return ESNet(scale=1.0,
-                 act="hard_swish",
-                 feature_maps=[4, 11, 14],
-                 channel_ratio=[
-                        0.875, 0.5, 1.0, 0.625, 0.5, 0.75, 0.625, 0.625, 0.5,
-                        0.625, 1.0, 0.625, 0.75])
-
-
-def ESNet_l():
-    return ESNet(scale=1.25,
-                 act="hard_swish",
-                 feature_maps=[4, 11, 14],
-                 channel_ratio=[
-                        0.875, 0.5, 1.0, 0.625, 0.5, 0.75, 0.625, 0.625, 0.5,
-                        0.625, 1.0, 0.625, 0.75])

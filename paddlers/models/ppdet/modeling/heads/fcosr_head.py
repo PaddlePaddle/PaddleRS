@@ -22,7 +22,9 @@ from paddle.regularizer import L2Decay
 from .fcos_head import ScaleReg
 from ..initializer import bias_init_with_prob, constant_, normal_
 from ..ops import get_act_fn, anchor_generator
+from ..rbox_utils import box2corners
 from ..losses import ProbIoULoss
+import numpy as np
 
 __all__ = ['FCOSRHead']
 

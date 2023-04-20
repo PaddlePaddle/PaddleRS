@@ -33,7 +33,6 @@ import paddlers.utils.logging as logging
 from paddlers.utils.checkpoint import det_pretrain_weights_dict
 from .base import BaseModel
 from .utils.det_metrics import VOCMetric, COCOMetric
-from paddlers.models.ppdet.core.workspace import global_config
 
 __all__ = [
     "YOLOv3", "FasterRCNN", "PPYOLO", "PPYOLOTiny", "PPYOLOv2", "MaskRCNN"
@@ -41,6 +40,9 @@ __all__ = [
 
 # TODO: Prune and decoupling
 
+
+
+ppdet.modeling.MobileNetV1 = ppdet.modeling.MobileNet
 
 class BaseDetector(BaseModel):
     data_fields = {
@@ -119,14 +121,41 @@ class BaseDetector(BaseModel):
     def _get_backbone(self, backbone_name, **params):
         # parse ResNetxx_xx
         if backbone_name.startswith('ResNet'):
-            name = backbone_name.split('_')
+            names = backbone_name.split('_')
             fixed_kwargs = {}
-            depth = name[0]
+            depth = names[0]
             fixed_kwargs['depth'] = int(depth[6:])
-            if len(name) > 1:
-                fixed_kwargs['variant'] = name[1]
+            if len(names) > 1:
+                fixed_kwargs['variant'] = names[1]
             backbone = getattr(ppdet.modeling, 'ResNet')
             backbone = functools.partial(backbone, **fixed_kwargs)
+        # parse HRNet_Wxx
+        elif backbone_name.startswith('HRNet'):
+            names = backbone_name.split('_')
+            depth = names[1]
+            fixed_kwargs = {'width': int(depth[1:])}
+            backbone = getattr(ppdet.modeling, 'HRNet')
+            backbone = functools.partial(backbone, **fixed_kwargs)
+        elif backbone_name.startswith('ESNet'):
+            cfgs = {'ESNet_m' : dict(scale=0.75,
+                 act="hard_swish",
+                 feature_maps=[4, 11, 14],
+                 channel_ratio=[
+                    0.875, 0.5, 0.5, 0.5, 0.625, 0.5, 0.625, 0.5, 0.5, 0.5,
+                    0.5, 0.5, 0.5]),
+                'ESNet_s': dict(scale=1.0,
+                 act="hard_swish",
+                 feature_maps=[4, 11, 14],
+                 channel_ratio=[
+                        0.875, 0.5, 1.0, 0.625, 0.5, 0.75, 0.625, 0.625, 0.5,
+                        0.625, 1.0, 0.625, 0.75]),
+                'ESNet_l': dict(scale=1.25,
+                     act="hard_swish",
+                     feature_maps=[4, 11, 14],
+                     channel_ratio=[
+                            0.875, 0.5, 1.0, 0.625, 0.5, 0.75, 0.625, 0.625, 0.5,
+                            0.625, 1.0, 0.625, 0.75])}
+            backbone = functools.partial(ppdet.modeling.ESNet, **cfgs[backbone_name])
         else:
             backbone = getattr(ppdet.modeling, backbone_name)
 
@@ -976,7 +1005,6 @@ class YOLOv3(BaseDetector):
                  rotate=False,
                  num_classes=80,
                  backbone='MobileNetV1',
-                 post_process=None,
                  anchors=[[10, 13], [16, 30], [33, 23], [30, 61], [62, 45],
                           [59, 119], [116, 90], [156, 198], [373, 326]],
                  anchor_masks=[[6, 7, 8], [3, 4, 5], [0, 1, 2]],
@@ -1462,25 +1490,20 @@ class PPYOLO(YOLOv3):
 
             if backbone == 'ResNet50_vd_dcn':
                 backbone = self._get_backbone(
-                    'ResNet',
-                    variant='d',
+                    backbone,
                     norm_type=norm_type,
                     return_idx=[1, 2, 3],
                     dcn_v2_stages=[3],
                     freeze_at=-1,
-                    freeze_norm=False,
-                    norm_decay=0.)
+                    freeze_norm=False)
 
             elif backbone == 'ResNet18_vd':
                 backbone = self._get_backbone(
-                    'ResNet',
-                    depth=18,
-                    variant='d',
+                    backbone,
                     norm_type=norm_type,
                     return_idx=[2, 3],
                     freeze_at=-1,
-                    freeze_norm=False,
-                    norm_decay=0.)
+                    freeze_norm=False)
 
             elif backbone == 'MobileNetV3_large':
                 backbone = self._get_backbone(
@@ -1610,7 +1633,6 @@ class PPYOLOTiny(YOLOv3):
                  nms_topk=1000,
                  nms_keep_topk=100,
                  nms_iou_threshold=0.45,
-                 nms_normalized=True,
                  **params):
         self.init_params = locals()
         if backbone != 'MobileNetV3':
@@ -1757,26 +1779,22 @@ class PPYOLOv2(YOLOv3):
 
             if backbone == 'ResNet50_vd_dcn':
                 backbone = self._get_backbone(
-                    'ResNet',
-                    variant='d',
+                    backbone,
                     norm_type=norm_type,
                     return_idx=[1, 2, 3],
                     dcn_v2_stages=[3],
                     freeze_at=-1,
-                    freeze_norm=False,
-                    norm_decay=0.)
+                    freeze_norm=False)
 
             elif backbone == 'ResNet101_vd_dcn':
                 backbone = self._get_backbone(
-                    'ResNet',
+                    backbone,
                     depth=101,
-                    variant='d',
                     norm_type=norm_type,
                     return_idx=[1, 2, 3],
                     dcn_v2_stages=[3],
                     freeze_at=-1,
-                    freeze_norm=False,
-                    norm_decay=0.)
+                    freeze_norm=False)
 
             neck = ppdet.modeling.PPYOLOPAN(
                 norm_type=norm_type,
@@ -1868,6 +1886,16 @@ class PPYOLOv2(YOLOv3):
 
 
 class MaskRCNN(BaseDetector):
+    data_fields = {
+            'coco': {
+                    'im_id', 'image_shape', 'image', 'gt_bbox', 'gt_class',
+                    'gt_poly', 'is_crowd'
+                },
+            'voc': {
+                'im_id', 'image_shape', 'image', 'gt_bbox', 'gt_class',
+                'difficult'
+                }
+            }
     def __init__(self,
                  num_classes=80,
                  backbone='ResNet50_vd',

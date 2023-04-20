@@ -22,7 +22,7 @@ import paddle.nn as nn
 import paddle.nn.functional as F
 
 from paddlers.models.ppdet.core.workspace import register
-from paddlers.transforms.rbox_utils import box2corners, check_points_in_polys, paddle_gather
+from paddlers.models.ppdet.modeling.rbox_utils import box2corners, check_points_in_polys, paddle_gather
 
 __all__ = ['FCOSRAssigner']
 
