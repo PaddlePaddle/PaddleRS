@@ -251,7 +251,7 @@ python ./coco_tools/json_anno_sta.py \
     --pic_pos_path=./anno_sta/annos_pos.png \
     --pic_pos_end_path=./anno_sta/annos_pos_end.png \
     --pic_cat_path=./anno_sta/annos_cat.png \
-    --pic_objNum_path=./anno_sta/annos_objNum.png \
+    --pic_obj_num_path=./anno_sta/annos_obj_num.png \
     --get_relative=True
 ```
 
@@ -267,7 +267,7 @@ python ./coco_tools/json_anno_sta.py \
 | `--pic_pos_path`       | (Optional) .png image saving path. The image visualizes the two-dimensional distribution of the coordinates at the upper left corner of all bounding boxes.                                                                                                                             | `None`          |
 | `--pic_pos_end_path`   | (Optional) .png image saving path. The image visualizes the two-dimensional distribution of the coordinates at the lower right corner of all bounding boxes.                                                                                                                            | `None`          |
 | `--pic_cat_path`       | (Optional) .png image saving path. The image visualizes the quantity distribution of objects in each category.                                                                                                                                                                          | `None`          |
-| `--pic_objNum_path`    | (Optional) .png image saving path. The image visualizes the quantity distribution of annotated objects in a single image.                                                                                                                                                               | `None`          |
+| `--pic_obj_num_path`   | (Optional) .png image saving path. The image visualizes the quantity distribution of annotated objects in a single image.                                                                                                                                                               | `None`          |
 | `--get_relative`       | (Optional) Whether to generate the shape of the image target detection frame and the relative ratio of the coordinates of the upper left corner and lower right corner of the object detection frame (horizontal axis coordinates/image length, vertical axis coordinates/image width). | `False`         |
 | `--image_keyname`      | (Optional) Image key in the json file.                                                                                                                                                                                                                                                  | `'images'`      |
 | `--anno_keyname`       | (Optional) Annotation key in the json file.                                                                                                                                                                                                                                             | `'annotations'` |
@@ -285,7 +285,7 @@ pic_shape_rate_path = ./anno_sta/annos_shape_rate.png
 pic_pos_path = ./anno_sta/annos_pos.png
 pic_pos_end_path = ./anno_sta/annos_pos_end.png
 pic_cat_path = ./anno_sta/annos_cat.png
-pic_objNum_path = ./anno_sta/annos_objNum.png
+pic_obj_num_path = ./anno_sta/annos_obj_num.png
 get_relative = True
 image_keyname = images
 anno_keyname = annotations
@@ -301,7 +301,7 @@ png save to ./anno_sta/annos_pos_Relative.png
 png save to ./anno_sta/annos_pos_end.png
 png save to ./anno_sta/annos_pos_end_Relative.png
 png save to ./anno_sta/annos_cat.png
-png save to ./anno_sta/annos_objNum.png
+png save to ./anno_sta/annos_obj_num.png
 csv save to ./anno_sta/annos.csv
 ```
 
@@ -454,7 +454,7 @@ python ./coco_tools/json_split.py \
 | `--json_val_path`    | Generated json file for the val set.                                                                 |                |
 | `--val_split_rate`   | (Optional) Proportion of files in the val set.                                                       | `0.1`          |
 | `--val_split_num`    | (Optional) Number of val set files. If this parameter is set,`--val_split_rate` will be invalidated. | `None`         |
-| `--keep_val_inTrain` | (Optional) Whether to keep the val set samples in the train set.                                     | `False`        |
+| `--keep_val_in_train`| (Optional) Whether to keep the val set samples in the train set.                                     | `False`        |
 | `--image_keyname`    | (Optional) Image key in the json file.                                                               | `'images'`     |
 | `--cat_keyname`      | (Optional) Category key in the json file.                                                            | `'categories'` |
 
@@ -469,7 +469,7 @@ json_train_path = ./instances_val2017_train.json
 json_val_path = ./instances_val2017_val.json
 val_split_rate = 0.1
 val_split_num = None
-keep_val_inTrain = False
+keep_val_in_train = False
 image_keyname = images
 anno_keyname = annotations
 

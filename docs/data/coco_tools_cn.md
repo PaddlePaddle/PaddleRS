@@ -251,7 +251,7 @@ python ./coco_tools/json_anno_sta.py \
     --pic_pos_path=./anno_sta/annos_pos.png \
     --pic_pos_end_path=./anno_sta/annos_pos_end.png \
     --pic_cat_path=./anno_sta/annos_cat.png \
-    --pic_objNum_path=./anno_sta/annos_objNum.png \
+    --pic_obj_num_path=./anno_sta/annos_obj_num.png \
     --get_relative=True
 ```
 
@@ -267,7 +267,7 @@ python ./coco_tools/json_anno_sta.py \
 | `--pic_pos_path`       | （可选）.png图片保存路径，图片内容为所有目标检测框左上角坐标的二维分布                                                    | `None`          |
 | `--pic_pos_end_path`   | （可选）.png图片保存路径，图片内容为所有目标检测框右下角坐标的二维分布                                                    | `None`          |
 | `--pic_cat_path`       | （可选）.png图片保存路径，图片内容为各个类别的对象数量分布                                                                | `None`          |
-| `--pic_objNum_path`    | （可选）.png图片保存路径，图片内容为单个图像中含有标注对象的数量分布                                                      | `None`          |
+| `--pic_obj_num_path`   | （可选）.png图片保存路径，图片内容为单个图像中含有标注对象的数量分布                                                      | `None`          |
 | `--get_relative`       | （可选）是否生成图像目标检测框shape、目标检测框左上角坐标、右下角坐标的相对比例值<br />(横轴坐标/图片长，纵轴坐标/图片宽) | `False`         |
 | `--image_keyname`      | （可选）json文件中，图像所对应的key                                                                                       | `'images'`      |
 | `--anno_keyname`       | （可选）json文件中，标注所对应的key                                                                                       | `'annotations'` |
@@ -285,7 +285,7 @@ pic_shape_rate_path = ./anno_sta/annos_shape_rate.png
 pic_pos_path = ./anno_sta/annos_pos.png
 pic_pos_end_path = ./anno_sta/annos_pos_end.png
 pic_cat_path = ./anno_sta/annos_cat.png
-pic_objNum_path = ./anno_sta/annos_objNum.png
+pic_obj_num_path = ./anno_sta/annos_obj_num.png
 get_relative = True
 image_keyname = images
 anno_keyname = annotations
@@ -301,7 +301,7 @@ png save to ./anno_sta/annos_pos_Relative.png
 png save to ./anno_sta/annos_pos_end.png
 png save to ./anno_sta/annos_pos_end_Relative.png
 png save to ./anno_sta/annos_cat.png
-png save to ./anno_sta/annos_objNum.png
+png save to ./anno_sta/annos_obj_num.png
 csv save to ./anno_sta/annos.csv
 ```
 
@@ -454,7 +454,7 @@ python ./coco_tools/json_split.py \
 | `--json_val_path`    | 生成的val部分json文件                                                                     |                |
 | `--val_split_rate`   | （可选）拆分过程中，val集文件的比例                                                       | `0.1`          |
 | `--val_split_num`    | （可选）拆分过程中，val集文件的数量，<br />如果设置了该参数，则`--val_split_rate`参数失效 | `None`         |
-| `--keep_val_inTrain` | （可选）拆分过程中，是否在train中仍然保留val部分                                          | `False`        |
+| `--keep_val_in_train`| （可选）拆分过程中，是否在train中仍然保留val部分                                          | `False`        |
 | `--image_keyname`    | （可选）json文件中，图像对应的key                                                         | `'images'`     |
 | `--cat_keyname`      | （可选）json文件中，类别对应的key                                                         | `'categories'` |
 
@@ -469,7 +469,7 @@ json_train_path = ./instances_val2017_train.json
 json_val_path = ./instances_val2017_val.json
 val_split_rate = 0.1
 val_split_num = None
-keep_val_inTrain = False
+keep_val_in_train = False
 image_keyname = images
 anno_keyname = annotations
 
