@@ -14,9 +14,9 @@
 
 import collections
 import copy
-import functools
 import os
 import os.path as osp
+import functools
 
 import numpy as np
 import paddle
@@ -24,19 +24,16 @@ from paddle.static import InputSpec
 
 import paddlers
 import paddlers.models.ppdet as ppdet
-import paddlers.utils.logging as logging
-from paddlers.models.ppdet.modeling.proposal_generator.target_layer import (
-    BBoxAssigner, MaskAssigner)
+from paddlers.models.ppdet.modeling.proposal_generator.target_layer import BBoxAssigner, MaskAssigner
+from paddlers.transforms import decode_image, construct_sample
+from paddlers.transforms.operators import _NormalizeBox, _PadBox, _BboxXYXY2XYWH, Resize, Pad
+from paddlers.transforms.batch_operators import BatchCompose, _BatchPad, _Gt2YoloTarget
 from paddlers.models.ppdet.optimizer import ModelEMA
-from paddlers.transforms import construct_sample, decode_image
-from paddlers.transforms.batch_operators import (BatchCompose, _BatchPad,
-                                                 _Gt2YoloTarget)
-from paddlers.transforms.operators import (Pad, Resize, _BboxXYXY2XYWH,
-                                           _NormalizeBox, _PadBox)
+import paddlers.utils.logging as logging
 from paddlers.utils.checkpoint import det_pretrain_weights_dict
-
 from .base import BaseModel
-from .utils.det_metrics import COCOMetric, VOCMetric
+from .utils.det_metrics import VOCMetric, COCOMetric
+from paddlers.models.ppdet.core.workspace import global_config
 
 __all__ = [
     "YOLOv3", "FasterRCNN", "PPYOLO", "PPYOLOTiny", "PPYOLOv2", "MaskRCNN"
@@ -44,13 +41,14 @@ __all__ = [
 
 # TODO: Prune and decoupling
 
+
 class BaseDetector(BaseModel):
     data_fields = {
-            'CocoDetection': {
+            'coco': {
                     'im_id', 'image_shape', 'image', 'gt_bbox', 'gt_class',
                     'is_crowd'
                 },
-            'VOCDetDataset': {
+            'voc': {
                 'im_id', 'image_shape', 'image', 'gt_bbox', 'gt_class',
                 'difficult'
                 }
@@ -71,17 +69,14 @@ class BaseDetector(BaseModel):
             params.pop('with_net', None)
             self.net = self.build_net(**params)
 
-    @classmethod
-    def set_data_fields(cls, data_name, data_fields):
-        cls.data_fields[data_name] = data_fields
-
     def build_net(self, **params):
         with paddle.utils.unique_name.guard():
             net = ppdet.modeling.__dict__[self.model_name](**params)
         return net
 
-    def build_modules(self, params):
-        pass
+    @classmethod
+    def set_data_fields(cls, data_name, data_fields):
+        cls.data_fields[data_name] = data_fields
 
     def _build_inference_net(self):
         infer_net = self.net
@@ -139,8 +134,6 @@ class BaseDetector(BaseModel):
         return backbone_module
 
     def run(self, net, inputs, mode):
-        if mode == 'eval' and 'gt_poly' in inputs:
-            del inputs['gt_poly']
         net_out = net(inputs)
         if mode in ['train', 'eval']:
             outputs = net_out
@@ -151,109 +144,87 @@ class BaseDetector(BaseModel):
 
         return outputs
 
-    def default_scheduler(self,                           
-                          scheduler=None,
-                          learning_rate=0.01,
-                          warmup_steps=0,
-                          warmup_start_lr=0.0,
-                          lr_decay_epochs=(216, 243),
-                          lr_decay_gamma=0.1,
-                          num_steps_each_epoch=None,
-                          num_epochs=None):
-        if isinstance(scheduler, str):
-            if scheduler.lower() == 'piecewise':
-                if num_steps_each_epoch is None:
-                    logging.error(
-                        "`num_steps_each_epoch` must be an integer",
-                        exit=False)
-                if warmup_steps > 0 and warmup_steps > lr_decay_epochs[
-                        0] * num_steps_each_epoch:
-                    logging.error(
-                        "In function train(), parameters must satisfy: "
-                        "warmup_steps <= lr_decay_epochs[0] * num_samples_in_train_dataset. "
-                        "See this doc for more information: "
-                        "https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/parameters.md",
-                        exit=False)
-                    logging.error(
-                        "Either `warmup_steps` be less than {} or lr_decay_epochs[0] be greater than {} "
-                        "must be satisfied, please modify 'warmup_steps' or 'lr_decay_epochs' in train function".
-                        format(lr_decay_epochs[0] * num_steps_each_epoch,
-                               warmup_steps // num_steps_each_epoch),
-                        exit=True)
-                boundaries = [b * num_steps_each_epoch for b in lr_decay_epochs]
-                values = [(lr_decay_gamma**i) * learning_rate
-                          for i in range(len(lr_decay_epochs) + 1)]
-                scheduler = paddle.optimizer.lr.PiecewiseDecay(boundaries, values)
-            elif scheduler.lower() == 'cosine':
-                if num_epochs is None:
-                    logging.error(
-                        "`num_epochs` must be set while using cosine annealing decay scheduler, but received {}".
-                        format(num_epochs),
-                        exit=False)
-                if warmup_steps > 0 and warmup_steps > num_epochs * num_steps_each_epoch:
-                    logging.error(
-                        "In function train(), parameters must satisfy: "
-                        "warmup_steps <= num_epochs * num_samples_in_train_dataset. "
-                        "See this doc for more information: "
-                        "https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/parameters.md",
-                        exit=False)
-                    logging.error(
-                        "`warmup_steps` must be less than the total number of steps({}), "
-                        "please modify 'num_epochs' or 'warmup_steps' in train function".
-                        format(num_epochs * num_steps_each_epoch),
-                        exit=True)
-                T_max = num_epochs * num_steps_each_epoch - warmup_steps
-                scheduler = paddle.optimizer.lr.CosineAnnealingDecay(
-                    learning_rate=learning_rate,
-                    T_max=T_max,
-                    eta_min=0.0,
-                    last_epoch=-1)
-            else:
-                logging.error(
-                    "Invalid learning rate scheduler: {}!".format(scheduler),
-                    exit=True)
-
-            if warmup_steps > 0:
-                scheduler = paddle.optimizer.lr.LinearWarmup(
-                    learning_rate=scheduler,
-                    warmup_steps=warmup_steps,
-                    start_lr=warmup_start_lr,
-                    end_lr=learning_rate)
-        elif isinstance(scheduler, paddle.optimizer.lr.LRScheduler):
-            self.scheduler = scheduler
-        else:
-            logging.error(
-                "lr scheduler must be `str` or `paddle.optimizer.lr.LRScheduler`, "
-                "but got {}".format(type(scheduler)),
-                exit=True)
-            
-
     def default_optimizer(self,
-                          optimizer=None,
-                          momentum=0.9,
+                          parameters,
+                          learning_rate,
+                          warmup_steps,
+                          warmup_start_lr,
+                          lr_decay_epochs,
+                          lr_decay_gamma,
+                          num_steps_each_epoch,
                           reg_coeff=1e-04,
-                          clip_grad_by_norm=None):
-        if self.scheduler is None:
-            raise RuntimeError("Please call `default_scheduler` before `default_optimizer`")
-        if optimizer is None:        
-            if clip_grad_by_norm is not None:
-                grad_clip = paddle.nn.ClipGradByGlobalNorm(
-                    clip_norm=clip_grad_by_norm)
-            else:
-                grad_clip = None
-            optimizer = paddle.optimizer.Momentum(
-                self.scheduler,
-                momentum=momentum,
-                weight_decay=paddle.regularizer.L2Decay(coeff=reg_coeff),
-                parameters=self.net.parameters(),
-                grad_clip=grad_clip)
-        elif isinstance(optimizer, paddle.optimizer):
-            self.optimizer = optimizer
+                          scheduler='Piecewise',
+                          cosine_decay_num_epoch=1000,
+                          clip_grad_by_norm=None,
+                          num_epochs=None):
+        if scheduler.lower() == 'piecewise':
+            if warmup_steps > 0 and warmup_steps > lr_decay_epochs[
+                    0] * num_steps_each_epoch:
+                logging.error(
+                    "In function train(), parameters must satisfy: "
+                    "warmup_steps <= lr_decay_epochs[0] * num_samples_in_train_dataset. "
+                    "See this doc for more information: "
+                    "https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/parameters.md",
+                    exit=False)
+                logging.error(
+                    "Either `warmup_steps` be less than {} or lr_decay_epochs[0] be greater than {} "
+                    "must be satisfied, please modify 'warmup_steps' or 'lr_decay_epochs' in train function".
+                    format(lr_decay_epochs[0] * num_steps_each_epoch,
+                           warmup_steps // num_steps_each_epoch),
+                    exit=True)
+            boundaries = [b * num_steps_each_epoch for b in lr_decay_epochs]
+            values = [(lr_decay_gamma**i) * learning_rate
+                      for i in range(len(lr_decay_epochs) + 1)]
+            scheduler = paddle.optimizer.lr.PiecewiseDecay(boundaries, values)
+        elif scheduler.lower() == 'cosine':
+            if num_epochs is None:
+                logging.error(
+                    "`num_epochs` must be set while using cosine annealing decay scheduler, but received {}".
+                    format(num_epochs),
+                    exit=False)
+            if warmup_steps > 0 and warmup_steps > num_epochs * num_steps_each_epoch:
+                logging.error(
+                    "In function train(), parameters must satisfy: "
+                    "warmup_steps <= num_epochs * num_samples_in_train_dataset. "
+                    "See this doc for more information: "
+                    "https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/parameters.md",
+                    exit=False)
+                logging.error(
+                    "`warmup_steps` must be less than the total number of steps({}), "
+                    "please modify 'num_epochs' or 'warmup_steps' in train function".
+                    format(num_epochs * num_steps_each_epoch),
+                    exit=True)
+            T_max = cosine_decay_num_epoch * num_steps_each_epoch - warmup_steps
+            scheduler = paddle.optimizer.lr.CosineAnnealingDecay(
+                learning_rate=learning_rate,
+                T_max=T_max,
+                eta_min=0.0,
+                last_epoch=-1)
         else:
             logging.error(
-                "optimizer must be `paddle.optimizer.lr.LRScheduler`, "
-                "but got {}".format(type(optimizer)),
+                "Invalid learning rate scheduler: {}!".format(scheduler),
                 exit=True)
+
+        if warmup_steps > 0:
+            scheduler = paddle.optimizer.lr.LinearWarmup(
+                learning_rate=scheduler,
+                warmup_steps=warmup_steps,
+                start_lr=warmup_start_lr,
+                end_lr=learning_rate)
+
+        if clip_grad_by_norm is not None:
+            grad_clip = paddle.nn.ClipGradByGlobalNorm(
+                clip_norm=clip_grad_by_norm)
+        else:
+            grad_clip = None
+
+        optimizer = paddle.optimizer.Momentum(
+            scheduler,
+            momentum=.9,
+            weight_decay=paddle.regularizer.L2Decay(coeff=reg_coeff),
+            parameters=parameters,
+            grad_clip=grad_clip)
+        return optimizer
 
     def train(self,
               num_epochs,
@@ -261,15 +232,24 @@ class BaseDetector(BaseModel):
               train_batch_size=64,
               eval_dataset=None,
               batch_transforms=None,
+              optimizer=None,
               save_interval_epochs=1,
               log_interval_steps=10,
               save_dir='output',
               pretrain_weights='IMAGENET',
+              learning_rate=.001,
+              warmup_steps=0,
+              warmup_start_lr=0.0,
+              scheduler='Piecewise',
+              lr_decay_epochs=(216, 243),
+              lr_decay_gamma=0.1,
+              cosine_decay_num_epoch=1000,
               metric=None,
               use_ema=False,
               early_stop=False,
               early_stop_patience=5,
               use_vdl=True,
+              clip_grad_by_norm=None,
               resume_checkpoint=None):
         """
         Train the model.
@@ -283,8 +263,11 @@ class BaseDetector(BaseModel):
             eval_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset|None, optional): 
                 Evaluation dataset. If None, the model will not be evaluated during training 
                 process. Defaults to None.
-            batch_transforms (paddlers.transforms.batch_operators.BatchCompose, optional):
-                Customized batch_transforms. If specified, the default batch_transforms will be disabled.
+            batch_transforms (paddlers.transforms.batch_operators.BatchCompose|None, optional):
+                Batch transformation operators. If None, the default batch transforms will be used. 
+                Defaults to None.
+            optimizer (paddle.optimizer.Optimizer|None, optional): Optimizer used for 
+                training. If None, a default optimizer will be used. Defaults to None.
             save_interval_epochs (int, optional): Epoch interval for saving the model. 
                 Defaults to 1.
             log_interval_steps (int, optional): Step interval for printing training 
@@ -293,8 +276,17 @@ class BaseDetector(BaseModel):
             pretrain_weights (str|None, optional): None or name/path of pretrained 
                 weights. If None, no pretrained weights will be loaded. 
                 Defaults to 'IMAGENET'.
+            learning_rate (float, optional): Learning rate for training. Defaults to .001.
+            warmup_steps (int, optional): Number of steps of warm-up training. 
+                Defaults to 0.
+            warmup_start_lr (float, optional): Start learning rate of warm-up training. 
+                Defaults to 0..
+            lr_decay_epochs (list|tuple, optional): Epoch milestones for learning 
+                rate decay. Defaults to (216, 243).
+            lr_decay_gamma (float, optional): Gamma coefficient of learning rate decay. 
+                Defaults to .1.
             metric (str|None, optional): Evaluation metric. Choices are {'VOC', 'COCO', None}. 
-                If None, determine the metric according to the dataset format. 
+                If None, determine the metric according to the  dataset format. 
                 Defaults to None.
             use_ema (bool, optional): Whether to use exponential moving average 
                 strategy. Defaults to False.
@@ -316,11 +308,13 @@ class BaseDetector(BaseModel):
     def _pre_train(self, in_args):
         return in_args
 
-    def _real_train(
-            self, num_epochs, train_dataset, train_batch_size, eval_dataset,
-            train_batch_transforms, save_interval_epochs, log_interval_steps, save_dir,
-            pretrain_weights, use_ema, early_stop, metric,
-            early_stop_patience, use_vdl, resume_checkpoint):
+    def _real_train(self, num_epochs, train_dataset, train_batch_size,
+                    eval_dataset, batch_transforms, optimizer, save_interval_epochs,
+                    log_interval_steps, save_dir, pretrain_weights,
+                    learning_rate, warmup_steps, warmup_start_lr,
+                    lr_decay_epochs, lr_decay_gamma, metric, use_ema,
+                    early_stop, early_stop_patience, use_vdl, resume_checkpoint,
+                    scheduler, cosine_decay_num_epoch, clip_grad_by_norm):
 
         if self.status == 'Infer':
             logging.error(
@@ -330,6 +324,7 @@ class BaseDetector(BaseModel):
             logging.error(
                 "`pretrain_weights` and `resume_checkpoint` cannot be set simultaneously.",
                 exit=True)
+        
 
         if metric is None:
             if eval_dataset.__class__.__name__ == 'VOCDetDataset':
@@ -341,26 +336,32 @@ class BaseDetector(BaseModel):
             assert self.metric in ['coco', 'voc'], \
                 "Evaluation metric {} is not supported. Please choose from 'COCO' and 'VOC'."
 
+        train_dataset.data_fields = self.data_fields[self.metric]
+
         self.labels = train_dataset.labels
         self.num_max_boxes = train_dataset.num_max_boxes
-
-        train_dataset.data_fields = self.data_fields[self.metric]
         train_dataset.batch_transforms = self._compose_batch_transform(
-            mode='train', batch_transforms=train_batch_transforms)
+            batch_transforms, mode='train')
         train_dataset.collate_fn = self._build_collate_fn(
             train_dataset.batch_transforms)
 
-        # Build scheduler if not defined
-        if self.scheduler is None:
-            num_steps_each_epoch = len(train_dataset) // train_batch_size
-            self.default_scheduler(
-                    scheduler='Piecewise',
-                    num_epochs=num_epochs,
-                    num_steps_each_epoch=num_steps_each_epoch)
-
         # Build optimizer if not defined
-        if self.optimizer is None:
-            self.default_optimizer()
+        if optimizer is None:
+            num_steps_each_epoch = len(train_dataset) // train_batch_size
+            self.optimizer = self.default_optimizer(
+                scheduler=scheduler,
+                parameters=self.net.parameters(),
+                learning_rate=learning_rate,
+                warmup_steps=warmup_steps,
+                warmup_start_lr=warmup_start_lr,
+                lr_decay_epochs=lr_decay_epochs,
+                lr_decay_gamma=lr_decay_gamma,
+                num_steps_each_epoch=num_steps_each_epoch,
+                num_epochs=num_epochs,
+                clip_grad_by_norm=clip_grad_by_norm,
+                cosine_decay_num_epoch=cosine_decay_num_epoch, )
+        else:
+            self.optimizer = optimizer
 
         # Initiate weights
         if pretrain_weights is not None:
@@ -420,7 +421,7 @@ class BaseDetector(BaseModel):
 
         return _collate_fn
 
-    def _compose_batch_transform(self, batch_transforms=None, mode='train'):
+    def _compose_batch_transform(self, batch_transforms, mode):
         raise NotImplementedError
 
     def quant_aware_train(self,
@@ -429,9 +430,15 @@ class BaseDetector(BaseModel):
                           train_batch_size=64,
                           eval_dataset=None,
                           batch_transforms=None,
+                          optimizer=None,
                           save_interval_epochs=1,
                           log_interval_steps=10,
                           save_dir='output',
+                          learning_rate=.00001,
+                          warmup_steps=0,
+                          warmup_start_lr=0.0,
+                          lr_decay_epochs=(216, 243),
+                          lr_decay_gamma=0.1,
                           metric=None,
                           use_ema=False,
                           early_stop=False,
@@ -451,13 +458,26 @@ class BaseDetector(BaseModel):
             eval_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset|None, optional): 
                 Evaluation dataset. If None, the model will not be evaluated during training 
                 process. Defaults to None.
-            batch_transforms (paddlers.transforms.batch_operators.BatchCompose, optional):
-                Customized batch_transforms. If specified, the default batch_transforms will be disabled.
+            batch_transforms (paddlers.transforms.batch_operators.BatchCompose|None, optional):
+                Batch transformation operators. If None, the default batch transforms will be used. 
+                Defaults to None.
+            optimizer (paddle.optimizer.Optimizer or None, optional): Optimizer used for 
+                training. If None, a default optimizer will be used. Defaults to None.
             save_interval_epochs (int, optional): Epoch interval for saving the model. 
                 Defaults to 1.
             log_interval_steps (int, optional): Step interval for printing training 
                 information. Defaults to 10.
             save_dir (str, optional): Directory to save the model. Defaults to 'output'.
+            learning_rate (float, optional): Learning rate for training. 
+                Defaults to .00001.
+            warmup_steps (int, optional): Number of steps of warm-up training. 
+                Defaults to 0.
+            warmup_start_lr (float, optional): Start learning rate of warm-up training. 
+                Defaults to 0..
+            lr_decay_epochs (list or tuple, optional): Epoch milestones for learning rate 
+                decay. Defaults to (216, 243).
+            lr_decay_gamma (float, optional): Gamma coefficient of learning rate decay. 
+                Defaults to .1.
             metric (str|None, optional): Evaluation metric. Choices are {'VOC', 'COCO', None}. 
                 If None, determine the metric according to the dataset format. 
                 Defaults to None.
@@ -482,10 +502,16 @@ class BaseDetector(BaseModel):
             train_batch_size=train_batch_size,
             eval_dataset=eval_dataset,
             batch_transforms=batch_transforms,
+            optimizer=optimizer,
             save_interval_epochs=save_interval_epochs,
             log_interval_steps=log_interval_steps,
             save_dir=save_dir,
             pretrain_weights=None,
+            learning_rate=learning_rate,
+            warmup_steps=warmup_steps,
+            warmup_start_lr=warmup_start_lr,
+            lr_decay_epochs=lr_decay_epochs,
+            lr_decay_gamma=lr_decay_gamma,
             metric=metric,
             use_ema=use_ema,
             early_stop=early_stop,
@@ -495,9 +521,9 @@ class BaseDetector(BaseModel):
 
     def evaluate(self,
                  eval_dataset,
+                 batch_transforms=None,
                  batch_size=1,
                  metric=None,
-                 batch_transforms=None,
                  return_details=False):
         """
         Evaluate the model.
@@ -505,13 +531,14 @@ class BaseDetector(BaseModel):
         Args:
             eval_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset): 
                 Evaluation dataset.
+            batch_transforms (paddlers.transforms.batch_operators.BatchCompose|None, optional):
+                Batch transformation operators. If None, the default batch transforms will be used. 
+                Defaults to None.
             batch_size (int, optional): Total batch size among all cards used for 
                 evaluation. Defaults to 1.
             metric (str|None, optional): Evaluation metric. Choices are {'VOC', 'COCO', None}. 
                 If None, determine the metric according to the dataset format. 
                 Defaults to None.
-            batch_transforms (paddlers.transforms.batch_operators.BatchCompose, optional):
-                Customized batch_transforms. If specified, the default batch_transforms will be disabled.
             return_details (bool, optional): Whether to return evaluation details. 
                 Defaults to False.
 
@@ -527,16 +554,16 @@ class BaseDetector(BaseModel):
                 elif eval_dataset.__class__.__name__ == 'COCODetDataset':
                     self.metric = 'coco'
         else:
-            assert metric.lower() in ['coco', 'voc'], \
-                "Evaluation metric {} is not supported. Please choose from 'COCO' and 'VOC'."
             self.metric = metric.lower()
+            assert self.metric.lower() in ['coco', 'voc'], \
+                "Evaluation metric {} is not supported. Please choose from 'COCO' and 'VOC'."
 
         eval_dataset.data_fields = self.data_fields[self.metric]
 
         eval_dataset.batch_transforms = self._compose_batch_transform(
-            mode='eval', batch_transforms=batch_transforms)
+            batch_transforms, mode='eval')
+        self._check_transforms(eval_dataset.transforms, 'eval')
 
-        self._check_transforms(eval_dataset.transforms)
         self.net.eval()
         nranks = paddle.distributed.get_world_size()
         local_rank = paddle.distributed.get_rank()
@@ -560,12 +587,10 @@ class BaseDetector(BaseModel):
                 collate_fn=self._build_collate_fn(
                     eval_dataset.batch_transforms))
             is_bbox_normalized = False
-            if batch_transforms:
-                if isinstance(batch_transforms, paddlers.transforms.batch_operators.BatchCompose):
-                    batch_transforms = batch_transforms
+            if hasattr(eval_dataset, 'batch_transforms'):
                 is_bbox_normalized = any(
                     isinstance(t, _NormalizeBox)
-                    for t in batch_transforms)
+                    for t in eval_dataset.batch_transforms.batch_transforms)
             if self.metric == 'voc':
                 eval_metric = VOCMetric(
                     labels=eval_dataset.labels,
@@ -577,7 +602,6 @@ class BaseDetector(BaseModel):
                     coco_gt=copy.deepcopy(eval_dataset.coco_gt),
                     classwise=False)
             scores = collections.OrderedDict()
-
             logging.info(
                 "Start to evaluate(total_samples={}, total_steps={})...".format(
                     eval_dataset.num_samples, eval_dataset.num_samples))
@@ -606,6 +630,9 @@ class BaseDetector(BaseModel):
             transforms (paddlers.transforms.Compose|None, optional): Transforms for 
                 inputs. If None, the transforms for evaluation process  will be used. 
                 Defaults to None.
+            batch_transforms (paddlers.transforms.batch_operators.BatchCompose|None, optional):
+                Batch transformation operators. If None, the default batch transforms will be used. 
+                Defaults to None.
 
         Returns:
             If `img_file` is a string or np.array, the result is a list of dict with 
@@ -630,7 +657,8 @@ class BaseDetector(BaseModel):
             images = [img_file]
         else:
             images = img_file
-        batch_samples, _ = self.preprocess(images, transforms, batch_transforms=batch_transforms)
+
+        batch_samples, _ = self.preprocess(images, transforms, batch_transforms)
         self.net.eval()
         outputs = self.run(self.net, batch_samples, 'test')
         prediction = self.postprocess(outputs)
@@ -639,7 +667,7 @@ class BaseDetector(BaseModel):
             prediction = prediction[0]
         return prediction
 
-    def preprocess(self, images, transforms, to_tensor=True, batch_transforms=None):
+    def preprocess(self, images, transforms, batch_transforms, to_tensor=True):
         self._check_transforms(transforms, 'test')
         batch_samples = list()
         for im in images:
@@ -647,8 +675,8 @@ class BaseDetector(BaseModel):
                 im = decode_image(im, read_raw=True)
             sample = construct_sample(image=im)
             sample = transforms(sample)
-            data = transforms(sample)
-            batch_samples.append(data[0])
+            data = sample[0]
+            batch_samples.append(data)
         batch_transforms = self._compose_batch_transform(batch_transforms, 'test')
         batch_samples = batch_transforms(batch_samples)
         if to_tensor:
@@ -725,6 +753,13 @@ class BaseDetector(BaseModel):
 
         return results
 
+    def _check_transforms(self, transforms, mode):
+        super()._check_transforms(transforms, mode)
+        if not isinstance(transforms.arrange,
+                          paddlers.transforms.ArrangeDetector):
+            raise TypeError(
+                "`transforms.arrange` must be an ArrangeDetector object.")
+
     def get_pruning_info(self):
         info = super().get_pruning_info()
         info['pruner_inputs'] = {
@@ -753,23 +788,97 @@ class PicoDet(BaseDetector):
                 "{'ESNet_s', 'ESNet_m', 'ESNet_l', 'LCNet', 'MobileNetV3', 'ResNet18_vd'}.".
                 format(backbone))
         self.backbone_name = backbone
+        if params.get('with_net', True):
+            kwargs = {}
+            if backbone == 'ESNet_s':
+                neck_out_channels = 96
+                head_num_convs = 2
+            elif backbone == 'ESNet_m':
+                neck_out_channels = 128
+                head_num_convs = 4
+            elif backbone == 'ESNet_l':
+                neck_out_channels = 160
+                head_num_convs = 4
+            elif backbone == 'LCNet':
+                kwargs['scale'] = 1.5
+                neck_out_channels = 128
+                head_num_convs = 4
+            elif backbone == 'MobileNetV3':
+                kwargs.update(dict(
+                            extra_block_filters=[],
+                            feature_maps=[7, 13, 16]))
+                neck_out_channels = 128
+                head_num_convs = 4
+            else:
+                kwargs.update(dict(
+                                return_idx=[1, 2, 3],
+                                freeze_at=-1,
+                                freeze_norm=False,
+                                norm_decay=0.))
+                neck_out_channels = 128
+                head_num_convs = 4
+            backbone = self._get_backbone(backbone, **kwargs)
+
+            neck = ppdet.modeling.CSPPAN(
+                in_channels=[i.channels for i in backbone.out_shape],
+                out_channels=neck_out_channels,
+                num_features=4,
+                num_csp_blocks=1,
+                use_depthwise=True)
+
+            head_conv_feat = ppdet.modeling.PicoFeat(
+                feat_in=neck_out_channels,
+                feat_out=neck_out_channels,
+                num_fpn_stride=4,
+                num_convs=head_num_convs,
+                norm_type='bn',
+                share_cls_reg=True, )
+            loss_class = ppdet.modeling.VarifocalLoss(
+                use_sigmoid=True, iou_weighted=True, loss_weight=1.0)
+            loss_dfl = ppdet.modeling.DistributionFocalLoss(loss_weight=.25)
+            loss_bbox = ppdet.modeling.GIoULoss(loss_weight=2.0)
+            assigner = ppdet.modeling.SimOTAAssigner(
+                candidate_topk=10, iou_weight=6, num_classes=num_classes)
+            nms = ppdet.modeling.MultiClassNMS(
+                nms_top_k=nms_topk,
+                keep_top_k=nms_keep_topk,
+                score_threshold=nms_score_threshold,
+                nms_threshold=nms_iou_threshold)
+            head = ppdet.modeling.PicoHead(
+                conv_feat=head_conv_feat,
+                num_classes=num_classes,
+                fpn_stride=[8, 16, 32, 64],
+                prior_prob=0.01,
+                reg_max=7,
+                cell_offset=.5,
+                loss_class=loss_class,
+                loss_dfl=loss_dfl,
+                loss_bbox=loss_bbox,
+                assigner=assigner,
+                feat_in_chan=neck_out_channels,
+                nms=nms)
+            params.update({
+                'backbone': backbone,
+                'neck': neck,
+                'head': head,
+            })
         super(PicoDet, self).__init__(
             model_name='PicoDet', num_classes=num_classes, **params)
 
-    def _compose_batch_transform(self, batch_transforms=None, mode='train'):
-        if not isinstance(batch_transforms, paddlers.transforms.batch_operators.BatchCompose):
-            batch_transforms = batch_transforms.batch_transforms
+    def _compose_batch_transform(self, batch_transforms, mode='train'):
+        if batch_transforms is None:
+            batch_transforms = [_BatchPad(pad_to_stride=32)]
+        else:
+            if not isinstance(batch_transforms, BatchCompose):
+                batch_transforms = batch_transforms.batch_transforms
+
         if mode == 'eval':
             collate_batch = True
         else:
             collate_batch = False
 
-        batch_transforms = batch_transforms or []
-
-
         batch_transforms = BatchCompose(
-            batch_transforms,
-            collate_batch=collate_batch)
+            batch_transforms, collate_batch=collate_batch)
 
         return batch_transforms
 
@@ -817,6 +926,24 @@ class PicoDet(BaseDetector):
         self.fixed_input_shape = image_shape
         return self._define_input_spec(image_shape)
 
+    def _pre_train(self, in_args):
+        optimizer = in_args['optimizer']
+        if optimizer is None:
+            in_args['num_steps_each_epoch'] = len(in_args['train_dataset']) // in_args[
+                'train_batch_size']
+            optimizer = self.default_optimizer(
+                parameters=self.net.parameters(),
+                learning_rate=in_args['learning_rate'],
+                warmup_steps=in_args['warmup_steps'],
+                warmup_start_lr=in_args['warmup_start_lr'],
+                lr_decay_epochs=in_args['lr_decay_epochs'],
+                lr_decay_gamma=in_args['lr_decay_gamma'],
+                num_steps_each_epoch=in_args['num_steps_each_epoch'],
+                reg_coeff=4e-05,
+                scheduler='Cosine',
+                num_epochs=in_args['num_epochs'])
+            in_args['optimizer'] = optimizer
+        return in_args
 
     def build_data_loader(self,
                           dataset,
@@ -846,6 +973,7 @@ class PicoDet(BaseDetector):
 
 class YOLOv3(BaseDetector):
     def __init__(self,
+                 rotate=False,
                  num_classes=80,
                  backbone='MobileNetV1',
                  post_process=None,
@@ -863,12 +991,12 @@ class YOLOv3(BaseDetector):
         self.init_params = locals()
         if backbone not in {
                 'MobileNetV1', 'MobileNetV1_ssld', 'MobileNetV3',
-                'MobileNetV3_ssld', 'DarkNet53', 'ResNet50_vd_dcn', 'ResNet34'
+                'MobileNetV3_ssld', 'DarkNet53', 'ResNet50_vd_dcn', 'ResNet34', 'ResNet50'
         }:
             raise ValueError(
                 "backbone: {} is not supported. Please choose one of "
                 "{'MobileNetV1', 'MobileNetV1_ssld', 'MobileNetV3', 'MobileNetV3_ssld', 'DarkNet53', "
-                "'ResNet50_vd_dcn', 'ResNet34'}.".format(backbone))
+                "'ResNet50_vd_dcn', 'ResNet34', 'ResNet50}.".format(backbone))
 
         self.backbone_name = backbone
         if params.get('with_net', True):
@@ -892,38 +1020,60 @@ class YOLOv3(BaseDetector):
             elif backbone == 'ResNet34':
                 kwargs.update(dict(return_idx=[1, 2, 3],
                                    freeze_at=-1,
-                                   freeze_norm=False,
-                                   norm_decay=0.))
+                                   freeze_norm=False))
+            elif backbone == 'ResNet50':
+                kwargs.update(dict(return_idx=[1, 2, 3],
+                                   groups=32,
+                                   freeze_norm=False))
 
             backbone = self._get_backbone(backbone, **kwargs)
-            neck = ppdet.modeling.YOLOv3FPN(
-                norm_type=norm_type,
-                in_channels=[i.channels for i in backbone.out_shape])
-            loss = ppdet.modeling.YOLOv3Loss(
-                num_classes=num_classes,
-                ignore_thresh=ignore_threshold,
-                label_smooth=label_smooth)
-            yolo_head = ppdet.modeling.YOLOv3Head(
-                in_channels=[i.channels for i in neck.out_shape],
-                anchors=anchors,
-                anchor_masks=anchor_masks,
-                num_classes=num_classes,
-                loss=loss)
-            post_process = ppdet.modeling.BBoxPostProcess(
-                decode=ppdet.modeling.YOLOBox(num_classes=num_classes),
-                nms=ppdet.modeling.MultiClassNMS(
-                    score_threshold=nms_score_threshold,
-                    nms_top_k=nms_topk,
-                    keep_top_k=nms_keep_topk,
-                    nms_threshold=nms_iou_threshold))
-            post_process = ppdet.modeling.BBoxPostProcess(
-                decode=ppdet.modeling.YOLOBox(num_classes=num_classes),
-                nms=ppdet.modeling.MultiClassNMS(
-                    score_threshold=nms_score_threshold,
-                    nms_top_k=nms_topk,
-                    keep_top_k=nms_keep_topk,
-                    nms_threshold=nms_iou_threshold,
-                    normalized=nms_normalized))
+            nms = ppdet.modeling.MultiClassNMS(
+                        score_threshold=nms_score_threshold,
+                        nms_top_k=nms_topk,
+                        keep_top_k=nms_keep_topk,
+                        nms_threshold=nms_iou_threshold,
+                        normalized=nms_normalized)
+            if rotate:
+                neck = ppdet.modeling.FPN(in_channels=[i.channels for i in backbone.out_shape],
+                                          out_channel=256,
+                                          has_extra_convs=True,
+                                          use_c5=False,
+                                          relu_before_extra_convs=True)
+                assigner = ppdet.modeling.FCOSRAssigner(factor=12,
+                                                        threshold=0.23,
+                                                        boundary=[[-1, 64], [64, 128], [128, 256], [256, 512], [512, 100000000.0]])
+                yolo_head = ppdet.modeling.FCOSRHead(feat_channels=256, 
+                                                     fpn_strides=[8, 16, 32, 64, 128],
+                                                     stacked_convs=4,
+                                                     loss_weight={'class':1., 'probiou':1.},
+                                                     assigner=assigner,
+                                                     nms=nms)
+                post_process = None
+            else:
+                neck = ppdet.modeling.YOLOv3FPN(
+                    norm_type=norm_type,
+                    in_channels=[i.channels for i in backbone.out_shape])
+                loss = ppdet.modeling.YOLOv3Loss(
+                    num_classes=num_classes,
+                    ignore_thresh=ignore_threshold,
+                    label_smooth=label_smooth)
+                yolo_head = ppdet.modeling.YOLOv3Head(
+                    in_channels=[i.channels for i in neck.out_shape],
+                    anchors=anchors,
+                    anchor_masks=anchor_masks,
+                    num_classes=num_classes,
+                    loss=loss)
+                post_process = ppdet.modeling.BBoxPostProcess(
+                    decode=ppdet.modeling.YOLOBox(num_classes=num_classes),
+                    nms=nms)
+                post_process = ppdet.modeling.BBoxPostProcess(
+                    decode=ppdet.modeling.YOLOBox(num_classes=num_classes),
+                    nms=ppdet.modeling.MultiClassNMS(
+                        score_threshold=nms_score_threshold,
+                        nms_top_k=nms_topk,
+                        keep_top_k=nms_keep_topk,
+                        nms_threshold=nms_iou_threshold,
+                        normalized=nms_normalized))
             params.update({
                 'backbone': backbone,
                 'neck': neck,
@@ -935,9 +1085,7 @@ class YOLOv3(BaseDetector):
         self.anchors = anchors
         self.anchor_masks = anchor_masks
 
-    def _compose_batch_transform(self, batch_transforms=None, mode='train'):
-        if isinstance(batch_transforms, paddlers.transforms.batch_operators.BatchCompose):
-            batch_transforms = batch_transforms.batch_transforms
+    def _compose_batch_transform(self, batch_transforms, mode='train'):
         if batch_transforms is None:
             if mode == 'train':
                 batch_transforms = [
@@ -952,15 +1100,16 @@ class YOLOv3(BaseDetector):
                 ]
             else:
                 batch_transforms = [_BatchPad(pad_to_stride=-1)]
-
+        else:
+            if not isinstance(batch_transforms, BatchCompose):
+                batch_transforms = batch_transforms.batch_transforms
         if mode == 'eval' and self.metric == 'voc':
             collate_batch = False
         else:
             collate_batch = True
 
         batch_transforms = BatchCompose(
-            batch_transforms,
-            collate_batch=collate_batch)
+            batch_transforms, collate_batch=collate_batch)
 
         return batch_transforms
 
@@ -1196,10 +1345,8 @@ class FasterRCNN(BaseDetector):
             train_dataset.num_workers = 0
         return in_args
 
-    def _compose_batch_transform(self, batch_transforms=None, mode='train'):
-        if isinstance(batch_transforms, paddlers.transforms.batch_operators.BatchCompose):
-            batch_transforms = batch_transforms.batch_transforms
-        if batch_transforms is not None:
+    def _compose_batch_transform(self, batch_transforms, mode='train'):
+        if batch_transforms is None:
             if mode == 'train':
                 batch_transforms = [
                     _BatchPad(pad_to_stride=32 if self.with_fpn else -1)
@@ -1208,10 +1355,11 @@ class FasterRCNN(BaseDetector):
                 batch_transforms = [
                     _BatchPad(pad_to_stride=32 if self.with_fpn else -1)
                 ]
-
+        else:
+            if isinstance(batch_transforms, BatchCompose):
+                batch_transforms = batch_transforms.batch_transforms
         batch_transforms = BatchCompose(
-            batch_transforms,
-            collate_batch=False)
+            batch_transforms, collate_batch=False)
 
         return batch_transforms
 
@@ -1462,6 +1610,7 @@ class PPYOLOTiny(YOLOv3):
                  nms_topk=1000,
                  nms_keep_topk=100,
                  nms_iou_threshold=0.45,
+                 nms_normalized=True,
                  **params):
         self.init_params = locals()
         if backbone != 'MobileNetV3':
@@ -1605,21 +1754,29 @@ class PPYOLOv2(YOLOv3):
                 norm_type = 'sync_bn'
             else:
                 norm_type = 'bn'
-            kwargs = {}
-            kwargs['norm_type'] = norm_type
+
             if backbone == 'ResNet50_vd_dcn':
-                kwargs.update(dict(
+                backbone = self._get_backbone(
+                    'ResNet',
+                    variant='d',
+                    norm_type=norm_type,
                     return_idx=[1, 2, 3],
                     dcn_v2_stages=[3],
                     freeze_at=-1,
-                    freeze_norm=False))
+                    freeze_norm=False,
+                    norm_decay=0.)
+
             elif backbone == 'ResNet101_vd_dcn':
-                kwargs.update(dict(
+                backbone = self._get_backbone(
+                    'ResNet',
+                    depth=101,
+                    variant='d',
+                    norm_type=norm_type,
                     return_idx=[1, 2, 3],
                     dcn_v2_stages=[3],
                     freeze_at=-1,
-                    freeze_norm=False))
-            backbone = self._get_backbone(backbone, **kwargs)
+                    freeze_norm=False,
+                    norm_decay=0.)
 
             neck = ppdet.modeling.PPYOLOPAN(
                 norm_type=norm_type,
@@ -1711,16 +1868,6 @@ class PPYOLOv2(YOLOv3):
 
 
 class MaskRCNN(BaseDetector):
-    data_fields = {
-            'CocoDetection': {
-                    'im_id', 'image_shape', 'image', 'gt_bbox', 'gt_class',
-                    'gt_poly', 'is_crowd'
-                },
-            'VOCDetDataset': {
-                'im_id', 'image_shape', 'image', 'gt_bbox', 'gt_class',
-                'difficult'
-                }
-            }
     def __init__(self,
                  num_classes=80,
                  backbone='ResNet50_vd',
@@ -1936,9 +2083,7 @@ class MaskRCNN(BaseDetector):
             train_dataset.num_workers = 0
         return in_args
 
-    def _compose_batch_transform(self, batch_transforms=None, mode='train'):
-        if isinstance(batch_transforms, paddlers.transforms.batch_operators.BatchCompose):
-            batch_transforms = batch_transforms.batch_transforms
+    def _compose_batch_transform(self, batch_transforms, mode='train'):
         if batch_transforms is None:
             if mode == 'train':
                 batch_transforms = [
@@ -1948,10 +2093,11 @@ class MaskRCNN(BaseDetector):
                 batch_transforms = [
                     _BatchPad(pad_to_stride=32 if self.with_fpn else -1)
                 ]
-
+        else:
+            if isinstance(batch_transforms, BatchCompose):
+                batch_transforms = batch_transforms.batch_transforms
         batch_transforms = BatchCompose(
-            batch_transforms,
-            collate_batch=False)
+            batch_transforms, collate_batch=False)
 
         return batch_transforms
 

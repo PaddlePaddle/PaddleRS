@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
-# 旋转目标检测模型fcos训练示例脚本
+# 旋转目标检测模型FCOS训练示例脚本
 # 执行此脚本前，请确认已正确安装PaddleRS库
 
 import os
 
 import paddlers as pdrs
 from paddlers import transforms as T
-from paddlers.models import ppdet
+from paddlers.models import paddlers.models.ppdet
 
 # 数据集存放目录
 DATA_DIR = "./data/dota/"
@@ -84,32 +84,6 @@ eval_dataset = pdrs.datasets.COCODetDataset(
 # 目前已支持的模型请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/intro/model_zoo.md
 
 # 创建FCOS所需要的组件
-backbone = ppdet.modeling.ResNet(depth=50, groups=32, base_width=4, return_idx=[1,2,3])
-
-neck = ppdet.modeling.FPN(in_channels=backbone.out_shape, out_channel=256, extra_stage=2, has_extra_convs=True, use_c5=False, relu_before_extra_convs=True)
-
-assigner = ppdet.modeling.FCOSRAssigner(
-            factor=12, threshold=0.23, boundary=[[-1, 64], [64, 128], [128, 256], [256, 512], [512, 100000000.0]]
-        )
-
-nms = ppdet.modeling.MultiClassNMS(nms_top_k=2000, keep_top_k=-1, score_threshold=0.1, nms_threshold=0.1, normalize=False)
-
-head = ppdet.modeling.FCOSRHead(
-    feat_channels=256,
-    fpn_strides=[8, 16, 32, 64, 128],
-    stacked_convs=4,
-    loss_weight={"class": 1.0,
-                 "probiou": 1.0},
-    nms=nms,
-    assigner=assigner
-    )
-
-params = {
-        'with_net': True,
-        'backbone': backbone,
-        'neck': neck,
-        "yolo_head": head,
-        }
 
 model = pdrs.tasks.det.YOLOv3(
     backbone="ResNet50_vd_dcn",
@@ -119,16 +93,8 @@ model = pdrs.tasks.det.YOLOv3(
     nms_keep_topk=-1,
     nms_normalized=False,
     nms_iou_threshold=0.1,
-    **params)
+    rotate=True)
 
-model.default_scheduler(scheduler='Piecewise',
-                        learning_rate=0.01,
-                        lr_decay_gamma=0.1,
-                        lr_decay_epochs=[24, 33],
-                        warmup_steps=500,
-                        warmup_start_lr=0.03333333)
-
-model.default_optimizer(clip_grad_by_norm=35.)
 
 # 执行模型训练
 model.train(
@@ -141,6 +107,17 @@ model.train(
     # 每多少次迭代记录一次日志
     log_interval_steps=4,
     save_dir=EXP_DIR,
+    # 初始学习率大小
+    learning_rate=0.001,
+    # 学习率预热（learning rate warm-up）步数与初始值
+    warmup_steps=500,
+    warmup_start_lr=0.03333333,
+    # 学习率衰减的epoch节点
+    lr_decay_epochs=[24, 33],
+    # 学习率衰减的参数 
+    lr_decay_gamma=0.1,
+    # clip_grad_by_norm梯度裁剪策略的参数
+    clip_grad_by_norm=35.,
     # 指定预训练权重
     pretrain_weights="COCO",
     # 是否启用VisualDL日志功能
