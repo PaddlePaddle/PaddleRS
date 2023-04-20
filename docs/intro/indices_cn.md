@@ -1,3 +1,5 @@
+简体中文 | [English](indices_en.md)
+
 # 遥感指数
 
 通过`paddlers.transforms.AppendIndex`算子可以计算遥感指数并追加到输入影像的最后一个波段。在构建`AppendIndex`对象时，需要传入遥感指数名称以及一个包含波段-索引对应关系的字典（字典中的键为波段名称，索引号从1开始计数）。

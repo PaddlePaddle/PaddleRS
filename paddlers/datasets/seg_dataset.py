@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import os.path as osp
-import copy
 
 from .base import BaseDataset
 from paddlers.utils import logging, get_encoding, norm_path, is_pic
@@ -35,6 +34,7 @@ class SegDataset(BaseDataset):
         shuffle (bool, optional): Whether to shuffle the samples. Defaults to False.
     """
 
+    _KEYS_TO_KEEP = ['image', 'mask']
     _collate_trans_info = True
 
     def __init__(self,
