@@ -72,7 +72,6 @@ python ./coco_tools/json_info_show.py \
 | -------------- | ----------------------------------------------------------- | ------------- |
 | `--json_path`  | Path of the json file whose statistics are to be collected. |               |
 | `--show_num`   | (Optional) Number of elements to show in the output.        | `5`           |
-| `--Args_show`  | (Optional) Whether to print input parameter information.    | `True`        |
 
 #### 3.2.3 Result Presentation
 
@@ -82,7 +81,6 @@ After the preceding command is executed, the following information will be displ
 ------------------------------------------------Args------------------------------------------------
 json_path = ./annotations/instances_val2017.json
 show_num = 5
-Args_show = True
 
 ------------------------------------------------Info------------------------------------------------
 json read...
@@ -184,20 +182,19 @@ python ./coco_tools/json_image_sta.py \
     --json_path=./annotations/instances_val2017.json \
     --csv_path=./img_sta/images.csv \
     --pic_shape_path=./img_sta/images_shape.png \
-    --pic_shapeRate_path=./img_sta/images_shapeRate.png
+    --pic_shape_rate_path=./img_sta/images_shape_rate.png
 ```
 
 #### 3.3.2 Parameter Description
 
 
-| Parameter Name         | Description                                                                                                                           | Default Value |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
-| `--json_path`          | Path of the json file whose statistics are to be collected.                                                                           |               |
-| `--csv_path`           | (Optional) Path for the statistics table.                                                                                             | `None`        |
-| `--pic_shape_path`     | (Optional) .png image saving path. The image visualizes the two-dimensional distribution of all image shapes.                         | `5`           |
-| `--pic_shapeRate_path` | (Optional) .png image saving path. The image visualizes the one-dimensional distribution of shape ratio (width/height) of all images. | `5`           |
-| `--image_keyname`      | (Optional) Image key in the json file.                                                                                                | `'images'`    |
-| `--Args_show`          | (Optional) Whether to print input parameter information.                                                                              | `True`        |
+| Parameter Name          | Description                                                                                                                           | Default Value |
+|-------------------------| ------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
+| `--json_path`           | Path of the json file whose statistics are to be collected.                                                                           |               |
+| `--csv_path`            | (Optional) Path for the statistics table.                                                                                             | `None`        |
+| `--pic_shape_path`      | (Optional) .png image saving path. The image visualizes the two-dimensional distribution of all image shapes.                         | `5`           |
+| `--pic_shape_rate_path` | (Optional) .png image saving path. The image visualizes the one-dimensional distribution of shape ratio (width/height) of all images. | `5`           |
+| `--image_keyname`       | (Optional) Image key in the json file.                                                                                                | `'images'`    |
 
 #### 3.3.3 Result Presentation
 
@@ -208,15 +205,14 @@ After the preceding command is executed, the following information will be displ
 json_path = ./annotations/instances_val2017.json
 csv_path = ./img_sta/images.csv
 pic_shape_path = ./img_sta/images_shape.png
-pic_shapeRate_path = ./img_sta/images_shapeRate.png
+pic_shape_rate_path = ./img_sta/images_shape_rate.png
 image_keyname = images
-Args_show = True
 
 json read...
 
 make dir: ./img_sta
 png save to ./img_sta/images_shape.png
-png save to ./img_sta/images_shapeRate.png
+png save to ./img_sta/images_shape_rate.png
 csv save to ./img_sta/images.csv
 ```
 
@@ -251,9 +247,9 @@ python ./coco_tools/json_anno_sta.py \
     --json_path=./annotations/instances_val2017.json \
     --csv_path=./anno_sta/annos.csv \
     --pic_shape_path=./anno_sta/annos_shape.png \
-    --pic_shapeRate_path=./anno_sta/annos_shapeRate.png \
+    --pic_shape_rate_path=./anno_sta/annos_shape_rate.png \
     --pic_pos_path=./anno_sta/annos_pos.png \
-    --pic_posEnd_path=./anno_sta/annos_posEnd.png \
+    --pic_pos_end_path=./anno_sta/annos_pos_end.png \
     --pic_cat_path=./anno_sta/annos_cat.png \
     --pic_objNum_path=./anno_sta/annos_objNum.png \
     --get_relative=True
@@ -263,19 +259,18 @@ python ./coco_tools/json_anno_sta.py \
 
 
 | Parameter Name         | Description                                                                                                                                                                                                                                                                             | Default Value   |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
-| `--json_path`          | (Optional) Path of the json file whose statistics you want to collect.                                                                                                                                                                                                                  |                 |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |-----------------|
+| `--json_path`          | Path of the json file whose statistics you want to collect.                                                                                                                                                                                                                             |                 |
 | `--csv_path`           | (Optional) Path to save the statistics table.                                                                                                                                                                                                                                           | `None`          |
 | `--pic_shape_path`     | (Optional) .png image saving path. The image visualizes the two-dimensional distribution of the shape of all target detection frames.                                                                                                                                                   | `None`          |
-| `--pic_shapeRate_path` | (Optional) .png image saving path. The image visualizes the one-dimensional distribution of shape ratio (width/height) of all target bounding boxes.                                                                                                                                    | `None`          |
+| `--pic_shape_rate_path`| (Optional) .png image saving path. The image visualizes the one-dimensional distribution of shape ratio (width/height) of all target bounding boxes.                                                                                                                                    | `None`          |
 | `--pic_pos_path`       | (Optional) .png image saving path. The image visualizes the two-dimensional distribution of the coordinates at the upper left corner of all bounding boxes.                                                                                                                             | `None`          |
-| `--pic_posEnd_path`    | (Optional) .png image saving path. The image visualizes the two-dimensional distribution of the coordinates at the lower right corner of all bounding boxes.                                                                                                                            | `None`          |
+| `--pic_pos_end_path`   | (Optional) .png image saving path. The image visualizes the two-dimensional distribution of the coordinates at the lower right corner of all bounding boxes.                                                                                                                            | `None`          |
 | `--pic_cat_path`       | (Optional) .png image saving path. The image visualizes the quantity distribution of objects in each category.                                                                                                                                                                          | `None`          |
 | `--pic_objNum_path`    | (Optional) .png image saving path. The image visualizes the quantity distribution of annotated objects in a single image.                                                                                                                                                               | `None`          |
-| `--get_relative`       | (Optional) Whether to generate the shape of the image target detection frame and the relative ratio of the coordinates of the upper left corner and lower right corner of the object detection frame (horizontal axis coordinates/image length, vertical axis coordinates/image width). | `None`          |
+| `--get_relative`       | (Optional) Whether to generate the shape of the image target detection frame and the relative ratio of the coordinates of the upper left corner and lower right corner of the object detection frame (horizontal axis coordinates/image length, vertical axis coordinates/image width). | `False`         |
 | `--image_keyname`      | (Optional) Image key in the json file.                                                                                                                                                                                                                                                  | `'images'`      |
 | `--anno_keyname`       | (Optional) Annotation key in the json file.                                                                                                                                                                                                                                             | `'annotations'` |
-| `--Args_show`          | (Optional) Whether to print input parameter information.                                                                                                                                                                                                                                | `True`          |
 
 #### 3.4.3 Result Presentation
 
@@ -286,26 +281,25 @@ After the preceding command is executed, the following information will be displ
 json_path = ./annotations/instances_val2017.json
 csv_path = ./anno_sta/annos.csv
 pic_shape_path = ./anno_sta/annos_shape.png
-pic_shapeRate_path = ./anno_sta/annos_shapeRate.png
+pic_shape_rate_path = ./anno_sta/annos_shape_rate.png
 pic_pos_path = ./anno_sta/annos_pos.png
-pic_posEnd_path = ./anno_sta/annos_posEnd.png
+pic_pos_end_path = ./anno_sta/annos_pos_end.png
 pic_cat_path = ./anno_sta/annos_cat.png
 pic_objNum_path = ./anno_sta/annos_objNum.png
 get_relative = True
 image_keyname = images
 anno_keyname = annotations
-Args_show = True
 
 json read...
 
 make dir: ./anno_sta
 png save to ./anno_sta/annos_shape.png
 png save to ./anno_sta/annos_shape_Relative.png
-png save to ./anno_sta/annos_shapeRate.png
+png save to ./anno_sta/annos_shape_rate.png
 png save to ./anno_sta/annos_pos.png
 png save to ./anno_sta/annos_pos_Relative.png
-png save to ./anno_sta/annos_posEnd.png
-png save to ./anno_sta/annos_posEnd_Relative.png
+png save to ./anno_sta/annos_pos_end.png
+png save to ./anno_sta/annos_pos_end_Relative.png
 png save to ./anno_sta/annos_cat.png
 png save to ./anno_sta/annos_objNum.png
 csv save to ./anno_sta/annos.csv
@@ -369,14 +363,13 @@ python ./coco_tools/json_image2json.py \
 #### 3.5.2 Parameter Description
 
 
-| Parameter Name      | Description                                              | Default Value  |
-| ------------------- | -------------------------------------------------------- | -------------- |
-| `--image_dir`       | Directory that contains the test seg images.             |                |
-| `--json_train_path` | json file path of the training set. Used as reference.   |                |
-| `--json_test_path`  | Path to the generated test set json file.                |                |
-| `--image_keyname`   | (Optional) Image key in the json file                    | `'images'`     |
-| `--cat_keyname`     | (Optional) Category key in the json file                 | `'categories'` |
-| `--Args_show`       | (Optional) Whether to print input parameter information. | `True`         |
+| Parameter Name      | Description                                            | Default Value  |
+| ------------------- |--------------------------------------------------------| -------------- |
+| `--image_dir`       | Directory that contains the test seg images.           |                |
+| `--json_train_path` | Json file path of the training set. Used as reference. |                |
+| `--json_test_path`  | Path to the generated test set json file.              |                |
+| `--image_keyname`   | (Optional) Image key in the json file.                 | `'images'`     |
+| `--cat_keyname`     | (Optional) Category key in the json file.              | `'categories'` |
 
 #### 3.5.3 Result Presentation
 
@@ -387,7 +380,6 @@ After the preceding command is executed, the following information will be displ
 image_dir = ./test2017
 json_train_path = ./annotations/instances_val2017.json
 json_test_path = ./test.json
-Args_show = True
 
 ----------------------------------------------Get Test----------------------------------------------
 
@@ -405,7 +397,6 @@ The generated json file information:
 ------------------------------------------------Args------------------------------------------------
 json_path = ./test.json
 show_num = 5
-Args_show = True
 
 ------------------------------------------------Info------------------------------------------------
 json read...
@@ -466,7 +457,6 @@ python ./coco_tools/json_split.py \
 | `--keep_val_inTrain` | (Optional) Whether to keep the val set samples in the train set.                                     | `False`        |
 | `--image_keyname`    | (Optional) Image key in the json file.                                                               | `'images'`     |
 | `--cat_keyname`      | (Optional) Category key in the json file.                                                            | `'categories'` |
-| `--Args_show`        | (Optional) Whether to print input parameter information.                                             | `'True'`       |
 
 #### 3.6.3 Result Presentation
 
@@ -482,7 +472,6 @@ val_split_num = None
 keep_val_inTrain = False
 image_keyname = images
 anno_keyname = annotations
-Args_show = True
 
 -----------------------------------------------Split------------------------------------------------
 
@@ -516,7 +505,6 @@ python ./coco_tools/json_merge.py \
 | `--json2_path` | Path of the second json file to merge.                   |                             |
 | `--save_path`  | Path to save the merged json file.                       |                             |
 | `--merge_keys` | (Optional) Keys to be merged.                            | `['images', 'annotations']` |
-| `--Args_show`  | (Optional) Whether to print input parameter information. | `True`                      |
 
 #### 3.7.3 Result Presentation
 
@@ -528,7 +516,6 @@ json1_path = ./annotations/instances_train2017.json
 json2_path = ./annotations/instances_val2017.json
 save_path = ./instances_trainval2017.json
 merge_keys = ['images', 'annotations']
-Args_show = True
 
 -----------------------------------------------Merge------------------------------------------------
 

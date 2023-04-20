@@ -44,8 +44,8 @@ def json_info_show(json_path, show_num):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="json information show")
     parser.add_argument("--json_path", type=str, required=True, \
-                        help="Path of json to show its basic information")
+                        help="Path of the json file whose statistics are to be collected. Default: None.")
     parser.add_argument("--show_num", type=int, default=5, \
-                        help="Show number of each sub record")
+                        help="(Optional) Number of elements to show in the output. Default: 5.")
     args = parser.parse_args()
     json_info_show(args.json_path, args.show_num)

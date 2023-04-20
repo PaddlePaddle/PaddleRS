@@ -42,13 +42,13 @@ def json_merge(json1_path, json2_path, save_path, merge_keys):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="json merge")
     parser.add_argument("--json1_path", type=str, required=True, \
-                        help="Path of 1st json to merge")
+                        help="Path of the first json file to merge. Default: None.")
     parser.add_argument("--json2_path", type=str, required=True, \
-                        help="Path of 2nd json to merge")
+                        help="Path of the second json file to merge. Default: None.")
     parser.add_argument("--save_path", type=str, required=True, \
-                        help="Path of json to save the merge result")
+                        help="Path to save the merged json file. Default: None.")
     parser.add_argument("--merge_keys", type=list, default=["images", "annotations"], \
-                        help="Keys used to match between json1 and json2 for merging")
+                        help="(Optional) Keys to be merged. Default: ['images', 'annotations'].")
     args = parser.parse_args()
     json_merge(args.json1_path, args.json2_path, args.save_path,
                args.merge_keys)
