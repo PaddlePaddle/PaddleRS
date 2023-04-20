@@ -39,12 +39,12 @@ python coco2mask.py --raw_dir {输入目录路径} --save_dir {输出目录路�
 `mask2shape.py`的主要功能是将.png格式的分割结果转换为shapefile格式（矢量图）。使用方式如下：
 
 ```shell
-python mask2shape.py --srcimg_path {带有地理信息的原始影像路径} --mask_path {输入分割标签路径} [--save_path {输出矢量图路径}] [--ignore_index {需要忽略的索引值}]
+python mask2shape.py --src_img_path {带有地理信息的原始影像路径} --mask_path {输入分割标签路径} [--save_path {输出矢量图路径}] [--ignore_index {需要忽略的索引值}]
 ```
 
 其中：
 
-- `srcimg_path`：原始影像路径，需要带有地理元信息，以便为生成的shapefile提供地理投影坐标系等信息。
+- `src_img_path`：原始影像路径，需要带有地理元信息，以便为生成的shapefile提供地理投影坐标系等信息。
 - `mask_path`：模型推理得到的.png格式的分割结果。
 - `save_path`：保存shapefile的路径，默认为`output`。
 - `ignore_index`：需要在shapefile中忽略的索引值（例如分割任务中的背景类），默认为`255`。
@@ -54,12 +54,12 @@ python mask2shape.py --srcimg_path {带有地理信息的原始影像路径} --m
 `geojson2mask.py`的主要功能是将GeoJSON格式的标签转换为.tif的栅格格式。使用方式如下：
 
 ```shell
-python geojson2mask.py --srcimg_path {带有地理信息的原始影像路径} --geojson_path {输入分割标签路径} --save_path {输出路径}
+python geojson2mask.py --src_img_path {带有地理信息的原始影像路径} --geojson_path {输入分割标签路径} --save_path {输出路径}
 ```
 
 其中：
 
-- `srcimg_path`：原始影像路径，需要带有地理元信息。
+- `src_img_path`：原始影像路径，需要带有地理元信息。
 - `geojson_path`：GeoJSON格式标签路径。
 - `save_path`：保存转换后的栅格文件的路径。
 
@@ -68,15 +68,15 @@ python geojson2mask.py --srcimg_path {带有地理信息的原始影像路径} -
 `match.py`的主要功能是在对两个时相的遥感影像进行空间配准。使用方式如下：
 
 ```shell
-python match.py --im1_path {时相1影像路径} --im2_path {时相2影像路径} --save_path {配准后时相2影像输出路径} [--im1_bands 1 2 3] [--im2_bands 1 2 3]
+python match.py --image1_path {时相1影像路径} --image2_path {时相2影像路径} --save_path {配准后时相2影像输出路径} [--image1_bands 1 2 3] [--image2_bands 1 2 3]
 ```
 
 其中：
 
-- `im1_path`：时相1影像路径。该影像必须包含地理信息，且配准过程中以该影像为基准影像。
-- `im2_path`：时相2影像路径。该影像的地理信息将不被用到。配准过程中将该影像配准到时相1影像。
-- `im1_bands`：时相1影像用于配准的波段，指定为三通道（分别代表R、G、B）或单通道，默认为`[1, 2, 3]`。
-- `im2_bands`：时相2影像用于配准的波段，指定为三通道（分别代表R、G、B）或单通道，默认为`[1, 2, 3]`。
+- `image1_path`：时相1影像路径。该影像必须包含地理信息，且配准过程中以该影像为基准影像。
+- `image2_path`：时相2影像路径。该影像的地理信息将不被用到。配准过程中将该影像配准到时相1影像。
+- `image1_bands`：时相1影像用于配准的波段，指定为三通道（分别代表R、G、B）或单通道，默认为`[1, 2, 3]`。
+- `image2_bands`：时相2影像用于配准的波段，指定为三通道（分别代表R、G、B）或单通道，默认为`[1, 2, 3]`。
 - `save_path`： 配准后时相2影像输出路径。
 
 ### split
@@ -98,12 +98,12 @@ python split.py --image_path {输入影像路径} [--mask_path {真值标签路�
 
 目前`coco_tools`目录中共包含6个工具，各工具功能如下：
 
-- `json_InfoShow.py`：    打印json文件中各个字典的基本信息；
-- `json_ImgSta.py`：      统计json文件中的影像信息，生成统计表、统计图；
-- `json_AnnoSta.py`：     统计json文件中的标注信息，生成统计表、统计图；
-- `json_Img2Json.py`：    统计test集影像，生成json文件；
-- `json_Split.py`：       将json文件中的内容划分为train set和val set；
-- `json_Merge.py`：       将多个json文件合并为一个。
+- `json_info_show.py`：    打印json文件中各个字典的基本信息；
+- `json_image_sta.py`：      统计json文件中的影像信息，生成统计表、统计图；
+- `json_anno_sta.py`：     统计json文件中的标注信息，生成统计表、统计图；
+- `json_image2json.py`：    统计test集影像，生成json文件；
+- `json_split.py`：       将json文件中的内容划分为train set和val set；
+- `json_merge.py`：       将多个json文件合并为一个。
 
 详细使用方法请参见[coco_tools使用说明](coco_tools_cn.md)。
 
@@ -133,12 +133,12 @@ python prepare_dataset/prepare_levircd.py --help
 `extract_ms_patches.py`的主要功能是利用四叉树从整幅遥感影像中提取不同尺度的包含感兴趣目标的影像块，提取的影像块可用作模型训练样本。使用方式如下：
 
 ```shell
-python extract_ms_patches.py --im_paths {一个或多个输入影像路径} --mask_path {真值标签路径} [--save_dir {输出目录}] [--min_patch_size {最小的影像块尺寸}] [--bg_class {背景类类别编号}] [--target_class {目标类类别编号}] [--max_level {检索的最大尺度层级}] [--include_bg] [--nonzero_ratio {影像块中非零像素占比阈值}] [--visualize]
+python extract_ms_patches.py --image_paths {一个或多个输入影像路径} --mask_path {真值标签路径} [--save_dir {输出目录}] [--min_patch_size {最小的影像块尺寸}] [--bg_class {背景类类别编号}] [--target_class {目标类类别编号}] [--max_level {检索的最大尺度层级}] [--include_bg] [--nonzero_ratio {影像块中非零像素占比阈值}] [--visualize]
 ```
 
 其中：
 
-- `im_paths`：源影像路径，可以指定多个路径。
+- `image_paths`：源影像路径，可以指定多个路径。
 - `mask_path`：真值标签路径。
 - `save_dir`：保存切分后结果的文件夹路径，默认为`output`。
 - `min_patch_size`：提取的影像块的最小尺寸（以影像块长/宽的像素个数计），即四叉树的叶子结点在图中覆盖的最小范围，默认为`256`。

@@ -35,8 +35,8 @@ def _calcOIF(rgb, stds, rho):
 
 
 @time_it
-def oif(img_path, topk=5):
-    raster = Raster(img_path)
+def oif(image_path, topk=5):
+    raster = Raster(image_path)
     img = raster.getArray()
     img_flatten = img.reshape([-1, raster.bands])
     stds = np.std(img_flatten, axis=0)
@@ -58,9 +58,9 @@ def oif(img_path, topk=5):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--im_path", type=str, required=True, \
+    parser.add_argument("--image_path", type=str, required=True, \
                         help="Path of HSIs image.")
     parser.add_argument("--topk", type=int, default=5, \
                         help="Number of top results. The default value is 5.")
     args = parser.parse_args()
-    oif(args.im_path, args.topk)
+    oif(args.image_path, args.topk)
