@@ -33,6 +33,7 @@ import paddlers.utils.logging as logging
 from paddlers.utils.checkpoint import det_pretrain_weights_dict
 from .base import BaseModel
 from .utils.det_metrics import VOCMetric, COCOMetric
+from paddlers.models.ppdet.core.workspace import global_config
 
 __all__ = [
     "YOLOv3", "FasterRCNN", "PPYOLO", "PPYOLOTiny", "PPYOLOv2", "MaskRCNN"
@@ -41,20 +42,14 @@ __all__ = [
 # TODO: Prune and decoupling
 
 
-
-ppdet.modeling.MobileNetV1 = ppdet.modeling.MobileNet
-
 class BaseDetector(BaseModel):
     data_fields = {
-            'coco': {
-                    'im_id', 'image_shape', 'image', 'gt_bbox', 'gt_class',
-                    'is_crowd'
-                },
-            'voc': {
-                'im_id', 'image_shape', 'image', 'gt_bbox', 'gt_class',
-                'difficult'
-                }
-            }
+        'coco':
+        {'im_id', 'image_shape', 'image', 'gt_bbox', 'gt_class', 'is_crowd'},
+        'voc':
+        {'im_id', 'image_shape', 'image', 'gt_bbox', 'gt_class', 'difficult'}
+    }
+
     def __init__(self, model_name, num_classes=80, **params):
         self.init_params.update(locals())
         if 'with_net' in self.init_params:
@@ -121,41 +116,14 @@ class BaseDetector(BaseModel):
     def _get_backbone(self, backbone_name, **params):
         # parse ResNetxx_xx
         if backbone_name.startswith('ResNet'):
-            names = backbone_name.split('_')
+            name = backbone_name.split('_')
             fixed_kwargs = {}
-            depth = names[0]
+            depth = name[0]
             fixed_kwargs['depth'] = int(depth[6:])
-            if len(names) > 1:
-                fixed_kwargs['variant'] = names[1]
+            if len(name) > 1:
+                fixed_kwargs['variant'] = name[1]
             backbone = getattr(ppdet.modeling, 'ResNet')
             backbone = functools.partial(backbone, **fixed_kwargs)
-        # parse HRNet_Wxx
-        elif backbone_name.startswith('HRNet'):
-            names = backbone_name.split('_')
-            depth = names[1]
-            fixed_kwargs = {'width': int(depth[1:])}
-            backbone = getattr(ppdet.modeling, 'HRNet')
-            backbone = functools.partial(backbone, **fixed_kwargs)
-        elif backbone_name.startswith('ESNet'):
-            cfgs = {'ESNet_m' : dict(scale=0.75,
-                 act="hard_swish",
-                 feature_maps=[4, 11, 14],
-                 channel_ratio=[
-                    0.875, 0.5, 0.5, 0.5, 0.625, 0.5, 0.625, 0.5, 0.5, 0.5,
-                    0.5, 0.5, 0.5]),
-                'ESNet_s': dict(scale=1.0,
-                 act="hard_swish",
-                 feature_maps=[4, 11, 14],
-                 channel_ratio=[
-                        0.875, 0.5, 1.0, 0.625, 0.5, 0.75, 0.625, 0.625, 0.5,
-                        0.625, 1.0, 0.625, 0.75]),
-                'ESNet_l': dict(scale=1.25,
-                     act="hard_swish",
-                     feature_maps=[4, 11, 14],
-                     channel_ratio=[
-                            0.875, 0.5, 1.0, 0.625, 0.5, 0.75, 0.625, 0.625, 0.5,
-                            0.625, 1.0, 0.625, 0.75])}
-            backbone = functools.partial(ppdet.modeling.ESNet, **cfgs[backbone_name])
         else:
             backbone = getattr(ppdet.modeling, backbone_name)
 
@@ -338,12 +306,13 @@ class BaseDetector(BaseModel):
         return in_args
 
     def _real_train(self, num_epochs, train_dataset, train_batch_size,
-                    eval_dataset, batch_transforms, optimizer, save_interval_epochs,
-                    log_interval_steps, save_dir, pretrain_weights,
-                    learning_rate, warmup_steps, warmup_start_lr,
-                    lr_decay_epochs, lr_decay_gamma, metric, use_ema,
-                    early_stop, early_stop_patience, use_vdl, resume_checkpoint,
-                    scheduler, cosine_decay_num_epoch, clip_grad_by_norm):
+                    eval_dataset, batch_transforms, optimizer,
+                    save_interval_epochs, log_interval_steps, save_dir,
+                    pretrain_weights, learning_rate, warmup_steps,
+                    warmup_start_lr, lr_decay_epochs, lr_decay_gamma, metric,
+                    use_ema, early_stop, early_stop_patience, use_vdl,
+                    resume_checkpoint, scheduler, cosine_decay_num_epoch,
+                    clip_grad_by_norm):
 
         if self.status == 'Infer':
             logging.error(
@@ -353,7 +322,6 @@ class BaseDetector(BaseModel):
             logging.error(
                 "`pretrain_weights` and `resume_checkpoint` cannot be set simultaneously.",
                 exit=True)
-        
 
         if metric is None:
             if eval_dataset.__class__.__name__ == 'VOCDetDataset':
@@ -706,7 +674,8 @@ class BaseDetector(BaseModel):
             sample = transforms(sample)
             data = sample[0]
             batch_samples.append(data)
-        batch_transforms = self._compose_batch_transform(batch_transforms, 'test')
+        batch_transforms = self._compose_batch_transform(batch_transforms,
+                                                         'test')
         batch_samples = batch_transforms(batch_samples)
         if to_tensor:
             for k in batch_samples:
@@ -833,17 +802,18 @@ class PicoDet(BaseDetector):
                 neck_out_channels = 128
                 head_num_convs = 4
             elif backbone == 'MobileNetV3':
-                kwargs.update(dict(
-                            extra_block_filters=[],
-                            feature_maps=[7, 13, 16]))
+                kwargs.update(
+                    dict(
+                        extra_block_filters=[], feature_maps=[7, 13, 16]))
                 neck_out_channels = 128
                 head_num_convs = 4
             else:
-                kwargs.update(dict(
-                                return_idx=[1, 2, 3],
-                                freeze_at=-1,
-                                freeze_norm=False,
-                                norm_decay=0.))
+                kwargs.update(
+                    dict(
+                        return_idx=[1, 2, 3],
+                        freeze_at=-1,
+                        freeze_norm=False,
+                        norm_decay=0.))
                 neck_out_channels = 128
                 head_num_convs = 4
             backbone = self._get_backbone(backbone, **kwargs)
@@ -958,8 +928,8 @@ class PicoDet(BaseDetector):
     def _pre_train(self, in_args):
         optimizer = in_args['optimizer']
         if optimizer is None:
-            in_args['num_steps_each_epoch'] = len(in_args['train_dataset']) // in_args[
-                'train_batch_size']
+            in_args['num_steps_each_epoch'] = len(in_args[
+                'train_dataset']) // in_args['train_batch_size']
             optimizer = self.default_optimizer(
                 parameters=self.net.parameters(),
                 learning_rate=in_args['learning_rate'],
@@ -1005,6 +975,7 @@ class YOLOv3(BaseDetector):
                  rotate=False,
                  num_classes=80,
                  backbone='MobileNetV1',
+                 post_process=None,
                  anchors=[[10, 13], [16, 30], [33, 23], [30, 61], [62, 45],
                           [59, 119], [116, 90], [156, 198], [373, 326]],
                  anchor_masks=[[6, 7, 8], [3, 4, 5], [0, 1, 2]],
@@ -1019,7 +990,8 @@ class YOLOv3(BaseDetector):
         self.init_params = locals()
         if backbone not in {
                 'MobileNetV1', 'MobileNetV1_ssld', 'MobileNetV3',
-                'MobileNetV3_ssld', 'DarkNet53', 'ResNet50_vd_dcn', 'ResNet34', 'ResNet50'
+                'MobileNetV3_ssld', 'DarkNet53', 'ResNet50_vd_dcn', 'ResNet34',
+                'ResNet50'
         }:
             raise ValueError(
                 "backbone: {} is not supported. Please choose one of "
@@ -1038,44 +1010,51 @@ class YOLOv3(BaseDetector):
             kwargs['norm_type'] = norm_type
 
             if 'MobileNetV3' in backbone:
-                kwargs['feature_maps']=[7, 13, 16]
+                kwargs['feature_maps'] = [7, 13, 16]
             elif backbone == 'ResNet50_vd_dcn':
-                kwargs.update(dict(return_idx=[1, 2, 3],
-                                   freeze_at=-1,
-                                   freeze_norm=False,
-                                   dcn_v2_stages=[3],
-                                   norm_decay=0.))
+                kwargs.update(
+                    dict(
+                        return_idx=[1, 2, 3],
+                        freeze_at=-1,
+                        freeze_norm=False,
+                        dcn_v2_stages=[3],
+                        norm_decay=0.))
             elif backbone == 'ResNet34':
-                kwargs.update(dict(return_idx=[1, 2, 3],
-                                   freeze_at=-1,
-                                   freeze_norm=False))
+                kwargs.update(
+                    dict(
+                        return_idx=[1, 2, 3], freeze_at=-1, freeze_norm=False))
             elif backbone == 'ResNet50':
-                kwargs.update(dict(return_idx=[1, 2, 3],
-                                   groups=32,
-                                   freeze_norm=False))
+                kwargs.update(
+                    dict(
+                        return_idx=[1, 2, 3], groups=32, freeze_norm=False))
 
             backbone = self._get_backbone(backbone, **kwargs)
             nms = ppdet.modeling.MultiClassNMS(
-                        score_threshold=nms_score_threshold,
-                        nms_top_k=nms_topk,
-                        keep_top_k=nms_keep_topk,
-                        nms_threshold=nms_iou_threshold,
-                        normalized=nms_normalized)
+                score_threshold=nms_score_threshold,
+                nms_top_k=nms_topk,
+                keep_top_k=nms_keep_topk,
+                nms_threshold=nms_iou_threshold,
+                normalized=nms_normalized)
             if rotate:
-                neck = ppdet.modeling.FPN(in_channels=[i.channels for i in backbone.out_shape],
-                                          out_channel=256,
-                                          has_extra_convs=True,
-                                          use_c5=False,
-                                          relu_before_extra_convs=True)
-                assigner = ppdet.modeling.FCOSRAssigner(factor=12,
-                                                        threshold=0.23,
-                                                        boundary=[[-1, 64], [64, 128], [128, 256], [256, 512], [512, 100000000.0]])
-                yolo_head = ppdet.modeling.FCOSRHead(feat_channels=256, 
-                                                     fpn_strides=[8, 16, 32, 64, 128],
-                                                     stacked_convs=4,
-                                                     loss_weight={'class':1., 'probiou':1.},
-                                                     assigner=assigner,
-                                                     nms=nms)
+                neck = ppdet.modeling.FPN(
+                    in_channels=[i.channels for i in backbone.out_shape],
+                    out_channel=256,
+                    has_extra_convs=True,
+                    use_c5=False,
+                    relu_before_extra_convs=True)
+                assigner = ppdet.modeling.FCOSRAssigner(
+                    factor=12,
+                    threshold=0.23,
+                    boundary=[[-1, 64], [64, 128], [128, 256], [256, 512],
+                              [512, 100000000.0]])
+                yolo_head = ppdet.modeling.FCOSRHead(
+                    feat_channels=256,
+                    fpn_strides=[8, 16, 32, 64, 128],
+                    stacked_convs=4,
+                    loss_weight={'class': 1.,
+                                 'probiou': 1.},
+                    assigner=assigner,
+                    nms=nms)
                 post_process = None
             else:
                 neck = ppdet.modeling.YOLOv3FPN(
@@ -1118,8 +1097,8 @@ class YOLOv3(BaseDetector):
             if mode == 'train':
                 batch_transforms = [
                     _BatchPad(pad_to_stride=-1), _NormalizeBox(),
-                    _PadBox(getattr(self, 'num_max_boxes', 50)), _BboxXYXY2XYWH(),
-                    _Gt2YoloTarget(
+                    _PadBox(getattr(self, 'num_max_boxes', 50)),
+                    _BboxXYXY2XYWH(), _Gt2YoloTarget(
                         anchor_masks=self.anchor_masks,
                         anchors=self.anchors,
                         downsample_ratios=getattr(self, 'downsample_ratios',
@@ -1218,10 +1197,7 @@ class FasterRCNN(BaseDetector):
                     logging.warning(
                         "Backbone {} without fpn should be used along with dcn disabled, 'with_dcn' is forcibly set to False".
                         format(backbone))
-                kwargs.update(dict(
-                    return_idx=[2],
-                    num_stages=3
-                    ))
+                kwargs.update(dict(return_idx=[2], num_stages=3))
                 kwargs.pop('dcn_v2_stages')
             elif 'ResNet34' in backbone:
                 if not with_fpn:
@@ -1386,8 +1362,7 @@ class FasterRCNN(BaseDetector):
         else:
             if isinstance(batch_transforms, BatchCompose):
                 batch_transforms = batch_transforms.batch_transforms
-        batch_transforms = BatchCompose(
-            batch_transforms, collate_batch=False)
+        batch_transforms = BatchCompose(batch_transforms, collate_batch=False)
 
         return batch_transforms
 
@@ -1490,20 +1465,25 @@ class PPYOLO(YOLOv3):
 
             if backbone == 'ResNet50_vd_dcn':
                 backbone = self._get_backbone(
-                    backbone,
+                    'ResNet',
+                    variant='d',
                     norm_type=norm_type,
                     return_idx=[1, 2, 3],
                     dcn_v2_stages=[3],
                     freeze_at=-1,
-                    freeze_norm=False)
+                    freeze_norm=False,
+                    norm_decay=0.)
 
             elif backbone == 'ResNet18_vd':
                 backbone = self._get_backbone(
-                    backbone,
+                    'ResNet',
+                    depth=18,
+                    variant='d',
                     norm_type=norm_type,
                     return_idx=[2, 3],
                     freeze_at=-1,
-                    freeze_norm=False)
+                    freeze_norm=False,
+                    norm_decay=0.)
 
             elif backbone == 'MobileNetV3_large':
                 backbone = self._get_backbone(
@@ -1633,6 +1613,7 @@ class PPYOLOTiny(YOLOv3):
                  nms_topk=1000,
                  nms_keep_topk=100,
                  nms_iou_threshold=0.45,
+                 nms_normalized=True,
                  **params):
         self.init_params = locals()
         if backbone != 'MobileNetV3':
@@ -1779,22 +1760,26 @@ class PPYOLOv2(YOLOv3):
 
             if backbone == 'ResNet50_vd_dcn':
                 backbone = self._get_backbone(
-                    backbone,
+                    'ResNet',
+                    variant='d',
                     norm_type=norm_type,
                     return_idx=[1, 2, 3],
                     dcn_v2_stages=[3],
                     freeze_at=-1,
-                    freeze_norm=False)
+                    freeze_norm=False,
+                    norm_decay=0.)
 
             elif backbone == 'ResNet101_vd_dcn':
                 backbone = self._get_backbone(
-                    backbone,
+                    'ResNet',
                     depth=101,
+                    variant='d',
                     norm_type=norm_type,
                     return_idx=[1, 2, 3],
                     dcn_v2_stages=[3],
                     freeze_at=-1,
-                    freeze_norm=False)
+                    freeze_norm=False,
+                    norm_decay=0.)
 
             neck = ppdet.modeling.PPYOLOPAN(
                 norm_type=norm_type,
@@ -1886,16 +1871,6 @@ class PPYOLOv2(YOLOv3):
 
 
 class MaskRCNN(BaseDetector):
-    data_fields = {
-            'coco': {
-                    'im_id', 'image_shape', 'image', 'gt_bbox', 'gt_class',
-                    'gt_poly', 'is_crowd'
-                },
-            'voc': {
-                'im_id', 'image_shape', 'image', 'gt_bbox', 'gt_class',
-                'difficult'
-                }
-            }
     def __init__(self,
                  num_classes=80,
                  backbone='ResNet50_vd',
@@ -1933,17 +1908,16 @@ class MaskRCNN(BaseDetector):
                     logging.warning(
                         "Backbone {} should be used along with dcn disabled, 'with_dcn' is forcibly set to False".
                         format(backbone))
-                    kwargs.update(dict(
-                        return_idx=[2],
-                        num_stages=3
-                        ))
+                    kwargs.update(dict(return_idx=[2], num_stages=3))
             elif 'ResNet50_vd' in backbone:
                 if not with_fpn:
                     logging.warning(
                         "Backbone {} should be used along with fpn enabled, 'with_fpn' is forcibly set to True".
                         format(backbone))
                     with_fpn = True
-                    kwargs['lr_mult_list'] = [0.05, 0.05, 0.1, 0.15] if '_ssld' in backbone else [1.0, 1.0, 1.0, 1.0]
+                    kwargs['lr_mult_list'] = [
+                        0.05, 0.05, 0.1, 0.15
+                    ] if '_ssld' in backbone else [1.0, 1.0, 1.0, 1.0]
             else:
                 if not with_fpn:
                     logging.warning(
@@ -2124,8 +2098,7 @@ class MaskRCNN(BaseDetector):
         else:
             if isinstance(batch_transforms, BatchCompose):
                 batch_transforms = batch_transforms.batch_transforms
-        batch_transforms = BatchCompose(
-            batch_transforms, collate_batch=False)
+        batch_transforms = BatchCompose(batch_transforms, collate_batch=False)
 
         return batch_transforms
 
