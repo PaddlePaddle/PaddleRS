@@ -37,13 +37,13 @@ def _check_dir(check_path, show=True):
             print("make dir:", check_directory)
 
 
-def json_anno_sta(json_path, csv_path, pic_shape_path, pic_shape_rate_path,
-                  pic_pos_path, pic_pos_end_path, pic_cat_path,
-                  pic_obj_num_path, get_relative, image_keyname, anno_keyname):
+def json_anno_sta(json_path, csv_path, obj_shape_path, obj_shape_rate_path,
+                  obj_pos_path, obj_pos_end_path, obj_cat_path, obj_num_path,
+                  get_relative, img_keyname, anno_keyname):
     print("json read...\n")
     with open(json_path, "r") as load_f:
         data = json.load(load_f)
-    df_image = pd.DataFrame(data[image_keyname])
+    df_image = pd.DataFrame(data[img_keyname])
     sns.jointplot(y="height", x="width", data=df_image, kind="hex")
     plt.close()
     df_image = df_image.rename(columns={
@@ -57,22 +57,22 @@ def json_anno_sta(json_path, csv_path, pic_shape_path, pic_shape_rate_path,
     df_anno["width"] = df_anno["width"].astype(int)
     df_anno["height"] = df_anno["height"].astype(int)
     df_merge = pd.merge(df_image, df_anno, on="image_id")
-    if pic_shape_path is not None:
-        _check_dir(pic_shape_path)
+    if obj_shape_path is not None:
+        _check_dir(obj_shape_path)
         sns.jointplot(y="height", x="width", data=df_merge, kind="hex")
-        plt.savefig(pic_shape_path)
+        plt.savefig(obj_shape_path)
         plt.close()
-        print("png save to", pic_shape_path)
+        print("png save to", obj_shape_path)
         if get_relative:
-            png_shapeR_path = pic_shape_path.replace(".png", "_Relative.png")
+            png_shapeR_path = obj_shape_path.replace(".png", "_relative.png")
             df_merge["heightR"] = df_merge["height"] / df_merge["image_height"]
             df_merge["widthR"] = df_merge["width"] / df_merge["image_width"]
             sns.jointplot(y="heightR", x="widthR", data=df_merge, kind="hex")
             plt.savefig(png_shapeR_path)
             plt.close()
             print("png save to", png_shapeR_path)
-    if pic_shape_rate_path is not None:
-        _check_dir(pic_shape_rate_path)
+    if obj_shape_rate_path is not None:
+        _check_dir(obj_shape_rate_path)
         plt.figure(figsize=(12, 8))
         df_merge["shape_rate"] = (df_merge["width"] /
                                   df_merge["height"]).round(1)
@@ -80,33 +80,33 @@ def json_anno_sta(json_path, csv_path, pic_shape_path, pic_shape_rate_path,
             sort=False, bins=SHP_RATE_BINS).plot(
                 kind="bar", title="images shape rate")
         plt.xticks(rotation=20)
-        plt.savefig(pic_shape_rate_path)
+        plt.savefig(obj_shape_rate_path)
         plt.close()
-        print("png save to", pic_shape_rate_path)
-    if pic_pos_path is not None:
-        _check_dir(pic_pos_path)
+        print("png save to", obj_shape_rate_path)
+    if obj_pos_path is not None:
+        _check_dir(obj_pos_path)
         sns.jointplot(y="pox_y", x="pox_x", data=df_merge, kind="hex")
-        plt.savefig(pic_pos_path)
+        plt.savefig(obj_pos_path)
         plt.close()
-        print("png save to", pic_pos_path)
+        print("png save to", obj_pos_path)
         if get_relative:
-            png_posR_path = pic_pos_path.replace(".png", "_Relative.png")
+            png_posR_path = obj_pos_path.replace(".png", "_relative.png")
             df_merge["pox_yR"] = df_merge["pox_y"] / df_merge["image_height"]
             df_merge["pox_xR"] = df_merge["pox_x"] / df_merge["image_width"]
             sns.jointplot(y="pox_yR", x="pox_xR", data=df_merge, kind="hex")
             plt.savefig(png_posR_path)
             plt.close()
             print("png save to", png_posR_path)
-    if pic_pos_end_path is not None:
-        _check_dir(pic_pos_end_path)
+    if obj_pos_end_path is not None:
+        _check_dir(obj_pos_end_path)
         df_merge["pox_y_end"] = df_merge["pox_y"] + df_merge["height"]
         df_merge["pox_x_end"] = df_merge["pox_x"] + df_merge["width"]
         sns.jointplot(y="pox_y_end", x="pox_x_end", data=df_merge, kind="hex")
-        plt.savefig(pic_pos_end_path)
+        plt.savefig(obj_pos_end_path)
         plt.close()
-        print("png save to", pic_pos_end_path)
+        print("png save to", obj_pos_end_path)
         if get_relative:
-            png_posEndR_path = pic_pos_end_path.replace(".png", "_Relative.png")
+            png_posEndR_path = obj_pos_end_path.replace(".png", "_relative.png")
             df_merge["pox_y_endR"] = df_merge["pox_y_end"] / df_merge[
                 "image_height"]
             df_merge["pox_x_endR"] = df_merge["pox_x_end"] / df_merge[
@@ -116,23 +116,23 @@ def json_anno_sta(json_path, csv_path, pic_shape_path, pic_shape_rate_path,
             plt.savefig(png_posEndR_path)
             plt.close()
             print("png save to", png_posEndR_path)
-    if pic_cat_path is not None:
-        _check_dir(pic_cat_path)
+    if obj_cat_path is not None:
+        _check_dir(obj_cat_path)
         plt.figure(figsize=(12, 8))
         df_merge["category_id"].value_counts().sort_index().plot(
             kind="bar", title="obj category")
-        plt.savefig(pic_cat_path)
+        plt.savefig(obj_cat_path)
         plt.close()
-        print("png save to", pic_cat_path)
-    if pic_obj_num_path is not None:
-        _check_dir(pic_obj_num_path)
+        print("png save to", obj_cat_path)
+    if obj_num_path is not None:
+        _check_dir(obj_num_path)
         plt.figure(figsize=(12, 8))
         df_merge["image_id"].value_counts().value_counts().sort_index().plot(
             kind="bar", title="obj number per image")
         plt.xticks(rotation=20)
-        plt.savefig(pic_obj_num_path)
+        plt.savefig(obj_num_path)
         plt.close()
-        print("png save to", pic_obj_num_path)
+        print("png save to", obj_num_path)
     if csv_path is not None:
         _check_dir(csv_path)
         df_merge.to_csv(csv_path)
@@ -146,27 +146,26 @@ if __name__ == "__main__":
                         help="Path of the json file whose statistics you want to collect. Default: None.")
     parser.add_argument("--csv_path", type=str, default=None, \
                         help="(Optional) Path to save the statistics table. Default: None.")
-    parser.add_argument("--pic_shape_path", type=str, default=None, \
-                        help="(Optional) .png image saving path. The image visualizes the two-dimensional distribution of the shape of all target detection frames. Default: None.")
-    parser.add_argument("--pic_shape_rate_path", type=str, default=None, \
+    parser.add_argument("--obj_shape_path", type=str, default=None, \
+                        help="(Optional) .png image saving path. The image visualizes the two-dimensional distribution of the shape of all object detection boxes. Default: None.")
+    parser.add_argument("--obj_shape_rate_path", type=str, default=None, \
                         help="(Optional) .png image saving path. The image visualizes the one-dimensional distribution of shape ratio (width/height) of all target bounding boxes. Default: None.")
-    parser.add_argument("--pic_pos_path", type=str, default=None, \
+    parser.add_argument("--obj_pos_path", type=str, default=None, \
                         help="(Optional) .png image saving path. The image visualizes the two-dimensional distribution of the coordinates at the upper left corner of all bounding boxes. Default: None.")
-    parser.add_argument("--pic_pos_end_path", type=str, default=None, \
+    parser.add_argument("--obj_pos_end_path", type=str, default=None, \
                         help="(Optional) .png image saving path. The image visualizes the two-dimensional distribution of the coordinates at the lower right corner of all bounding boxes. Default: None.")
-    parser.add_argument("--pic_cat_path", type=str, default=None, \
+    parser.add_argument("--obj_cat_path", type=str, default=None, \
                         help="(Optional) .png image saving path. The image visualizes the quantity distribution of objects in each category. Default: None.")
-    parser.add_argument("--pic_obj_num_path", type=str, default=None, \
+    parser.add_argument("--obj_num_path", type=str, default=None, \
                         help="(Optional) .png image saving path. The image visualizes the quantity distribution of annotated objects in a single image. Default: None.")
     parser.add_argument("--get_relative", action="store_true", \
                         help="(Optional) Whether to generate the shape of the image target detection frame and the relative ratio of the coordinates of the upper left corner and lower right corner of the object detection frame (horizontal axis coordinates/image length, vertical axis coordinates/image width). Default: False.")
-    parser.add_argument("--image_keyname", type=str, default="images", \
+    parser.add_argument("--img_keyname", type=str, default="images", \
                         help="(Optional) Image key in the json file. Default: 'images'.")
     parser.add_argument("--anno_keyname", type=str, default="annotations", \
                         help="(Optional) Annotation key in the json file. Default: 'annotations'.")
     args = parser.parse_args()
-    json_anno_sta(args.json_path, args.csv_path, args.pic_shape_path,
-                  args.pic_shape_rate_path, args.pic_pos_path,
-                  args.pic_pos_end_path, args.pic_cat_path,
-                  args.pic_obj_num_path, args.get_relative, args.image_keyname,
-                  args.anno_keyname)
+    json_anno_sta(args.json_path, args.csv_path, args.obj_shape_path,
+                  args.obj_shape_rate_path, args.obj_pos_path,
+                  args.obj_pos_end_path, args.obj_cat_path, args.obj_num_path,
+                  args.get_relative, args.img_keyname, args.anno_keyname)

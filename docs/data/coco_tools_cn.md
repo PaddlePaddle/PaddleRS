@@ -180,21 +180,21 @@ contributor : COCO Consortium
 ```
 python ./coco_tools/json_image_sta.py \
     --json_path=./annotations/instances_val2017.json \
-    --csv_path=./img_sta/images.csv \
-    --pic_shape_path=./img_sta/images_shape.png \
-    --pic_shape_rate_path=./img_sta/images_shape_rate.png
+    --csv_path=./img_sta/img.csv \
+    --img_shape_path=./img_sta/img_shape.png \
+    --img_shape_rate_path=./img_sta/img_shape_rate.png
 ```
 
 #### 3.3.2 参数说明
 
 
-| 参数名                 | 含义                                                                   | 默认值     |
-| ---------------------- | ---------------------------------------------------------------------- | ---------- |
-| `--json_path`          | 需要统计的json文件路径                                                 |            |
-| `--csv_path`           | （可选）统计表格保存路径                                               | `None`     |
-| `--pic_shape_path`     | （可选）.png图片保存路径，图片内容为所有图像shape的二维分布            | `5`        |
-| `--pic_shape_rate_path`| （可选）.png图片保存路径，图片内容为所有图像shape比例(宽/高)的一维分布 | `5`        |
-| `--image_keyname`      | （可选）json文件中，图像所对应的key                                    | `'images'` |
+| 参数名                     | 含义                                                                   | 默认值     |
+|-------------------------| ---------------------------------------------------------------------- | ---------- |
+| `--json_path`           | 需要统计的json文件路径                                                 |            |
+| `--csv_path`            | （可选）统计表格保存路径                                               | `None`     |
+| `--img_shape_path`      | （可选）.png图片保存路径，图片内容为所有图像shape的二维分布            | `5`        |
+| `--img_shape_rate_path` | （可选）.png图片保存路径，图片内容为所有图像shape比例(宽/高)的一维分布 | `5`        |
+| `--img_keyname`         | （可选）json文件中，图像所对应的key                                    | `'images'` |
 
 #### 3.3.3 结果展示
 
@@ -203,17 +203,17 @@ python ./coco_tools/json_image_sta.py \
 ```
 ------------------------------------------------Args------------------------------------------------
 json_path = ./annotations/instances_val2017.json
-csv_path = ./img_sta/images.csv
-pic_shape_path = ./img_sta/images_shape.png
-pic_shape_rate_path = ./img_sta/images_shape_rate.png
-image_keyname = images
+csv_path = ./img_sta/img.csv
+img_shape_path = ./img_sta/img_shape.png
+img_shape_rate_path = ./img_sta/img_shape_rate.png
+img_keyname = images
 
 json read...
 
 make dir: ./img_sta
-png save to ./img_sta/images_shape.png
-png save to ./img_sta/images_shape_rate.png
-csv save to ./img_sta/images.csv
+png save to ./img_sta/img_shape.png
+png save to ./img_sta/img_shape_rate.png
+csv save to ./img_sta/img.csv
 ```
 
 部分表格内容：
@@ -245,32 +245,32 @@ csv save to ./img_sta/images.csv
 ```
 python ./coco_tools/json_anno_sta.py \
     --json_path=./annotations/instances_val2017.json \
-    --csv_path=./anno_sta/annos.csv \
-    --pic_shape_path=./anno_sta/annos_shape.png \
-    --pic_shape_rate_path=./anno_sta/annos_shape_rate.png \
-    --pic_pos_path=./anno_sta/annos_pos.png \
-    --pic_pos_end_path=./anno_sta/annos_pos_end.png \
-    --pic_cat_path=./anno_sta/annos_cat.png \
-    --pic_obj_num_path=./anno_sta/annos_obj_num.png \
+    --csv_path=./anno_sta/obj.csv \
+    --obj_shape_path=./anno_sta/obj_shape.png \
+    --obj_shape_rate_path=./anno_sta/obj_shape_rate.png \
+    --obj_pos_path=./anno_sta/obj_pos.png \
+    --obj_pos_end_path=./anno_sta/obj_pos_end.png \
+    --obj_cat_path=./anno_sta/obj_cat.png \
+    --obj_obj_num_path=./anno_sta/obj_obj_num.png \
     --get_relative=True
 ```
 
 #### 3.4.2 参数说明
 
 
-| 参数名                 | 含义                                                                                                                      | 默认值             |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------- |-----------------|
-| `--json_path`          | 需要统计的json文件路径                                                                                            |                 |
-| `--csv_path`           | （可选）统计表格保存路径                                                                                                  | `None`          |
-| `--pic_shape_path`     | （可选）.png图片保存路径，图片内容为所有目标检测框shape的二维分布                                                         | `None`          |
-| `--pic_shape_rate_path`| （可选）.png图片保存路径，图片内容为所有目标检测框shape比例(宽/高)的一维分布                                              | `None`          |
-| `--pic_pos_path`       | （可选）.png图片保存路径，图片内容为所有目标检测框左上角坐标的二维分布                                                    | `None`          |
-| `--pic_pos_end_path`   | （可选）.png图片保存路径，图片内容为所有目标检测框右下角坐标的二维分布                                                    | `None`          |
-| `--pic_cat_path`       | （可选）.png图片保存路径，图片内容为各个类别的对象数量分布                                                                | `None`          |
-| `--pic_obj_num_path`   | （可选）.png图片保存路径，图片内容为单个图像中含有标注对象的数量分布                                                      | `None`          |
-| `--get_relative`       | （可选）是否生成图像目标检测框shape、目标检测框左上角坐标、右下角坐标的相对比例值<br />(横轴坐标/图片长，纵轴坐标/图片宽) | `False`         |
-| `--image_keyname`      | （可选）json文件中，图像所对应的key                                                                                       | `'images'`      |
-| `--anno_keyname`       | （可选）json文件中，标注所对应的key                                                                                       | `'annotations'` |
+| 参数名                     | 含义                                                                                                                      | 默认值             |
+|-------------------------| ------------------------------------------------------------------------------------------------------------------------- |-----------------|
+| `--json_path`           | 需要统计的json文件路径                                                                                            |                 |
+| `--csv_path`            | （可选）统计表格保存路径                                                                                                  | `None`          |
+| `--obj_shape_path`      | （可选）.png图片保存路径，图片内容为所有目标检测框shape的二维分布                                                         | `None`          |
+| `--obj_shape_rate_path` | （可选）.png图片保存路径，图片内容为所有目标检测框shape比例(宽/高)的一维分布                                              | `None`          |
+| `--obj_pos_path`        | （可选）.png图片保存路径，图片内容为所有目标检测框左上角坐标的二维分布                                                    | `None`          |
+| `--obj_pos_end_path`    | （可选）.png图片保存路径，图片内容为所有目标检测框右下角坐标的二维分布                                                    | `None`          |
+| `--obj_cat_path`        | （可选）.png图片保存路径，图片内容为各个类别的对象数量分布                                                                | `None`          |
+| `--obj_obj_num_path`    | （可选）.png图片保存路径，图片内容为单个图像中含有标注对象的数量分布                                                      | `None`          |
+| `--get_relative`        | （可选）是否生成图像目标检测框shape、目标检测框左上角坐标、右下角坐标的相对比例值<br />(横轴坐标/图片长，纵轴坐标/图片宽) | `False`         |
+| `--img_keyname`         | （可选）json文件中，图像所对应的key                                                                                       | `'images'`      |
+| `--anno_keyname`        | （可选）json文件中，标注所对应的key                                                                                       | `'annotations'` |
 
 #### 3.4.3 结果展示
 
@@ -279,30 +279,30 @@ python ./coco_tools/json_anno_sta.py \
 ```
 ------------------------------------------------Args------------------------------------------------
 json_path = ./annotations/instances_val2017.json
-csv_path = ./anno_sta/annos.csv
-pic_shape_path = ./anno_sta/annos_shape.png
-pic_shape_rate_path = ./anno_sta/annos_shape_rate.png
-pic_pos_path = ./anno_sta/annos_pos.png
-pic_pos_end_path = ./anno_sta/annos_pos_end.png
-pic_cat_path = ./anno_sta/annos_cat.png
-pic_obj_num_path = ./anno_sta/annos_obj_num.png
+csv_path = ./anno_sta/obj.csv
+obj_shape_path = ./anno_sta/obj_shape.png
+obj_shape_rate_path = ./anno_sta/obj_shape_rate.png
+obj_pos_path = ./anno_sta/obj_pos.png
+obj_pos_end_path = ./anno_sta/obj_pos_end.png
+obj_cat_path = ./anno_sta/obj_cat.png
+obj_obj_num_path = ./anno_sta/obj_obj_num.png
 get_relative = True
-image_keyname = images
+img_keyname = images
 anno_keyname = annotations
 
 json read...
 
 make dir: ./anno_sta
-png save to ./anno_sta/annos_shape.png
-png save to ./anno_sta/annos_shape_Relative.png
-png save to ./anno_sta/annos_shape_rate.png
-png save to ./anno_sta/annos_pos.png
-png save to ./anno_sta/annos_pos_Relative.png
-png save to ./anno_sta/annos_pos_end.png
-png save to ./anno_sta/annos_pos_end_Relative.png
-png save to ./anno_sta/annos_cat.png
-png save to ./anno_sta/annos_obj_num.png
-csv save to ./anno_sta/annos.csv
+png save to ./anno_sta/obj_shape.png
+png save to ./anno_sta/obj_shape_relative.png
+png save to ./anno_sta/obj_shape_rate.png
+png save to ./anno_sta/obj_pos.png
+png save to ./anno_sta/obj_pos_relative.png
+png save to ./anno_sta/obj_pos_end.png
+png save to ./anno_sta/obj_pos_end_relative.png
+png save to ./anno_sta/obj_cat.png
+png save to ./anno_sta/obj_num.png
+csv save to ./anno_sta/obj.csv
 ```
 
 部分表格内容：
@@ -363,12 +363,12 @@ python ./coco_tools/json_image2json.py \
 #### 3.5.2 参数说明
 
 
-| 参数名              | 含义                              | 默认值         |
-| ------------------- | --------------------------------- | -------------- |
+| 参数名                 | 含义                              | 默认值         |
+|---------------------| --------------------------------- | -------------- |
 | `--image_dir`       | 需要统计的图像目录路径            |                |
 | `--json_train_path` | 用于参考的训练集json文件路径      |                |
 | `--json_test_path`  | 生成的测试集json文件路径          |                |
-| `--image_keyname`   | （可选）json文件中，图像对应的key | `'images'`     |
+| `--img_keyname`     | （可选）json文件中，图像对应的key | `'images'`     |
 | `--cat_keyname`     | （可选）json文件中，类别对应的key | `'categories'` |
 
 #### 3.5.3 结果展示
@@ -447,16 +447,16 @@ python ./coco_tools/json_split.py \
 #### 3.6.2 参数说明
 
 
-| 参数名               | 含义                                                                                      | 默认值         |
-| -------------------- | ----------------------------------------------------------------------------------------- | -------------- |
-| `--json_all_path`    | 需要拆分的json文件路径                                                                    |                |
-| `--json_train_path`  | 生成的train部分json文件                                                                   |                |
-| `--json_val_path`    | 生成的val部分json文件                                                                     |                |
-| `--val_split_rate`   | （可选）拆分过程中，val集文件的比例                                                       | `0.1`          |
-| `--val_split_num`    | （可选）拆分过程中，val集文件的数量，<br />如果设置了该参数，则`--val_split_rate`参数失效 | `None`         |
-| `--keep_val_in_train`| （可选）拆分过程中，是否在train中仍然保留val部分                                          | `False`        |
-| `--image_keyname`    | （可选）json文件中，图像对应的key                                                         | `'images'`     |
-| `--cat_keyname`      | （可选）json文件中，类别对应的key                                                         | `'categories'` |
+| 参数名                   | 含义                                                                                      | 默认值         |
+|-----------------------| ----------------------------------------------------------------------------------------- | -------------- |
+| `--json_all_path`     | 需要拆分的json文件路径                                                                    |                |
+| `--json_train_path`   | 生成的train部分json文件                                                                   |                |
+| `--json_val_path`     | 生成的val部分json文件                                                                     |                |
+| `--val_split_rate`    | （可选）拆分过程中，val集文件的比例                                                       | `0.1`          |
+| `--val_split_num`     | （可选）拆分过程中，val集文件的数量，<br />如果设置了该参数，则`--val_split_rate`参数失效 | `None`         |
+| `--keep_val_in_train` | （可选）拆分过程中，是否在train中仍然保留val部分                                          | `False`        |
+| `--img_keyname`       | （可选）json文件中，图像对应的key                                                         | `'images'`     |
+| `--cat_keyname`       | （可选）json文件中，类别对应的key                                                         | `'categories'` |
 
 #### 3.6.3 结果展示
 
@@ -470,7 +470,7 @@ json_val_path = ./instances_val2017_val.json
 val_split_rate = 0.1
 val_split_num = None
 keep_val_in_train = False
-image_keyname = images
+img_keyname = images
 anno_keyname = annotations
 
 -----------------------------------------------Split------------------------------------------------

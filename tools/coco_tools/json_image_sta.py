@@ -32,27 +32,27 @@ def _check_dir(check_path, show=False):
             print("make dir:", check_directory)
 
 
-def json_image_sta(json_path, csv_path, pic_shape_path, pic_shape_rate_path,
-                   image_keyname):
+def json_image_sta(json_path, csv_path, img_shape_path, img_shape_rate_path,
+                   img_keyname):
     print("json read...\n")
     with open(json_path, "r") as load_f:
         data = json.load(load_f)
-    df_image = pd.DataFrame(data[image_keyname])
-    if pic_shape_path is not None:
-        _check_dir(pic_shape_path)
+    df_image = pd.DataFrame(data[img_keyname])
+    if img_shape_path is not None:
+        _check_dir(img_shape_path)
         sns.jointplot(y="height", x="width", data=df_image, kind="hex")
-        plt.savefig(pic_shape_path)
+        plt.savefig(img_shape_path)
         plt.close()
-        print("png save to", pic_shape_path)
-    if pic_shape_rate_path is not None:
-        _check_dir(pic_shape_rate_path)
+        print("png save to", img_shape_path)
+    if img_shape_rate_path is not None:
+        _check_dir(img_shape_rate_path)
         df_image["shape_rate"] = (df_image["width"] /
                                   df_image["height"]).round(1)
         df_image["shape_rate"].value_counts().sort_index().plot(
             kind="bar", title="images shape rate")
-        plt.savefig(pic_shape_rate_path)
+        plt.savefig(img_shape_rate_path)
         plt.close()
-        print("png save to", pic_shape_rate_path)
+        print("png save to", img_shape_rate_path)
     if csv_path is not None:
         _check_dir(csv_path)
         df_image.to_csv(csv_path)
@@ -65,12 +65,12 @@ if __name__ == "__main__":
                         help="Path of the json file whose statistics are to be collected. Default: None.")
     parser.add_argument("--csv_path", type=str, default=None, \
                         help="(Optional) Path for the statistics table. Default: None.")
-    parser.add_argument("--pic_shape_path", type=str, default=None, \
+    parser.add_argument("--img_shape_path", type=str, default=None, \
                         help="(Optional) .png image saving path. The image visualizes the two-dimensional distribution of all image shapes. Default: None.")
-    parser.add_argument("--pic_shape_rate_path", type=str, default=None, \
+    parser.add_argument("--img_shape_rate_path", type=str, default=None, \
                         help="(Optional) .png image saving path. The image visualizes the one-dimensional distribution of shape ratio (width/height) of all images. Default: None.")
-    parser.add_argument("--image_keyname", type=str, default="images", \
+    parser.add_argument("--img_keyname", type=str, default="images", \
                         help="(Optional) Image key in the json file. Default: 'images'.")
     args = parser.parse_args()
-    json_image_sta(args.json_path, args.csv_path, args.pic_shape_path,
-                   args.pic_shape_rate_path, args.image_keyname)
+    json_image_sta(args.json_path, args.csv_path, args.img_shape_path,
+                   args.img_shape_rate_path, args.img_keyname)

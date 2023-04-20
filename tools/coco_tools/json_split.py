@@ -28,13 +28,13 @@ def _get_annno(df_image_split, df_anno):
 
 
 def json_split(json_all_path, json_train_path, json_val_path, val_split_rate,
-               val_split_num, keep_val_in_train, image_keyname, anno_keyname):
+               val_split_num, keep_val_in_train, img_keyname, anno_keyname):
     print("Split".center(100, "-"))
     print("json read...\n")
     with open(json_all_path, "r") as load_f:
         data = json.load(load_f)
     df_anno = pd.DataFrame(data[anno_keyname])
-    df_image = pd.DataFrame(data[image_keyname])
+    df_image = pd.DataFrame(data[img_keyname])
     df_image = df_image.rename(columns={"id": "image_id"})
     df_image = df_image.sample(frac=1, random_state=0)
     if val_split_num is None:
@@ -53,12 +53,12 @@ def json_split(json_all_path, json_train_path, json_val_path, val_split_rate,
         columns={"image_id": "id"}).sort_values(by="id")
     df_image_val = df_image_val.rename(columns={"image_id": "id"}).sort_values(
         by="id")
-    data[image_keyname] = json.loads(df_image_train.to_json(orient="records"))
+    data[img_keyname] = json.loads(df_image_train.to_json(orient="records"))
     data[anno_keyname] = json.loads(df_anno_train.to_json(orient="records"))
     str_json = json.dumps(data, ensure_ascii=False)
     with open(json_train_path, "w", encoding="utf-8") as file_obj:
         file_obj.write(str_json)
-    data[image_keyname] = json.loads(df_image_val.to_json(orient="records"))
+    data[img_keyname] = json.loads(df_image_val.to_json(orient="records"))
     data[anno_keyname] = json.loads(df_anno_val.to_json(orient="records"))
     str_json = json.dumps(data, ensure_ascii=False)
     with open(json_val_path, "w", encoding="utf-8") as file_obj:
@@ -84,11 +84,11 @@ if __name__ == "__main__":
                         help="(Optional) Number of val set files. If this parameter is set,`--val_split_rate` will be invalidated. Default: None.")
     parser.add_argument("--keep_val_in_train", action="store_true", \
                         help="(Optional) Whether to keep the val set samples in the train set. Default: False.")
-    parser.add_argument("--image_keyname", type=str, default="images", \
+    parser.add_argument("--img_keyname", type=str, default="images", \
                         help="(Optional) Image key in the json file. Default: 'images'.")
     parser.add_argument("--anno_keyname", type=str, default="annotations", \
                         help="(Optional) Category key in the json file. Default: 'annotations'.")
     args = parser.parse_args()
     json_split(args.json_all_path, args.json_train_path, args.json_val_path,
                args.val_split_rate, args.val_split_num, args.keep_val_in_train,
-               args.image_keyname, args.anno_keyname)
+               args.img_keyname, args.anno_keyname)

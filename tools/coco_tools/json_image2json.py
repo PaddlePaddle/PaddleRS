@@ -20,7 +20,7 @@ import cv2
 from tqdm import tqdm
 
 
-def json_image2json(image_dir, json_train_path, json_test_path, image_keyname,
+def json_image2json(image_dir, json_train_path, json_test_path, img_keyname,
                     cat_keyname):
     print("Image to Json".center(100, "-"))
     print("json read...\n")
@@ -41,7 +41,7 @@ def json_image2json(image_dir, json_train_path, json_test_path, image_keyname,
             tmp["file_name"] = image_name
             images.append(tmp)
     print("\n total test image:", len(file_list))
-    data[image_keyname] = images
+    data[img_keyname] = images
     data[cat_keyname] = data_train[cat_keyname]
     with open(json_test_path, "w") as f:
         json.dump(data, f)
@@ -55,10 +55,10 @@ if __name__ == "__main__":
                         help="Json file path of the training set. Used as reference. Default: None.")
     parser.add_argument("--result_path", type=str, required=True, \
                         help="Path to the generated test set json file. Default: None.")
-    parser.add_argument("--image_keyname", type=str, default="images", \
+    parser.add_argument("--img_keyname", type=str, default="images", \
                         help="(Optional) Image key in the json file. Default: 'images'.")
     parser.add_argument("--cat_keyname", type=str, default="categories", \
                         help="(Optional) Category key in the json file. Default: 'categories'.")
     args = parser.parse_args()
     json_image2json(args.image_dir, args.json_train_path, args.result_path,
-                    args.image_keyname, args.cat_keyname)
+                    args.img_keyname, args.cat_keyname)
