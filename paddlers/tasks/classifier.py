@@ -29,7 +29,6 @@ from paddlers.models import clas_losses
 from paddlers.models.ppcls.data.postprocess import build_postprocess
 from paddlers.utils.checkpoint import cls_pretrain_weights_dict
 from paddlers.transforms import Resize, decode_image, construct_sample
-from paddlers.transforms.operators import ArrangeClassifier
 
 from .base import BaseModel
 
@@ -37,8 +36,6 @@ __all__ = ["ResNet50_vd", "MobileNetV3", "HRNet", "CondenseNetV2"]
 
 
 class BaseClassifier(BaseModel):
-    _arrange = ArrangeClassifier
-
     def __init__(self,
                  model_name,
                  in_channels=3,
@@ -122,13 +119,13 @@ class BaseClassifier(BaseModel):
         return input_spec
 
     def run(self, net, inputs, mode):
-        net_out = net(inputs[0])
+        net_out = net(inputs['image'])
 
         if mode == 'test':
             return self.postprocess(net_out)
 
         outputs = OrderedDict()
-        label = paddle.to_tensor(inputs[1], dtype="int64")
+        label = paddle.to_tensor(inputs['label'], dtype="int64")
 
         if mode == 'eval':
             label = paddle.unsqueeze(label, axis=-1)
@@ -404,8 +401,6 @@ class BaseClassifier(BaseModel):
         if nranks < 2 or local_rank == 0:
             self.eval_data_loader = self.build_data_loader(
                 eval_dataset, batch_size=batch_size, mode='eval')
-            self._check_arrange(self.eval_data_loader.dataset.transforms,
-                                'eval')
             logging.info(
                 "Start to evaluate(total_samples={}, total_steps={})...".format(
                     eval_dataset.num_samples, eval_dataset.num_samples))
@@ -414,7 +409,6 @@ class BaseClassifier(BaseModel):
             top5s = []
             with paddle.no_grad():
                 for step, data in enumerate(self.eval_data_loader):
-                    data.append(eval_dataset.transforms.transforms)
                     outputs = self.run(self.net, data, 'eval')
                     top1s.append(outputs["top1"])
                     top5s.append(outputs["top5"])
@@ -461,8 +455,6 @@ class BaseClassifier(BaseModel):
             images = [img_file]
         else:
             images = img_file
-        transforms = self._build_transforms(transforms, "test")
-        self._check_arrange(transforms, "test")
         data, _ = self.preprocess(images, transforms, self.model_type)
         self.net.eval()
 
@@ -495,20 +487,14 @@ class BaseClassifier(BaseModel):
                 im = decode_image(im, read_raw=True)
             sample = construct_sample(image=im)
             data = transforms(sample)
-            im = data[0][0]
+            im = data[0]['image']
             batch_im.append(im)
         if to_tensor:
             batch_im = paddle.to_tensor(batch_im)
         else:
             batch_im = np.asarray(batch_im)
 
-        return batch_im, None
-
-    def _check_arrange(self, transforms, mode):
-        super()._check_arrange(transforms, mode)
-        if not isinstance(transforms.arrange, ArrangeClassifier):
-            raise TypeError(
-                "`transforms.arrange` must be an `ArrangeClassifier` object.")
+        return {'image': batch_im}, None
 
     def build_data_loader(self,
                           dataset,

@@ -37,11 +37,9 @@ def normalize(im, mean, std, min_value=[0, 0, 0], max_value=[255, 255, 255]):
     return im
 
 
-def permute(im, to_bgr=False):
+def permute(im):
     im = np.swapaxes(im, 1, 2)
     im = np.swapaxes(im, 1, 0)
-    if to_bgr:
-        im = im[[2, 1, 0], :, :]
     return im
 
 
@@ -396,6 +394,14 @@ def to_uint8(im, norm=True, stretch=False):
         np.ndarray: Image data with unit8 type.
     """
 
+    EPS = 1e-32
+
+    def _minmax_norm(image):
+        image = image.astype(np.float32)
+        min_val = image.min()
+        max_val = image.max()
+        return (image - min_val) / (max_val - min_val + EPS)
+
     # 2% linear stretch
     def _two_percent_linear(image, max_out=1., min_out=0.):
         def _gray_process(gray, maxout=max_out, minout=min_out):
@@ -403,7 +409,7 @@ def to_uint8(im, norm=True, stretch=False):
             high_value = np.percentile(gray, 98)
             low_value = np.percentile(gray, 2)
             truncated_gray = np.clip(gray, a_min=low_value, a_max=high_value)
-            processed_gray = ((truncated_gray - low_value) / (high_value - low_value)) * \
+            processed_gray = ((truncated_gray - low_value) / (high_value - low_value + EPS)) * \
                              (maxout - minout)
             return processed_gray
 
@@ -416,24 +422,28 @@ def to_uint8(im, norm=True, stretch=False):
             result = _gray_process(image)
         return result
 
-    # Simple image standardization
-    def _sample_norm(image):
+    def _equalize_hist(image):
         stretches = []
         if len(image.shape) == 3:
             for b in range(image.shape[-1]):
                 stretched = exposure.equalize_hist(image[:, :, b])
-                stretched /= float(np.max(stretched))
+                stretched /= float(np.max(stretched)) + EPS
                 stretches.append(stretched)
             stretched_img = np.stack(stretches, axis=2)
         else:  # if len(image.shape) == 2
             stretched_img = exposure.equalize_hist(image)
+            stretched_img /= float(np.max(stretched_img)) + EPS
         return stretched_img
 
     dtype = im.dtype.name
-    if dtype != "uint8" and norm:
-        im = _sample_norm(im)
+    if dtype == 'uint8' and not stretch:
+        return im
     if stretch:
         im = _two_percent_linear(im)
+    else:
+        im = _minmax_norm(im)
+    if norm:
+        im = _equalize_hist(im)
     im = np.uint8(im * 255)
     return im
 

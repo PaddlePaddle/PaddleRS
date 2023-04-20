@@ -34,6 +34,8 @@ class ClasDataset(BaseDataset):
         shuffle (bool, optional): Whether to shuffle the samples. Defaults to False.
     """
 
+    _KEYS_TO_KEEP = ['image', 'label']
+
     def __init__(self,
                  data_dir,
                  file_list,
