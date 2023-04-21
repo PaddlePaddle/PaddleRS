@@ -162,13 +162,13 @@ The main function of `generate_file_lists.py` is to generate file lists that con
 python generate_file_lists.py --data_dir {root directory of dataset} --save_dir {output directory} [--subsets {names of subsets}] [--subdirs {names of subdirectories}] [--glob_pattern {glob pattern used to match image files}] [--file_list_pattern {patterm to name the file lists}] [--store_abs_path] [--sep {delimeter to use in file lists}]
 ```
 
-其中：
+Among them:
 
-- `--data_dir`：Root directory of the dataset.
-- `--save_dir`：Directory to save the generated file lists.
-- `--subsets`：Names of subsets. Images should be stored in `data_dir/subset/subdir/` or `data_dir/subdir/` (when `--subsets` is not specified), where `subset` is one of the values in `--subsets`. Example: `--subsets train val test`.
-- `--subdirs`：Names of subdirectories. Images should be stored in `data_dir/subset/subdir/` or `data_dir/subdir/` (when `--subsets` is not specified), where `subdir` is one of the values in `--subdirs`. Defaults to `('images', 'masks')`.
-- `--glob_pattern`：Glob pattern used to match image files. Defaults to `*`, which matches arbitrary file.
-- `--file_list_pattern`：Pattern to name the file lists. Defaults to `{subset}.txt`.
-- `--store_abs_path`：If specified, store the absolute path rather than the relative path in file lists.
-- `--sep`：Delimiter to use when writing lines to file lists. Defaults to ` ` (a space).
+- `--data_dir`: Root directory of the dataset.
+- `--save_dir`: Directory to save the generated file lists.
+- `--subsets`: Names of subsets. Images should be stored in `data_dir/subset/subdir/` or `data_dir/subdir/` (when `--subsets` is not specified), where `subset` is one of the values in `--subsets`. Example: `--subsets train val test`.
+- `--subdirs`: Names of subdirectories. Images should be stored in `data_dir/subset/subdir/` or `data_dir/subdir/` (when `--subsets` is not specified), where `subdir` is one of the values in `--subdirs`. Defaults to `('images', 'masks')`.
+- `--glob_pattern`: Glob pattern used to match image files. Defaults to `*`, which matches arbitrary file.
+- `--file_list_pattern`: Pattern to name the file lists. Defaults to `{subset}.txt`.
+- `--store_abs_path`: If specified, store the absolute path rather than the relative path in file lists.
+- `--sep`: Delimiter to use when writing lines to file lists. Defaults to ` ` (a space).

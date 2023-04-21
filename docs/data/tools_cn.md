@@ -166,7 +166,7 @@ python generate_file_lists.py --data_dir {数据集根目录路径} --save_dir {
 
 - `--data_dir`：数据集的根目录。
 - `--save_dir`：保存生成的file list的目录。
-- `--subsets`：数据集所包含子集名称。数据集中的影像应保存在`data_dir/subset/subdir/`或者`data_dir/subdir/` (当不指定`--subsets`时)，其中`subset`是通过`--subsets`指定的子集名称之一。示例：`--subsets train val test`.
+- `--subsets`：数据集所包含子集名称。数据集中的影像应保存在`data_dir/subset/subdir/`或者`data_dir/subdir/` (当不指定`--subsets`时)，其中`subset`是通过`--subsets`指定的子集名称之一。示例：`--subsets train val test`。
 - `--subdirs`：子目录名称。数据集中的影像应保存在`data_dir/subset/subdir/`或者`data_dir/subdir/` (当不指定`--subsets`时)，其中`subdir`是通过`--subdirs`指定的子目录名称之一。默认为`('images', 'masks')`。
 - `--glob_pattern`：影像文件名匹配模板。默认为`*`，表示匹配所有文件。
 - `--file_list_pattern`：file list文件名模板。默认为`'{subset}.txt'`。
