@@ -4,14 +4,15 @@
 
 PaddleRS provides a rich set of remote sensing image processing tools in the `tools` directory, including:
 
-- `coco2mask.py`: Convert COCO annotation files to .png files.
-- `mask2shape.py`: Convert .png format raster labels from model inference output to .shp vector format.
+- `coco2mask.py`: Convert COCO annotation files to PNG files.
+- `mask2shape.py`: Convert PNG format raster labels from model inference output to .shp vector format.
 - `geojson2mask.py`: Convert GeoJSON format labels to .tif raster format.
 - `match.py`: Implement registration of two images.
 - `split.py`: Split large image into tiles.
 - `coco_tools/`: A collection of COCO tools for processing COCO format annotation files.
 - `prepare_dataset/`: A collection of scripts for preprocessing datasets.
 - `extract_ms_patches.py`: Extract multi-scale image blocks from entire remote sensing images.
+- `generate_file_lists.py`：Generate file lists.
 
 ## Usage
 
@@ -23,7 +24,7 @@ cd tools
 
 ### coco2mask
 
-The main function of `coco2mask.py` is to convert images and corresponding COCO-formatted segmentation labels into images and labels in .png format, which are stored separately in the `img` and `gt` directories. The relevant data examples can be found in the [Chinese Typical City Building Instance Dataset](https://www.scidb.cn/detail?dataSetId=806674532768153600&dataSetType=journal). For the masks, the saved result is a single-channel pseudo-color image. The usage is as follows:
+The main function of `coco2mask.py` is to convert images and corresponding COCO-formatted segmentation labels into images and labels in PNG format, which are stored separately in the `img` and `gt` directories. The relevant data examples can be found in the [Chinese Typical City Building Instance Dataset](https://www.scidb.cn/detail?dataSetId=806674532768153600&dataSetType=journal). For the masks, the saved result is a single-channel pseudo-color image. The usage is as follows:
 
 ```shell
 python coco2mask.py --raw_dir {input directory path} --save_dir {output directory path}
@@ -31,12 +32,12 @@ python coco2mask.py --raw_dir {input directory path} --save_dir {output director
 
 Among them:
 
-- `raw_dir`: Directory where the raw data are stored. Images are stored in the `images` subdirectory, and labels are saved in the `xxx.json` format.
-- `save_dir`: Directory where the output results are saved. Images are saved in the `img` subdirectory, and .png format labels are saved in the `gt` subdirectory.
+- `--raw_dir`: Directory where the raw data are stored. Images are stored in the `images` subdirectory, and labels are saved in the `xxx.json` format.
+- `--save_dir`: Directory where the output results are saved. Images are saved in the `img` subdirectory, and PNG format labels are saved in the `gt` subdirectory.
 
 ### mask2shape
 
-The main function of `mask2shape.py` is to convert the segmentation results in .png format into shapefile format (vector graphics). The usage is as follows:
+The main function of `mask2shape.py` is to convert the segmentation results in PNG format into shapefile format (vector graphics). The usage is as follows:
 
 ```shell
 python mask2shape.py --src_img_path {path to the original image with geographic information} --mask_path {path to segmentation mask} [--save_path {path to save the output vector graphics}] [--ignore_index {index value to be ignored}]
@@ -44,10 +45,10 @@ python mask2shape.py --src_img_path {path to the original image with geographic 
 
 Among them:
 
-- `src_img_path`: Path to the original image with geographic information, which is required to provide the shapefile with geoprojection coordinate system information.
-- `mask_path`: Path to the .png format segmentation result obtained by the model inference.
-- `save_path`: Path to save the shapefile. The default value is `output`.
-- `ignore_index`: Index value to be ignored in the shapefile, such as the background class ID in segmentation tasks. The default value is `255`.
+- `--src_img_path`: Path to the original image with geographic information, which is required to provide the shapefile with geoprojection coordinate system information.
+- `--mask_path`: Path to the PNG format segmentation result obtained by the model inference.
+- `--save_path`: Path to save the shapefile. The default value is `output`.
+- `--ignore_index`: Index value to be ignored in the shapefile, such as the background class ID in segmentation tasks. The default value is `255`.
 
 ### geojson2mask
 
@@ -59,9 +60,9 @@ python geojson2mask.py --src_img_path {path to the original image with geographi
 
 Among them:
 
-- `src_img_path`: Path to the original image file that contains the geospatial information.
-- `geojson_path`: Path to the GeoJSON format label file.
-- `save_path`: Path to save the converted raster file.
+- `--src_img_path`: Path to the original image file that contains the geospatial information.
+- `--geojson_path`: Path to the GeoJSON format label file.
+- `--save_path`: Path to save the converted raster file.
 
 ### match
 
@@ -73,11 +74,11 @@ python match.py --image1_path {path to temporal image 1} --image2_path {path to 
 
 Among them:
 
-- `image1_path`: File path of the first temporal image. This image must contain geospatial information and will be used as the reference image during the registration process.
-- `image2_path`: File path of the second temporal image. The geospatial information of this image will not be used. This image will be registered to the first temporal image.
-- `image1_bands`: Bands of the first temporal image used for registration, specified as three channels (representing R, G, and B) or a single channel. Default is `[1, 2, 3]`.
-- `image2_bands`: Bands of the second temporal image used for registration, specified as three channels (representing R, G, and B) or a single channel. Default is `[1, 2, 3]`.
-- `save_path`: Output file path of the registered image.
+- `--image1_path`: File path of the first temporal image. This image must contain geospatial information and will be used as the reference image during the registration process.
+- `--image2_path`: File path of the second temporal image. The geospatial information of this image will not be used. This image will be registered to the first temporal image.
+- `--image1_bands`: Bands of the first temporal image used for registration, specified as three channels (representing R, G, and B) or a single channel. Default is `[1, 2, 3]`.
+- `--image2_bands`: Bands of the second temporal image used for registration, specified as three channels (representing R, G, and B) or a single channel. Default is `[1, 2, 3]`.
+- `--save_path`: Output file path of the registered image.
 
 ### split
 
@@ -89,10 +90,10 @@ python split.py --image_path {input image path} [--mask_path {ground-truth label
 
 Among them:
 
-- `image_path`: Path of the image to be split.
-- `mask_path`: Path of the ground-truth label image to be split together. Default is `None`.
-- `block_size`: Size of the image blocks. Default is `512`.
-- `save_dir`: Directory to save the cropped image blocks. Default is `output`.
+- `--image_path`: Path of the image to be split.
+- `--mask_path`: Path of the ground-truth label image to be split together. Default is `None`.
+- `--block_size`: Size of the image blocks. Default is `512`.
+- `--save_dir`: Directory to save the cropped image blocks. Default is `output`.
 
 ### coco_tools
 
@@ -138,17 +139,36 @@ python extract_ms_patches.py --image_paths {one or more input image paths} --mas
 
 Among them:
 
-- `image_paths`: Path of the source image(s). Multiple paths can be specified.
-- `mask_path`: Path to the ground-truth label.
-- `save_dir`: Path to the directory to save the split result. Default is `output`.
-- `min_patch_size`: Minimum size of the extracted image block (in terms of the number of pixels in the height/width of the image block). This is the minimum area covered by a leaf node in the quadtree. Default is `256`.
-- `bg_class`: Category ID of the background class. Default is `0`.
-- `target_class`: Category ID of the target class. If it is `None`, it means that all classes except the background class are target classes. Default is `None`.
-- `max_level`: Maximum scale level to retrieve. If it is `None`, it means that there is no limit to the scale level. Default is `None`.
-- `include_bg`: If specified, also save the image blocks that only contain the background class and do not contain the target class.
+- `--image_paths`: Path of the source image(s). Multiple paths can be specified.
+- `--mask_path`: Path to the ground-truth label.
+- `--save_dir`: Path to the directory to save the split result. Default is `output`.
+- `--min_patch_size`: Minimum size of the extracted image block (in terms of the number of pixels in the height/width of the image block). This is the minimum area covered by a leaf node in the quadtree. Default is `256`.
+- `--bg_class`: Category ID of the background class. Default is `0`.
+- `--target_class`: Category ID of the target class. If it is `None`, it means that all classes except the background class are target classes. Default is `None`.
+- `--max_level`: Maximum scale level to retrieve. If it is `None`, it means that there is no limit to the scale level. Default is `None`.
+- `--include_bg`: If specified, also save the image blocks that only contain the background class and do not contain the target class.
 - `--nonzero_ratio`: Specify a threshold. For any source image, if the ratio of nonzero pixels in the image block is less than this threshold, the image block will be discarded. If it is `None`, no filtering will be performed. Default is `None`.
 - `--visualize`: If specified, the image `./vis_quadtree.png` will be generated, which visualizes the nodes in the quadtree. An example is shown in the following figure:
 
 <div align="center">
 <img src="https://user-images.githubusercontent.com/21275753/189264850-f94b3d7b-c631-47b1-9833-0800de2ccf54.png"  width = "400" />  
 </div>
+
+### generate_file_lists
+
+The main function of `generate_file_lists.py` is to generate file lists that contain the image and label paths of a dataset. The usage is as follows:
+
+```shell
+python generate_file_lists.py --data_dir {root directory of dataset} --save_dir {output directory} [--subsets {names of subsets}] [--subdirs {names of subdirectories}] [--glob_pattern {glob pattern used to match image files}] [--file_list_pattern {patterm to name the file lists}] [--store_abs_path] [--sep {delimeter to use in file lists}]
+```
+
+Among them:
+
+- `--data_dir`: Root directory of the dataset.
+- `--save_dir`: Directory to save the generated file lists.
+- `--subsets`: Names of subsets. Images should be stored in `data_dir/subset/subdir/` or `data_dir/subdir/` (when `--subsets` is not specified), where `subset` is one of the values in `--subsets`. Example: `--subsets train val test`.
+- `--subdirs`: Names of subdirectories. Images should be stored in `data_dir/subset/subdir/` or `data_dir/subdir/` (when `--subsets` is not specified), where `subdir` is one of the values in `--subdirs`. Defaults to `('images', 'masks')`.
+- `--glob_pattern`: Glob pattern used to match image files. Defaults to `*`, which matches arbitrary file.
+- `--file_list_pattern`: Pattern to name the file lists. Defaults to `{subset}.txt`.
+- `--store_abs_path`: If specified, store the absolute path rather than the relative path in file lists.
+- `--sep`: Delimiter to use when writing lines to file lists. Defaults to ` ` (a space).
