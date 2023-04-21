@@ -4,8 +4,8 @@
 
 PaddleRS在`tools`目录中提供了丰富的遥感影像处理工具，包括：
 
-- `coco2mask.py`：用于将COCO格式的标注文件转换为.png格式。
-- `mask2shape.py`：用于将模型推理输出的.png格式栅格标签转换为.shp矢量格式。
+- `coco2mask.py`：用于将COCO格式的标注文件转换为PNG格式。
+- `mask2shape.py`：用于将模型推理输出的PNG格式栅格标签转换为.shp矢量格式。
 - `geojson2mask.py`：用于将GeoJSON格式标签转换为.tif栅格格式。
 - `match.py`：用于实现两幅影像的配准。
 - `split.py`：用于对大幅面影像数据进行切片。
@@ -24,7 +24,7 @@ cd tools
 
 ### coco2mask
 
-`coco2mask.py`的主要功能是将影像以及对应的COCO格式的分割标签转换为影像与.png格式的标签，结果会分别存放在`img`和`gt`两个目录中。相关的数据样例可以参考[中国典型城市建筑物实例数据集](https://www.scidb.cn/detail?dataSetId=806674532768153600&dataSetType=journal)。对于mask，保存结果为单通道的伪彩色影像。使用方式如下：
+`coco2mask.py`的主要功能是将影像以及对应的COCO格式的分割标签转换为影像与PNG格式的标签，结果会分别存放在`img`和`gt`两个目录中。相关的数据样例可以参考[中国典型城市建筑物实例数据集](https://www.scidb.cn/detail?dataSetId=806674532768153600&dataSetType=journal)。对于mask，保存结果为单通道的伪彩色影像。使用方式如下：
 
 ```shell
 python coco2mask.py --raw_dir {输入目录路径} --save_dir {输出目录路径}
@@ -33,11 +33,11 @@ python coco2mask.py --raw_dir {输入目录路径} --save_dir {输出目录路�
 其中：
 
 - `--raw_dir`：存放原始数据的目录，其中影像存放在`images`子目录中，标签以`xxx.json`格式保存。
-- `--save_dir`：保存输出结果的目录，其中影像保存在`img`子目录中，.png格式的标签保存在`gt`子目录中。
+- `--save_dir`：保存输出结果的目录，其中影像保存在`img`子目录中，PNG格式的标签保存在`gt`子目录中。
 
 ### mask2shape
 
-`mask2shape.py`的主要功能是将.png格式的分割结果转换为shapefile格式（矢量图）。使用方式如下：
+`mask2shape.py`的主要功能是将PNG格式的分割结果转换为shapefile格式（矢量图）。使用方式如下：
 
 ```shell
 python mask2shape.py --src_img_path {带有地理信息的原始影像路径} --mask_path {输入分割标签路径} [--save_path {输出矢量图路径}] [--ignore_index {需要忽略的索引值}]
@@ -46,7 +46,7 @@ python mask2shape.py --src_img_path {带有地理信息的原始影像路径} --
 其中：
 
 - `--src_img_path`：原始影像路径，需要带有地理元信息，以便为生成的shapefile提供地理投影坐标系等信息。
-- `--mask_path`：模型推理得到的.png格式的分割结果。
+- `--mask_path`：模型推理得到的PNG格式的分割结果。
 - `--save_path`：保存shapefile的路径，默认为`output`。
 - `--ignore_index`：需要在shapefile中忽略的索引值（例如分割任务中的背景类），默认为`255`。
 
@@ -159,7 +159,7 @@ python extract_ms_patches.py --image_paths {一个或多个输入影像路径} -
 `generate_file_lists.py`的主要功能是对数据集生成符合PaddleRS格式要求的file list。使用方式如下：
 
 ```shell
-python generate_file_lists.py --data_dir {数据集根目录路径} --save_dir {输出目录路径} [--subsets {数据集所包含子集名称}] [--subdirs {子目录名称}] [--glob_pattern {影像文件名匹配模板}] [--file_list_pattern {file list文件名模板}] [--store_abs_path {是否在file list中保存绝对路径}] [--sep {file list中使用的分隔符}]
+python generate_file_lists.py --data_dir {数据集根目录路径} --save_dir {输出目录路径} [--subsets {数据集所包含子集名称}] [--subdirs {子目录名称}] [--glob_pattern {影像文件名匹配模板}] [--file_list_pattern {file list文件名模板}] [--store_abs_path] [--sep {file list中使用的分隔符}]
 ```
 
 其中：
