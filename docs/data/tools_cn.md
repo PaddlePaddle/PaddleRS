@@ -12,7 +12,7 @@ PaddleRS在`tools`目录中提供了丰富的遥感影像处理工具，包括�
 - `coco_tools/`：COCO工具合集，用于统计处理COCO格式标注文件。
 - `prepare_dataset/`：数据集预处理脚本合集。
 - `extract_ms_patches.py`：从整幅遥感影像中提取多尺度影像块。
-- `generate_file_lists.py`：用于对数据集生成file list。
+- `generate_file_lists.py`：对数据集生成file list。
 
 ## 使用说明
 
@@ -32,8 +32,8 @@ python coco2mask.py --raw_dir {输入目录路径} --save_dir {输出目录路�
 
 其中：
 
-- `raw_dir`：存放原始数据的目录，其中影像存放在`images`子目录中，标签以`xxx.json`格式保存。
-- `save_dir`：保存输出结果的目录，其中影像保存在`img`子目录中，.png格式的标签保存在`gt`子目录中。
+- `--raw_dir`：存放原始数据的目录，其中影像存放在`images`子目录中，标签以`xxx.json`格式保存。
+- `--save_dir`：保存输出结果的目录，其中影像保存在`img`子目录中，.png格式的标签保存在`gt`子目录中。
 
 ### mask2shape
 
@@ -45,10 +45,10 @@ python mask2shape.py --srcimg_path {带有地理信息的原始影像路径} --m
 
 其中：
 
-- `srcimg_path`：原始影像路径，需要带有地理元信息，以便为生成的shapefile提供地理投影坐标系等信息。
-- `mask_path`：模型推理得到的.png格式的分割结果。
-- `save_path`：保存shapefile的路径，默认为`output`。
-- `ignore_index`：需要在shapefile中忽略的索引值（例如分割任务中的背景类），默认为`255`。
+- `--srcimg_path`：原始影像路径，需要带有地理元信息，以便为生成的shapefile提供地理投影坐标系等信息。
+- `--mask_path`：模型推理得到的.png格式的分割结果。
+- `--save_path`：保存shapefile的路径，默认为`output`。
+- `--ignore_index`：需要在shapefile中忽略的索引值（例如分割任务中的背景类），默认为`255`。
 
 ### geojson2mask
 
@@ -60,9 +60,9 @@ python geojson2mask.py --srcimg_path {带有地理信息的原始影像路径} -
 
 其中：
 
-- `srcimg_path`：原始影像路径，需要带有地理元信息。
-- `geojson_path`：GeoJSON格式标签路径。
-- `save_path`：保存转换后的栅格文件的路径。
+- `--srcimg_path`：原始影像路径，需要带有地理元信息。
+- `--geojson_path`：GeoJSON格式标签路径。
+- `--save_path`：保存转换后的栅格文件的路径。
 
 ### match
 
@@ -74,26 +74,26 @@ python match.py --im1_path {时相1影像路径} --im2_path {时相2影像路径
 
 其中：
 
-- `im1_path`：时相1影像路径。该影像必须包含地理信息，且配准过程中以该影像为基准影像。
-- `im2_path`：时相2影像路径。该影像的地理信息将不被用到。配准过程中将该影像配准到时相1影像。
-- `im1_bands`：时相1影像用于配准的波段，指定为三通道（分别代表R、G、B）或单通道，默认为`[1, 2, 3]`。
-- `im2_bands`：时相2影像用于配准的波段，指定为三通道（分别代表R、G、B）或单通道，默认为`[1, 2, 3]`。
-- `save_path`： 配准后时相2影像输出路径。
+- `--im1_path`：时相1影像路径。该影像必须包含地理信息，且配准过程中以该影像为基准影像。
+- `--im2_path`：时相2影像路径。该影像的地理信息将不被用到。配准过程中将该影像配准到时相1影像。
+- `--im1_bands`：时相1影像用于配准的波段，指定为三通道（分别代表R、G、B）或单通道，默认为`[1, 2, 3]`。
+- `--im2_bands`：时相2影像用于配准的波段，指定为三通道（分别代表R、G、B）或单通道，默认为`[1, 2, 3]`。
+- `--save_path`： 配准后时相2影像输出路径。
 
 ### split
 
 `split.py`的主要功能是将大幅面遥感影像划分为影像块，这些影像块可以作为训练时的输入。使用方式如下：
 
 ```shell
-python split.py --image_path {输入影像路径} [--mask_path {真值标签路径}] [--block_size {影像块尺寸}] [--save_dir {输出目录}]
+python split.py --image_path {输入影像路径} [--mask_path {真值标签路径}] [--block_size {影像块尺寸}] [--save_dir {输出目录路径}]
 ```
 
 其中：
 
-- `image_path`：需要切分的影像的路径。
-- `mask_path`：一同切分的标签影像路径，默认为`None`。
-- `block_size`：切分影像块大小，默认为`512`。
-- `save_dir`：保存切分后结果的文件夹路径，默认为`output`。
+- `--image_path`：需要切分的影像的路径。
+- `--mask_path`：一同切分的标签影像路径，默认为`None`。
+- `--block_size`：切分影像块大小，默认为`512`。
+- `--save_dir`：保存切分后结果的文件夹路径，默认为`output`。
 
 ### coco_tools
 
@@ -139,14 +139,14 @@ python extract_ms_patches.py --im_paths {一个或多个输入影像路径} --ma
 
 其中：
 
-- `im_paths`：源影像路径，可以指定多个路径。
-- `mask_path`：真值标签路径。
-- `save_dir`：保存切分后结果的文件夹路径，默认为`output`。
-- `min_patch_size`：提取的影像块的最小尺寸（以影像块长/宽的像素个数计），即四叉树的叶子结点在图中覆盖的最小范围，默认为`256`。
-- `bg_class`：背景类别的类别编号，默认为`0`。
-- `target_class`：目标类别的类别编号，若为`None`，则表示所有背景类别以外的类别均为目标类别，默认为`None`。
-- `max_level`：检索的最大尺度层级，若为`None`，则表示不限制层级，默认为`None`。
-- `include_bg`：若指定此选项，则也保存那些仅包含背景类别、不包含目标类别的影像块。
+- `--im_paths`：源影像路径，可以指定多个路径。
+- `--mask_path`：真值标签路径。
+- `--save_dir`：保存切分后结果的文件夹路径，默认为`output`。
+- `--min_patch_size`：提取的影像块的最小尺寸（以影像块长/宽的像素个数计），即四叉树的叶子结点在图中覆盖的最小范围，默认为`256`。
+- `--bg_class`：背景类别的类别编号，默认为`0`。
+- `--target_class`：目标类别的类别编号，若为`None`，则表示所有背景类别以外的类别均为目标类别，默认为`None`。
+- `--max_level`：检索的最大尺度层级，若为`None`，则表示不限制层级，默认为`None`。
+- `--include_bg`：若指定此选项，则也保存那些仅包含背景类别、不包含目标类别的影像块。
 - `--nonzero_ratio`：指定一个阈值，对于任意一幅源影像，若影像块中非零像素占比小于此阈值，则该影像块将被舍弃。若为`None`，则表示不进行过滤。默认为`None`。
 - `--visualize`：若指定此选项，则程序执行完毕后将生成图像`./vis_quadtree.png`，其中保存有四叉树中节点情况的可视化结果，一个例子如下图所示：
 
@@ -156,19 +156,19 @@ python extract_ms_patches.py --im_paths {一个或多个输入影像路径} --ma
 
 ### generate_file_lists
 
-`generate_file_lists.py`的主要功能是对数据集生成具有的影像、标注路径的file list。使用方式如下：
+`generate_file_lists.py`的主要功能是对数据集生成符合PaddleRS格式要求的file list。使用方式如下：
 
 ```shell
-python generate_file_lists.py --data_dir {数据集根目录路径} --save_dir {输出结果保留目录路径} [--subsets {数据集所包含子集的名称列表或None}] [--subdirs {子文件夹的名称列表}] [--glob_pattern {图像文件名全局匹配模式}] [--file_list_pattern {结果文件名保存模式}] [--store_abs_path {是否在结果中保存全局路径}] [--sep {结果文件中的分割符}]
+python generate_file_lists.py --data_dir {数据集根目录路径} --save_dir {输出目录路径} [--subsets {数据集所包含子集名称}] [--subdirs {子目录名称}] [--glob_pattern {影像文件名匹配模板}] [--file_list_pattern {file list文件名模板}] [--store_abs_path {是否在file list中保存绝对路径}] [--sep {file list中使用的分隔符}]
 ```
 
 其中：
 
-- `data_dir`：数据集的根目录。
-- `save_dir`：保存输出结果的目录
-- `subsets`：数据子集的名称列表或元组，或者设置为`None`。数据集中的图像应保存在`data_dir/subset/subdir/`或者`data_dir/subdir/` (当`subsets`为None时)中, 其中`subset`是`subsets`种的元素。默认为`None`。
-- `subdirs`：子文件夹的名称列表或元组。数据集中的图像应保存在`data_dir/subset/subdir/`或者`data_dir/subdir/` (当`subsets`为None时)中, 其中`subdir`是`subdirs`种的元素。默认为`('images', 'masks')`。
-- `glob_pattern`：图像文件名全局匹配模式。默认为`*`，表示匹配所有文件。
-- `file_list_pattern`：结果文件名保存模式。默认为`'{subset}.txt'`。
-- `store_abs_path`：是否在结果中保存绝对路径，默认为`False`，表示保存相对路径。
-- `sep`：结果文件中的分割符，默认为空格。默认为` `。
+- `--data_dir`：数据集的根目录。
+- `--save_dir`：保存生成的file list的目录。
+- `--subsets`：数据集所包含子集名称。数据集中的影像应保存在`data_dir/subset/subdir/`或者`data_dir/subdir/` (当不指定`--subsets`时)，其中`subset`是通过`--subsets`指定的子集名称之一。示例：`--subsets train val test`.
+- `--subdirs`：子目录名称。数据集中的影像应保存在`data_dir/subset/subdir/`或者`data_dir/subdir/` (当不指定`--subsets`时)，其中`subdir`是通过`--subdirs`指定的子目录名称之一。默认为`('images', 'masks')`。
+- `--glob_pattern`：影像文件名匹配模板。默认为`*`，表示匹配所有文件。
+- `--file_list_pattern`：file list文件名模板。默认为`'{subset}.txt'`。
+- `--store_abs_path`：若指定此选项，则在file list中保存绝对路径，否则保存相对路径。
+- `--sep`：file list中使用的分隔符，默认为` `（空格）。
