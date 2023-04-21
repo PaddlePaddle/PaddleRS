@@ -12,6 +12,7 @@ PaddleRS provides a rich set of remote sensing image processing tools in the `to
 - `coco_tools/`: A collection of COCO tools for processing COCO format annotation files.
 - `prepare_dataset/`: A collection of scripts for preprocessing datasets.
 - `extract_ms_patches.py`: Extract multi-scale image blocks from entire remote sensing images.
+- `generate_file_lists.py`：Generate file lists.
 
 ## Usage
 
@@ -152,3 +153,22 @@ Among them:
 <div align="center">
 <img src="https://user-images.githubusercontent.com/21275753/189264850-f94b3d7b-c631-47b1-9833-0800de2ccf54.png"  width = "400" />  
 </div>
+
+### generate_file_lists
+
+The main function of `generate_file_lists.py` is to generate file lists that contain the image and label paths of a dataset. The usage is as follows:
+
+```shell
+python generate_file_lists.py --data_dir {Root directory of the dataset} --save_dir {Directory to save the generated file lists} [--subsets {List or tuple of names of subsets or None}] [--subdirs {List or tuple of names of subdirectories}] [--glob_pattern {glob pattern used to match image files}] [--file_list_pattern {Pattern to name the file lists}] [--store_abs_path {Whether to store the absolute path in file lists}] [--sep {Delimiter to use when writing lines to file lists}]
+```
+
+其中：
+
+- `data_dir`：Root directory of the dataset.
+- `save_dir`：Directory to save the generated file lists.
+- `subsets`：List or tuple of names of subsets or None. Images should be stored in `data_dir/subset/subdir/` or `data_dir/subdir/` (when `subsets` is set to None), where `subset` is an element of `subsets`. Defaults to None.
+- `subdirs`：List or tuple of names of subdirectories. Images should be stored in `data_dir/subset/subdir/` or `data_dir/subdir/` (when `subsets` is set to None), where `subdir` is an element of `subdirs`. Defaults to `('images', 'masks')`.
+- `glob_pattern`：Glob pattern used to match image files. Defaults to `*`, which matches arbitrary file.
+- `file_list_pattern`：Pattern to name the file lists. Defaults to `{subset}.txt`.
+- `store_abs_path`：Whether to store the absolute path in file lists. Defaults to `False`, which indicates storing the relative path.
+- `sep`：Delimiter to use when writing lines to file lists. Defaults to ` `.
