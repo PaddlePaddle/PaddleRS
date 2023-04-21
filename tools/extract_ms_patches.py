@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -216,7 +218,7 @@ def merge_bins(bins1, bins2):
 
 
 @time_it
-def extract_ms_patches(im_paths,
+def extract_ms_patches(image_paths,
                        mask_path,
                        save_dir,
                        min_patch_size=256,
@@ -251,7 +253,7 @@ def extract_ms_patches(im_paths,
     quad_tree.build_tree(mask_ds, bg_class)
     if visualize:
         print("Start drawing rectangles...")
-        save_path = quad_tree.visualize_regions(im_paths[0])
+        save_path = quad_tree.visualize_regions(image_paths[0])
         print(f"The visualization result is saved in {save_path} .")
     print("Quad tree has been built. Now start collecting nodes...")
     nodes = quad_tree.get_nodes(
@@ -266,21 +268,21 @@ def extract_ms_patches(im_paths,
             continue
         is_valid = True
         if nonzero_ratio is not None:
-            for src_path in im_paths:
+            for src_path in image_paths:
                 im_ds = gdal.Open(src_path)
                 arr = im_ds.ReadAsArray(j, i, real_w, real_h)
                 if np.count_nonzero(arr) / arr.size < nonzero_ratio:
                     is_valid = False
                     break
         if is_valid:
-            for src_path in im_paths:
+            for src_path in image_paths:
                 _save_patch(src_path, i, j, real_h, real_w)
             _save_patch(mask_path, i, j, real_h, real_w, 'mask')
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--im_paths", type=str, required=True, nargs='+', \
+    parser.add_argument("--image_paths", type=str, required=True, nargs='+', \
                         help="Path of images. Different images must have unique file names.")
     parser.add_argument("--mask_path", type=str, required=True, \
                         help="Path of mask.")
@@ -302,7 +304,7 @@ if __name__ == '__main__':
                         help="Visualize the quadtree.")
     args = parser.parse_args()
 
-    extract_ms_patches(args.im_paths, args.mask_path, args.save_dir,
+    extract_ms_patches(args.image_paths, args.mask_path, args.save_dir,
                        args.min_patch_size, args.bg_class, args.target_class,
                        args.max_level, args.include_bg, args.nonzero_ratio,
                        args.visualize)
