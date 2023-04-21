@@ -40,12 +40,12 @@ Among them:
 The main function of `mask2shape.py` is to convert the segmentation results in .png format into shapefile format (vector graphics). The usage is as follows:
 
 ```shell
-python mask2shape.py --srcimg_path {path to the original image with geographic information} --mask_path {path to segmentation mask} [--save_path {path to save the output vector graphics}] [--ignore_index {index value to be ignored}]
+python mask2shape.py --src_img_path {path to the original image with geographic information} --mask_path {path to segmentation mask} [--save_path {path to save the output vector graphics}] [--ignore_index {index value to be ignored}]
 ```
 
 Among them:
 
-- `srcimg_path`: Path to the original image with geographic information, which is required to provide the shapefile with geoprojection coordinate system information.
+- `src_img_path`: Path to the original image with geographic information, which is required to provide the shapefile with geoprojection coordinate system information.
 - `mask_path`: Path to the .png format segmentation result obtained by the model inference.
 - `save_path`: Path to save the shapefile. The default value is `output`.
 - `ignore_index`: Index value to be ignored in the shapefile, such as the background class ID in segmentation tasks. The default value is `255`.
@@ -55,12 +55,12 @@ Among them:
 The main function of `geojson2mask.py` is to convert the GeoJSON-formatted labels to a .tif raster format. The usage is as follows:
 
 ```shell
-python geojson2mask.py --srcimg_path {path to the original image with geographic information} --geojson_path {path to segmentation mask} --save_path {output path}
+python geojson2mask.py --src_img_path {path to the original image with geographic information} --geojson_path {path to segmentation mask} --save_path {output path}
 ```
 
 Among them:
 
-- `srcimg_path`: Path to the original image file that contains the geospatial information.
+- `src_img_path`: Path to the original image file that contains the geospatial information.
 - `geojson_path`: Path to the GeoJSON format label file.
 - `save_path`: Path to save the converted raster file.
 
@@ -69,15 +69,15 @@ Among them:
 The main function of `match.py` is to perform spatial registration on two temporal remote sensing images. The usage is as follows:
 
 ```shell
-python match.py --im1_path {path to temporal image 1} --im2_path {path to temporal image 2} --save_path {output path to registered image} [--im1_bands 1 2 3] [--im2_bands 1 2 3]
+python match.py --image1_path {path to temporal image 1} --image2_path {path to temporal image 2} --save_path {output path to registered image} [--image1_bands 1 2 3] [--image2_bands 1 2 3]
 ```
 
 Among them:
 
-- `im1_path`: File path of the first temporal image. This image must contain geospatial information and will be used as the reference image during the registration process.
-- `im2_path`: File path of the second temporal image. The geospatial information of this image will not be used. This image will be registered to the first temporal image.
-- `im1_bands`: Bands of the first temporal image used for registration, specified as three channels (representing R, G, and B) or a single channel. Default is `[1, 2, 3]`.
-- `im2_bands`: Bands of the second temporal image used for registration, specified as three channels (representing R, G, and B) or a single channel. Default is `[1, 2, 3]`.
+- `image1_path`: File path of the first temporal image. This image must contain geospatial information and will be used as the reference image during the registration process.
+- `image2_path`: File path of the second temporal image. The geospatial information of this image will not be used. This image will be registered to the first temporal image.
+- `image1_bands`: Bands of the first temporal image used for registration, specified as three channels (representing R, G, and B) or a single channel. Default is `[1, 2, 3]`.
+- `image2_bands`: Bands of the second temporal image used for registration, specified as three channels (representing R, G, and B) or a single channel. Default is `[1, 2, 3]`.
 - `save_path`: Output file path of the registered image.
 
 ### split
@@ -99,12 +99,12 @@ Among them:
 
 There are six tools included in the `coco_tools` directory, each with the following functions
 
-- `json_InfoShow.py`:    Print basic information about each dictionary in the json file.
-- `json_ImgSta.py`:      Collect image information in json files and generate statistical tables and charts.
-- `json_AnnoSta.py`:     Collect annotation information in json files to generate statistical tables and charts.
-- `json_Img2Json.py`:    Collect images of the test set and generate json file.
-- `json_Split.py`:       Split the json file into train set and val set.
-- `json_Merge.py`:       Merge multiple json files into one.
+- `json_info_show.py`:    Print basic information about each dictionary in the JSON file.
+- `json_image_sta.py`:      Collect image information in JSON files and generate statistical tables and charts.
+- `json_anno_sta.py`:     Collect annotation information in JSON files to generate statistical tables and charts.
+- `json_image2json.py`:    Collect images of the test set and generate JSON file.
+- `json_split.py`:       Split the JSON file into train set and val set.
+- `json_merge.py`:       Merge multiple JSON files into one.
 
 For detailed usage instructions, please refer to [coco_tools Usage Instructions](coco_tools_en.md).
 
@@ -134,12 +134,12 @@ You can refer to [this document](../intro/data_prep_en.md) to see which preproce
 The main function of `extract_ms_patches.py` is to extract image patches containing objects of interest at different scales from the entire remote sensing image using a quadtree. The extracted image patches can be used as training samples for deep learning models. The usage is as follows:
 
 ```shell
-python extract_ms_patches.py --im_paths {one or more input image paths} --mask_path {ground-truth label image path} [--save_dir {output directory}] [--min_patch_size {minimum patch size}] [--bg_class {background category ID}] [--target_class {target category ID}] [--max_level {maximum scale level}] [--include_bg] [--nonzero_ratio {threshold of the ratio of nonzero pixels}] [--visualize]
+python extract_ms_patches.py --image_paths {one or more input image paths} --mask_path {ground-truth label image path} [--save_dir {output directory}] [--min_patch_size {minimum patch size}] [--bg_class {background category ID}] [--target_class {target category ID}] [--max_level {maximum scale level}] [--include_bg] [--nonzero_ratio {threshold of the ratio of nonzero pixels}] [--visualize]
 ```
 
 Among them:
 
-- `im_paths`: Path of the source image(s). Multiple paths can be specified.
+- `image_paths`: Path of the source image(s). Multiple paths can be specified.
 - `mask_path`: Path to the ground-truth label.
 - `save_dir`: Path to the directory to save the split result. Default is `output`.
 - `min_patch_size`: Minimum size of the extracted image block (in terms of the number of pixels in the height/width of the image block). This is the minimum area covered by a leaf node in the quadtree. Default is `256`.
