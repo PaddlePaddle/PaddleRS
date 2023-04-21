@@ -16,5 +16,5 @@ from testing_utils import run_script
 
 if __name__ == '__main__':
     run_script(
-        f"python generate_file_lists.py --data_dir ../tests/datalevircd_crop --save_dir ../tests/datalevircd_crop --subsets train val test --subdirs A B label --glob_pattern '*' --store_abs_path",
+        f"python generate_file_lists.py --data_dir ../tests/data/levircd_crop --save_dir ../tests/data/levircd_crop --subsets train val test --subdirs A B label --glob_pattern '*' --store_abs_path",
         wd="../tools")
