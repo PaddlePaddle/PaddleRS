@@ -60,17 +60,18 @@ def json_image_sta(json_path, csv_path, img_shape_path, img_shape_rate_path,
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="image infomation statistics")
+    parser = argparse.ArgumentParser(
+        description="Get image infomation statistics")
     parser.add_argument("--json_path", type=str, \
-                        help="Path of the json file whose statistics are to be collected. Default: None.")
+                        help="Path of the JSON file whose statistics are to be collected.")
     parser.add_argument("--csv_path", type=str, default=None, \
-                        help="(Optional) Path for the statistics table. Default: None.")
+                        help="Path for the statistics table.")
     parser.add_argument("--img_shape_path", type=str, default=None, \
-                        help="(Optional) .png image saving path. The image visualizes the two-dimensional distribution of all image shapes. Default: None.")
+                        help="Output image saving path. The image visualizes the two-dimensional distribution of all image shapes.")
     parser.add_argument("--img_shape_rate_path", type=str, default=None, \
-                        help="(Optional) .png image saving path. The image visualizes the one-dimensional distribution of shape ratio (width/height) of all images. Default: None.")
+                        help="Output image saving path. The image visualizes the one-dimensional distribution of shape ratio (width/height) of all images.")
     parser.add_argument("--img_keyname", type=str, default="images", \
-                        help="(Optional) Image key in the json file. Default: 'images'.")
+                        help="Image key in the JSON file.")
     args = parser.parse_args()
     json_image_sta(args.json_path, args.csv_path, args.img_shape_path,
                    args.img_shape_rate_path, args.img_keyname)

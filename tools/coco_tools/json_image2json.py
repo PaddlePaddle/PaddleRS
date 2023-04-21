@@ -48,17 +48,18 @@ def json_image2json(image_dir, json_train_path, json_test_path, img_keyname,
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="get json from image dir")
+    parser = argparse.ArgumentParser(
+        description="Generate JSON file from image directory")
     parser.add_argument("--image_dir", type=str, required=True, \
-                        help="Directory that contains the test seg images. Default: None.")
+                        help="Directory that contains the test set images.")
     parser.add_argument("--json_train_path", type=str, required=True, \
-                        help="Json file path of the training set. Used as reference. Default: None.")
+                        help="JSON file path of the training set. Used as reference.")
     parser.add_argument("--result_path", type=str, required=True, \
-                        help="Path to the generated test set json file. Default: None.")
+                        help="Path to the generated test set JSON file.")
     parser.add_argument("--img_keyname", type=str, default="images", \
-                        help="(Optional) Image key in the json file. Default: 'images'.")
+                        help="Image key in the JSON file.")
     parser.add_argument("--cat_keyname", type=str, default="categories", \
-                        help="(Optional) Category key in the json file. Default: 'categories'.")
+                        help="Category key in the JSON file.")
     args = parser.parse_args()
     json_image2json(args.image_dir, args.json_train_path, args.result_path,
                     args.img_keyname, args.cat_keyname)

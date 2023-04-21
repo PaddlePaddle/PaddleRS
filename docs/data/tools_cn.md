@@ -98,12 +98,12 @@ python split.py --image_path {输入影像路径} [--mask_path {真值标签路�
 
 目前`coco_tools`目录中共包含6个工具，各工具功能如下：
 
-- `json_info_show.py`：    打印json文件中各个字典的基本信息；
-- `json_image_sta.py`：      统计json文件中的影像信息，生成统计表、统计图；
-- `json_anno_sta.py`：     统计json文件中的标注信息，生成统计表、统计图；
-- `json_image2json.py`：    统计test集影像，生成json文件；
-- `json_split.py`：       将json文件中的内容划分为train set和val set；
-- `json_merge.py`：       将多个json文件合并为一个。
+- `json_info_show.py`：    打印JSON文件中各个字典的基本信息；
+- `json_image_sta.py`：      统计JSON文件中的影像信息，生成统计表、统计图；
+- `json_anno_sta.py`：     统计JSON文件中的标注信息，生成统计表、统计图；
+- `json_image2json.py`：    统计test集影像，生成JSON文件；
+- `json_split.py`：       将JSON文件中的内容划分为train set和val set；
+- `json_merge.py`：       将多个JSON文件合并为一个。
 
 详细使用方法请参见[coco_tools使用说明](coco_tools_cn.md)。
 

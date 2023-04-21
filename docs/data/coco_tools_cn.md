@@ -6,18 +6,16 @@
 
 coco_tools是PaddleRS提供的用于处理COCO格式标注文件的工具集，位于`tools/coco_tools/`目录。由于[pycocotools库](https://pypi.org/project/pycocotools/)在部分环境下无法安装，PaddleRS提供coco_tools作为替代，进行一些简单的文件处理工作。
 
-*请注意，coco_tools目前为一项实验性功能，若您在使用过程中遇到问题，请及时向我们反馈。*
-
 ## 2 文件说明
 
 目前coco_tools共有6个文件，各文件及其功能如下：
 
-- `json_info_show.py`:    打印json文件中各个字典的基本信息；
-- `json_image_sta.py`:      统计json文件中的图像信息，生成统计表、统计图；
-- `json_anno_sta.py`:     统计json文件中的标注信息，生成统计表、统计图；
-- `json_image2json.py`:    统计test集图像，生成json文件；
-- `json_split.py`:       将json文件中的内容划分为train set和val set；
-- `json_merge.py`:       将多个json文件合并为1个。
+- `json_info_show.py`:    打印JSON文件中各个字典的基本信息；
+- `json_image_sta.py`:      统计JSON文件中的图像信息，生成统计表、统计图；
+- `json_anno_sta.py`:     统计JSON文件中的标注信息，生成统计表、统计图；
+- `json_image2json.py`:    统计test set图像，生成JSON文件；
+- `json_split.py`:       将JSON文件中的内容划分为train set和val set；
+- `json_merge.py`:       将多个JSON文件合并为1个。
 
 ## 3 使用示例
 
@@ -53,7 +51,7 @@ coco_tools是PaddleRS提供的用于处理COCO格式标注文件的工具集，�
 
 ### 3.2 打印json信息
 
-使用`json_info_show.py`可以打印json文件中的各个键值对的key， 并输出value中排列靠前的元素，从而帮助您快速了解标注信息。对于COCO格式标注数据而言，您应该特别留意`'image'`和`'annotation'`字段的内容。
+使用`json_info_show.py`可以打印JSON文件中的各个键值对的key， 并输出value中排列靠前的元素，从而帮助您快速了解标注信息。对于COCO格式标注数据而言，您应该特别留意`'image'`和`'annotation'`字段的内容。
 
 #### 3.2.1 命令演示
 
@@ -70,7 +68,7 @@ python ./coco_tools/json_info_show.py \
 
 | 参数名        | 含义                                    | 默认值 |
 | ------------- | --------------------------------------- | ------ |
-| `--json_path` | 需要统计的json文件路径                  |        |
+| `--json_path` | 需要统计的JSON文件路径                  |        |
 | `--show_num`  | （可选）输出value中排列靠前的元素的个数 | `5`    |
 
 #### 3.2.3 结果展示
@@ -190,11 +188,11 @@ python ./coco_tools/json_image_sta.py \
 
 | 参数名                     | 含义                                                                   | 默认值     |
 |-------------------------| ---------------------------------------------------------------------- | ---------- |
-| `--json_path`           | 需要统计的json文件路径                                                 |            |
+| `--json_path`           | 需要统计的JSON文件路径                                                 |            |
 | `--csv_path`            | （可选）统计表格保存路径                                               | `None`     |
-| `--img_shape_path`      | （可选）.png图片保存路径，图片内容为所有图像shape的二维分布            | `5`        |
-| `--img_shape_rate_path` | （可选）.png图片保存路径，图片内容为所有图像shape比例(宽/高)的一维分布 | `5`        |
-| `--img_keyname`         | （可选）json文件中，图像所对应的key                                    | `'images'` |
+| `--img_shape_path`      | （可选）输出图片保存路径，图片内容为所有图像shape的二维分布            | `5`        |
+| `--img_shape_rate_path` | （可选）输出图片保存路径，图片内容为所有图像shape比例(宽/高)的一维分布 | `5`        |
+| `--img_keyname`         | （可选）JSON文件中，图像所对应的key                                    | `'images'` |
 
 #### 3.3.3 结果展示
 
@@ -260,17 +258,17 @@ python ./coco_tools/json_anno_sta.py \
 
 | 参数名                     | 含义                                                                                                                      | 默认值             |
 |-------------------------| ------------------------------------------------------------------------------------------------------------------------- |-----------------|
-| `--json_path`           | 需要统计的json文件路径                                                                                            |                 |
+| `--json_path`           | 需要统计的JSON文件路径                                                                                            |                 |
 | `--csv_path`            | （可选）统计表格保存路径                                                                                                  | `None`          |
-| `--obj_shape_path`      | （可选）.png图片保存路径，图片内容为所有目标检测框shape的二维分布                                                         | `None`          |
-| `--obj_shape_rate_path` | （可选）.png图片保存路径，图片内容为所有目标检测框shape比例(宽/高)的一维分布                                              | `None`          |
-| `--obj_pos_path`        | （可选）.png图片保存路径，图片内容为所有目标检测框左上角坐标的二维分布                                                    | `None`          |
-| `--obj_pos_end_path`    | （可选）.png图片保存路径，图片内容为所有目标检测框右下角坐标的二维分布                                                    | `None`          |
-| `--obj_cat_path`        | （可选）.png图片保存路径，图片内容为各个类别的对象数量分布                                                                | `None`          |
-| `--obj_obj_num_path`    | （可选）.png图片保存路径，图片内容为单个图像中含有标注对象的数量分布                                                      | `None`          |
+| `--obj_shape_path`      | （可选）输出图片保存路径，图片内容为所有目标检测框shape的二维分布                                                         | `None`          |
+| `--obj_shape_rate_path` | （可选）输出图片保存路径，图片内容为所有目标检测框shape比例(宽/高)的一维分布                                              | `None`          |
+| `--obj_pos_path`        | （可选）输出图片保存路径，图片内容为所有目标检测框左上角坐标的二维分布                                                    | `None`          |
+| `--obj_pos_end_path`    | （可选）输出图片保存路径，图片内容为所有目标检测框右下角坐标的二维分布                                                    | `None`          |
+| `--obj_cat_path`        | （可选）输出图片保存路径，图片内容为各个类别的对象数量分布                                                                | `None`          |
+| `--obj_obj_num_path`    | （可选）输出图片保存路径，图片内容为单个图像中含有标注对象的数量分布                                                      | `None`          |
 | `--get_relative`        | （可选）是否生成图像目标检测框shape、目标检测框左上角坐标、右下角坐标的相对比例值<br />(横轴坐标/图片长，纵轴坐标/图片宽) | `False`         |
-| `--img_keyname`         | （可选）json文件中，图像所对应的key                                                                                       | `'images'`      |
-| `--anno_keyname`        | （可选）json文件中，标注所对应的key                                                                                       | `'annotations'` |
+| `--img_keyname`         | （可选）JSON文件中，图像所对应的key                                                                                       | `'images'`      |
+| `--anno_keyname`        | （可选）JSON文件中，标注所对应的key                                                                                       | `'annotations'` |
 
 #### 3.4.3 结果展示
 
@@ -347,7 +345,7 @@ csv save to ./anno_sta/obj.csv
 
 ### 3.5 统计图像信息生成json
 
-使用`json_image2json.py`，可以根据`test2017`中的文件信息与训练集json文件快速提取图像信息，生成测试集json文件。
+使用`json_image2json.py`，可以根据`test2017`中的文件信息与训练集JSON文件快速提取图像信息，生成测试集JSON文件。
 
 #### 3.5.1 命令演示
 
@@ -366,10 +364,10 @@ python ./coco_tools/json_image2json.py \
 | 参数名                 | 含义                              | 默认值         |
 |---------------------| --------------------------------- | -------------- |
 | `--image_dir`       | 需要统计的图像目录路径            |                |
-| `--json_train_path` | 用于参考的训练集json文件路径      |                |
-| `--json_test_path`  | 生成的测试集json文件路径          |                |
-| `--img_keyname`     | （可选）json文件中，图像对应的key | `'images'`     |
-| `--cat_keyname`     | （可选）json文件中，类别对应的key | `'categories'` |
+| `--json_train_path` | 用于参考的训练集JSON文件路径      |                |
+| `--json_test_path`  | 生成的测试集JSON文件路径          |                |
+| `--img_keyname`     | （可选）JSON文件中，图像对应的key | `'images'`     |
+| `--cat_keyname`     | （可选）JSON文件中，类别对应的key | `'categories'` |
 
 #### 3.5.3 结果展示
 
@@ -391,7 +389,7 @@ test image read...
  total test image: 40670
 ```
 
-生成的json文件信息：
+生成的JSON文件信息：
 
 ```
 ------------------------------------------------Args------------------------------------------------
@@ -429,7 +427,7 @@ json keys: dict_keys(['images', 'categories'])
 ...
 ```
 
-### 3.6 json文件拆分
+### 3.6 JSON文件拆分
 
 使用`json_split.py`，可以将`instances_val2017.json`文件拆分为2个子集。
 
@@ -449,14 +447,14 @@ python ./coco_tools/json_split.py \
 
 | 参数名                   | 含义                                                                                      | 默认值         |
 |-----------------------| ----------------------------------------------------------------------------------------- | -------------- |
-| `--json_all_path`     | 需要拆分的json文件路径                                                                    |                |
-| `--json_train_path`   | 生成的train部分json文件                                                                   |                |
-| `--json_val_path`     | 生成的val部分json文件                                                                     |                |
+| `--json_all_path`     | 需要拆分的JSON文件路径                                                                    |                |
+| `--json_train_path`   | 生成的train部分JSON文件                                                                   |                |
+| `--json_val_path`     | 生成的val部分JSON文件                                                                     |                |
 | `--val_split_rate`    | （可选）拆分过程中，val集文件的比例                                                       | `0.1`          |
 | `--val_split_num`     | （可选）拆分过程中，val集文件的数量，<br />如果设置了该参数，则`--val_split_rate`参数失效 | `None`         |
 | `--keep_val_in_train` | （可选）拆分过程中，是否在train中仍然保留val部分                                          | `False`        |
-| `--img_keyname`       | （可选）json文件中，图像对应的key                                                         | `'images'`     |
-| `--cat_keyname`       | （可选）json文件中，类别对应的key                                                         | `'categories'` |
+| `--img_keyname`       | （可选）JSON文件中，图像对应的key                                                         | `'images'`     |
+| `--cat_keyname`       | （可选）JSON文件中，类别对应的key                                                         | `'categories'` |
 
 #### 3.6.3 结果展示
 
@@ -481,9 +479,9 @@ image total 5000, train 4500, val 500
 anno total 36781, train 33119, val 3662
 ```
 
-### 3.7 json文件合并
+### 3.7 JSON文件合并
 
-使用`json_merge.py`，可以合并2个json文件。
+使用`json_merge.py`，可以合并2个JSON文件。
 
 #### 3.7.1 命令演示
 
@@ -501,9 +499,9 @@ python ./coco_tools/json_merge.py \
 
 | 参数名         | 含义                            | 默认值                      |
 | -------------- | ------------------------------- | --------------------------- |
-| `--json1_path` | 需要合并的json文件1路径         |                             |
-| `--json2_path` | 需要合并的json文件2路径         |                             |
-| `--save_path`  | 生成的json文件                  |                             |
+| `--json1_path` | 需要合并的JSON文件1路径         |                             |
+| `--json2_path` | 需要合并的JSON文件2路径         |                             |
+| `--save_path`  | 生成的JSON文件                  |                             |
 | `--merge_keys` | （可选）合并过程中需要合并的key | `['images', 'annotations']` |
 
 #### 3.7.3 结果展示

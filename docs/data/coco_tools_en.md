@@ -6,18 +6,16 @@
 
 coco_tools is a set of tools provided by PaddleRS for handling COCO annotation files. It is located in the `tools/coco_tools/` directory. Because [pycocotools library] (https://pypi.org/project/pycocotools/) cannot be installed in some environment, PaddleRS provides coco_tools as an alternative.
 
-*Please note that coco_tools is an experimental function at present. If you encounter problems when using coco_tools, please timely feedback to us.*
-
 ## 2 Document Description
 
 At present, coco_tools has 6 files, in the following we show each file and its function:
 
-- `json_info_show.py`:    Print basic information about each dictionary in the json file.
-- `json_image_sta.py`:      Collect image information in json files and generate statistical tables and charts.
-- `json_anno_sta.py`:     Collect annotation information in json files to generate statistical tables and charts.
-- `json_image2json.py`:    Collect images of the test set and generate json file.
-- `json_split.py`:       Split the json file into train set and val set.
-- `json_merge.py`:       Merge multiple json files into one.
+- `json_info_show.py`:    Print basic information about each dictionary in the JSON file.
+- `json_image_sta.py`:      Collect image information in JSON files and generate statistical tables and charts.
+- `json_anno_sta.py`:     Collect annotation information in JSON files to generate statistical tables and charts.
+- `json_image2json.py`:    Collect images of the test set and generate JSON file.
+- `json_split.py`:       Split the JSON file into train set and val set.
+- `json_merge.py`:       Merge multiple JSON files into one.
 
 ## 3 Usage Example
 
@@ -53,7 +51,7 @@ After the download is complete, you can copy or link the `coco_tools` directory 
 
 ### 3.2 Printing json Information
 
-Using `json_info_show.py` allows you to print the keys of each key-value pair in a json file and output the first element in the value to help you quickly understand the annotation information. For COCO format annotations, you should pay special attention to the contents of the `image` and `annotation` fields.
+Using `json_info_show.py` allows you to print the keys of each key-value pair in a JSON file and output the first element in the value to help you quickly understand the annotation information. For COCO format annotations, you should pay special attention to the contents of the `image` and `annotation` fields.
 
 #### 3.2.1 Command Demonstration
 
@@ -70,7 +68,7 @@ python ./coco_tools/json_info_show.py \
 
 | Parameter Name | Description                                                 | Default Value |
 | -------------- | ----------------------------------------------------------- | ------------- |
-| `--json_path`  | Path of the json file whose statistics are to be collected. |               |
+| `--json_path`  | Path of the JSON file whose statistics are to be collected. |               |
 | `--show_num`   | (Optional) Number of elements to show in the output.        | `5`           |
 
 #### 3.2.3 Result Presentation
@@ -190,11 +188,11 @@ python ./coco_tools/json_image_sta.py \
 
 | Parameter Name          | Description                                                                                                                           | Default Value |
 |-------------------------| ------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
-| `--json_path`           | Path of the json file whose statistics are to be collected.                                                                           |               |
+| `--json_path`           | Path of the JSON file whose statistics are to be collected.                                                                           |               |
 | `--csv_path`            | (Optional) Path for the statistics table.                                                                                             | `None`        |
-| `--img_shape_path`      | (Optional) .png image saving path. The image visualizes the two-dimensional distribution of all image shapes.                         | `5`           |
-| `--img_shape_rate_path` | (Optional) .png image saving path. The image visualizes the one-dimensional distribution of shape ratio (width/height) of all images. | `5`           |
-| `--img_keyname`         | (Optional) Image key in the json file.                                                                                                | `'images'`    |
+| `--img_shape_path`      | (Optional) Output image saving path. The image visualizes the two-dimensional distribution of all image shapes.                         | `5`           |
+| `--img_shape_rate_path` | (Optional) Output image saving path. The image visualizes the one-dimensional distribution of shape ratio (width/height) of all images. | `5`           |
+| `--img_keyname`         | (Optional) Image key in the JSON file.                                                                                                | `'images'`    |
 
 #### 3.3.3 Result Presentation
 
@@ -260,17 +258,17 @@ python ./coco_tools/json_anno_sta.py \
 
 | Parameter Name          | Description                                                                                                                                                                                                                                                                             | Default Value   |
 |-------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------|
-| `--json_path`           | Path of the json file whose statistics you want to collect.                                                                                                                                                                                                                             |                 |
+| `--json_path`           | Path of the JSON file whose statistics you want to collect.                                                                                                                                                                                                                             |                 |
 | `--csv_path`            | (Optional) Path to save the statistics table.                                                                                                                                                                                                                                           | `None`          |
-| `--obj_shape_path`      | (Optional) .png image saving path. The image visualizes the two-dimensional distribution of the shape of all object detection boxes.                                                                                                                                                    | `None`          |
-| `--obj_shape_rate_path` | (Optional) .png image saving path. The image visualizes the one-dimensional distribution of shape ratio (width/height) of all target bounding boxes.                                                                                                                                    | `None`          |
-| `--obj_pos_path`        | (Optional) .png image saving path. The image visualizes the two-dimensional distribution of the coordinates at the upper left corner of all bounding boxes.                                                                                                                             | `None`          |
-| `--obj_pos_end_path`    | (Optional) .png image saving path. The image visualizes the two-dimensional distribution of the coordinates at the lower right corner of all bounding boxes.                                                                                                                            | `None`          |
-| `--obj_cat_path`        | (Optional) .png image saving path. The image visualizes the quantity distribution of objects in each category.                                                                                                                                                                          | `None`          |
-| `--obj_obj_num_path`    | (Optional) .png image saving path. The image visualizes the quantity distribution of annotated objects in a single image.                                                                                                                                                               | `None`          |
+| `--obj_shape_path`      | (Optional) Output image saving path. The image visualizes the two-dimensional distribution of the shape of all object detection boxes.                                                                                                                                                    | `None`          |
+| `--obj_shape_rate_path` | (Optional) Output image saving path. The image visualizes the one-dimensional distribution of shape ratio (width/height) of all target bounding boxes.                                                                                                                                    | `None`          |
+| `--obj_pos_path`        | (Optional) Output image saving path. The image visualizes the two-dimensional distribution of the coordinates at the upper left corner of all bounding boxes.                                                                                                                             | `None`          |
+| `--obj_pos_end_path`    | (Optional) Output image saving path. The image visualizes the two-dimensional distribution of the coordinates at the lower right corner of all bounding boxes.                                                                                                                            | `None`          |
+| `--obj_cat_path`        | (Optional) Output image saving path. The image visualizes the quantity distribution of objects in each category.                                                                                                                                                                          | `None`          |
+| `--obj_obj_num_path`    | (Optional) Output image saving path. The image visualizes the quantity distribution of annotated objects in a single image.                                                                                                                                                               | `None`          |
 | `--get_relative`        | (Optional) Whether to generate the shape of the image target detection frame and the relative ratio of the coordinates of the upper left corner and lower right corner of the object detection frame (horizontal axis coordinates/image length, vertical axis coordinates/image width). | `False`         |
-| `--img_keyname`         | (Optional) Image key in the json file.                                                                                                                                                                                                                                                  | `'images'`      |
-| `--anno_keyname`        | (Optional) Annotation key in the json file.                                                                                                                                                                                                                                             | `'annotations'` |
+| `--img_keyname`         | (Optional) Image key in the JSON file.                                                                                                                                                                                                                                                  | `'images'`      |
+| `--anno_keyname`        | (Optional) Annotation key in the JSON file.                                                                                                                                                                                                                                             | `'annotations'` |
 
 #### 3.4.3 Result Presentation
 
@@ -347,7 +345,7 @@ A single image contains the quantity distribution of annotated objects:
 
 ### 3.5 Stat Image Information to Generates json
 
-Using `json_image2json.py`, you can quickly extract image information according to the file information in `test2017` and the training set json file, and generate the test set json file.
+Using `json_image2json.py`, you can quickly extract image information according to the file information in `test2017` and the training set JSON file, and generate the test set JSON file.
 
 #### 3.5.1 Command Demonstration
 
@@ -365,11 +363,11 @@ python ./coco_tools/json_image2json.py \
 
 | Parameter Name      | Description                                            | Default Value  |
 |---------------------|--------------------------------------------------------| -------------- |
-| `--image_dir`       | Directory that contains the test seg images.           |                |
-| `--json_train_path` | Json file path of the training set. Used as reference. |                |
-| `--json_test_path`  | Path to the generated test set json file.              |                |
-| `--img_keyname`     | (Optional) Image key in the json file.                 | `'images'`     |
-| `--cat_keyname`     | (Optional) Category key in the json file.              | `'categories'` |
+| `--image_dir`       | Directory that contains the test set images.           |                |
+| `--json_train_path` | JSON file path of the training set. Used as reference. |                |
+| `--json_test_path`  | Path to the generated test set JSON file.              |                |
+| `--img_keyname`     | (Optional) Image key in the JSON file.                 | `'images'`     |
+| `--cat_keyname`     | (Optional) Category key in the JSON file.              | `'categories'` |
 
 #### 3.5.3 Result Presentation
 
@@ -391,7 +389,7 @@ test image read...
  total test image: 40670
 ```
 
-The generated json file information:
+The generated JSON file information:
 
 ```
 ------------------------------------------------Args------------------------------------------------
@@ -449,14 +447,14 @@ python ./coco_tools/json_split.py \
 
 | Parameter Name        | Description                                                                                          | Default Value  |
 |-----------------------| ---------------------------------------------------------------------------------------------------- | -------------- |
-| `--json_all_path`     | Path to the original json file.                                                                      |                |
-| `--json_train_path`   | Generated json file for the train set.                                                               |                |
-| `--json_val_path`     | Generated json file for the val set.                                                                 |                |
+| `--json_all_path`     | Path to the original JSON file.                                                                      |                |
+| `--json_train_path`   | Generated JSON file for the train set.                                                               |                |
+| `--json_val_path`     | Generated JSON file for the val set.                                                                 |                |
 | `--val_split_rate`    | (Optional) Proportion of files in the val set.                                                       | `0.1`          |
 | `--val_split_num`     | (Optional) Number of val set files. If this parameter is set,`--val_split_rate` will be invalidated. | `None`         |
 | `--keep_val_in_train` | (Optional) Whether to keep the val set samples in the train set.                                     | `False`        |
-| `--img_keyname`       | (Optional) Image key in the json file.                                                               | `'images'`     |
-| `--cat_keyname`       | (Optional) Category key in the json file.                                                            | `'categories'` |
+| `--img_keyname`       | (Optional) Image key in the JSON file.                                                               | `'images'`     |
+| `--cat_keyname`       | (Optional) Category key in the JSON file.                                                            | `'categories'` |
 
 #### 3.6.3 Result Presentation
 
@@ -483,7 +481,7 @@ anno total 36781, train 33119, val 3662
 
 ### 3.7 json File Merging
 
-Using `json_merge.py` to merge two json files.
+Using `json_merge.py` to merge two JSON files.
 
 #### 3.7.1 Command Demonstration
 
@@ -501,9 +499,9 @@ python ./coco_tools/json_merge.py \
 
 | Parameter Name | Description                                              | Default Value               |
 | -------------- | -------------------------------------------------------- | --------------------------- |
-| `--json1_path` | Path of the first json file to merge.                    |                             |
-| `--json2_path` | Path of the second json file to merge.                   |                             |
-| `--save_path`  | Path to save the merged json file.                       |                             |
+| `--json1_path` | Path of the first JSON file to merge.                    |                             |
+| `--json2_path` | Path of the second JSON file to merge.                   |                             |
+| `--save_path`  | Path to save the merged JSON file.                       |                             |
 | `--merge_keys` | (Optional) Keys to be merged.                            | `['images', 'annotations']` |
 
 #### 3.7.3 Result Presentation

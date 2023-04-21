@@ -141,29 +141,29 @@ def json_anno_sta(json_path, csv_path, obj_shape_path, obj_shape_rate_path,
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="annotation infomation statistics")
+        description="Get annotation infomation statistics")
     parser.add_argument("--json_path", type=str, required=True, \
-                        help="Path of the json file whose statistics you want to collect. Default: None.")
+                        help="Path of the JSON file whose statistics you want to collect.")
     parser.add_argument("--csv_path", type=str, default=None, \
-                        help="(Optional) Path to save the statistics table. Default: None.")
+                        help="Path to save the statistics table.")
     parser.add_argument("--obj_shape_path", type=str, default=None, \
-                        help="(Optional) .png image saving path. The image visualizes the two-dimensional distribution of the shape of all object detection boxes. Default: None.")
+                        help="Output image saving path. The image visualizes the two-dimensional distribution of the shape of all object detection boxes.")
     parser.add_argument("--obj_shape_rate_path", type=str, default=None, \
-                        help="(Optional) .png image saving path. The image visualizes the one-dimensional distribution of shape ratio (width/height) of all target bounding boxes. Default: None.")
+                        help="Output image saving path. The image visualizes the one-dimensional distribution of shape ratio (width/height) of all target bounding boxes.")
     parser.add_argument("--obj_pos_path", type=str, default=None, \
-                        help="(Optional) .png image saving path. The image visualizes the two-dimensional distribution of the coordinates at the upper left corner of all bounding boxes. Default: None.")
+                        help="Output image saving path. The image visualizes the two-dimensional distribution of the coordinates at the upper left corner of all bounding boxes.")
     parser.add_argument("--obj_pos_end_path", type=str, default=None, \
-                        help="(Optional) .png image saving path. The image visualizes the two-dimensional distribution of the coordinates at the lower right corner of all bounding boxes. Default: None.")
+                        help="Output image saving path. The image visualizes the two-dimensional distribution of the coordinates at the lower right corner of all bounding boxes.")
     parser.add_argument("--obj_cat_path", type=str, default=None, \
-                        help="(Optional) .png image saving path. The image visualizes the quantity distribution of objects in each category. Default: None.")
+                        help="Output image saving path. The image visualizes the quantity distribution of objects in each category.")
     parser.add_argument("--obj_num_path", type=str, default=None, \
-                        help="(Optional) .png image saving path. The image visualizes the quantity distribution of annotated objects in a single image. Default: None.")
+                        help="Output image saving path. The image visualizes the quantity distribution of annotated objects in a single image.")
     parser.add_argument("--get_relative", action="store_true", \
-                        help="(Optional) Whether to generate the shape of the image target detection frame and the relative ratio of the coordinates of the upper left corner and lower right corner of the object detection frame (horizontal axis coordinates/image length, vertical axis coordinates/image width). Default: False.")
+                        help="Whether to generate the shape of the image target detection frame and the relative ratio of the coordinates of the upper left corner and lower right corner of the object detection frame (horizontal axis coordinates/image length, vertical axis coordinates/image width).")
     parser.add_argument("--img_keyname", type=str, default="images", \
-                        help="(Optional) Image key in the json file. Default: 'images'.")
+                        help="Image key in the JSON file.")
     parser.add_argument("--anno_keyname", type=str, default="annotations", \
-                        help="(Optional) Annotation key in the json file. Default: 'annotations'.")
+                        help="Annotation key in the JSON file.")
     args = parser.parse_args()
     json_anno_sta(args.json_path, args.csv_path, args.obj_shape_path,
                   args.obj_shape_rate_path, args.obj_pos_path,

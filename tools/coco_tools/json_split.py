@@ -71,23 +71,23 @@ def json_split(json_all_path, json_train_path, json_val_path, val_split_rate,
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="json merge")
+    parser = argparse.ArgumentParser(description="Split JSON file")
     parser.add_argument("--json_all_path", type=str,  required=True, \
-                        help="Path to the original json file. Default: None.")
+                        help="Path to the original JSON file.")
     parser.add_argument("--json_train_path", type=str, required=True, \
-                        help="Generated json file for the train set. Default: None.")
+                        help="Generated JSON file for the train set.")
     parser.add_argument( "--json_val_path", type=str, required=True, \
-                        help="Generated json file for the val set. Default: None.")
+                        help="Generated JSON file for the val set.")
     parser.add_argument("--val_split_rate", type=float, default=0.1, \
-                        help="V(Optional) Proportion of files in the val set. Default: 0.1.")
+                        help="Proportion of files in the val set.")
     parser.add_argument("--val_split_num", type=int, default=None, \
-                        help="(Optional) Number of val set files. If this parameter is set,`--val_split_rate` will be invalidated. Default: None.")
+                        help="Number of val set files. If this parameter is set,`--val_split_rate` will be invalidated.")
     parser.add_argument("--keep_val_in_train", action="store_true", \
-                        help="(Optional) Whether to keep the val set samples in the train set. Default: False.")
+                        help="Whether to keep the val set samples in the train set.")
     parser.add_argument("--img_keyname", type=str, default="images", \
-                        help="(Optional) Image key in the json file. Default: 'images'.")
+                        help="Image key in the JSON file.")
     parser.add_argument("--anno_keyname", type=str, default="annotations", \
-                        help="(Optional) Category key in the json file. Default: 'annotations'.")
+                        help="Category key in the JSON file.")
     args = parser.parse_args()
     json_split(args.json_all_path, args.json_train_path, args.json_val_path,
                args.val_split_rate, args.val_split_num, args.keep_val_in_train,

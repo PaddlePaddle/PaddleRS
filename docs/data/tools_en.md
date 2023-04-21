@@ -98,12 +98,12 @@ Among them:
 
 There are six tools included in the `coco_tools` directory, each with the following functions
 
-- `json_info_show.py`:    Print basic information about each dictionary in the json file.
-- `json_image_sta.py`:      Collect image information in json files and generate statistical tables and charts.
-- `json_anno_sta.py`:     Collect annotation information in json files to generate statistical tables and charts.
-- `json_image2json.py`:    Collect images of the test set and generate json file.
-- `json_split.py`:       Split the json file into train set and val set.
-- `json_merge.py`:       Merge multiple json files into one.
+- `json_info_show.py`:    Print basic information about each dictionary in the JSON file.
+- `json_image_sta.py`:      Collect image information in JSON files and generate statistical tables and charts.
+- `json_anno_sta.py`:     Collect annotation information in JSON files to generate statistical tables and charts.
+- `json_image2json.py`:    Collect images of the test set and generate JSON file.
+- `json_split.py`:       Split the JSON file into train set and val set.
+- `json_merge.py`:       Merge multiple JSON files into one.
 
 For detailed usage instructions, please refer to [coco_tools Usage Instructions](coco_tools_en.md).
 

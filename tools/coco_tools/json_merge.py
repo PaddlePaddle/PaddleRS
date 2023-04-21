@@ -40,15 +40,15 @@ def json_merge(json1_path, json2_path, save_path, merge_keys):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="json merge")
+    parser = argparse.ArgumentParser(description="Merge JSON files")
     parser.add_argument("--json1_path", type=str, required=True, \
-                        help="Path of the first json file to merge. Default: None.")
+                        help="Path of the first JSON file to merge.")
     parser.add_argument("--json2_path", type=str, required=True, \
-                        help="Path of the second json file to merge. Default: None.")
+                        help="Path of the second JSON file to merge.")
     parser.add_argument("--save_path", type=str, required=True, \
-                        help="Path to save the merged json file. Default: None.")
+                        help="Path to save the merged JSON file.")
     parser.add_argument("--merge_keys", type=list, default=["images", "annotations"], \
-                        help="(Optional) Keys to be merged. Default: ['images', 'annotations'].")
+                        help="Keys to be merged.")
     args = parser.parse_args()
     json_merge(args.json1_path, args.json2_path, args.save_path,
                args.merge_keys)
