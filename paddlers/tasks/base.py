@@ -78,6 +78,10 @@ class BaseModel(metaclass=ModelMeta):
         self.eval_metrics = None
         self.best_accuracy = -1.
         self.best_model_epoch = -1
+        self.precision = 'fp32'
+        self.amp_level = None
+        self.custom_white_list = None
+        self.custom_black_list = None
         # Whether to use synchronized BN
         self.sync_bn = False
         self.status = 'Normal'
@@ -312,6 +316,17 @@ class BaseModel(metaclass=ModelMeta):
                    use_vdl=True):
         self._check_transforms(train_dataset.transforms)
 
+        # use amp
+        if self.precision == 'fp16':
+            logging.info('use AMP to train. AMP level = {}'.format(
+                self.amp_level))
+            scaler = paddle.amp.GradScaler(init_loss_scaling=1024)
+            model, optimizer = paddle.amp.decorate(
+                models=self.net,
+                optimizers=self.optimizer,
+                level=self.amp_level,
+                save_dtype='float32')
+
         # XXX: Hard-coding
         if self.model_type == 'detector' and 'RCNN' in self.__class__.__name__ and train_dataset.pos_num < len(
                 train_dataset.file_list):
@@ -369,12 +384,32 @@ class BaseModel(metaclass=ModelMeta):
             step_time_tic = time.time()
 
             for step, data in enumerate(self.train_data_loader()):
-                if nranks > 1:
-                    outputs = self.train_step(step, data, ddp_net)
-                else:
-                    outputs = self.train_step(step, data, self.net)
+                if self.precision == 'fp16':
+                    with paddle.amp.auto_cast(
+                            level=self.amp_level,
+                            enable=True,
+                            custom_white_list=self.custom_white_list,
+                            custom_black_list=self.custom_black_list):
+                        if nranks > 1:
+                            outputs = self.train_step(step, data, ddp_net)
+                        else:
+                            outputs = self.train_step(step, data, self.net)
 
-                scheduler_step(self.optimizer, outputs['loss'])
+                    scaled = scaler.scale(outputs['loss'])
+                    scaled.backward()
+                    if isinstance(self.optimizer,
+                                  paddle.distributed.fleet.Fleet):
+                        scaler.minimize(self.optimizer.user_defined_optimizer,
+                                        scaled)
+                    else:
+                        scaler.minimize(optimizer, scaled)
+                else:
+                    if nranks > 1:
+                        outputs = self.train_step(step, data, ddp_net)
+                    else:
+                        outputs = self.train_step(step, data, self.net)
+
+                    scheduler_step(self.optimizer, outputs['loss'])
 
                 train_avg_metrics.update(outputs)
                 lr = self.optimizer.get_lr()
@@ -670,7 +705,8 @@ class BaseModel(metaclass=ModelMeta):
         outputs = self.run(net, data, mode='train')
 
         loss = outputs['loss']
-        loss.backward()
+        if self.precision == 'fp32':
+            loss.backward()
         self.optimizer.step()
         self.optimizer.clear_grad()
 

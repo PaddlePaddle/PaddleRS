@@ -179,22 +179,27 @@ class BaseClassifier(BaseModel):
         # Add class_id_map from model.yml
         self.postprocess.class_id_map = label_dict
 
-    def train(self,
-              num_epochs,
-              train_dataset,
-              train_batch_size=2,
-              eval_dataset=None,
-              optimizer=None,
-              save_interval_epochs=1,
-              log_interval_steps=2,
-              save_dir='output',
-              pretrain_weights='IMAGENET',
-              learning_rate=0.1,
-              lr_decay_power=0.9,
-              early_stop=False,
-              early_stop_patience=5,
-              use_vdl=True,
-              resume_checkpoint=None):
+    def train(
+            self,
+            num_epochs,
+            train_dataset,
+            train_batch_size=2,
+            eval_dataset=None,
+            optimizer=None,
+            save_interval_epochs=1,
+            log_interval_steps=2,
+            save_dir='output',
+            pretrain_weights='IMAGENET',
+            learning_rate=0.1,
+            lr_decay_power=0.9,
+            early_stop=False,
+            early_stop_patience=5,
+            use_vdl=True,
+            resume_checkpoint=None,
+            precision='fp32',
+            amp_level='O1',
+            custom_white_list=None,
+            custom_black_list=None, ):
         """
         Train the model.
 
@@ -228,7 +233,26 @@ class BaseClassifier(BaseModel):
                 training from. If None, no training checkpoint will be resumed. At most
                 Aone of `resume_checkpoint` and `pretrain_weights` can be set simultaneously.
                 Defaults to None.
+            precision (str, optional): Use AMP if precision='fp16'. If precision='fp32',
+                the training is normal.
+            amp_level (str, optional): Auto mixed precision level. Accepted values are
+                “O1” and “O2”: O1 represent mixed precision, the input data type of each
+                operator will be casted by white_list and black_list; O2 represent pure
+                fp16, all operators parameters and input data will be casted to fp16,
+                except operators in black_list, don’t support fp16 kernel and batchnorm.
+                Default is O1(amp).
+            custom_white_list(set|list|tuple, optional): The custom white_list. It's the
+                set of ops that support fp16 calculation and are considered numerically-safe
+                and performance-critical. These ops will be converted to fp16.
+            custom_black_list(set|list|tuple, optional): The custom black_list. The set of
+                ops that support fp16 calculation and are considered numerically-dangerous
+                and whose effects may also be observed in downstream ops. These ops will
+                not be converted to fp16.
         """
+        self.precision = precision
+        self.amp_level = amp_level
+        self.custom_white_list = custom_white_list
+        self.custom_black_list = custom_black_list
 
         if self.status == 'Infer':
             logging.error(
@@ -409,7 +433,15 @@ class BaseClassifier(BaseModel):
             top5s = []
             with paddle.no_grad():
                 for step, data in enumerate(self.eval_data_loader):
-                    outputs = self.run(self.net, data, 'eval')
+                    if self.precision == 'fp16':
+                        with paddle.amp.auto_cast(
+                                level=self.amp_level,
+                                enable=True,
+                                custom_white_list=self.custom_white_list,
+                                custom_black_list=self.custom_black_list):
+                            outputs = self.run(self.net, data, 'eval')
+                    else:
+                        outputs = self.run(self.net, data, 'eval')
                     top1s.append(outputs["top1"])
                     top5s.append(outputs["top5"])
 
