@@ -37,6 +37,7 @@ PaddleRS目前已支持的全部模型如下（标注\*的为遥感专用模型�
 | 目标检测 | PP-YOLO Tiny | 否 |
 | 目标检测 | PP-YOLOv2 | 否 |
 | 目标检测 | YOLOv3 | 否 |
+| 目标检测 | FCOS-R | 否 |
 | 图像分割 | BiSeNet V2 | 是 |
 | 图像分割 | DeepLab V3+ | 是 |
 | 图像分割 | \*FactSeg | 是 |

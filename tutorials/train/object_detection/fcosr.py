@@ -7,7 +7,6 @@ import os
 
 import paddlers as pdrs
 from paddlers import transforms as T
-from paddlers.models import paddlers.models.ppdet
 
 # 数据集存放目录
 DATA_DIR = "./data/dota/"
@@ -34,29 +33,36 @@ train_transforms = T.Compose([
     # 随机水平翻转
     T.RandomRFlip(),
     # 随机旋转
-    T.RandomRRotate(angel_mode='value', angle=[0, 90, 180, -90]),
+    T.RandomRRotate(
+        angle_mode='value', angle=[0, 90, 180, -90]),
     # 随机旋转
-    T.RandomRRotate(angel_mode='value', angle=[30, 60], rotate_prob=0.5),
+    T.RandomRRotate(
+        angle_mode='value', angle=[30, 60], rotate_prob=0.5),
     # 随机缩放图片
-    T.RResize(target_size=IMAGE_SIZE, keep_ratio=True, interp=2),
+    T.RResize(
+        target_size=IMAGE_SIZE, keep_ratio=True, interp=2),
     # 将标签转换为rotate box的格式
-    T.Poly2Box(filter_threshold=2, filter_mode='edge', rbox_type="oc"),
+    T.Poly2RBox(
+        filter_threshold=2, filter_mode='edge', rbox_type="oc"),
 ])
 
 train_batch_transforms = [
     # 归一化图像
-    T.BatchNormalizeImage(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    T.BatchNormalizeImage(
+        mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     # 用0填充标签
     T.BatchPadRGT(),
     # 填充图像
-    T._BatchPad(pad_to_stride=32)]
+    T._BatchPad(pad_to_stride=32)
+]
 
 eval_transforms = T.Compose([
     T.DecodeImg(),
     # 将标签转换为numpy array
     T.Poly2Array(),
     # 随机缩放图片
-    T.RResize(target_size=IMAGE_SIZE, keep_ratio=True, interp=2),
+    T.RResize(
+        target_size=IMAGE_SIZE, keep_ratio=True, interp=2),
     # 归一化图像
     T.Normalize(
         mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
@@ -69,7 +75,6 @@ train_dataset = pdrs.datasets.COCODetDataset(
     image_dir=IMAGE_DIR,
     anno_path=ANNO_PATH,
     transforms=train_transforms,
-    batch_transforms=train_batch_transforms,
     shuffle=True)
 
 eval_dataset = pdrs.datasets.COCODetDataset(
@@ -77,8 +82,7 @@ eval_dataset = pdrs.datasets.COCODetDataset(
     image_dir=IMAGE_DIR,
     anno_path=ANNO_PATH,
     transforms=eval_transforms,
-    batch_transforms=eval_batch_transforms,
-    shuffle=False )
+    shuffle=False)
 
 # 构建FCOS模型
 # 目前已支持的模型请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/intro/model_zoo.md
@@ -86,15 +90,14 @@ eval_dataset = pdrs.datasets.COCODetDataset(
 # 创建FCOS所需要的组件
 
 model = pdrs.tasks.det.YOLOv3(
-    backbone="ResNet50_vd_dcn",
-    num_classes=len(train_dataset.labels),
+    backbone="ResNeXt50_32x4d",
+    num_classes=15,
     nms_score_threshold=0.1,
     nms_topk=2000,
     nms_keep_topk=-1,
     nms_normalized=False,
     nms_iou_threshold=0.1,
     rotate=True)
-
 
 # 执行模型训练
 model.train(

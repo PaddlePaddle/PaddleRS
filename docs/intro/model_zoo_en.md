@@ -37,6 +37,7 @@ All models currently supported by PaddleRS are listed below (those marked \* are
 | Object Detection | PP-YOLO Tiny | No |
 | Object Detection | PP-YOLOv2 | No |
 | Object Detection | YOLOv3 | No |
+| Rotated Object Detection | FCOS-R | No |
 | Image Segmentation | BiSeNet V2 | Yes |
 | Image Segmentation | DeepLab V3+ | Yes |
 | Image Segmentation | \*FactSeg | Yes |

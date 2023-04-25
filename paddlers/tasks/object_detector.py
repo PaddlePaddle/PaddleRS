@@ -1,7 +1,7 @@
 # Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
+
 # You may obtain a copy of the License at
 #
 #    http://www.apache.org/licenses/LICENSE-2.0
@@ -32,8 +32,7 @@ from paddlers.models.ppdet.optimizer import ModelEMA
 import paddlers.utils.logging as logging
 from paddlers.utils.checkpoint import det_pretrain_weights_dict
 from .base import BaseModel
-from .utils.det_metrics import VOCMetric, COCOMetric
-from paddlers.models.ppdet.core.workspace import global_config
+from .utils.det_metrics import VOCMetric, COCOMetric, RBoxMetric
 
 __all__ = [
     "YOLOv3", "FasterRCNN", "PPYOLO", "PPYOLOTiny", "PPYOLOv2", "MaskRCNN"
@@ -47,7 +46,9 @@ class BaseDetector(BaseModel):
         'coco':
         {'im_id', 'image_shape', 'image', 'gt_bbox', 'gt_class', 'is_crowd'},
         'voc':
-        {'im_id', 'image_shape', 'image', 'gt_bbox', 'gt_class', 'difficult'}
+        {'im_id', 'image_shape', 'image', 'gt_bbox', 'gt_class', 'difficult'},
+        'rbox':
+        {'im_id', 'image_shape', 'image', 'gt_bbox', 'gt_class', 'gt_poly'},
     }
 
     def __init__(self, model_name, num_classes=80, **params):
@@ -282,7 +283,7 @@ class BaseDetector(BaseModel):
                 rate decay. Defaults to (216, 243).
             lr_decay_gamma (float, optional): Gamma coefficient of learning rate decay. 
                 Defaults to .1.
-            metric (str|None, optional): Evaluation metric. Choices are {'VOC', 'COCO', None}. 
+            metric (str|None, optional): Evaluation metric. Choices are {'VOC', 'COCO', 'RBOX', None}. 
                 If None, determine the metric according to the  dataset format. 
                 Defaults to None.
             use_ema (bool, optional): Whether to use exponential moving average 
@@ -330,7 +331,7 @@ class BaseDetector(BaseModel):
                 self.metric = 'coco'
         else:
             self.metric = metric.lower()
-            assert self.metric in ['coco', 'voc'], \
+            assert self.metric in ['coco', 'voc', 'rbox'], \
                 "Evaluation metric {} is not supported. Please choose from 'COCO' and 'VOC'."
 
         train_dataset.data_fields = self.data_fields[self.metric]
@@ -552,14 +553,14 @@ class BaseDetector(BaseModel):
                     self.metric = 'coco'
         else:
             self.metric = metric.lower()
-            assert self.metric.lower() in ['coco', 'voc'], \
+            assert self.metric.lower() in ['coco', 'voc', 'rbox'], \
                 "Evaluation metric {} is not supported. Please choose from 'COCO' and 'VOC'."
 
         eval_dataset.data_fields = self.data_fields[self.metric]
 
         eval_dataset.batch_transforms = self._compose_batch_transform(
             batch_transforms, mode='eval')
-        self._check_transforms(eval_dataset.transforms, 'eval')
+        self._check_transforms(eval_dataset.transforms)
 
         self.net.eval()
         nranks = paddle.distributed.get_world_size()
@@ -594,10 +595,14 @@ class BaseDetector(BaseModel):
                     coco_gt=copy.deepcopy(eval_dataset.coco_gt),
                     is_bbox_normalized=is_bbox_normalized,
                     classwise=False)
-            else:
+            elif self.metric == 'coco':
                 eval_metric = COCOMetric(
                     coco_gt=copy.deepcopy(eval_dataset.coco_gt),
                     classwise=False)
+            else:
+                assert hasattr(eval_dataset, 'get_anno_path')
+                eval_metric = RBoxMetric(
+                    anno_file=eval_dataset.get_anno_path(), classwise=False)
             scores = collections.OrderedDict()
             logging.info(
                 "Start to evaluate(total_samples={}, total_steps={})...".format(
@@ -665,15 +670,14 @@ class BaseDetector(BaseModel):
         return prediction
 
     def preprocess(self, images, transforms, batch_transforms, to_tensor=True):
-        self._check_transforms(transforms, 'test')
+        self._check_transforms(transforms)
         batch_samples = list()
         for im in images:
             if isinstance(im, str):
                 im = decode_image(im, read_raw=True)
             sample = construct_sample(image=im)
-            sample = transforms(sample)
-            data = sample[0]
-            batch_samples.append(data)
+            data = transforms(sample)
+            batch_samples.append(data[0])
         batch_transforms = self._compose_batch_transform(batch_transforms,
                                                          'test')
         batch_samples = batch_transforms(batch_samples)
@@ -750,13 +754,6 @@ class BaseDetector(BaseModel):
             start = end
 
         return results
-
-    def _check_transforms(self, transforms, mode):
-        super()._check_transforms(transforms, mode)
-        if not isinstance(transforms.arrange,
-                          paddlers.transforms.ArrangeDetector):
-            raise TypeError(
-                "`transforms.arrange` must be an ArrangeDetector object.")
 
     def get_pruning_info(self):
         info = super().get_pruning_info()
@@ -991,12 +988,13 @@ class YOLOv3(BaseDetector):
         if backbone not in {
                 'MobileNetV1', 'MobileNetV1_ssld', 'MobileNetV3',
                 'MobileNetV3_ssld', 'DarkNet53', 'ResNet50_vd_dcn', 'ResNet34',
-                'ResNet50'
+                'ResNeXt50_32x4d'
         }:
             raise ValueError(
                 "backbone: {} is not supported. Please choose one of "
                 "{'MobileNetV1', 'MobileNetV1_ssld', 'MobileNetV3', 'MobileNetV3_ssld', 'DarkNet53', "
-                "'ResNet50_vd_dcn', 'ResNet34', 'ResNet50}.".format(backbone))
+                "'ResNet50_vd_dcn', 'ResNet34', 'ResNeXt50_32x4d'}.".format(
+                    backbone))
 
         self.backbone_name = backbone
         if params.get('with_net', True):
@@ -1023,10 +1021,14 @@ class YOLOv3(BaseDetector):
                 kwargs.update(
                     dict(
                         return_idx=[1, 2, 3], freeze_at=-1, freeze_norm=False))
-            elif backbone == 'ResNet50':
+            elif backbone == 'ResNeXt50_32x4d':
+                backbone = 'ResNet50'
                 kwargs.update(
                     dict(
-                        return_idx=[1, 2, 3], groups=32, freeze_norm=False))
+                        return_idx=[1, 2, 3],
+                        base_width=4,
+                        groups=32,
+                        freeze_norm=False))
 
             backbone = self._get_backbone(backbone, **kwargs)
             nms = ppdet.modeling.MultiClassNMS(
@@ -1043,11 +1045,14 @@ class YOLOv3(BaseDetector):
                     use_c5=False,
                     relu_before_extra_convs=True)
                 assigner = ppdet.modeling.FCOSRAssigner(
+                    num_classes=num_classes,
                     factor=12,
                     threshold=0.23,
                     boundary=[[-1, 64], [64, 128], [128, 256], [256, 512],
                               [512, 100000000.0]])
                 yolo_head = ppdet.modeling.FCOSRHead(
+                    num_classes=num_classes,
+                    in_channels=[i.channels for i in neck.out_shape],
                     feat_channels=256,
                     fpn_strides=[8, 16, 32, 64, 128],
                     stacked_convs=4,
@@ -1108,7 +1113,7 @@ class YOLOv3(BaseDetector):
             else:
                 batch_transforms = [_BatchPad(pad_to_stride=-1)]
         else:
-            if not isinstance(batch_transforms, BatchCompose):
+            if isinstance(batch_transforms, BatchCompose):
                 batch_transforms = batch_transforms.batch_transforms
         if mode == 'eval' and self.metric == 'voc':
             collate_batch = False

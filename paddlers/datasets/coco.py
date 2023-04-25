@@ -34,7 +34,7 @@ class COCODetDataset(BaseDataset):
     Args:
         data_dir (str): Root directory of the dataset.
         image_dir (str): Directory that contains the images.
-        ann_path (str): Path to COCO annotations.
+        anno_path (str): Path to COCO annotations.
         transforms (paddlers.transforms.Compose|list): Data preprocessing and data augmentation operators to apply.
         label_list (str|None, optional): Path of the file that contains the category names. Defaults to None.
         num_workers (int|str, optional): Number of processes used for data loading. If `num_workers` is 'auto',
@@ -52,7 +52,6 @@ class COCODetDataset(BaseDataset):
                  image_dir,
                  anno_path,
                  transforms,
-                 batch_transforms=None,
                  label_list=None,
                  num_workers='auto',
                  shuffle=False,
@@ -84,23 +83,25 @@ class COCODetDataset(BaseDataset):
         self.file_list = list()
         neg_file_list = list()
         self.labels = list()
+        self.anno_path = anno_path
 
         annotations = defaultdict(list)
 
         cname2cid = OrderedDict()
         label_id = 0
-        with open(label_list, 'r', encoding=get_encoding(label_list)) as f:
-            for line in f.readlines():
-                cname2cid[line.strip()] = label_id
-                label_id += 1
-                self.labels.append(line.strip())
+        if label_list:
+            with open(label_list, 'r', encoding=get_encoding(label_list)) as f:
+                for line in f.readlines():
+                    cname2cid[line.strip()] = label_id
+                    label_id += 1
+                    self.labels.append(line.strip())
 
-        for k, v in cname2cid.items():
-            annotations['categories'].append({
-                'supercategory': 'component',
-                'id': v + 1,
-                'name': k
-            })
+            for k, v in cname2cid.items():
+                annotations['categories'].append({
+                    'supercategory': 'component',
+                    'id': v + 1,
+                    'name': k
+                })
 
         anno_path = norm_path(os.path.join(self.data_dir, anno_path))
         image_dir = norm_path(os.path.join(self.data_dir, image_dir))
@@ -206,7 +207,7 @@ class COCODetDataset(BaseDataset):
                     'difficult': inst.get('difficult', 0.)
                 })
                 if gt_poly:
-                    annotations['annotations'][-1].append(gt_poly[-1])
+                    annotations['annotations'][-1]['gt_poly'] = gt_poly[-1]
 
             label_info = {
                 'is_crowd': np.array(is_crowds),
@@ -277,6 +278,11 @@ class COCODetDataset(BaseDataset):
 
     def __len__(self):
         return self.num_samples
+
+    def get_anno_path(self):
+        if self.anno_path:
+            return norm_path(os.path.join(self.data_dir, self.anno_path))
+        return None
 
     def set_epoch(self, epoch_id):
         self._epoch = epoch_id

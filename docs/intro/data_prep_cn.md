@@ -10,4 +10,5 @@
 | 变化检测 | Season-varying | https://paperswithcode.com/dataset/cdd-dataset-season-varying | [prepare_svcd.py](https://github.com/PaddlePaddle/PaddleRS/blob/develop/tools/prepare_dataset/prepare_svcd.py) |
 | 场景分类 | UC Merced | http://weegee.vision.ucmerced.edu/datasets/landuse.html | [prepare_ucmerced.py](https://github.com/PaddlePaddle/PaddleRS/blob/develop/tools/prepare_dataset/prepare_ucmerced.py) |
 | 目标检测 | RSOD | https://github.com/RSIA-LIESMARS-WHU/RSOD-Dataset- | [prepare_rsod](https://github.com/PaddlePaddle/PaddleRS/blob/develop/tools/prepare_dataset/prepare_rsod.py) |
+| 旋转目标检测 | DOTA | https://captain-whu.github.io/DOTA/ | [prepare_dota](https://github.com/PaddlePaddle/PaddleRS/blob/develop/tools/prepare_dataset/prepare_dota.py) |
 | 图像分割 | iSAID | https://captain-whu.github.io/iSAID/ | [prepare_isaid](https://github.com/PaddlePaddle/PaddleRS/blob/develop/tools/prepare_dataset/prepare_isaid.py) |

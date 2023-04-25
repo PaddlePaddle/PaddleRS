@@ -57,7 +57,7 @@
 |-------|----|--------|-----|
 |`data_dir`|`str`|数据集存放目录。||
 |`image_dir`|`str`|输入图像存放目录。||
-|`ann_path`|`str`|[COCO格式](https://cocodataset.org/#home)标注文件路径。||
+|`anno_path`|`str`|[COCO格式](https://cocodataset.org/#home)标注文件路径。||
 |`transforms`|`paddlers.transforms.Compose`|对输入数据应用的数据变换算子。||
 |`label_list`|`str` \| `None`|label list文件。label list是一个文本文件，其中每一行包含一个类别的名称。|`None`|
 |`num_workers`|`int` \| `str`|加载数据时使用的辅助进程数。若设置为`'auto'`，则按照如下规则确定使用进程数：当CPU核心数大于16时，使用8个数据读取辅助进程；否则，使用CPU核心数一半数量的辅助进程。|`'auto'`|

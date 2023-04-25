@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# 目标检测模型YOLOv3训练示例脚本
+# 目标检测模型Faster R-CNN训练示例脚本
 # 执行此脚本前，请确认已正确安装PaddleRS库
 
 import os
@@ -17,7 +17,7 @@ EVAL_FILE_LIST_PATH = './data/sarship/eval.txt'
 # 数据集类别信息文件路径
 LABEL_LIST_PATH = './data/sarship/labels.txt'
 # 实验目录，保存输出的模型权重和结果
-EXP_DIR = './output/yolov3/'
+EXP_DIR = './output/faster_rcnn/'
 
 # 下载和解压SAR影像舰船检测数据集
 pdrs.utils.download_and_decompress(
@@ -63,18 +63,10 @@ eval_dataset = pdrs.datasets.VOCDetDataset(
     transforms=eval_transforms,
     shuffle=False)
 
-# 构建YOLOv3模型，使用DarkNet53作为backbone
+# 构建Faster R-CNN模型
 # 目前已支持的模型请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/intro/model_zoo.md
 # 模型输入参数请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/tasks/object_detector.py
-model = pdrs.tasks.det.YOLOv3(
-    num_classes=len(train_dataset.labels), backbone='DarkNet53')
-
-# 设置学习率衰减策略, 初始学习率大小以及学习率预热的步数和初始大小
-model.default_scheduler(
-    scheduler='Piecewise',
-    learning_rate=0.0001,
-    warmup_steps=0,
-    warmup_start_lr=0.0)
+model = pdrs.tasks.det.FasterRCNN(num_classes=len(train_dataset.labels))
 
 # 执行模型训练
 model.train(
@@ -87,5 +79,12 @@ model.train(
     # 每多少次迭代记录一次日志
     log_interval_steps=4,
     save_dir=EXP_DIR,
+    # 指定预训练权重
+    pretrain_weights='COCO',
+    # 初始学习率大小
+    learning_rate=0.005,
+    # 学习率预热（learning rate warm-up）步数与初始值
+    warmup_steps=0,
+    warmup_start_lr=0.0,
     # 是否启用VisualDL日志功能
     use_vdl=True)

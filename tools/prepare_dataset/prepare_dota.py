@@ -12,20 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import json
-import cv2
-from tqdm import tqdm
-from multiprocessing import Pool
-import argparse
-import math
 import copy
-from numbers import Number
+import json
+import math
+import os
 from multiprocessing import Pool
+from numbers import Number
 
 import cv2
 import numpy as np
 import shapely.geometry as shgeo
+from tqdm import tqdm
+
+from common import add_crop_options, get_default_parser
 
 wordname_15 = [
     'plane', 'baseball-diamond', 'bridge', 'ground-track-field',
@@ -46,34 +45,13 @@ DATA_CLASSES = {
 
 
 def parse_args():
-    parser = argparse.ArgumentParser('prepare data for training')
-
-    parser.add_argument(
-        '--input_dirs',
-        nargs='+',
-        type=str,
-        default=None,
-        help='input dirs which contain image and labelTxt dir')
-
-    parser.add_argument(
-        '--output_dir',
-        type=str,
-        default=None,
-        help='output dirs which contain image and labelTxt dir and coco style json file'
-    )
-
+    parser = get_default_parser()
+    parser = add_crop_options(parser)
     parser.add_argument(
         '--coco_json_file',
         type=str,
         default='',
         help='coco json annotation files')
-
-    parser.add_argument('--subsize', type=int, default=1024, help='patch size')
-
-    parser.add_argument('--gap', type=int, default=200, help='step size')
-
-    parser.add_argument(
-        '--data_type', type=str, default='dota10', help='data type')
 
     parser.add_argument(
         '--rates',
@@ -488,16 +466,16 @@ def load_dataset(input_dir, nproc, data_type):
 def main():
     args = parse_args()
     infos = []
-    for input_dir in args.input_dirs:
+    for input_dir in args.in_dataset_dir:
         infos += load_dataset(input_dir, args.nproc, args.data_type)
 
     slicer = SliceBase(
-        args.gap,
-        args.subsize,
+        args.crop_stride,
+        args.crop_size,
         args.iof_thr,
         num_process=args.nproc,
         image_only=args.image_only)
-    slicer.slice_data(infos, args.rates, args.output_dir)
+    slicer.slice_data(infos, args.rates, args.out_dataset_dir)
     if args.coco_json_file:
         infos = load_dota_infos(args.output_dir, args.nproc)
         coco_json_file = os.path.join(args.output_dir, args.coco_json_file)
