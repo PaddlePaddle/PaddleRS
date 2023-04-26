@@ -64,7 +64,11 @@ def train(self,
           early_stop=False,
           early_stop_patience=5,
           use_vdl=True,
-          resume_checkpoint=None):
+          resume_checkpoint=None,
+          precision='fp32',
+          amp_level='O1',
+          custom_white_list=None,
+          custom_black_list=None):
 ```
 
 The meaning of each parameter is as follows:
@@ -86,6 +90,10 @@ The meaning of each parameter is as follows:
 |`early_stop_patience`|`int`|`patience` parameter when the early stopping policy is enabled. Please refer to [`EarlyStop`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/utils/utils.py) for more details.|`5`|
 |`use_vdl`|`bool`|Whether to enable VisualDL.|`True`|
 |`resume_checkpoint`|`str` \| `None`|Checkpoint path. PaddleRS supports resuming training from checkpoints (including model weights and optimizer weights stored during previous training), but note that `resume_checkpoint` and `pretrain_weights` must not be set to values other than `None` at the same time.|`None`|
+|`precision`|`str`|Use AMP (auto mixed precision) training if `precision` is set to `'fp16'`.|`'fp32'`|
+|`amp_level`|`str`|Auto mixed precision level. Accepted values are 'O1' and 'O2': At O1 level, the input data type of each operator will be casted according to a white list and a black list. At O2 level, all parameters and input data will be casted to FP16, except those for the operators in the black list, those without the support for FP16 kernel, and those for the batchnorm layers.|`'O1'`|
+|`custom_white_list`|`set` \| `list` \| `tuple` \| `None` |Custom white list to use when `amp_level` is set to `'O1'`.|`None`|
+|`custom_black_list`|`set` \| `list` \| `tuple` \| `None` |Custom black list to use in AMP training.|`None`|
 
 ### `BaseClassifier.train()`
 
@@ -107,7 +115,11 @@ def train(self,
           early_stop=False,
           early_stop_patience=5,
           use_vdl=True,
-          resume_checkpoint=None):
+          resume_checkpoint=None,
+          precision='fp32',
+          amp_level='O1',
+          custom_white_list=None,
+          custom_black_list=None):
 ```
 
 The meaning of each parameter is as follows:
@@ -129,6 +141,10 @@ The meaning of each parameter is as follows:
 |`early_stop_patience`|`int`|`patience` parameter when the early stopping policy is enabled. Please refer to [`EarlyStop`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/utils/utils.py) for more details.|`5`|
 |`use_vdl`|`bool`|Whether to enable VisualDL.|`True`|
 |`resume_checkpoint`|`str` \| `None`|Checkpoint path. PaddleRS supports resuming training from checkpoints (including model weights and optimizer weights stored during previous training), but note that `resume_checkpoint` and `pretrain_weights` must not be set to values other than `None` at the same time.|`None`|
+|`precision`|`str`|Use AMP (auto mixed precision) training if `precision` is set to `'fp16'`.|`'fp32'`|
+|`amp_level`|`str`|Auto mixed precision level. Accepted values are 'O1' and 'O2': At O1 level, the input data type of each operator will be casted according to a white list and a black list. At O2 level, all parameters and input data will be casted to FP16, except those for the operators in the black list, those without the support for FP16 kernel, and those for the batchnorm layers.|`'O1'`|
+|`custom_white_list`|`set` \| `list` \| `tuple` \| `None` |Custom white list to use when `amp_level` is set to `'O1'`.|`None`|
+|`custom_black_list`|`set` \| `list` \| `tuple` \| `None` |Custom black list to use in AMP training.|`None`|
 
 ### `BaseDetector.train()`
 
@@ -155,7 +171,11 @@ def train(self,
           early_stop=False,
           early_stop_patience=5,
           use_vdl=True,
-          resume_checkpoint=None):
+          resume_checkpoint=None,
+          precision='fp32',
+          amp_level='O1',
+          custom_white_list=None,
+          custom_black_list=None):
 ```
 
 The meaning of each parameter is as follows:
@@ -182,6 +202,10 @@ The meaning of each parameter is as follows:
 |`early_stop_patience`|`int`|`patience` parameter when the early stopping policy is enabled. Please refer to [`EarlyStop`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/utils/utils.py) for more details.|`5`|
 |`use_vdl`|`bool`|Whether to enable VisualDL.|`True`|
 |`resume_checkpoint`|`str` \| `None`|Checkpoint path. PaddleRS supports resuming training from checkpoints (including model weights and optimizer weights stored during previous training), but note that `resume_checkpoint` and `pretrain_weights` must not be set to values other than `None` at the same time.|`None`|
+|`precision`|`str`|Use AMP (auto mixed precision) training if `precision` is set to `'fp16'`.|`'fp32'`|
+|`amp_level`|`str`|Auto mixed precision level. Accepted values are 'O1' and 'O2': At O1 level, the input data type of each operator will be casted according to a white list and a black list. At O2 level, all parameters and input data will be casted to FP16, except those for the operators in the black list, those without the support for FP16 kernel, and those for the batchnorm layers.|`'O1'`|
+|`custom_white_list`|`set` \| `list` \| `tuple` \| `None` |Custom white list to use when `amp_level` is set to `'O1'`.|`None`|
+|`custom_black_list`|`set` \| `list` \| `tuple` \| `None` |Custom black list to use in AMP training.|`None`|
 
 ### `BaseRestorer.train()`
 
@@ -203,7 +227,11 @@ def train(self,
           early_stop=False,
           early_stop_patience=5,
           use_vdl=True,
-          resume_checkpoint=None):
+          resume_checkpoint=None,
+          precision='fp32',
+          amp_level='O1',
+          custom_white_list=None,
+          custom_black_list=None):
 ```
 
 The meaning of each parameter is as follows:
@@ -225,6 +253,10 @@ The meaning of each parameter is as follows:
 |`early_stop_patience`|`int`|`patience` parameter when the early stopping policy is enabled. Please refer to [`EarlyStop`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/utils/utils.py) for more details.|`5`|
 |`use_vdl`|`bool`|Whether to enable VisualDL.|`True`|
 |`resume_checkpoint`|`str` \| `None`|Checkpoint path. PaddleRS supports resuming training from checkpoints (including model weights and optimizer weights stored during previous training), but note that `resume_checkpoint` and `pretrain_weights` must not be set to values other than `None` at the same time.|`None`|
+|`precision`|`str`|Use AMP (auto mixed precision) training if `precision` is set to `'fp16'`.|`'fp32'`|
+|`amp_level`|`str`|Auto mixed precision level. Accepted values are 'O1' and 'O2': At O1 level, the input data type of each operator will be casted according to a white list and a black list. At O2 level, all parameters and input data will be casted to FP16, except those for the operators in the black list, those without the support for FP16 kernel, and those for the batchnorm layers.|`'O1'`|
+|`custom_white_list`|`set` \| `list` \| `tuple` \| `None` |Custom white list to use when `amp_level` is set to `'O1'`.|`None`|
+|`custom_black_list`|`set` \| `list` \| `tuple` \| `None` |Custom black list to use in AMP training.|`None`|
 
 ### `BaseSegmenter.train()`
 
@@ -246,7 +278,11 @@ def train(self,
           early_stop=False,
           early_stop_patience=5,
           use_vdl=True,
-          resume_checkpoint=None):
+          resume_checkpoint=None,
+          precision='fp32',
+          amp_level='O1',
+          custom_white_list=None,
+          custom_black_list=None):
 ```
 
 The meaning of each parameter is as follows:
@@ -268,6 +304,10 @@ The meaning of each parameter is as follows:
 |`early_stop_patience`|`int`|`patience` parameter when the early stopping policy is enabled. Please refer to [`EarlyStop`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/utils/utils.py) for more details.|`5`|
 |`use_vdl`|`bool`|Whether to enable VisualDL.|`True`|
 |`resume_checkpoint`|`str` \| `None`|Checkpoint path. PaddleRS supports resuming training from checkpoints (including model weights and optimizer weights stored during previous training), but note that `resume_checkpoint` and `pretrain_weights` must not be set to values other than `None` at the same time.|`None`|
+|`precision`|`str`|Use AMP (auto mixed precision) training if `precision` is set to `'fp16'`.|`'fp32'`|
+|`amp_level`|`str`|Auto mixed precision level. Accepted values are 'O1' and 'O2': At O1 level, the input data type of each operator will be casted according to a white list and a black list. At O2 level, all parameters and input data will be casted to FP16, except those for the operators in the black list, those without the support for FP16 kernel, and those for the batchnorm layers.|`'O1'`|
+|`custom_white_list`|`set` \| `list` \| `tuple` \| `None` |Custom white list to use when `amp_level` is set to `'O1'`.|`None`|
+|`custom_black_list`|`set` \| `list` \| `tuple` \| `None` |Custom black list to use in AMP training.|`None`|
 
 ## `evaluate()`
 

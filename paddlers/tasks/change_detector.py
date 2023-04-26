@@ -216,27 +216,26 @@ class BaseChangeDetector(BaseModel):
             weight_decay=4e-5)
         return optimizer
 
-    def train(
-            self,
-            num_epochs,
-            train_dataset,
-            train_batch_size=2,
-            eval_dataset=None,
-            optimizer=None,
-            save_interval_epochs=1,
-            log_interval_steps=2,
-            save_dir='output',
-            pretrain_weights=None,
-            learning_rate=0.01,
-            lr_decay_power=0.9,
-            early_stop=False,
-            early_stop_patience=5,
-            use_vdl=True,
-            resume_checkpoint=None,
-            precision='fp32',
-            amp_level='O1',
-            custom_white_list=None,
-            custom_black_list=None, ):
+    def train(self,
+              num_epochs,
+              train_dataset,
+              train_batch_size=2,
+              eval_dataset=None,
+              optimizer=None,
+              save_interval_epochs=1,
+              log_interval_steps=2,
+              save_dir='output',
+              pretrain_weights=None,
+              learning_rate=0.01,
+              lr_decay_power=0.9,
+              early_stop=False,
+              early_stop_patience=5,
+              use_vdl=True,
+              resume_checkpoint=None,
+              precision='fp32',
+              amp_level='O1',
+              custom_white_list=None,
+              custom_black_list=None):
         """
         Train the model.
 
@@ -268,21 +267,18 @@ class BaseChangeDetector(BaseModel):
                 training from. If None, no training checkpoint will be resumed. At most
                 Aone of `resume_checkpoint` and `pretrain_weights` can be set simultaneously.
                 Defaults to None.
-            precision (str, optional): Use AMP if precision='fp16'. If precision='fp32',
-                the training is normal.
-            amp_level (str, optional): Auto mixed precision level. Accepted values are
-                “O1” and “O2”: O1 represent mixed precision, the input data type of each
-                operator will be casted by white_list and black_list; O2 represent pure
-                fp16, all operators parameters and input data will be casted to fp16,
-                except operators in black_list, don’t support fp16 kernel and batchnorm.
-                Default is O1(amp).
-            custom_white_list(set|list|tuple, optional): The custom white_list. It's the
-                set of ops that support fp16 calculation and are considered numerically-safe
-                and performance-critical. These ops will be converted to fp16.
-            custom_black_list(set|list|tuple, optional): The custom black_list. The set of
-                ops that support fp16 calculation and are considered numerically-dangerous
-                and whose effects may also be observed in downstream ops. These ops will
-                not be converted to fp16.
+            precision (str, optional): Use AMP (auto mixed precision) training if `precision`
+                is set to 'fp16'. Defaults to 'fp32'.
+            amp_level (str, optional): Auto mixed precision level. Accepted values are 'O1' 
+                and 'O2': At O1 level, the input data type of each operator will be casted 
+                according to a white list and a black list. At O2 level, all parameters and 
+                input data will be casted to FP16, except those for the operators in the black 
+                list, those without the support for FP16 kernel, and those for the batchnorm 
+                layers. Defaults to 'O1'.
+            custom_white_list(set|list|tuple|None, optional): Custom white list to use when 
+                `amp_level` is set to 'O1'. Defaults to None.
+            custom_black_list(set|list|tuple|None, optional): Custom black list to use in AMP 
+                training. Defaults to None.
         """
         self.precision = precision
         self.amp_level = amp_level
@@ -478,7 +474,7 @@ class BaseChangeDetector(BaseModel):
         label_area_all = 0
         conf_mat_all = []
         logging.info(
-            "Start to evaluate(total_samples={}, total_steps={})...".format(
+            "Start to evaluate (total_samples={}, total_steps={})...".format(
                 eval_dataset.num_samples,
                 math.ceil(eval_dataset.num_samples * 1.0 / batch_size)))
         with paddle.no_grad():
