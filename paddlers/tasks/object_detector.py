@@ -273,7 +273,11 @@ class BaseDetector(BaseModel):
             custom_black_list(set|list|tuple|None, optional): Custom black list to use in AMP 
                 training. Defaults to None.
         """
+        if precision != 'fp32':
+            raise ValueError("Currently, {} does not support AMP training.".
+                             format(self.__class__.__name__))
         args = self._pre_train(locals())
+        args.pop('self')
         return self._real_train(**args)
 
     def _pre_train(self, in_args):

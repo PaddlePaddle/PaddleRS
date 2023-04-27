@@ -688,14 +688,14 @@ class BaseModel(metaclass=ModelMeta):
                     custom_white_list=self.custom_white_list,
                     custom_black_list=self.custom_black_list):
                 outputs = self.run(net, data, mode='train')
-                # XXX: Hard-code init loss scaling
-                scaler = paddle.amp.GradScaler(init_loss_scaling=1024)
-                scaled = scaler.scale(outputs['loss'])
-                scaled.backward()
-                if isinstance(optimizer, paddle.distributed.fleet.Fleet):
-                    scaler.minimize(optimizer.user_defined_optimizer, scaled)
-                else:
-                    scaler.minimize(optimizer, scaled)
+            # XXX: Hard-code init loss scaling
+            scaler = paddle.amp.GradScaler(init_loss_scaling=1024)
+            scaled = scaler.scale(outputs['loss'])
+            scaled.backward()
+            if isinstance(optimizer, paddle.distributed.fleet.Fleet):
+                scaler.minimize(optimizer.user_defined_optimizer, scaled)
+            else:
+                scaler.minimize(optimizer, scaled)
         else:
             outputs = self.run(net, data, mode='train')
             loss = outputs['loss']
