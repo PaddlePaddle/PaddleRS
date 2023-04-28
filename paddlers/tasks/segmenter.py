@@ -220,7 +220,11 @@ class BaseSegmenter(BaseModel):
               early_stop=False,
               early_stop_patience=5,
               use_vdl=True,
-              resume_checkpoint=None):
+              resume_checkpoint=None,
+              precision='fp32',
+              amp_level='O1',
+              custom_white_list=None,
+              custom_black_list=None):
         """
         Train the model.
 
@@ -253,7 +257,23 @@ class BaseSegmenter(BaseModel):
                 training from. If None, no training checkpoint will be resumed. At most
                 Aone of `resume_checkpoint` and `pretrain_weights` can be set simultaneously.
                 Defaults to None.
+            precision (str, optional): Use AMP (auto mixed precision) training if `precision`
+                is set to 'fp16'. Defaults to 'fp32'.
+            amp_level (str, optional): Auto mixed precision level. Accepted values are 'O1' 
+                and 'O2': At O1 level, the input data type of each operator will be casted 
+                according to a white list and a black list. At O2 level, all parameters and 
+                input data will be casted to FP16, except those for the operators in the black 
+                list, those without the support for FP16 kernel, and those for the batchnorm 
+                layers. Defaults to 'O1'.
+            custom_white_list(set|list|tuple|None, optional): Custom white list to use when 
+                `amp_level` is set to 'O1'. Defaults to None.
+            custom_black_list(set|list|tuple|None, optional): Custom black list to use in AMP 
+                training. Defaults to None.
         """
+        self.precision = precision
+        self.amp_level = amp_level
+        self.custom_white_list = custom_white_list
+        self.custom_black_list = custom_black_list
 
         if self.status == 'Infer':
             logging.error(
@@ -434,12 +454,20 @@ class BaseSegmenter(BaseModel):
         label_area_all = 0
         conf_mat_all = []
         logging.info(
-            "Start to evaluate(total_samples={}, total_steps={})...".format(
+            "Start to evaluate (total_samples={}, total_steps={})...".format(
                 eval_dataset.num_samples,
                 math.ceil(eval_dataset.num_samples * 1.0 / batch_size)))
         with paddle.no_grad():
             for step, data in enumerate(self.eval_data_loader):
-                outputs = self.run(self.net, data, 'eval')
+                if self.precision == 'fp16':
+                    with paddle.amp.auto_cast(
+                            level=self.amp_level,
+                            enable=True,
+                            custom_white_list=self.custom_white_list,
+                            custom_black_list=self.custom_black_list):
+                        outputs = self.run(self.net, data, 'eval')
+                else:
+                    outputs = self.run(self.net, data, 'eval')
                 pred_area = outputs['pred_area']
                 label_area = outputs['label_area']
                 intersect_area = outputs['intersect_area']
