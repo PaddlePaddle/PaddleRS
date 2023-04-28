@@ -82,6 +82,7 @@ class BaseModel(metaclass=ModelMeta):
         self.amp_level = None
         self.custom_white_list = None
         self.custom_black_list = None
+        self.scaler = None
         # Whether to use synchronized BN
         self.sync_bn = False
         self.status = 'Normal'
@@ -316,17 +317,19 @@ class BaseModel(metaclass=ModelMeta):
                    use_vdl=True):
         self._check_transforms(train_dataset.transforms)
 
+        net, optimizer = self.net, self.optimizer
         # Use AMP
         if self.precision == 'fp16':
             logging.info("Use AMP training. AMP level = {}.".format(
                 self.amp_level))
-            net, optimizer = paddle.amp.decorate(
-                models=self.net,
-                optimizers=self.optimizer,
-                level=self.amp_level,
-                save_dtype='float32')
-        else:
-            net, optimizer = self.net, self.optimizer
+            # XXX: Hard-code init loss scaling
+            self.scaler = paddle.amp.GradScaler(init_loss_scaling=1024)
+            if self.amp_level == 'O2':
+                net, optimizer = paddle.amp.decorate(
+                    models=self.net,
+                    optimizers=self.optimizer,
+                    level=self.amp_level,
+                    save_dtype='float32')
 
         # XXX: Hard-coding
         if self.model_type == 'detector' and 'RCNN' in self.__class__.__name__ and train_dataset.pos_num < len(
@@ -688,14 +691,12 @@ class BaseModel(metaclass=ModelMeta):
                     custom_white_list=self.custom_white_list,
                     custom_black_list=self.custom_black_list):
                 outputs = self.run(net, data, mode='train')
-            # XXX: Hard-code init loss scaling
-            scaler = paddle.amp.GradScaler(init_loss_scaling=1024)
-            scaled = scaler.scale(outputs['loss'])
+            scaled = self.scaler.scale(outputs['loss'])
             scaled.backward()
             if isinstance(optimizer, paddle.distributed.fleet.Fleet):
-                scaler.minimize(optimizer.user_defined_optimizer, scaled)
+                self.scaler.minimize(optimizer.user_defined_optimizer, scaled)
             else:
-                scaler.minimize(optimizer, scaled)
+                self.scaler.minimize(optimizer, scaled)
         else:
             outputs = self.run(net, data, mode='train')
             loss = outputs['loss']
