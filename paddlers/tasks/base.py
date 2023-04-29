@@ -78,6 +78,11 @@ class BaseModel(metaclass=ModelMeta):
         self.eval_metrics = None
         self.best_accuracy = -1.
         self.best_model_epoch = -1
+        self.precision = 'fp32'
+        self.amp_level = None
+        self.custom_white_list = None
+        self.custom_black_list = None
+        self.scaler = None
         # Whether to use synchronized BN
         self.sync_bn = False
         self.status = 'Normal'
@@ -312,6 +317,20 @@ class BaseModel(metaclass=ModelMeta):
                    use_vdl=True):
         self._check_transforms(train_dataset.transforms)
 
+        net, optimizer = self.net, self.optimizer
+        # Use AMP
+        if self.precision == 'fp16':
+            logging.info("Use AMP training. AMP level = {}.".format(
+                self.amp_level))
+            # XXX: Hard-code init loss scaling
+            self.scaler = paddle.amp.GradScaler(init_loss_scaling=1024)
+            if self.amp_level == 'O2':
+                net, optimizer = paddle.amp.decorate(
+                    models=self.net,
+                    optimizers=self.optimizer,
+                    level=self.amp_level,
+                    save_dtype='float32')
+
         # XXX: Hard-coding
         if self.model_type == 'detector' and 'RCNN' in self.__class__.__name__ and train_dataset.pos_num < len(
                 train_dataset.file_list):
@@ -325,12 +344,10 @@ class BaseModel(metaclass=ModelMeta):
             ):
                 paddle.distributed.init_parallel_env()
                 ddp_net = to_data_parallel(
-                    self.net,
-                    find_unused_parameters=self.find_unused_parameters)
+                    net, find_unused_parameters=self.find_unused_parameters)
             else:
                 ddp_net = to_data_parallel(
-                    self.net,
-                    find_unused_parameters=self.find_unused_parameters)
+                    net, find_unused_parameters=self.find_unused_parameters)
 
         if use_vdl:
             from visualdl import LogWriter
@@ -361,7 +378,7 @@ class BaseModel(metaclass=ModelMeta):
 
         current_step = 0
         for i in range(start_epoch, num_epochs):
-            self.net.train()
+            net.train()
             if callable(
                     getattr(self.train_data_loader.dataset, 'set_epoch', None)):
                 self.train_data_loader.dataset.set_epoch(i)
@@ -370,14 +387,14 @@ class BaseModel(metaclass=ModelMeta):
 
             for step, data in enumerate(self.train_data_loader()):
                 if nranks > 1:
-                    outputs = self.train_step(step, data, ddp_net)
+                    outputs = self.train_step(step, data, ddp_net, optimizer)
                 else:
-                    outputs = self.train_step(step, data, self.net)
+                    outputs = self.train_step(step, data, net, optimizer)
 
-                scheduler_step(self.optimizer, outputs['loss'])
+                scheduler_step(optimizer, outputs['loss'])
 
                 train_avg_metrics.update(outputs)
-                lr = self.optimizer.get_lr()
+                lr = optimizer.get_lr()
                 outputs['lr'] = lr
                 if ema is not None:
                     ema.update(self.net)
@@ -666,13 +683,26 @@ class BaseModel(metaclass=ModelMeta):
         logging.info("The inference model for deployment is saved in {}.".
                      format(save_dir))
 
-    def train_step(self, step, data, net):
-        outputs = self.run(net, data, mode='train')
-
-        loss = outputs['loss']
-        loss.backward()
-        self.optimizer.step()
-        self.optimizer.clear_grad()
+    def train_step(self, step, data, net, optimizer):
+        if self.precision == 'fp16':
+            with paddle.amp.auto_cast(
+                    level=self.amp_level,
+                    enable=True,
+                    custom_white_list=self.custom_white_list,
+                    custom_black_list=self.custom_black_list):
+                outputs = self.run(net, data, mode='train')
+            scaled = self.scaler.scale(outputs['loss'])
+            scaled.backward()
+            if isinstance(optimizer, paddle.distributed.fleet.Fleet):
+                self.scaler.minimize(optimizer.user_defined_optimizer, scaled)
+            else:
+                self.scaler.minimize(optimizer, scaled)
+        else:
+            outputs = self.run(net, data, mode='train')
+            loss = outputs['loss']
+            loss.backward()
+            optimizer.step()
+            optimizer.clear_grad()
 
         return outputs
 
