@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -73,15 +75,16 @@ def _polygonize_raster(mask_path, vec_save_path, proj, geot, ignore_index, ext):
 
 
 @time_it
-def mask2shape(srcimg_path, mask_path, save_path, ignore_index=255):
+def mask2shape(src_img_path, mask_path, save_path, ignore_index=255):
     vec_ext = save_path.split(".")[-1].lower()
     if vec_ext not in ["json", "geojson", "shp"]:
         raise ValueError(
             "The extension of `save_path` must be 'json/geojson' or 'shp', not {}.".
             format(vec_ext))
-    ras_ext = srcimg_path.split(".")[-1].lower()
-    if osp.exists(srcimg_path) and ras_ext in ["tif", "tiff", "geotiff", "img"]:
-        src = Raster(srcimg_path)
+    ras_ext = src_img_path.split(".")[-1].lower()
+    if osp.exists(
+            src_img_path) and ras_ext in ["tif", "tiff", "geotiff", "img"]:
+        src = Raster(src_img_path)
         _polygonize_raster(mask_path, save_path, src.proj, src.geot,
                            ignore_index, vec_ext)
         src = None
@@ -96,10 +99,10 @@ if __name__ == "__main__":
                         help="Path of mask data.")
     parser.add_argument("--save_path", type=str, required=True, \
                         help="Path to save the shape file (the extension is .json/geojson or .shp).")
-    parser.add_argument("--srcimg_path", type=str, default="", \
+    parser.add_argument("--src_img_path", type=str, default="", \
                         help="Path of original data with geoinfo. Default to empty.")
     parser.add_argument("--ignore_index", type=int, default=255, \
                         help="The ignored index will not be converted to a value in the shape file. Default value is 255.")
     args = parser.parse_args()
-    mask2shape(args.srcimg_path, args.mask_path, args.save_path,
+    mask2shape(args.src_img_path, args.mask_path, args.save_path,
                args.ignore_index)

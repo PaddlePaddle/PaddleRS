@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,8 +36,8 @@ def _gt_convert(x_geo, y_geo, geotf):
 
 @time_it
 # TODO: update for vector2raster
-def convert_data(image_path, geojson_path, save_path):
-    raster = Raster(image_path)
+def convert_data(src_img_path, geojson_path, save_path):
+    raster = Raster(src_img_path)
     tmp_img = np.zeros((raster.height, raster.width), dtype=np.int32)
     # vector to EPSG from raster
     temp_geojson_path = translate_vector(geojson_path, raster.proj)
@@ -63,11 +65,11 @@ def convert_data(image_path, geojson_path, save_path):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--srcimg_path", type=str, required=True, \
+    parser.add_argument("--src_img_path", type=str, required=True, \
                         help="Path of the original image.")
     parser.add_argument("--geojson_path", type=str, required=True, \
                         help="Path of the GeoJSON file (the coordinate system is WGS84).")
     parser.add_argument("--save_path", type=str, required=True, \
                         help="Path to store the mask data.")
     args = parser.parse_args()
-    convert_data(args.srcimg_path, args.geojson_path, args.save_path)
+    convert_data(args.src_img_path, args.geojson_path, args.save_path)

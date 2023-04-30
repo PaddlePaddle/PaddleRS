@@ -12,12 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import tempfile
-
 from testing_utils import run_script
 
 if __name__ == '__main__':
-    with tempfile.TemporaryDirectory() as td:
-        run_script(
-            f"python pca.py --image_path ../tests/data/ssst/multispectral.tif --save_dir {td} --dim 5",
-            wd="../tools")
+    run_script(
+        f"python generate_file_lists.py --data_dir ../tests/data/levircd_crop --save_dir ../tests/data/levircd_crop --subsets train val test --subdirs A B label --glob_pattern '*' --store_abs_path",
+        wd="../tools")
