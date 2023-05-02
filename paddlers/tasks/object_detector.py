@@ -595,10 +595,10 @@ class BaseDetector(BaseModel):
 
         eval_dataset.data_fields = self.data_fields[self.metric]
 
-        if eval_dataset.batch_transforms:
+        if eval_dataset.batch_transforms is None:
             eval_dataset.batch_transforms = self._compose_batch_transform(
                 batch_transforms, mode='eval')
-            self._check_transforms(eval_dataset.transforms)
+        self._check_transforms(eval_dataset.transforms)
 
         self.net.eval()
         nranks = paddle.distributed.get_world_size()

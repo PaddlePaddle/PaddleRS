@@ -37,6 +37,7 @@ class BaseDataset(Dataset):
 
         self.num_workers = get_num_workers(num_workers)
         self.shuffle = shuffle
+        self.batch_transform = None
 
     def __getitem__(self, idx):
         sample = construct_sample_from_dict(self.file_list[idx])
