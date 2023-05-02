@@ -54,6 +54,8 @@ def train(self,
           train_dataset,
           train_batch_size=2,
           eval_dataset=None,
+          train_batch_transforms=None,
+          eval_batch_transforms=None,
           optimizer=None,
           save_interval_epochs=1,
           log_interval_steps=2,
@@ -79,6 +81,8 @@ The meaning of each parameter is as follows:
 |`train_dataset`|`paddlers.datasets.CDDataset`|Training dataset.||
 |`train_batch_size`|`int`|Batch size used during training.|`2`|
 |`eval_dataset`|`paddlers.datasets.CDDataset` \| `None`|Validation dataset.|`None`|
+|`train_batch_transforms`|`paddlers.transforms.BatchCompose` \| `None`|Batch data transformation operators in train data.|`None`|
+|`eval_batch_transforms`|`paddlers.transforms.BatchCompose` \| `None`|Batch data transformation operators in eval data.|`None`|
 |`optimizer`|`paddle.optimizer.Optimizer` \| `None`|Optimizer used during training. If `None`, the optimizer defined by default is used.|`None`|
 |`save_interval_epochs`|`int`|Number of intervals (in epochs) to evaluate and store models during training.|`1`|
 |`log_interval_steps`|`int`|Number of interval steps (i.e., the number of iterations) to print logs during training.|`2`|

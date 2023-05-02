@@ -75,6 +75,9 @@ def parse_args():
         default=False,
         help='only processing image')
 
+    parser.add_argument(
+        '--data_type', type=str, default='dota10', help='data type')
+
     args = parser.parse_args()
     return args
 
@@ -477,8 +480,8 @@ def main():
         image_only=args.image_only)
     slicer.slice_data(infos, args.rates, args.out_dataset_dir)
     if args.coco_json_file:
-        infos = load_dota_infos(args.output_dir, args.nproc)
-        coco_json_file = os.path.join(args.output_dir, args.coco_json_file)
+        infos = load_dota_infos(args.out_dataset_dir, args.nproc)
+        coco_json_file = os.path.join(args.out_dataset_dir, args.coco_json_file)
         class_names = DATA_CLASSES[args.data_type]
         data_to_coco(infos, coco_json_file, class_names, args.nproc)
 

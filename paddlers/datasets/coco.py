@@ -193,7 +193,7 @@ class COCODetDataset(BaseDataset):
                         gt_poly.append(inst['segmentation'])
 
                 is_crowds.append([inst['iscrowd']])
-                gt_classes.append([inst['category_id']])
+                gt_classes.append([catid2clsid[inst['category_id']]])
                 gt_bboxs.append(inst['clean_bbox'])
                 gt_scores.append([1.])
                 difficulties.append(inst.get('difficult', 0.))

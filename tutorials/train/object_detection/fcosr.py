@@ -11,7 +11,7 @@ from paddlers import transforms as T
 # 数据集存放目录
 DATA_DIR = "./data/dota/"
 # 数据集标签文件路径
-ANNO_PATH = "./data/dota/dota_trainval1024.json"
+ANNO_PATH = "./data/dota/DOTA_trainval1024.json"
 # 数据集图像目录
 IMAGE_DIR = "./data/dota/images"
 # 实验目录，保存输出的模型权重和结果
@@ -105,6 +105,8 @@ model.train(
     train_dataset=train_dataset,
     train_batch_size=2,
     eval_dataset=eval_dataset,
+    train_batch_transforms=train_batch_transforms,
+    eval_batch_transforms=eval_batch_transforms,
     # 每多少个epoch存储一次检查点
     save_interval_epochs=5,
     # 每多少次迭代记录一次日志

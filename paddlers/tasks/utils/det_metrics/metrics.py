@@ -248,7 +248,7 @@ class RBoxMetric(Metric):
         self.reset()
 
     def reset(self):
-        self.results = []
+        self.details = []
         self.detection_map.reset()
 
     def update(self, inputs, outputs):
@@ -263,7 +263,7 @@ class RBoxMetric(Metric):
 
         infer_results = get_infer_results(outs, self.clsid2catid)
         infer_results = infer_results['bbox'] if 'bbox' in infer_results else []
-        self.results += infer_results
+        self.details += infer_results
         if self.save_prediction_only:
             return
 
@@ -330,7 +330,7 @@ class RBoxMetric(Metric):
 
     def accumulate(self):
         if self.output_eval:
-            self.save_results(self.results, self.output_eval, self.imid2path)
+            self.save_results(self.details, self.output_eval, self.imid2path)
 
         if not self.save_prediction_only:
             logging.info("Accumulating evaluatation results...")
@@ -340,6 +340,11 @@ class RBoxMetric(Metric):
         map_stat = 100. * self.detection_map.get_map()
         logging.info("mAP({:.2f}, {}) = {:.2f}%".format(
             self.overlap_thresh, self.map_type, map_stat))
+
+    def get(self):
+        map_stat = 100. * self.detection_map.get_map()
+        stats = {'mAP': map_stat}
+        return stats
 
     def get_results(self):
         return {'bbox': [self.detection_map.get_map()]}

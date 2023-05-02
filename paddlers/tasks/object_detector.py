@@ -229,7 +229,8 @@ class BaseDetector(BaseModel):
               train_dataset,
               train_batch_size=64,
               eval_dataset=None,
-              batch_transforms=None,
+              train_batch_transforms=None,
+              eval_batch_transforms=None,
               optimizer=None,
               save_interval_epochs=1,
               log_interval_steps=10,
@@ -265,8 +266,11 @@ class BaseDetector(BaseModel):
             eval_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset|None, optional): 
                 Evaluation dataset. If None, the model will not be evaluated during training 
                 process. Defaults to None.
-            batch_transforms (paddlers.transforms.batch_operators.BatchCompose|None, optional):
-                Batch transformation operators. If None, the default batch transforms will be used. 
+            train_batch_transforms (paddlers.transforms.batch_operators.BatchCompose|None, optional):
+                Train batch transformation operators. If None, the default batch transforms will be used. 
+                Defaults to None.
+            eval_batch_transforms (paddlers.transforms.batch_operators.BatchCompose|None, optional):
+                Eval batch transformation operators. If None, the default batch transforms will be used. 
                 Defaults to None.
             optimizer (paddle.optimizer.Optimizer|None, optional): Optimizer used for 
                 training. If None, a default optimizer will be used. Defaults to None.
@@ -325,9 +329,9 @@ class BaseDetector(BaseModel):
         return in_args
 
     def _real_train(self, num_epochs, train_dataset, train_batch_size,
-                    eval_dataset, batch_transforms, optimizer,
-                    save_interval_epochs, log_interval_steps, save_dir,
-                    pretrain_weights, learning_rate, warmup_steps,
+                    eval_dataset, train_batch_transforms, eval_batch_transforms,
+                    optimizer, save_interval_epochs, log_interval_steps,
+                    save_dir, pretrain_weights, learning_rate, warmup_steps,
                     warmup_start_lr, lr_decay_epochs, lr_decay_gamma, metric,
                     use_ema, early_stop, early_stop_patience, use_vdl,
                     resume_checkpoint, scheduler, cosine_decay_num_epoch,
@@ -362,9 +366,14 @@ class BaseDetector(BaseModel):
         self.labels = train_dataset.labels
         self.num_max_boxes = train_dataset.num_max_boxes
         train_dataset.batch_transforms = self._compose_batch_transform(
-            batch_transforms, mode='train')
+            train_batch_transforms, mode='train')
         train_dataset.collate_fn = self._build_collate_fn(
             train_dataset.batch_transforms)
+
+        eval_dataset.batch_transforms = self._compose_batch_transform(
+            eval_batch_transforms, mode='eval')
+        eval_dataset.collate_fn = self._build_collate_fn(
+            eval_dataset.batch_transforms)
 
         # Build optimizer if not defined
         if optimizer is None:
@@ -450,7 +459,8 @@ class BaseDetector(BaseModel):
                           train_dataset,
                           train_batch_size=64,
                           eval_dataset=None,
-                          batch_transforms=None,
+                          train_batch_transforms=None,
+                          eval_batch_transforms=None,
                           optimizer=None,
                           save_interval_epochs=1,
                           log_interval_steps=10,
@@ -479,8 +489,11 @@ class BaseDetector(BaseModel):
             eval_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset|None, optional): 
                 Evaluation dataset. If None, the model will not be evaluated during training 
                 process. Defaults to None.
-            batch_transforms (paddlers.transforms.batch_operators.BatchCompose|None, optional):
-                Batch transformation operators. If None, the default batch transforms will be used. 
+            train_batch_transforms (paddlers.transforms.batch_operators.BatchCompose|None, optional):
+                Train batch transformation operators. If None, the default batch transforms will be used. 
+                Defaults to None.
+            eval_batch_transforms (paddlers.transforms.batch_operators.BatchCompose|None, optional):
+                Eval batch transformation operators. If None, the default batch transforms will be used. 
                 Defaults to None.
             optimizer (paddle.optimizer.Optimizer or None, optional): Optimizer used for 
                 training. If None, a default optimizer will be used. Defaults to None.
@@ -522,7 +535,8 @@ class BaseDetector(BaseModel):
             train_dataset=train_dataset,
             train_batch_size=train_batch_size,
             eval_dataset=eval_dataset,
-            batch_transforms=batch_transforms,
+            train_batch_transforms=train_batch_transforms,
+            eval_batch_transforms=eval_batch_transforms,
             optimizer=optimizer,
             save_interval_epochs=save_interval_epochs,
             log_interval_steps=log_interval_steps,
@@ -553,7 +567,7 @@ class BaseDetector(BaseModel):
             eval_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset): 
                 Evaluation dataset.
             batch_transforms (paddlers.transforms.batch_operators.BatchCompose|None, optional):
-                Batch transformation operators. If None, the default batch transforms will be used. 
+                Eval batch transformation operators. If None, the default batch transforms will be used. 
                 Defaults to None.
             batch_size (int, optional): Total batch size among all cards used for 
                 evaluation. Defaults to 1.
@@ -581,9 +595,10 @@ class BaseDetector(BaseModel):
 
         eval_dataset.data_fields = self.data_fields[self.metric]
 
-        eval_dataset.batch_transforms = self._compose_batch_transform(
-            batch_transforms, mode='eval')
-        self._check_transforms(eval_dataset.transforms)
+        if eval_dataset.batch_transforms:
+            eval_dataset.batch_transforms = self._compose_batch_transform(
+                batch_transforms, mode='eval')
+            self._check_transforms(eval_dataset.transforms)
 
         self.net.eval()
         nranks = paddle.distributed.get_world_size()
@@ -1649,7 +1664,6 @@ class PPYOLOTiny(YOLOv3):
                  nms_topk=1000,
                  nms_keep_topk=100,
                  nms_iou_threshold=0.45,
-                 nms_normalized=True,
                  **params):
         self.init_params = locals()
         if backbone != 'MobileNetV3':
