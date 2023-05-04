@@ -41,7 +41,6 @@ def get_default_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--in_dataset_dir',
-        nargs='+',
         type=str,
         required=True,
         help="Input dataset directory.")

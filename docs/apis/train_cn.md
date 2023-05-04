@@ -156,8 +156,6 @@ def train(self,
           train_dataset,
           train_batch_size=64,
           eval_dataset=None,
-          train_batch_transforms=None,
-          eval_batch_transforms=None,
           optimizer=None,
           save_interval_epochs=1,
           log_interval_steps=10,
@@ -188,8 +186,6 @@ def train(self,
 |`train_dataset`|`paddlers.datasets.COCODetDataset` \| `paddlers.datasets.VOCDetDataset` |训练数据集。||
 |`train_batch_size`|`int`|训练时使用的batch size。|`64`|
 |`eval_dataset`|`paddlers.datasets.COCODetDataset` \| `paddlers.datasets.VOCDetDataset` \| `None`|验证数据集。|`None`|
-|`train_batch_transforms`|`paddlers.transforms.BatchCompose` \| `None`|训练集上的批数据变换算子。|`None`|
-|`eval_batch_transforms`|`paddlers.transforms.BatchCompose` \| `None`|验证集上的批数据变换算子。|`None`|
 |`optimizer`|`paddle.optimizer.Optimizer` \| `None`|训练时使用的优化器。若为`None`，则使用默认定义的优化器。|`None`|
 |`save_interval_epochs`|`int`|训练时存储模型的间隔epoch数。|`1`|
 |`log_interval_steps`|`int`|训练时打印日志的间隔step数（即迭代数）。|`10`|

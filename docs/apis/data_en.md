@@ -64,6 +64,7 @@ The initialization parameter list is as follows:
 |`shuffle`|`bool`|Whether to randomly shuffle the samples in the dataset.|`False`|
 |`allow_empty`|`bool`|Whether to add negative samples to the dataset.|`False`|
 |`empty_ratio`|`float`|Negative sample ratio. Take effect only if `allow_empty` is `True`. If `empty_ratio` is negative or greater than or equal to 1, all negative samples generated are retained.|`1.0`|
+|`batch_transforms`|`paddlers.transforms.BatchCompose`|Data batch transformation operators applied to input data.||
 
 ### VOC Format Object Detection Dataset `VOCDetDataset`
 
@@ -81,6 +82,7 @@ The initialization parameter list is as follows:
 |`shuffle`|`bool`|Whether to randomly shuffle the samples in the dataset.|`False`|
 |`allow_empty`|`bool`|Whether to add negative samples to the dataset.|`False`|
 |`empty_ratio`|`float`|Negative sample ratio. Takes effect only if `allow_empty` is `True`. If `empty_ratio` is negative or greater than or equal to `1`, all negative samples generated will be retained.|`1.0`|
+|`batch_transforms`|`paddlers.transforms.BatchCompose`|Data batch transformation operators applied to input data.||
 
 The requirements of `VOCDetDataset` for the file list are as follows:
 

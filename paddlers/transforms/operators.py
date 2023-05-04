@@ -1874,7 +1874,7 @@ class SelectBand(Transform):
 
 
 class _PadBox(Transform):
-    def __init__(self, num_max_boxes=50, return_gt_mask=False):
+    def __init__(self, num_max_boxes=50):
         """
         Pad zeros to bboxes if number of bboxes is less than `num_max_boxes`.
 
@@ -1883,7 +1883,6 @@ class _PadBox(Transform):
         """
 
         self.num_max_boxes = num_max_boxes
-        self.return_gt_mask = return_gt_mask
         super(_PadBox, self).__init__()
 
     def pad_field(self, sample, field, num_gt):

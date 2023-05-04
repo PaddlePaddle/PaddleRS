@@ -64,6 +64,7 @@
 |`shuffle`|`bool`|是否随机打乱数据集中的样本。|`False`|
 |`allow_empty`|`bool`|是否向数据集中添加负样本。|`False`|
 |`empty_ratio`|`float`|负样本占比，仅当`allow_empty`为`True`时生效。若`empty_ratio`为负值或大于等于1，则保留所有生成的负样本。|`1.0`|
+|`batch_transforms`|`paddlers.transforms.BatchCompose`|对输入数据应用的批数据变换算子。||
 
 ### VOC格式目标检测数据集`VOCDetDataset`
 
@@ -81,6 +82,7 @@
 |`shuffle`|`bool`|是否随机打乱数据集中的样本。|`False`|
 |`allow_empty`|`bool`|是否向数据集中添加负样本。|`False`|
 |`empty_ratio`|`float`|负样本占比，仅当`allow_empty`为`True`时生效。若`empty_ratio`为负值或大于等于1，则保留所有生成的负样本。|`1.0`|
+|`batch_transforms`|`paddlers.transforms.BatchCompose`|对输入数据应用的批数据变换算子。||
 
 `VOCDetDataset`对file list的要求如下：
 

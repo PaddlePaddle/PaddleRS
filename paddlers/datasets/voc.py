@@ -46,6 +46,7 @@ class VOCDetDataset(BaseDataset):
         allow_empty (bool, optional): Whether to add negative samples. Defaults to False.
         empty_ratio (float, optional): Ratio of negative samples. If `empty_ratio` is smaller than 0 or not less 
             than 1, keep all generated negative samples. Defaults to 1.0.
+        batch_transforms (paddlers.transforms.BatchCompose|list): Batch transformation operators to apply.
     """
 
     def __init__(self,
@@ -56,14 +57,15 @@ class VOCDetDataset(BaseDataset):
                  num_workers='auto',
                  shuffle=False,
                  allow_empty=False,
-                 empty_ratio=1.):
+                 empty_ratio=1.,
+                 batch_transforms=None):
         # matplotlib.use() must be called *before* pylab, matplotlib.pyplot,
         # or matplotlib.backends is imported for the first time.
         import matplotlib
         matplotlib.use('Agg')
         from pycocotools.coco import COCO
         super(VOCDetDataset, self).__init__(data_dir, label_list, transforms,
-                                            num_workers, shuffle)
+                                            num_workers, shuffle, batch_transforms)
 
         self.data_fields = None
         self.num_max_boxes = 50

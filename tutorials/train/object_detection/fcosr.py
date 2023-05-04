@@ -75,14 +75,16 @@ train_dataset = pdrs.datasets.COCODetDataset(
     image_dir=IMAGE_DIR,
     anno_path=ANNO_PATH,
     transforms=train_transforms,
-    shuffle=True)
+    shuffle=True,
+    batch_transforms=train_batch_transforms)
 
 eval_dataset = pdrs.datasets.COCODetDataset(
     data_dir=DATA_DIR,
     image_dir=IMAGE_DIR,
     anno_path=ANNO_PATH,
     transforms=eval_transforms,
-    shuffle=False)
+    shuffle=False,
+    batch_transforms=eval_batch_transforms)
 
 # 构建FCOS模型
 # 目前已支持的模型请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/intro/model_zoo.md
@@ -105,8 +107,6 @@ model.train(
     train_dataset=train_dataset,
     train_batch_size=2,
     eval_dataset=eval_dataset,
-    train_batch_transforms=train_batch_transforms,
-    eval_batch_transforms=eval_batch_transforms,
     # 每多少个epoch存储一次检查点
     save_interval_epochs=5,
     # 每多少次迭代记录一次日志
@@ -126,4 +126,4 @@ model.train(
     # 指定预训练权重
     pretrain_weights="COCO",
     # 是否启用VisualDL日志功能
-    use_vdl=True, )
+    use_vdl=True)

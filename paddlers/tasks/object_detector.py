@@ -1,6 +1,7 @@
 # Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
 
 # You may obtain a copy of the License at
 #
@@ -229,8 +230,6 @@ class BaseDetector(BaseModel):
               train_dataset,
               train_batch_size=64,
               eval_dataset=None,
-              train_batch_transforms=None,
-              eval_batch_transforms=None,
               optimizer=None,
               save_interval_epochs=1,
               log_interval_steps=10,
@@ -266,12 +265,6 @@ class BaseDetector(BaseModel):
             eval_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset|None, optional): 
                 Evaluation dataset. If None, the model will not be evaluated during training 
                 process. Defaults to None.
-            train_batch_transforms (paddlers.transforms.batch_operators.BatchCompose|None, optional):
-                Train batch transformation operators. If None, the default batch transforms will be used. 
-                Defaults to None.
-            eval_batch_transforms (paddlers.transforms.batch_operators.BatchCompose|None, optional):
-                Eval batch transformation operators. If None, the default batch transforms will be used. 
-                Defaults to None.
             optimizer (paddle.optimizer.Optimizer|None, optional): Optimizer used for 
                 training. If None, a default optimizer will be used. Defaults to None.
             save_interval_epochs (int, optional): Epoch interval for saving the model. 
@@ -329,10 +322,10 @@ class BaseDetector(BaseModel):
         return in_args
 
     def _real_train(self, num_epochs, train_dataset, train_batch_size,
-                    eval_dataset, train_batch_transforms, eval_batch_transforms,
-                    optimizer, save_interval_epochs, log_interval_steps,
-                    save_dir, pretrain_weights, learning_rate, warmup_steps,
-                    warmup_start_lr, lr_decay_epochs, lr_decay_gamma, metric,
+                    eval_dataset, optimizer, save_interval_epochs, 
+                    log_interval_steps, save_dir, pretrain_weights, 
+                    learning_rate, warmup_steps, warmup_start_lr, 
+                    lr_decay_epochs, lr_decay_gamma, metric,
                     use_ema, early_stop, early_stop_patience, use_vdl,
                     resume_checkpoint, scheduler, cosine_decay_num_epoch,
                     clip_grad_by_norm, precision, amp_level, custom_white_list,
@@ -365,15 +358,10 @@ class BaseDetector(BaseModel):
 
         self.labels = train_dataset.labels
         self.num_max_boxes = train_dataset.num_max_boxes
-        train_dataset.batch_transforms = self._compose_batch_transform(
-            train_batch_transforms, mode='train')
-        train_dataset.collate_fn = self._build_collate_fn(
-            train_dataset.batch_transforms)
-
-        eval_dataset.batch_transforms = self._compose_batch_transform(
-            eval_batch_transforms, mode='eval')
-        eval_dataset.collate_fn = self._build_collate_fn(
-            eval_dataset.batch_transforms)
+        train_batch_transforms = self._default_batch_transforms('train') if train_dataset.batch_transforms is None else None
+        eval_batch_transforms = self._default_batch_transforms('eval') if eval_dataset.batch_transforms is None else None
+        train_dataset._build_collate_fn(train_batch_transforms, self._default_collate_fn)
+        eval_dataset._build_collate_fn(eval_batch_transforms, self._default_collate_fn)
 
         # Build optimizer if not defined
         if optimizer is None:
@@ -389,7 +377,7 @@ class BaseDetector(BaseModel):
                 num_steps_each_epoch=num_steps_each_epoch,
                 num_epochs=num_epochs,
                 clip_grad_by_norm=clip_grad_by_norm,
-                cosine_decay_num_epoch=cosine_decay_num_epoch, )
+                cosine_decay_num_epoch=cosine_decay_num_epoch)
         else:
             self.optimizer = optimizer
 
@@ -443,15 +431,15 @@ class BaseDetector(BaseModel):
             early_stop_patience=early_stop_patience,
             use_vdl=use_vdl)
 
-    def _build_collate_fn(self, compose):
+    def _default_collate_fn(self, dataset):
         def _collate_fn(batch):
             # We drop `trans_info` as it is not required in detection tasks
             samples = [s[0] for s in batch]
-            return compose(samples)
+            return dataset.batch_transforms(samples)
 
         return _collate_fn
 
-    def _compose_batch_transform(self, batch_transforms, mode):
+    def _default_batch_transforms(self, mode):
         raise NotImplementedError
 
     def quant_aware_train(self,
@@ -459,8 +447,6 @@ class BaseDetector(BaseModel):
                           train_dataset,
                           train_batch_size=64,
                           eval_dataset=None,
-                          train_batch_transforms=None,
-                          eval_batch_transforms=None,
                           optimizer=None,
                           save_interval_epochs=1,
                           log_interval_steps=10,
@@ -489,12 +475,6 @@ class BaseDetector(BaseModel):
             eval_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset|None, optional): 
                 Evaluation dataset. If None, the model will not be evaluated during training 
                 process. Defaults to None.
-            train_batch_transforms (paddlers.transforms.batch_operators.BatchCompose|None, optional):
-                Train batch transformation operators. If None, the default batch transforms will be used. 
-                Defaults to None.
-            eval_batch_transforms (paddlers.transforms.batch_operators.BatchCompose|None, optional):
-                Eval batch transformation operators. If None, the default batch transforms will be used. 
-                Defaults to None.
             optimizer (paddle.optimizer.Optimizer or None, optional): Optimizer used for 
                 training. If None, a default optimizer will be used. Defaults to None.
             save_interval_epochs (int, optional): Epoch interval for saving the model. 
@@ -535,8 +515,6 @@ class BaseDetector(BaseModel):
             train_dataset=train_dataset,
             train_batch_size=train_batch_size,
             eval_dataset=eval_dataset,
-            train_batch_transforms=train_batch_transforms,
-            eval_batch_transforms=eval_batch_transforms,
             optimizer=optimizer,
             save_interval_epochs=save_interval_epochs,
             log_interval_steps=log_interval_steps,
@@ -556,7 +534,6 @@ class BaseDetector(BaseModel):
 
     def evaluate(self,
                  eval_dataset,
-                 batch_transforms=None,
                  batch_size=1,
                  metric=None,
                  return_details=False):
@@ -566,9 +543,6 @@ class BaseDetector(BaseModel):
         Args:
             eval_dataset (paddlers.datasets.COCODetDataset|paddlers.datasets.VOCDetDataset): 
                 Evaluation dataset.
-            batch_transforms (paddlers.transforms.batch_operators.BatchCompose|None, optional):
-                Eval batch transformation operators. If None, the default batch transforms will be used. 
-                Defaults to None.
             batch_size (int, optional): Total batch size among all cards used for 
                 evaluation. Defaults to 1.
             metric (str|None, optional): Evaluation metric. Choices are {'VOC', 'COCO', None}. 
@@ -594,10 +568,8 @@ class BaseDetector(BaseModel):
                 "Evaluation metric {} is not supported. Please choose from 'COCO' and 'VOC'."
 
         eval_dataset.data_fields = self.data_fields[self.metric]
-
-        if eval_dataset.batch_transforms is None:
-            eval_dataset.batch_transforms = self._compose_batch_transform(
-                batch_transforms, mode='eval')
+        eval_batch_transforms = self._default_batch_transforms('eval') if eval_dataset.batch_transforms is None else None
+        eval_dataset._build_collate_fn(eval_batch_transforms)
         self._check_transforms(eval_dataset.transforms)
 
         self.net.eval()
@@ -620,8 +592,7 @@ class BaseDetector(BaseModel):
                 eval_dataset,
                 batch_size=batch_size,
                 mode='eval',
-                collate_fn=self._build_collate_fn(
-                    eval_dataset.batch_transforms))
+                collate_fn=eval_dataset.collate_fn)
             is_bbox_normalized = False
             if hasattr(eval_dataset, 'batch_transforms'):
                 is_bbox_normalized = any(
@@ -667,7 +638,7 @@ class BaseDetector(BaseModel):
             return scores
 
     @paddle.no_grad()
-    def predict(self, img_file, transforms=None, batch_transforms=None):
+    def predict(self, img_file, transforms=None):
         """
         Do inference.
 
@@ -677,9 +648,6 @@ class BaseDetector(BaseModel):
                 predicted as a mini-batch.
             transforms (paddlers.transforms.Compose|None, optional): Transforms for 
                 inputs. If None, the transforms for evaluation process  will be used. 
-                Defaults to None.
-            batch_transforms (paddlers.transforms.batch_operators.BatchCompose|None, optional):
-                Batch transformation operators. If None, the default batch transforms will be used. 
                 Defaults to None.
 
         Returns:
@@ -706,7 +674,7 @@ class BaseDetector(BaseModel):
         else:
             images = img_file
 
-        batch_samples, _ = self.preprocess(images, transforms, batch_transforms)
+        batch_samples, _ = self.preprocess(images, transforms)
         self.net.eval()
         outputs = self.run(self.net, batch_samples, 'test')
         prediction = self.postprocess(outputs)
@@ -715,7 +683,7 @@ class BaseDetector(BaseModel):
             prediction = prediction[0]
         return prediction
 
-    def preprocess(self, images, transforms, batch_transforms, to_tensor=True):
+    def preprocess(self, images, transforms, to_tensor=True):
         self._check_transforms(transforms)
         batch_samples = list()
         for im in images:
@@ -724,8 +692,7 @@ class BaseDetector(BaseModel):
             sample = construct_sample(image=im)
             data = transforms(sample)
             batch_samples.append(data[0])
-        batch_transforms = self._compose_batch_transform(batch_transforms,
-                                                         'test')
+        batch_transforms = self._default_batch_transforms('test')
         batch_samples = batch_transforms(batch_samples)
         if to_tensor:
             for k in batch_samples:
@@ -907,12 +874,8 @@ class PicoDet(BaseDetector):
         super(PicoDet, self).__init__(
             model_name='PicoDet', num_classes=num_classes, **params)
 
-    def _compose_batch_transform(self, batch_transforms, mode='train'):
-        if batch_transforms is None:
-            batch_transforms = [_BatchPad(pad_to_stride=32)]
-        else:
-            if not isinstance(batch_transforms, BatchCompose):
-                batch_transforms = batch_transforms.batch_transforms
+    def _default_batch_transforms(self, mode='train'):
+        batch_transforms = [_BatchPad(pad_to_stride=32)]
 
         if mode == 'eval':
             collate_batch = True
@@ -1143,24 +1106,21 @@ class YOLOv3(BaseDetector):
         self.anchors = anchors
         self.anchor_masks = anchor_masks
 
-    def _compose_batch_transform(self, batch_transforms, mode='train'):
-        if batch_transforms is None:
-            if mode == 'train':
-                batch_transforms = [
-                    _BatchPad(pad_to_stride=-1), _NormalizeBox(),
-                    _PadBox(getattr(self, 'num_max_boxes', 50)),
-                    _BboxXYXY2XYWH(), _Gt2YoloTarget(
-                        anchor_masks=self.anchor_masks,
-                        anchors=self.anchors,
-                        downsample_ratios=getattr(self, 'downsample_ratios',
-                                                  [32, 16, 8]),
-                        num_classes=self.num_classes)
-                ]
-            else:
-                batch_transforms = [_BatchPad(pad_to_stride=-1)]
+    def _default_batch_transforms(self, mode='train'):
+        if mode == 'train':
+            batch_transforms = [
+                _BatchPad(pad_to_stride=-1), _NormalizeBox(),
+                _PadBox(getattr(self, 'num_max_boxes', 50)),
+                _BboxXYXY2XYWH(), _Gt2YoloTarget(
+                    anchor_masks=self.anchor_masks,
+                    anchors=self.anchors,
+                    downsample_ratios=getattr(self, 'downsample_ratios',
+                                              [32, 16, 8]),
+                    num_classes=self.num_classes)
+            ]
         else:
-            if isinstance(batch_transforms, BatchCompose):
-                batch_transforms = batch_transforms.batch_transforms
+            batch_transforms = [_BatchPad(pad_to_stride=-1)]
+
         if mode == 'eval' and self.metric == 'voc':
             collate_batch = False
         else:
@@ -1400,19 +1360,16 @@ class FasterRCNN(BaseDetector):
             train_dataset.num_workers = 0
         return in_args
 
-    def _compose_batch_transform(self, batch_transforms, mode='train'):
-        if batch_transforms is None:
-            if mode == 'train':
-                batch_transforms = [
-                    _BatchPad(pad_to_stride=32 if self.with_fpn else -1)
-                ]
-            else:
-                batch_transforms = [
-                    _BatchPad(pad_to_stride=32 if self.with_fpn else -1)
-                ]
+    def _default_batch_transforms(self, mode='train'):
+        if mode == 'train':
+            batch_transforms = [
+                _BatchPad(pad_to_stride=32 if self.with_fpn else -1)
+            ]
         else:
-            if isinstance(batch_transforms, BatchCompose):
-                batch_transforms = batch_transforms.batch_transforms
+            batch_transforms = [
+                _BatchPad(pad_to_stride=32 if self.with_fpn else -1)
+            ]
+
         batch_transforms = BatchCompose(batch_transforms, collate_batch=False)
 
         return batch_transforms
@@ -2135,19 +2092,16 @@ class MaskRCNN(BaseDetector):
             train_dataset.num_workers = 0
         return in_args
 
-    def _compose_batch_transform(self, batch_transforms, mode='train'):
-        if batch_transforms is None:
-            if mode == 'train':
-                batch_transforms = [
-                    _BatchPad(pad_to_stride=32 if self.with_fpn else -1)
-                ]
-            else:
-                batch_transforms = [
-                    _BatchPad(pad_to_stride=32 if self.with_fpn else -1)
-                ]
+    def _default_batch_transforms(self, mode='train'):
+        if mode == 'train':
+            batch_transforms = [
+                _BatchPad(pad_to_stride=32 if self.with_fpn else -1)
+            ]
         else:
-            if isinstance(batch_transforms, BatchCompose):
-                batch_transforms = batch_transforms.batch_transforms
+            batch_transforms = [
+                _BatchPad(pad_to_stride=32 if self.with_fpn else -1)
+            ]
+
         batch_transforms = BatchCompose(batch_transforms, collate_batch=False)
 
         return batch_transforms
