@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# 旋转目标检测模型FCOS训练示例脚本
+# 旋转目标检测模型FCOSR训练示例脚本
 # 执行此脚本前，请确认已正确安装PaddleRS库
 
 import os
@@ -41,12 +41,13 @@ train_transforms = T.Compose([
     # 随机缩放图片
     T.RResize(
         target_size=IMAGE_SIZE, keep_ratio=True, interp=2),
-    # 将标签转换为rotate box的格式
+    # 将标签转换为rotated box的格式
     T.Poly2RBox(
         filter_threshold=2, filter_mode='edge', rbox_type="oc"),
 ])
 
-train_batch_transforms = [
+# 定义批变换方式，作用在一个批次的数据上。
+train_batch_transforms = T.BatchCompose([
     # 归一化图像
     T.BatchNormalizeImage(
         mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
@@ -54,7 +55,7 @@ train_batch_transforms = [
     T.BatchPadRGT(),
     # 填充图像
     T._BatchPad(pad_to_stride=32)
-]
+])
 
 eval_transforms = T.Compose([
     T.DecodeImg(),
@@ -68,7 +69,8 @@ eval_transforms = T.Compose([
         mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
 ])
 
-eval_batch_transforms = [T._BatchPad(pad_to_stride=32)]
+eval_batch_transforms = T.BatchCompose([T._BatchPad(pad_to_stride=32)])
+
 # 分别构建训练和验证所用的数据集
 train_dataset = pdrs.datasets.COCODetDataset(
     data_dir=DATA_DIR,
@@ -86,11 +88,8 @@ eval_dataset = pdrs.datasets.COCODetDataset(
     shuffle=False,
     batch_transforms=eval_batch_transforms)
 
-# 构建FCOS模型
+# 构建FCOSR模型
 # 目前已支持的模型请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/intro/model_zoo.md
-
-# 创建FCOS所需要的组件
-
 model = pdrs.tasks.det.YOLOv3(
     backbone="ResNeXt50_32x4d",
     num_classes=15,

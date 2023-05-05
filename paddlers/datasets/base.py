@@ -18,8 +18,8 @@ from paddle.io import Dataset
 from paddle.fluid.dataloader.collate import default_collate_fn
 
 from paddlers.utils import get_num_workers
-from paddlers.transforms import construct_sample_from_dict, Compose, BatchCompose
 import paddlers.utils.logging as logging
+from paddlers.transforms import construct_sample_from_dict, Compose, BatchCompose
 
 
 class BaseDataset(Dataset):
@@ -39,7 +39,7 @@ class BaseDataset(Dataset):
         self.num_workers = get_num_workers(num_workers)
         self.shuffle = shuffle
         self.batch_transforms = None
-        self._build_collate_fn(batch_transforms)
+        self.build_collate_fn(batch_transforms)
 
     def __getitem__(self, idx):
         sample = construct_sample_from_dict(self.file_list[idx])
@@ -73,9 +73,9 @@ class BaseDataset(Dataset):
         else:
             return default_collate_fn(samples)
 
-    def _build_collate_fn(self, batch_transforms, collate_fn_constructor=None):
-        if self.batch_transforms is not None:
-            logging.warning("The batch_transforms will be covered, which have been set when initialization.")
+    def build_collate_fn(self, batch_transforms, collate_fn_constructor=None):
+        if self.batch_transforms is not None and batch_transforms:
+            logging.warning("The initial `batch_transforms` will be overwritten.")
         if batch_transforms is not None:
             batch_transforms = copy.deepcopy(batch_transforms)
             if isinstance(batch_transforms, list):

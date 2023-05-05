@@ -5,7 +5,7 @@
 PaddleRS has collected and summarized the most commonly used **open source** datasets in the field of remote sensing, providing the following information for each data set: dataset description, image information, annotation information, source address, and AI Studio backup link. According to the task type, these data sets can be divided into **image classification, image segmentation, change detection, object detection, object tracking, multi-label classification, image generation**, and other types. Currently, the collected remote sensing datasets include:
 
 * 32 image classification datasets;
-* 41 object detection datasets;
+* 40 object detection datasets;
 * 70 image segmentation datasets;
 * 28 change detection datasets;
 * 7 instance segmentation datasets;

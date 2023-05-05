@@ -45,9 +45,10 @@ class ResDataset(BaseDataset):
                  transforms,
                  num_workers='auto',
                  shuffle=False,
-                 sr_factor=None):
+                 sr_factor=None,
+                 batch_transforms=None):
         super(ResDataset, self).__init__(data_dir, None, transforms,
-                                         num_workers, shuffle)
+                                         num_workers, shuffle, batch_transforms)
         self.file_list = list()
 
         with open(file_list, encoding=get_encoding(file_list)) as f:
