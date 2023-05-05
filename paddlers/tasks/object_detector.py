@@ -799,12 +799,39 @@ class PicoDet(BaseDetector):
         if params.get('with_net', True):
             kwargs = {}
             if backbone == 'ESNet_s':
+                backbone = self._get_backbone(
+                    'ESNet',
+                    scale=.75,
+                    feature_maps=[4, 11, 14],
+                    act="hard_swish",
+                    channel_ratio=[
+                        0.875, 0.5, 0.5, 0.5, 0.625, 0.5, 0.625, 0.5, 0.5, 0.5,
+                        0.5, 0.5, 0.5
+                    ])
                 neck_out_channels = 96
                 head_num_convs = 2
             elif backbone == 'ESNet_m':
+                backbone = self._get_backbone(
+                    'ESNet',
+                    scale=1.0,
+                    feature_maps=[4, 11, 14],
+                    act="hard_swish",
+                    channel_ratio=[
+                        0.875, 0.5, 1.0, 0.625, 0.5, 0.75, 0.625, 0.625, 0.5,
+                        0.625, 1.0, 0.625, 0.75
+                    ])
                 neck_out_channels = 128
                 head_num_convs = 4
             elif backbone == 'ESNet_l':
+                backbone = self._get_backbone(
+                    'ESNet',
+                    scale=1.25,
+                    feature_maps=[4, 11, 14],
+                    act="hard_swish",
+                    channel_ratio=[
+                        0.875, 0.5, 1.0, 0.625, 0.5, 0.75, 0.625, 0.625, 0.5,
+                        0.625, 1.0, 0.625, 0.75
+                    ])
                 neck_out_channels = 160
                 head_num_convs = 4
             elif backbone == 'LCNet':
@@ -826,7 +853,8 @@ class PicoDet(BaseDetector):
                         norm_decay=0.))
                 neck_out_channels = 128
                 head_num_convs = 4
-            backbone = self._get_backbone(backbone, **kwargs)
+            if isinstance(backbone, str):
+                backbone = self._get_backbone(backbone, **kwargs)
 
             neck = ppdet.modeling.CSPPAN(
                 in_channels=[i.channels for i in backbone.out_shape],
