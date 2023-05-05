@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import argparse
 import copy
 import json
 import math
@@ -24,7 +25,7 @@ import numpy as np
 import shapely.geometry as shgeo
 from tqdm import tqdm
 
-from common import add_crop_options, get_default_parser
+from common import add_crop_options
 
 wordname_15 = [
     'plane', 'baseball-diamond', 'bridge', 'ground-track-field',
@@ -45,7 +46,15 @@ DATA_CLASSES = {
 
 
 def parse_args():
-    parser = get_default_parser()
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--in_dataset_dir',
+        type=str,
+        nargs='+', 
+        required=True,
+        help="Input dataset directory.")
+    parser.add_argument(
+        '--out_dataset_dir', type=str, help="Output dataset directory.")
     parser = add_crop_options(parser)
     parser.add_argument(
         '--coco_json_file',
