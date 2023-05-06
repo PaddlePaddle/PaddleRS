@@ -50,9 +50,9 @@ def parse_args():
     parser.add_argument(
         '--in_dataset_dir',
         type=str,
-        nargs='+', 
+        nargs='+',
         required=True,
-        help="Input dataset directory.")
+        help="Input dataset directories.")
     parser.add_argument(
         '--out_dataset_dir', type=str, help="Output dataset directory.")
     parser = add_crop_options(parser)
@@ -60,32 +60,32 @@ def parse_args():
         '--coco_json_file',
         type=str,
         default='',
-        help='coco json annotation files')
+        help="COCO JSON annotation files.")
 
     parser.add_argument(
         '--rates',
         nargs='+',
         type=float,
         default=[1.],
-        help='scales for multi-slice training')
+        help="Scales for cropping multi-scale samples.")
 
     parser.add_argument(
-        '--nproc', type=int, default=8, help='the processor number')
+        '--nproc', type=int, default=8, help="Number of processes to use.")
 
     parser.add_argument(
         '--iof_thr',
         type=float,
         default=0.5,
-        help='the minimal iof between a object and a window')
+        help="Minimal IoF between an object and a window.")
 
     parser.add_argument(
         '--image_only',
         action='store_true',
         default=False,
-        help='only processing image')
+        help="To process images only.")
 
     parser.add_argument(
-        '--data_type', type=str, default='dota10', help='data type')
+        '--data_type', type=str, default='dota10', help="Type of dataset.")
 
     args = parser.parse_args()
     return args

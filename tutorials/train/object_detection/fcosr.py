@@ -3,8 +3,6 @@
 # 旋转目标检测模型FCOSR训练示例脚本
 # 执行此脚本前，请确认已正确安装PaddleRS库
 
-import os
-
 import paddlers as pdrs
 from paddlers import transforms as T
 
@@ -18,7 +16,8 @@ IMAGE_DIR = "./data/dota/images"
 EXP_DIR = "./output/fcosr/"
 
 IMAGE_SIZE = [1024, 1024]
-# 下载和解压sar影像舰船检测数据集
+
+# 下载和解压SAR影像舰船检测数据集
 pdrs.utils.download_and_decompress(
     "https://paddlers.bj.bcebos.com/datasets/dota.zip", path="./data/")
 
@@ -46,7 +45,8 @@ train_transforms = T.Compose([
         filter_threshold=2, filter_mode='edge', rbox_type="oc"),
 ])
 
-# 定义批变换方式，作用在一个批次的数据上。
+# 定义作用在一个批次数据上的变换
+# 使用BatchCompose组合
 train_batch_transforms = T.BatchCompose([
     # 归一化图像
     T.BatchNormalizeImage(
@@ -113,14 +113,15 @@ model.train(
     save_dir=EXP_DIR,
     # 初始学习率大小
     learning_rate=0.001,
-    # 学习率预热（learning rate warm-up）步数与初始值
+    # 学习率预热（learning rate warm-up）步数
     warmup_steps=500,
+    # 初始学习率大小
     warmup_start_lr=0.03333333,
     # 学习率衰减的epoch节点
     lr_decay_epochs=[24, 33],
-    # 学习率衰减的参数 
+    # 学习率衰减的参数
     lr_decay_gamma=0.1,
-    # clip_grad_by_norm梯度裁剪策略的参数
+    # 梯度裁剪策略的参数
     clip_grad_by_norm=35.,
     # 指定预训练权重
     pretrain_weights="COCO",

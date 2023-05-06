@@ -197,8 +197,8 @@ def train(self,
 |`warmup_start_lr`|`int`|默认优化器warm-up阶段使用的初始学习率。|`0`|
 |`lr_decay_epochs`|`list` \| `tuple`|默认优化器学习率衰减的milestones，以epoch计。即，在第几个epoch执行学习率的衰减。|`(216, 243)`|
 |`lr_decay_gamma`|`float`|学习率衰减系数，适用于默认优化器。|`0.1`|
-|`cosine_decay_num_epochs`|`int`|余弦退火学习率调度器余弦周期衰减的参数。|`1000`|
-|`metric`|`str` \| `None`|评价指标，可以为`'VOC'`、`COCO`或`None`。若为`None`，则根据数据集格式自动确定使用的评价指标。|`None`|
+|`cosine_decay_num_epochs`|`int`|使用余弦退火学习率调度器时计算退火周期的参数。|`1000`|
+|`metric`|`str` \| `None`|评价指标，可以为`'VOC'`、`'COCO'`、`'RBOX'`或`None`。若为`None`，则根据数据集格式自动确定使用的评价指标。|`None`|
 |`use_ema`|`bool`|是否启用[指数滑动平均策略](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/models/ppdet/optimizer.py)更新模型权重参数。|`False`|
 |`early_stop`|`bool`|训练过程是否启用早停策略。|`False`|
 |`early_stop_patience`|`int`|启用早停策略时的`patience`参数（参见[`EarlyStop`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/utils/utils.py)）。|`5`|

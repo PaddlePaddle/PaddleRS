@@ -284,11 +284,12 @@ class BaseDetector(BaseModel):
                 rate decay. Defaults to (216, 243).
             lr_decay_gamma (float, optional): Gamma coefficient of learning rate decay. 
                 Defaults to .1.
-            cosine_decay_num_epochs (int, optional):  The parameter used by the cosine 
-                annealing learning rate scheduler.Defaults to 1000.
-            metric (str|None, optional): Evaluation metric. Choices are {'VOC', 'COCO', 'RBOX', None}. 
-                If None, determine the metric according to the  dataset format. 
-                Defaults to None.
+            cosine_decay_num_epochs (int, optional):  Parameter to determine the annealing 
+                cycle when a cosine annealing learning rate scheduler is used. 
+                Defaults to 1000.
+            metric (str|None, optional): Evaluation metric. Choices are 
+                {'VOC', 'COCO', 'RBOX', None}. If None, determine the metric according to 
+                the dataset format. Defaults to None.
             use_ema (bool, optional): Whether to use exponential moving average 
                 strategy. Defaults to False.
             early_stop (bool, optional): Whether to adopt early stop strategy. 
@@ -324,14 +325,13 @@ class BaseDetector(BaseModel):
         return in_args
 
     def _real_train(self, num_epochs, train_dataset, train_batch_size,
-                    eval_dataset, optimizer, save_interval_epochs, 
-                    log_interval_steps, save_dir, pretrain_weights, 
-                    learning_rate, warmup_steps, warmup_start_lr, 
-                    lr_decay_epochs, lr_decay_gamma, metric,
-                    use_ema, early_stop, early_stop_patience, use_vdl,
-                    resume_checkpoint, scheduler, cosine_decay_num_epochs,
-                    clip_grad_by_norm, precision, amp_level, custom_white_list,
-                    custom_black_list):
+                    eval_dataset, optimizer, save_interval_epochs,
+                    log_interval_steps, save_dir, pretrain_weights,
+                    learning_rate, warmup_steps, warmup_start_lr,
+                    lr_decay_epochs, lr_decay_gamma, metric, use_ema,
+                    early_stop, early_stop_patience, use_vdl, resume_checkpoint,
+                    scheduler, cosine_decay_num_epochs, clip_grad_by_norm,
+                    precision, amp_level, custom_white_list, custom_black_list):
         self.precision = precision
         self.amp_level = amp_level
         self.custom_white_list = custom_white_list
@@ -360,10 +360,14 @@ class BaseDetector(BaseModel):
 
         self.labels = train_dataset.labels
         self.num_max_boxes = train_dataset.num_max_boxes
-        train_batch_transforms = self._default_batch_transforms('train') if train_dataset.batch_transforms is None else None
-        eval_batch_transforms = self._default_batch_transforms('eval') if eval_dataset.batch_transforms is None else None
-        train_dataset.build_collate_fn(train_batch_transforms, self._default_collate_fn)
-        eval_dataset.build_collate_fn(eval_batch_transforms, self._default_collate_fn)
+        train_batch_transforms = self._default_batch_transforms(
+            'train') if train_dataset.batch_transforms is None else None
+        eval_batch_transforms = self._default_batch_transforms(
+            'eval') if eval_dataset.batch_transforms is None else None
+        train_dataset.build_collate_fn(train_batch_transforms,
+                                       self._default_collate_fn)
+        eval_dataset.build_collate_fn(eval_batch_transforms,
+                                      self._default_collate_fn)
 
         # Build optimizer if not defined
         if optimizer is None:
@@ -570,7 +574,8 @@ class BaseDetector(BaseModel):
                 "Evaluation metric {} is not supported. Please choose from 'COCO' and 'VOC'."
 
         eval_dataset.data_fields = self.data_fields[self.metric]
-        eval_batch_transforms = self._default_batch_transforms('eval') if eval_dataset.batch_transforms is None else None
+        eval_batch_transforms = self._default_batch_transforms(
+            'eval') if eval_dataset.batch_transforms is None else None
         eval_dataset._build_collate_fn(eval_batch_transforms)
         self._check_transforms(eval_dataset.transforms)
 
@@ -1140,8 +1145,8 @@ class YOLOv3(BaseDetector):
         if mode == 'train':
             batch_transforms = [
                 _BatchPad(pad_to_stride=-1), _NormalizeBox(),
-                _PadBox(getattr(self, 'num_max_boxes', 50)),
-                _BboxXYXY2XYWH(), _Gt2YoloTarget(
+                _PadBox(getattr(self, 'num_max_boxes', 50)), _BboxXYXY2XYWH(),
+                _Gt2YoloTarget(
                     anchor_masks=self.anchor_masks,
                     anchors=self.anchors,
                     downsample_ratios=getattr(self, 'downsample_ratios',

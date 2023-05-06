@@ -71,7 +71,6 @@ class BatchCompose(BatchTransform):
             if permuted:
                 samples[i] = perm_op(samples[i])
 
-
         extra_key = ['h', 'w', 'flipped', 'trans_info']
 
         for k in extra_key:
@@ -119,10 +118,10 @@ class BatchRandomResize(BatchTransform):
     def __init__(self, target_sizes, interp="NEAREST"):
         super(BatchRandomResize, self).__init__()
         if not (interp == "RANDOM" or interp in interp_dict):
-            raise ValueError("interp should be one of {}".format(
+            raise ValueError("`interp` should be one of {}".format(
                 interp_dict.keys()))
         self.interp = interp
-        assert isinstance(target_sizes, list), "target_size must be a list."
+        assert isinstance(target_sizes, list), "`target_size` must be a list."
         for i, item in enumerate(target_sizes):
             if isinstance(item, int):
                 target_sizes[i] = (item, item)
@@ -163,10 +162,10 @@ class BatchRandomResizeByShort(BatchTransform):
     def __init__(self, short_sizes, max_size=-1, interp="NEAREST"):
         super(BatchRandomResizeByShort, self).__init__()
         if not (interp == "RANDOM" or interp in interp_dict):
-            raise ValueError("interp should be one of {}".format(
+            raise ValueError("`interp` should be one of {}".format(
                 interp_dict.keys()))
         self.interp = interp
-        assert isinstance(short_sizes, list), "short_sizes must be a list."
+        assert isinstance(short_sizes, list), "`short_sizes` must be a list."
 
         self.short_sizes = short_sizes
         self.max_size = max_size
@@ -190,10 +189,11 @@ class BatchNormalizeImage(BatchTransform):
             norm_type="mean_std", ):
         """
         Args:
-            mean (list): the pixel mean
-            std (list): the pixel variance
-            is_scale (bool): scale the pixel to [0,1]
-            norm_type (str): type in ['mean_std', 'none']
+            mean (list, optional): Pixel mean values. Default: [0.485, 0.456, 0.406].
+            std (list, optional): Pixel variance valus. Default: [0.485, 0.456, 0.406].
+            is_scale (bool, optional): Whether to scale the pixel values to [0, 1]. 
+                Default: True.
+            norm_type (str, optional): One of ['mean_std', 'none']. Default: 'mean_std'.
         """
         super(BatchNormalizeImage, self).__init__()
         self.mean = mean
@@ -249,11 +249,12 @@ class BatchNormalizeImage(BatchTransform):
 
 class BatchPadRGT(BatchTransform):
     """
-    Pad 0 to `gt_class`, `gt_bbox`, `gt_score`...
-    The num_max_boxes is the largest for batch.
+    Pad `gt_class`, `gt_bbox`, `gt_score` with zero value.
+
     Args:
-        return_gt_mask (bool): If true, return `pad_gt_mask`,
-                                1 means bbox, 0 means no bbox.
+        return_gt_mask (bool, optional): If True, return `pad_gt_mask`. In
+            `pad_gt_mask`, 1 means there is a bbox while 0 means there is none.
+            Default: True.
     """
 
     def __init__(self, return_gt_mask=True):
@@ -327,7 +328,7 @@ class _BatchPad(BatchTransform):
 
 class _Gt2YoloTarget(BatchTransform):
     """
-    Generate YOLOv3 targets by groud truth data, this operator is only used in
+    Generate YOLOv3 targets from ground-truth data, this operator is only used in
         fine grained YOLOv3 loss mode.
     """
 
@@ -347,7 +348,7 @@ class _Gt2YoloTarget(BatchTransform):
     def __call__(self, samples, context=None):
         assert len(self.anchor_masks) == len(
             self.downsample_ratios
-        ), "anchor_masks', and 'downsample_ratios' should have same length."
+        ), "`anchor_masks` and `downsample_ratios` should have same length."
 
         h, w = samples[0]["image"].shape[:2]
         an_hw = np.array(self.anchors) / np.array([[w, h]])
