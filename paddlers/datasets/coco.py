@@ -66,7 +66,8 @@ class COCODetDataset(BaseDataset):
         from pycocotools.coco import COCO
 
         super(COCODetDataset, self).__init__(data_dir, label_list, transforms,
-                                             num_workers, shuffle, batch_transforms)
+                                             num_workers, shuffle,
+                                             batch_transforms)
 
         self.data_fields = None
         self.num_max_boxes = 50

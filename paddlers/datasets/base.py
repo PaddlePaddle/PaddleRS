@@ -27,7 +27,13 @@ class BaseDataset(Dataset):
     _KEYS_TO_DISCARD = None
     _collate_trans_info = False
 
-    def __init__(self, data_dir, label_list, transforms, num_workers, shuffle, batch_transforms=None):
+    def __init__(self,
+                 data_dir,
+                 label_list,
+                 transforms,
+                 num_workers,
+                 shuffle,
+                 batch_transforms=None):
         super(BaseDataset, self).__init__()
 
         self.data_dir = data_dir
@@ -67,7 +73,7 @@ class BaseDataset(Dataset):
 
         if self.batch_transforms:
             samples = self.batch_transforms(samples)
-                
+
         if self._collate_trans_info:
             return default_collate_fn(samples), [s[1] for s in batch]
         else:
@@ -75,7 +81,8 @@ class BaseDataset(Dataset):
 
     def build_collate_fn(self, batch_transforms, collate_fn_constructor=None):
         if self.batch_transforms is not None and batch_transforms:
-            logging.warning("The initial `batch_transforms` will be overwritten.")
+            logging.warning(
+                "The initial `batch_transforms` will be overwritten.")
         if batch_transforms is not None:
             batch_transforms = copy.deepcopy(batch_transforms)
             if isinstance(batch_transforms, list):
@@ -83,4 +90,3 @@ class BaseDataset(Dataset):
             self.batch_transforms = batch_transforms
         if collate_fn_constructor:
             self.collate_fn = collate_fn_constructor(self)
-
