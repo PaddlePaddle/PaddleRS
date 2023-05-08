@@ -36,7 +36,13 @@ from .base import BaseModel
 from .utils.det_metrics import VOCMetric, COCOMetric, RBoxMetric
 
 __all__ = [
-    "YOLOv3", "FasterRCNN", "PPYOLO", "PPYOLOTiny", "PPYOLOv2", "MaskRCNN"
+    "YOLOv3",
+    "FasterRCNN",
+    "PPYOLO",
+    "PPYOLOTiny",
+    "PPYOLOv2",
+    "MaskRCNN",
+    "FCOSR",
 ]
 
 # TODO: Prune and decoupling
@@ -2179,3 +2185,6 @@ class MaskRCNN(BaseDetector):
         self.fixed_input_shape = image_shape
 
         return self._define_input_spec(image_shape)
+
+
+FCOSR = functools.partial(YOLOv3, rotate=True)

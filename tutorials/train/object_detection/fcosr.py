@@ -21,6 +21,10 @@ IMAGE_SIZE = [1024, 1024]
 pdrs.utils.download_and_decompress(
     "https://paddlers.bj.bcebos.com/datasets/dota.zip", path="./data/")
 
+# 对于旋转目标检测，我们需要安装ppdet的外部自定义算子，安装方式如下：
+# cd paddlers/models/ppdet/ext_op
+# python setup.py install
+
 # 定义训练和验证时使用的数据变换（数据增强、预处理等）
 # 使用Compose组合多种变换方式。Compose中包含的变换将按顺序串行执行
 # API说明：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/data.md
@@ -90,7 +94,7 @@ eval_dataset = pdrs.datasets.COCODetDataset(
 
 # 构建FCOSR模型
 # 目前已支持的模型请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/intro/model_zoo.md
-model = pdrs.tasks.det.YOLOv3(
+model = pdrs.tasks.det.FCOSR(
     backbone="ResNeXt50_32x4d",
     num_classes=15,
     nms_score_threshold=0.1,
