@@ -11,7 +11,9 @@ from .rbox_utils import poly2rbox_le135_np, poly2rbox_oc_np, rbox2poly_np
 
 
 class Poly2Array(Transform):
-    """convert gt_poly to np.array for rotated bboxes"""
+    """
+    Convert gt_poly to np.array for rotated bboxes.
+    """
 
     def __init__(self):
         super(Poly2Array, self).__init__()
@@ -21,13 +23,15 @@ class Poly2Array(Transform):
 
 
 class Poly2RBox(Transform):
-    """Polygon to Rotated Box, using new OpenCV definition since 4.5.1
+    """
+    Convert Polygon to Rotated Box, using new OpenCV definition since 4.5.1
 
     Args:
-        filter_threshold (int, float): threshold to filter annotations
-        filter_mode (str): filter mode, ['area', 'edge']
-        rbox_type (str): rbox type, ['le135', 'oc']
-
+        filter_threshold (int, float): threshold to filter annotations.
+            Default: 4.
+        filter_mode (str, optional): filter mode, ['area', 'edge'].
+            Default: None.
+        rbox_type (str): rbox type, ['le135', 'oc'], Default 'le135'.
     """
 
     def __init__(self, filter_threshold=4, filter_mode=None, rbox_type="le135"):
@@ -77,20 +81,40 @@ class Poly2RBox(Transform):
 
 
 class RandomRFlip(Transform):
+    """
+    Randomly horizontally flips an image and its corresponding 
+        bounding boxes and polygons.
+    Args:
+        prob (float): Probability of flipping the image.
+            Default: 0.5.
+    """
+
     def __init__(self, prob=0.5):
-        """
-        Args:
-            prob (float): the probability of flipping image
-        """
         super(RandomRFlip, self).__init__()
         self.prob = prob
         if not (isinstance(self.prob, float)):
             raise TypeError("{}: input type is invalid.".format(self))
 
     def apply_im(self, image):
+        """
+        Flips the image horizontally.
+        Args:
+            image (numpy.ndarray): Input image.
+        Returns:
+            (numpy.ndarray): Horizontally flipped image.
+        """
         return image[:, ::-1, :]
 
     def apply_pts(self, pts, width):
+        """
+        Flips the bounding boxes and polygons horizontally.
+        Args:
+            pts (numpy.ndarray): Array of points representing bounding 
+                boxes or polygons.
+            width (int): Width of the original image.
+        Returns:
+            (numpy.ndarray): Horizontally flipped bounding boxes or polygons.
+        """
         oldx = pts[:, 0::2].copy()
         pts[:, 0::2] = width - oldx - 1
         return pts
@@ -111,13 +135,17 @@ class RandomRFlip(Transform):
 
 
 class RRotate(Transform):
-    """Rotate Image, Polygon, Box
+    """
+    Applies a rotation transformation to an image and its corresponding 
+        bounding boxes and polygons.
 
     Args:
-        scale (float): rotate scale
-        angle (float): rotate angle
-        fill_value (int, tuple): fill color
-        auto_bound (bool): whether auto bound or not
+        scale (float): The scale factor for the rotation. Default: 1.0.
+        angle (float): The angle of rotation in degrees. Default: 0.0.
+        fill_value (float): The value to fill pixels outside the image. 
+            Default: 0.0.
+        auto_bound (bool): Whether to automatically adjust the output 
+            image size to contain the entire rotated image. Default is True.
     """
 
     def __init__(self, scale=1.0, angle=0.0, fill_value=0.0, auto_bound=True):
@@ -191,15 +219,25 @@ class RRotate(Transform):
 
 
 class RandomRRotate(Transform):
-    """Random Rotate Image
+    """
+    Applies a random rotation transformation to an image and its corresponding 
+        bounding boxes and polygons.
+
     Args:
-        scale (float, tuple, list): rotate scale
-        scale_mode (str): mode of scale, [range, value, None]
-        angle (float, tuple, list): rotate angle
-        angle_mode (str): mode of angle, [range, value, None]
-        fill_value (float, tuple, list): fill value
-        rotate_prob (float): probability of rotation
-        auto_bound (bool): whether auto bound or not
+        scale (float|list): The scale factor or range of scale factors 
+            for the rotation. Default: 1.0.
+        scale_mode (str, optional): The mode for selecting the scale factor. 
+            must be one of "range", "value", or None. Default: None.
+        angle (float|list): The angle or range of angles in degrees 
+            for the rotation. Default: 0.0.
+        angle_mode (str, optional): The mode for selecting the rotation angle. 
+            one of the "range", "value", or None. Default is None.
+        fill_value (float): The value to fill pixels outside the image. 
+            Default: 0.0.
+        rotate_prob (float): The probability of applying the rotation 
+            transformation. Default: 1.0.
+        auto_bound (bool): Whether to automatically adjust the output image 
+            size to contain the entire rotated image. Default is True.
     """
 
     def __init__(
@@ -243,7 +281,6 @@ class RandomRRotate(Transform):
         return rotator(sample)
 
 
-
 class RResize(Transform):
     def __init__(self, target_size, keep_ratio, interp=cv2.INTER_LINEAR):
         """
@@ -251,9 +288,9 @@ class RResize(Transform):
         resize the image's long side to the maximum of target_size
         if keep_ratio is False, resize the image to target size(h, w)
         Args:
-            target_size (int|list): image target size
-            keep_ratio (bool): whether keep_ratio or not, default true
-            interp (int): the interpolation method
+            target_size (int|list): image target size.
+            keep_ratio (bool): whether keep_ratio or not, default true.
+            interp (int): the interpolation method. Default: cv2.INTER_LINEAR.
         """
         super(RResize, self).__init__()
         self.keep_ratio = keep_ratio
