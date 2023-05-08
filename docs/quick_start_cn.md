@@ -53,6 +53,15 @@ Windows用户可以在[此站点](https://www.lfd.uci.edu/~gohlke/pythonlibs/#gd
 pip install GDAL‑3.3.3‑cp39‑cp39‑win_amd64.whl
 ```
 
+4. （可选）安装ext_op
+
+PaddleRS支持旋转目标检测，在使用之前需要安装`ext_op`外部自定义库，安装方式如下：
+```shell
+cd paddlers/models/ppdet/ext_op
+python setup.py install
+```
+
+
 除了采用上述安装步骤以外，PaddleRS也提供Docker安装方式。具体步骤如下：
 
 1. 从dockerhub拉取镜像:

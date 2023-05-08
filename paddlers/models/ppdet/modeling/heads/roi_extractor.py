@@ -15,6 +15,7 @@
 import paddle
 from paddlers.models.ppdet.core.workspace import register
 from paddlers.models.ppdet.modeling import ops
+import paddle.nn as nn
 
 
 def _to_list(v):
@@ -24,12 +25,12 @@ def _to_list(v):
 
 
 @register
-class RoIAlign(object):
+class RoIAlign(nn.Layer):
     """
     RoI Align module
 
     For more details, please refer to the document of roi_align in
-    in https://github.com/PaddlePaddle/Paddle/blob/release/2.5/python/paddle/vision/ops.py
+    in https://github.com/PaddlePaddle/Paddle/blob/develop/python/paddle/vision/ops.py
 
     Args:
         resolution (int): The output size, default 14
@@ -73,7 +74,7 @@ class RoIAlign(object):
     def from_config(cls, cfg, input_shape):
         return {'spatial_scale': [1. / i.stride for i in input_shape]}
 
-    def __call__(self, feats, roi, rois_num):
+    def forward(self, feats, roi, rois_num):
         roi = paddle.concat(roi) if len(roi) > 1 else roi[0]
         if len(feats) == 1:
             rois_feat = paddle.vision.ops.roi_align(

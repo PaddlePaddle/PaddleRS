@@ -57,13 +57,14 @@
 |-------|----|--------|-----|
 |`data_dir`|`str`|数据集存放目录。||
 |`image_dir`|`str`|输入图像存放目录。||
-|`ann_path`|`str`|[COCO格式](https://cocodataset.org/#home)标注文件路径。||
+|`anno_path`|`str`|[COCO格式](https://cocodataset.org/#home)标注文件路径。||
 |`transforms`|`paddlers.transforms.Compose`|对输入数据应用的数据变换算子。||
 |`label_list`|`str` \| `None`|label list文件。label list是一个文本文件，其中每一行包含一个类别的名称。|`None`|
 |`num_workers`|`int` \| `str`|加载数据时使用的辅助进程数。若设置为`'auto'`，则按照如下规则确定使用进程数：当CPU核心数大于16时，使用8个数据读取辅助进程；否则，使用CPU核心数一半数量的辅助进程。|`'auto'`|
 |`shuffle`|`bool`|是否随机打乱数据集中的样本。|`False`|
 |`allow_empty`|`bool`|是否向数据集中添加负样本。|`False`|
 |`empty_ratio`|`float`|负样本占比，仅当`allow_empty`为`True`时生效。若`empty_ratio`为负值或大于等于1，则保留所有生成的负样本。|`1.0`|
+|`batch_transforms`|`paddlers.transforms.BatchCompose`|对输入数据应用的批数据变换算子。||
 
 ### VOC格式目标检测数据集`VOCDetDataset`
 
@@ -81,6 +82,7 @@
 |`shuffle`|`bool`|是否随机打乱数据集中的样本。|`False`|
 |`allow_empty`|`bool`|是否向数据集中添加负样本。|`False`|
 |`empty_ratio`|`float`|负样本占比，仅当`allow_empty`为`True`时生效。若`empty_ratio`为负值或大于等于1，则保留所有生成的负样本。|`1.0`|
+|`batch_transforms`|`paddlers.transforms.BatchCompose`|对输入数据应用的批数据变换算子。||
 
 `VOCDetDataset`对file list的要求如下：
 

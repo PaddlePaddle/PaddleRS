@@ -443,6 +443,7 @@ The YOLOv3 implementation based on PaddlePaddle.
 
 | Parameter Name | Description                                                                                                                 | Default Value |
 | --- |-----------------------------------------------------------------------------------------------------------------------------| --- |
+| `rotate (bool)` | If True, the model performs rotated object detection | `False` |
 | `num_classes (int)` | Number of target classes                                                                                                    | `80` |
 | `backbone (str)` | Backbone network to use                                                                                      | `'MobileNetV1'` |
 | `anchors (list[list[int]])` | Sizes of predefined anchor boxes                                                                                                   | `[[10, 13], [16, 30], [33, 23], [30, 61], [62, 45 ], [59, 119], [116, 90], [156, 198], [373, 326]]` |

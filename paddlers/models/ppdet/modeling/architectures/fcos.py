@@ -16,7 +16,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import paddle
 from paddlers.models.ppdet.core.workspace import register, create
 from .meta_arch import BaseArch
 
@@ -32,22 +31,25 @@ class FCOS(BaseArch):
         backbone (object): backbone instance
         neck (object): 'FPN' instance
         fcos_head (object): 'FCOSHead' instance
-        post_process (object): 'FCOSPostProcess' instance
+        ssod_loss (object): 'SSODFCOSLoss' instance, only used for semi-det(ssod)
     """
 
     __category__ = 'architecture'
-    __inject__ = ['fcos_post_process']
+    __inject__ = ['ssod_loss']
 
     def __init__(self,
-                 backbone,
-                 neck,
+                 backbone='ResNet',
+                 neck='FPN',
                  fcos_head='FCOSHead',
-                 fcos_post_process='FCOSPostProcess'):
+                 ssod_loss='SSODFCOSLoss'):
         super(FCOS, self).__init__()
         self.backbone = backbone
         self.neck = neck
         self.fcos_head = fcos_head
-        self.fcos_post_process = fcos_post_process
+
+        # for ssod, semi-det
+        self.is_teacher = False
+        self.ssod_loss = ssod_loss
 
     @classmethod
     def from_config(cls, cfg, *args, **kwargs):
@@ -68,38 +70,27 @@ class FCOS(BaseArch):
     def _forward(self):
         body_feats = self.backbone(self.inputs)
         fpn_feats = self.neck(body_feats)
-        fcos_head_outs = self.fcos_head(fpn_feats, self.training)
-        if not self.training:
-            scale_factor = self.inputs['scale_factor']
-            bboxes = self.fcos_post_process(fcos_head_outs, scale_factor)
-            return bboxes
+
+        self.is_teacher = self.inputs.get('is_teacher', False)
+        if self.training or self.is_teacher:
+            losses = self.fcos_head(fpn_feats, self.inputs)
+            return losses
         else:
-            return fcos_head_outs
+            fcos_head_outs = self.fcos_head(fpn_feats)
+            bbox_pred, bbox_num = self.fcos_head.post_process(
+                fcos_head_outs, self.inputs['scale_factor'])
+            return {'bbox': bbox_pred, 'bbox_num': bbox_num}
 
-    def get_loss(self, ):
-        loss = {}
-        tag_labels, tag_bboxes, tag_centerness = [], [], []
-        for i in range(len(self.fcos_head.fpn_stride)):
-            # labels, reg_target, centerness
-            k_lbl = 'labels{}'.format(i)
-            if k_lbl in self.inputs:
-                tag_labels.append(self.inputs[k_lbl])
-            k_box = 'reg_target{}'.format(i)
-            if k_box in self.inputs:
-                tag_bboxes.append(self.inputs[k_box])
-            k_ctn = 'centerness{}'.format(i)
-            if k_ctn in self.inputs:
-                tag_centerness.append(self.inputs[k_ctn])
-
-        fcos_head_outs = self._forward()
-        loss_fcos = self.fcos_head.get_loss(fcos_head_outs, tag_labels,
-                                            tag_bboxes, tag_centerness)
-        loss.update(loss_fcos)
-        total_loss = paddle.add_n(list(loss.values()))
-        loss.update({'loss': total_loss})
-        return loss
+    def get_loss(self):
+        return self._forward()
 
     def get_pred(self):
-        bbox_pred, bbox_num = self._forward()
-        output = {'bbox': bbox_pred, 'bbox_num': bbox_num}
-        return output
+        return self._forward()
+
+    def get_loss_keys(self):
+        return ['loss_cls', 'loss_box', 'loss_quality']
+
+    def get_ssod_loss(self, student_head_outs, teacher_head_outs, train_cfg):
+        ssod_losses = self.ssod_loss(student_head_outs, teacher_head_outs,
+                                     train_cfg)
+        return ssod_losses

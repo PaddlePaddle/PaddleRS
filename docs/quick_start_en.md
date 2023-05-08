@@ -46,6 +46,15 @@ Windows users can download GDAL wheels from [this site](https://www.lfd.uci.edu/
 pip install GDAL‑3.3.3‑cp39‑cp39‑win_amd64.whl
 ```
 
+4. (Optional) Install ext_op
+
+PaddleRS supports rotated object detection, which requires the installation of the `ext_op` external custom library before use. you need ti install ext_op as follows:
+
+```shell
+cd paddlers/models/ppdet/ext_op
+python setup.py install
+```
+
 We also provide a docker image for installation:
 
 1. Pull from dockerhub:

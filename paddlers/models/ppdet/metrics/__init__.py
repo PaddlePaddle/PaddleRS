@@ -17,6 +17,7 @@ from . import keypoint_metrics
 
 from .metrics import *
 from .keypoint_metrics import *
+from .pose3d_metrics import *
 
 __all__ = metrics.__all__ + keypoint_metrics.__all__
 
@@ -26,4 +27,4 @@ __all__ = metrics.__all__ + mot_metrics.__all__
 
 from . import mcmot_metrics
 from .mcmot_metrics import *
-__all__ = metrics.__all__ + mcmot_metrics.__all__
+__all__ = metrics.__all__ + mcmot_metrics.__all__ 

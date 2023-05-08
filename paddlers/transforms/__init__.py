@@ -16,7 +16,8 @@ import copy
 import os.path as osp
 
 from .operators import *
-from .batch_operators import BatchRandomResize, BatchRandomResizeByShort, _BatchPad
+from .rotated_operators import *
+from .batch_operators import BatchRandomResize, BatchRandomResizeByShort, _BatchPad, BatchNormalizeImage, BatchPadRGT, BatchCompose
 from paddlers import transforms as T
 
 
