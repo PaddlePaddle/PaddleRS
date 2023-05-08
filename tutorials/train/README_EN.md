@@ -26,6 +26,7 @@ Sample code using the PaddleRS training model is curated in this directory. The 
 |image_restoration/esrgan.py | Image Restoration | ESRGAN |
 |image_restoration/lesrcnn.py | Image Restoration | LESRCNN |
 |object_detection/faster_rcnn.py | Object Detection | Faster R-CNN |
+|object_detection/fcosr.py | Object Detection | FCOSR |
 |object_detection/ppyolo.py | Object Detection | PP-YOLO |
 |object_detection/ppyolo_tiny.py | Object Detection | PP-YOLO Tiny |
 |object_detection/ppyolov2.py | Object Detection | PP-YOLOv2 |

@@ -101,8 +101,7 @@ model = pdrs.tasks.det.FCOSR(
     nms_topk=2000,
     nms_keep_topk=-1,
     nms_normalized=False,
-    nms_iou_threshold=0.1,
-    rotate=True)
+    nms_iou_threshold=0.1)
 
 # 执行模型训练
 model.train(

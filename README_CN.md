@@ -110,6 +110,7 @@ PaddleRS具有以下五大特色：
         <details><summary><b>目标检测</b></summary>
         <ul>
           <li><a href="./tutorials/train/object_detection/faster_rcnn.py">Faster R-CNN</a></li>
+          <li><a href="./tutorials/train/object_detection/fcosr.py">FCOSR</a></li>
           <li><a href="./tutorials/train/object_detection/ppyolo.py">PP-YOLO</a></li>
           <li><a href="./tutorials/train/object_detection/ppyolo_tiny.py">PP-YOLO Tiny</a></li>
           <li><a href="./tutorials/train/object_detection/ppyolov2.py">PP-YOLOv2</a></li>
