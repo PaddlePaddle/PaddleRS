@@ -1,11 +1,26 @@
+# Copyright (c) 2023 PaddlePaddle Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 try:
     from collections.abc import Sequence
 except Exception:
     from collections import Sequence
-
 from numbers import Integral
+
 import numpy as np
 import cv2
+
 from .operators import Transform
 from .rbox_utils import poly2rbox_le135_np, poly2rbox_oc_np, rbox2poly_np
 
@@ -24,14 +39,14 @@ class Poly2Array(Transform):
 
 class Poly2RBox(Transform):
     """
-    Convert Polygon to Rotated Box, using new OpenCV definition since 4.5.1
+    Convert Polygon to Rotated Box, using new OpenCV definition since 4.5.1.
 
     Args:
-        filter_threshold (int, float): threshold to filter annotations.
+        filter_threshold (int|float, optional): Threshold to filter annotations.
             Default: 4.
-        filter_mode (str, optional): filter mode, ['area', 'edge'].
+        filter_mode (str, optional): Filtering mode: 'area', 'edge', or None.
             Default: None.
-        rbox_type (str): rbox type, ['le135', 'oc'], Default 'le135'.
+        rbox_type (str, optional): RBox type: 'le135' or 'oc'. Default: 'le135'.
     """
 
     def __init__(self, filter_threshold=4, filter_mode=None, rbox_type="le135"):
@@ -82,10 +97,11 @@ class Poly2RBox(Transform):
 
 class RandomRFlip(Transform):
     """
-    Randomly horizontally flips an image and its corresponding 
+    Randomly horizontally flip an image and its corresponding 
         bounding boxes and polygons.
+    
     Args:
-        prob (float): Probability of flipping the image.
+        prob (float, optional): Probability of flipping the image.
             Default: 0.5.
     """
 
@@ -98,22 +114,26 @@ class RandomRFlip(Transform):
     def apply_im(self, image):
         """
         Flips the image horizontally.
+
         Args:
             image (numpy.ndarray): Input image.
+        
         Returns:
-            (numpy.ndarray): Horizontally flipped image.
+            numpy.ndarray: Horizontally flipped image.
         """
         return image[:, ::-1, :]
 
     def apply_pts(self, pts, width):
         """
         Flips the bounding boxes and polygons horizontally.
+
         Args:
             pts (numpy.ndarray): Array of points representing bounding 
                 boxes or polygons.
             width (int): Width of the original image.
+        
         Returns:
-            (numpy.ndarray): Horizontally flipped bounding boxes or polygons.
+            numpy.ndarray: Horizontally flipped bounding boxes or polygons.
         """
         oldx = pts[:, 0::2].copy()
         pts[:, 0::2] = width - oldx - 1
@@ -140,12 +160,12 @@ class RRotate(Transform):
         bounding boxes and polygons.
 
     Args:
-        scale (float): The scale factor for the rotation. Default: 1.0.
-        angle (float): The angle of rotation in degrees. Default: 0.0.
-        fill_value (float): The value to fill pixels outside the image. 
+        scale (float, optional): Scale factor for the rotation. Default: 1.0.
+        angle (float, optional): Angle of rotation in degrees. Default: 0.0.
+        fill_value (float, optional): Value to fill pixels outside the image. 
             Default: 0.0.
-        auto_bound (bool): Whether to automatically adjust the output 
-            image size to contain the entire rotated image. Default is True.
+        auto_bound (bool, optional): Whether to automatically adjust the output 
+            image size to accommodate the entire rotated image. Default is True.
     """
 
     def __init__(self, scale=1.0, angle=0.0, fill_value=0.0, auto_bound=True):
@@ -220,24 +240,24 @@ class RRotate(Transform):
 
 class RandomRRotate(Transform):
     """
-    Applies a random rotation transformation to an image and its corresponding 
+    Apply a random rotation transformation to an image and its corresponding 
         bounding boxes and polygons.
 
     Args:
-        scale (float|list): The scale factor or range of scale factors 
+        scale (float|list, optional): Scale factor or range of scale factors 
             for the rotation. Default: 1.0.
-        scale_mode (str, optional): The mode for selecting the scale factor. 
-            must be one of "range", "value", or None. Default: None.
-        angle (float|list): The angle or range of angles in degrees 
+        scale_mode (str, optional): Mode for selecting the scale factor. 
+            Must be one of 'range', 'value', or None. Default: None.
+        angle (float|list, optional): Angle or range of angles in degrees 
             for the rotation. Default: 0.0.
-        angle_mode (str, optional): The mode for selecting the rotation angle. 
-            one of the "range", "value", or None. Default is None.
-        fill_value (float): The value to fill pixels outside the image. 
+        angle_mode (str, optional): Mode for selecting the rotation angle. 
+            Must be one of 'range', 'value', or None. Default is None.
+        fill_value (float, optional): Value to fill pixels outside the image. 
             Default: 0.0.
-        rotate_prob (float): The probability of applying the rotation 
+        rotate_prob (float, optional): Probability of applying the rotation 
             transformation. Default: 1.0.
-        auto_bound (bool): Whether to automatically adjust the output image 
-            size to contain the entire rotated image. Default is True.
+        auto_bound (bool, optional): Whether to automatically adjust the output image 
+            size to accommodate the entire rotated image. Default is True.
     """
 
     def __init__(
@@ -253,7 +273,7 @@ class RandomRRotate(Transform):
         assert not angle_mode or angle_mode in [
             "range",
             "value",
-        ], "angle mode should be in [range, value, None]"
+        ], "angle mode should be in ['range', 'value', None]."
         self.scale = scale
         self.scale_mode = scale_mode
         self.angle = angle
@@ -282,22 +302,23 @@ class RandomRRotate(Transform):
 
 
 class RResize(Transform):
-    def __init__(self, target_size, keep_ratio, interp=cv2.INTER_LINEAR):
+    def __init__(self, target_size, keep_ratio=True, interp=cv2.INTER_LINEAR):
         """
-        Resize image to target size. if keep_ratio is True,
-        resize the image's long side to the maximum of target_size
-        if keep_ratio is False, resize the image to target size(h, w)
+        Resize image to target size. If `keep_ratio` is True,
+        resize the image's long side to the maximum of `target_size`.
+        If `keep_ratio` is False, resize the image to target size (h, w).
+
         Args:
-            target_size (int|list): image target size.
-            keep_ratio (bool): whether keep_ratio or not, default true.
-            interp (int): the interpolation method. Default: cv2.INTER_LINEAR.
+            target_size (int|list): Image target size.
+            keep_ratio (bool, optional): Whether or not to keep ratio. Default: True.
+            interp (int, optional): Interpolation method. Default: cv2.INTER_LINEAR.
         """
         super(RResize, self).__init__()
         self.keep_ratio = keep_ratio
         self.interp = interp
         if not isinstance(target_size, (Integral, Sequence)):
             raise TypeError(
-                "Type of target_size is invalid. Must be Integer or List or Tuple, now is {}".
+                "Type of `target_size` is invalid. Must be integer, list, or tuple, but now it is {}.".
                 format(type(target_size)))
         if isinstance(target_size, Integral):
             target_size = [target_size, target_size]

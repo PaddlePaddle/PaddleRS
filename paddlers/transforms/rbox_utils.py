@@ -1,4 +1,4 @@
-#   Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
+# Copyright (c) 2023 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,16 +25,16 @@ def norm_angle(angle, range=[-np.pi / 4, np.pi]):
 # rbox function implemented using numpy
 def poly2rbox_le135_np(poly):
     """
-    Convert poly to rbox within the range of [-pi / 4, 3 * pi / 4]
+    Convert poly to rbox within the range of [-pi / 4, 3 * pi / 4].
 
     Args:
-        poly (list[float|int]): List of polygonal bounding box, contains 4 coordinates:
-            The format is: [x1, y1, x2, y2, x3, y3, x4, y4].
+        poly (list[float|int]): List of polygonal bounding boxes, each 
+            containing 4 coordinates. The format is: 
+            [x1, y1, x2, y2, x3, y3, x4, y4].
 
     Returns:
-        (list[float]): The center point coordinates, 
-            height, width and rotate angle of bounding box.
-            The format is: [cx, cy, w, h, angle].
+        list[float]: Center point coordinates, height, width, and rotation 
+            angle of bounding box. The format is: [cx, cy, w, h, angle].
     """
     poly = np.array(poly[:8], dtype=np.float32)
 
@@ -66,16 +66,16 @@ def poly2rbox_le135_np(poly):
 
 def poly2rbox_oc_np(poly):
     """
-    Convert poly to rbox within the range of (0, pi / 2]
+    Convert poly to rbox within the range of (0, pi / 2].
 
     Args:
-        poly (list[float|int]): List of polygonal bounding box, contains 4 coordinates:
-            The format is: [x1, y1, x2, y2, x3, y3, x4, y4].
+        poly (list[float|int]): List of polygonal bounding boxes, each 
+            containing 4 coordinates. The format is: 
+            [x1, y1, x2, y2, x3, y3, x4, y4].
 
     Returns:
-        (list[float]): The center point coordinates, 
-            height, width and rotate angle of bounding box.
-            The format is: [cx, cy, w, h, angle].
+        list[float]: Center point coordinates, height, width, and rotation 
+            angle of bounding box. The format is: [cx, cy, w, h, angle].
     """
     points = np.array(poly, dtype=np.float32).reshape((-1, 2))
     (cx, cy), (w, h), angle = cv2.minAreaRect(points)
@@ -98,18 +98,18 @@ def poly2rbox_oc_np(poly):
 
 def poly2rbox_np(polys, rbox_type='oc'):
     """
-    Convert poly to rbox with given rbox_type.
+    Convert poly to rbox with given rbox type.
 
     Args:
-        poly (list[float|int]): List of polygonal bounding box, contains 4 coordinates:
-            The format is: [x1, y1, x2, y2, x3, y3, x4, y4].
-            rbox_type (str, optional): The type of rbox to convert.
-                Default: 'oc'.
+        poly (list[float|int]): List of polygonal bounding boxes, each 
+            containing 4 coordinates: The format is: 
+            [x1, y1, x2, y2, x3, y3, x4, y4].
+        rbox_type (str, optional): The type of rbox to convert to. 
+            Default: 'oc'.
 
     Returns:
-        (list[float]): the center point coordinates, 
-            height, width and rotate angle of bounding box.
-            the format is: [cx, cy, w, h, angle].
+        list[float]: Center point coordinates, height, width, and rotation 
+            angle of bounding box. The format is: [cx, cy, w, h, angle].
     """
     assert rbox_type in ['oc', 'le135'], 'only oc or le135 is supported now'
     poly2rbox_fn = poly2rbox_oc_np if rbox_type == 'oc' else poly2rbox_le135_np
@@ -158,13 +158,13 @@ def rbox2poly_np(rboxes):
     Convert rbox to poly.
 
     Args:
-        rboxes (list[float]): Rotated box which contains 
-            center point coordinates,height, width and rotate angle.
-            the format is: [cx, cy, w, h, angle].
+        rboxes (list[float]): Rotated boxes, each containing center point 
+            coordinates, height, width, and rotation angle. The format is: 
+            [cx, cy, w, h, angle].
 
     Returns:
-        (list[float]): List of polygonal bounding box, contains 4 coordinates:
-            The format is: [x1, y1, x2, y2, x3, y3, x4, y4].
+        list[float]: List of polygonal bounding boxes, each containing 4 
+            coordinates. The format is: [x1, y1, x2, y2, x3, y3, x4, y4].
     """
     polys = []
     for i in range(len(rboxes)):
@@ -187,15 +187,16 @@ def rbox2poly_np(rboxes):
 def box2corners(box):
     """
     Convert bounding box coordinates to corner coordinates.
+
     Args:
-        box (5-D Tensor): A tensor of shape (B, 5), where B is the batch size
+        box (paddle.Tensor): A tensor of shape (B, 5), where B is the batch size
             and each row represents a bounding box with coordinates 
             (x, y, w, h, alpha), where (x, y) is the center of the box, 
             w is the width, h is the height, and alpha is the angle of 
             rotation in radians.
 
     Returns:
-        (4-D Tensor): A tensor of shape (B, N, 4, 2), where N is the number 
+        paddle.Tensor: A tensor of shape (B, N, 4, 2), where N is the number 
         of bounding boxes in each batch and each box is represented by four
         corner coordinates (x1, y1), (x2, y2), (x3, y3), (x4, y4).
     """
@@ -247,15 +248,14 @@ def check_points_in_polys(points, polys):
     Check if points are inside polygons.
 
     Args:
-        points (3-D Tensor): A tensor of shape (1, L, 2) representing L points,
+        points (paddle.Tensor): A tensor of shape (1, L, 2) representing L points,
             where each point is represented by its (x, y) coordinates.
-        polys (4-D Tensor): A tensor of shape (B, N, 4, 2) representing 
-            N polygons in each of the B batches, where each polygon is
-            represented by four corner coordinates 
-            (x1, y1), (x2, y2), (x3, y3), (x4, y4).
+        polys (paddle.Tensor): A tensor of shape (B, N, 4, 2) representing N
+            polygons in each of the B batches, where each polygon is represented
+            by four corner coordinates (x1, y1), (x2, y2), (x3, y3), (x4, y4).
 
     Returns:
-        (3-D Tensor) A boolean tensor of shape (B, N, L) where each element 
+        paddle.Tensor: A boolean tensor of shape (B, N, L) where each element 
             indicates whether the corresponding point is inside 
             the corresponding polygon.
     """
@@ -286,15 +286,15 @@ def check_points_in_rotated_boxes(points, boxes):
     Check if points are inside rotated boxes.
 
     Args:
-        points (3-D Tensor): A tensor of shape [B, L, 2] representing the 
+        points (paddle.Tensor): A tensor of shape [B, L, 2] representing the 
             coordinates of L points in 2D space for each of the B boxes.
-        boxes (3-D Tensor): A tensor of shape [B, N, 5] representing the 
+        boxes (paddle.Tensor): A tensor of shape [B, N, 5] representing the 
             N rotated boxes for each of the B samples. 
             Each box is represented by its center coordinates (x, y), 
-            width, height and rotation angle in radians.
+            width, height, and rotation angle in radians.
 
     Returns:
-        (3-D Tensor): A boolean tensor of shape [B, N, L] 
+        paddle.Tensor: A boolean tensor of shape [B, N, L] 
             where each element (i, j, k) is True 
             if the k-th point of the i-th sample is inside 
             the j-th box and False otherwise.
@@ -332,14 +332,15 @@ def rotated_iou_similarity(box1, box2, eps=1e-9, func=''):
         rotated boxes.
 
     Args:
-        box1 (2-D Tensor): A tensor of shape [B, 5] representing B rotated 
+        box1 (paddle.Tensor): A tensor of shape [B, 5] representing B rotated 
             boxes. Each box is represented by its center coordinates (x, y), 
-            width, height and rotation angle in radians.
-        box2 (2-D Tensor): Sample shape and format with box1.
-        eps (float): A small value to avoid division by zero. Default: 1e-9.
+            width, height, and rotation angle in radians.
+        box2 (paddle.Tensor): Sample shape and format with box1.
+        eps (float, optional): A small value to avoid division by zero. 
+            Default: 1e-9.
 
     Returns:
-        (1-D Tensor): A tensor of shape [B] representing the IoU similarity 
+        paddle.Tensor: A tensor of shape [B] representing the IoU similarity 
             between each pair of rotated boxes.
 
     Raises:
