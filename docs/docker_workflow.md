@@ -39,7 +39,26 @@ python split.py --image_path /home/myVol/qingdao.tif --block_size 512 --save_dir
 
 ## 二、模型训练
 
-标注完成后可参考PaddleRS的[训练文档](../tutorials/train/README.md)进行训练。
+- 标注完成后可参考PaddleRS的[训练文档](../tutorials/train/README.md)进行训练。对于标注好的数据，在EISeg的保存目录中为如下格式：
+
+```
+image
+  ├- label
+  |    └- A.tif
+  └- A.tif
+```
+
+- 因此需要将数据移动为下列格式：
+
+```
+datas
+  ├- label
+  |    └- A.tif
+  └- image
+       └- A.tif
+```
+
+- 然后生成对应的数据列表，参照[Farseg的训练文件](../tutorials/train/segmentation/farseg.py)进行训练即可。
 
 ## 三、可视化
 
@@ -49,3 +68,5 @@ python split.py --image_path /home/myVol/qingdao.tif --block_size 512 --save_dir
 ![geoview](https://github.com/geoyee/img-bed/assets/71769312/7228c87c-5d2a-4e4a-bd98-b76a6a791b68)
 
 - 上传图像，开始处理，就能得到可视化的结果了。
+
+> 目前GeoView存在一些问题，且显示在非GPU环境下会报错，等待修复中...

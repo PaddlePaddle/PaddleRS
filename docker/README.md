@@ -90,7 +90,7 @@ eiseg
   vim ../config.yaml
   ```
 
-  6. 参考GeoView的文档进行[模型准备](https://github.com/geoyee/GeoView/blob/develop/docs/dev.md)，将容器内的模型使用`cp -r <model_path> /opt/GeoView/backend/model/<task_type>/<model_path>`。
+  6. 参考GeoView的文档进行[模型准备](https://github.com/geoyee/GeoView/blob/develop/docs/dev.md)，将容器内的模型（导出为部署模型）使用`cp -r <model_path> /opt/GeoView/backend/model/<task_type>/<model_path>`。
   6. 启动后端：
 
   ```shell
