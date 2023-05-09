@@ -13,7 +13,7 @@ ANNO_PATH = "./data/dota/DOTA_trainval1024.json"
 # 数据集图像目录
 IMAGE_DIR = "./data/dota/images"
 # 实验目录，保存输出的模型权重和结果
-EXP_DIR = "./output/fcosr/"
+EXP_DIR = "./output/ppyoloe_r/"
 
 IMAGE_SIZE = [1024, 1024]
 

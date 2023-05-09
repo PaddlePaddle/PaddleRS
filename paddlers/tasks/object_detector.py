@@ -1094,6 +1094,8 @@ class _YOLOv3(BaseDetector):
                         return_idx=[1, 2, 3],
                         use_large_stem=True,
                         use_alpha=True))
+            elif backbone == 'DarkNet53':
+                backbone = 'DarkNet'
 
             backbone = self._get_backbone(backbone, **kwargs)
             nms = ppdet.modeling.MultiClassNMS(
@@ -2300,5 +2302,5 @@ class PPYOLOE_R(_YOLOv3):
 
         return neck, yolo_head, post_process
 
-YOLOv3 = functools.partial(_YOLOv3, rotate=False)
 
+YOLOv3 = functools.partial(_YOLOv3, rotate=False)
