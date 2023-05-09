@@ -598,7 +598,7 @@ class BaseDetector(BaseModel):
         eval_dataset.data_fields = self.data_fields[self.metric]
         eval_batch_transforms = self._default_batch_transforms(
             'eval') if eval_dataset.batch_transforms is None else None
-        eval_dataset._build_collate_fn(eval_batch_transforms)
+        eval_dataset.build_collate_fn(eval_batch_transforms)
         self._check_transforms(eval_dataset.transforms)
 
         self.net.eval()
