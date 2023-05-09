@@ -4,11 +4,7 @@
 
 ## 〇、准备
 
-- 拉取镜像（或构建镜像）并运行镜像，详细过程可以参考[文档](../docker/README.md)。这里使用的容器文件夹绝对路径为`/home/myVol`。
-
-```shell
-docker run -it -v <本机文件夹绝对路径:容器文件夹绝对路径> <imageID>
-```
+- 拉取镜像（或构建镜像）并运行镜像，详细过程可以参考[文档](../docker/README.md)。这里使用的容器文件夹绝对路径为`/usr/myVol`。
 
 ## 一、数据标注
 
@@ -22,7 +18,7 @@ python setup.py install
 
 ```shell
 cd tools/
-python split.py --image_path /home/myVol/qingdao.tif --block_size 512 --save_dir /home/myVol
+python split.py --image_path /usr/myVol/qingdao.tif --block_size 512 --save_dir /usr/myVol
 ```
 
 - 等待进度条完成后则数据划分完毕。此时将建筑交互式模型参数[下载](https://paddleseg.bj.bcebos.com/eiseg/0.4/static_hrnet18_ocr48_rsbuilding_instance.zip)到共享文件夹中，打开[VcXsrv](https://sourceforge.net/projects/vcxsrv/)（宿主机系统为Windows10），准备使用EISeg进行标注。具体操作参考[文档](../docker/README.md)中关于EISeg的使用部分。
@@ -69,4 +65,4 @@ datas
 
 - 上传图像，开始处理，就能得到可视化的结果了。
 
-> 目前GeoView存在一些问题，且显示在非GPU环境下会报错，等待修复中...
+*\*由于PaddleRS经过了一段时间的更新，目前GeoView推理时暂时有点问题，结果待更正*
