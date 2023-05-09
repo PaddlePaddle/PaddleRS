@@ -2297,7 +2297,7 @@ class PPYOLOE_R(_YOLOv3):
             topk=13,
             alpha=1.0,
             beta=6.0, )
-        yolo_head = ppdet.modeling.PPYOLOEHead(
+        yolo_head = ppdet.modeling.PPYOLOERHead(
             num_classes=num_classes,
             in_channels=[i.channels for i in neck.out_shape],
             fpn_strides=[32, 16, 8],

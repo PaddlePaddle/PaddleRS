@@ -386,6 +386,8 @@ class BaseModel(metaclass=ModelMeta):
             step_time_tic = time.time()
 
             for step, data in enumerate(self.train_data_loader()):
+                if self.model_name in ['PicoDet', 'PPYOLOE_R']:
+                    data['epoch_id'] = i
                 if nranks > 1:
                     outputs = self.train_step(step, data, ddp_net, optimizer)
                 else:

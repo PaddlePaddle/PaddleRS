@@ -113,6 +113,7 @@ model.train(
     save_interval_epochs=5,
     # 每多少次迭代记录一次日志
     log_interval_steps=4,
+    metric='rbox',
     save_dir=EXP_DIR,
     # 初始学习率大小，请根据此公式适当调整learning_rate：(train_batch_size * gpu_nums) / (4 * 4) * 0.01
     learning_rate=0.01,
