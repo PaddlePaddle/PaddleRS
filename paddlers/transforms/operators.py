@@ -204,6 +204,8 @@ class Transform(object):
                 map(self.apply_mask, sample['aux_masks']))
         if 'target' in sample:
             sample['target'] = self.apply_im(sample['target'])
+        if 'gt_poly' in sample:
+            sample['gt_poly'] = self.apply_segm(sample['gt_poly'])
 
         return sample
 
@@ -1882,6 +1884,14 @@ class _PadBox(Transform):
 
         self.num_max_boxes = num_max_boxes
         super(_PadBox, self).__init__()
+
+    def pad_field(self, sample, field, num_gt):
+        name, shape, dtype = field
+        if name in sample:
+            pad_v = np.zeros(shape, dtype=dtype)
+            if num_gt > 0:
+                pad_v[:num_gt] = sample[name]
+            sample[name] = pad_v
 
     def apply(self, sample):
         gt_num = min(self.num_max_boxes, len(sample['gt_bbox']))

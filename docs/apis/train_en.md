@@ -166,6 +166,7 @@ def train(self,
           warmup_start_lr=0.0,
           lr_decay_epochs=(216, 243),
           lr_decay_gamma=0.1,
+          cosine_decay_num_epochs=1000,
           metric=None,
           use_ema=False,
           early_stop=False,
@@ -196,7 +197,8 @@ The meaning of each parameter is as follows:
 |`warmup_start_lr`|`int`|Default initial learning rate used in the warm-up phase of the optimizer.|`0`|
 |`lr_decay_epochs`|`list` \| `tuple`|Milestones of learning rate decline of the default optimizer, in terms of epochs. That is, which epoch the decay of the learning rate occurs.|`(216, 243)`|
 |`lr_decay_gamma`|`float`|Learning rate attenuation coefficient, for default optimizer.|`0.1`|
-|`metric`|`str` \| `None`|Evaluation metrics, which can be `'VOC'`, `COCO`, or `None`. If `None`, the evaluation metrics will be automatically determined according to the format of the dataset.|`None`|
+|`cosine_decay_num_epochs`|`int`|Parameter to determine the annealing cycle when a cosine annealing learning rate scheduler is used.|`1000`|
+|`metric`|`str` \| `None`|Evaluation metrics, which can be `'VOC'`, `'COCO'`, `'RBOX'`, or `None`. If `None`, the evaluation metrics will be automatically determined according to the format of the dataset.|`None`|
 |`use_ema`|`bool`|Whether to enable [exponential moving average strategy](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/models/ppdet/optimizer.py) to update model weights.|`False`|
 |`early_stop`|`bool`|Whether to enable the early stopping policy during training.|`False`|
 |`early_stop_patience`|`int`|`patience` parameter when the early stopping policy is enabled. Please refer to [`EarlyStop`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/utils/utils.py) for more details.|`5`|

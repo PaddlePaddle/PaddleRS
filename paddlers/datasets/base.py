@@ -18,7 +18,8 @@ from paddle.io import Dataset
 from paddle.fluid.dataloader.collate import default_collate_fn
 
 from paddlers.utils import get_num_workers
-from paddlers.transforms import construct_sample_from_dict, Compose
+import paddlers.utils.logging as logging
+from paddlers.transforms import construct_sample_from_dict, Compose, BatchCompose
 
 
 class BaseDataset(Dataset):
@@ -26,7 +27,13 @@ class BaseDataset(Dataset):
     _KEYS_TO_DISCARD = None
     _collate_trans_info = False
 
-    def __init__(self, data_dir, label_list, transforms, num_workers, shuffle):
+    def __init__(self,
+                 data_dir,
+                 label_list,
+                 transforms,
+                 num_workers,
+                 shuffle,
+                 batch_transforms=None):
         super(BaseDataset, self).__init__()
 
         self.data_dir = data_dir
@@ -37,6 +44,8 @@ class BaseDataset(Dataset):
 
         self.num_workers = get_num_workers(num_workers)
         self.shuffle = shuffle
+        self.batch_transforms = None
+        self.build_collate_fn(batch_transforms)
 
     def __getitem__(self, idx):
         sample = construct_sample_from_dict(self.file_list[idx])
@@ -59,8 +68,25 @@ class BaseDataset(Dataset):
             for key in self._KEYS_TO_DISCARD:
                 for s, _ in batch:
                     s.pop(key, None)
+
+        samples = [s[0] for s in batch]
+
+        if self.batch_transforms:
+            samples = self.batch_transforms(samples)
+
         if self._collate_trans_info:
-            return default_collate_fn(
-                [s[0] for s in batch]), [s[1] for s in batch]
+            return default_collate_fn(samples), [s[1] for s in batch]
         else:
-            return default_collate_fn([s[0] for s in batch])
+            return default_collate_fn(samples)
+
+    def build_collate_fn(self, batch_transforms, collate_fn_constructor=None):
+        if self.batch_transforms is not None and batch_transforms:
+            logging.warning(
+                "The initial `batch_transforms` will be overwritten.")
+        if batch_transforms is not None:
+            batch_transforms = copy.deepcopy(batch_transforms)
+            if isinstance(batch_transforms, list):
+                batch_transforms = BatchCompose(batch_transforms)
+            self.batch_transforms = batch_transforms
+        if collate_fn_constructor:
+            self.collate_fn = collate_fn_constructor(self)

@@ -369,6 +369,24 @@
 | `test_post_nms_top_n (int)`   | 测试时，进行 NMS 操作之后保留的预测框数量                           | `1000` |
 
 
+## `FCOSR`
+
+基于PaddlePaddle的FCOSR实现。
+
+| 参数名 | 描述                            | 默认值 |
+| --- |-------------------------------| --- |
+| `num_classes (int)` | 目标类别数量                        | `80` |
+| `backbone (str)` | 骨干网络名称                | `'MobileNetV1'` |
+| `anchors (list[list[int]])` | 预定义锚框的大小                       | `[[10, 13], [16, 30], [33, 23], [30, 61], [62, 45], [59, 119], [116, 90], [156, 198], [373, 326]]` |
+| `anchor_masks (list[list[int]])` | 预定义锚框的掩码                  | `[[6, 7, 8], [3, 4, 5], [0, 1, 2]]` |
+| `ignore_threshold (float)` | IoU 阈值，用于将预测框分配给真实框   | `0.7` |
+| `nms_score_threshold (float)` | NMS 的分数阈值      | `0.01` |
+| `nms_topk (int)` | 在执行 NMS 之前保留的最大预测框数  | `1000` |
+| `nms_keep_topk (int)` | 在执行 NMS 之后保留的最大预测框数            | `100` |
+| `nms_iou_threshold (float)` | NMS IoU 阈值    | `0.45` |
+| `label_smooth (bool)` | 是否使用标签平滑                 | `False` |
+
+
 ## `PPYOLO`
 
 基于PaddlePaddle的PP-YOLO实现。

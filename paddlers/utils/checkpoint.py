@@ -53,6 +53,7 @@ det_pretrain_weights_dict = {
     'YOLOv3_MobileNetV1_ssld': ['COCO', 'PascalVOC', 'IMAGENET'],
     'YOLOv3_DarkNet53': ['COCO', 'IMAGENET'],
     'YOLOv3_ResNet50_vd_dcn': ['COCO', 'IMAGENET'],
+    'YOLOv3_ResNeXt50_32x4d': ['IMAGENET'],
     'YOLOv3_ResNet34': ['COCO', 'IMAGENET'],
     'YOLOv3_MobileNetV3': ['COCO', 'PascalVOC', 'IMAGENET'],
     'YOLOv3_MobileNetV3_ssld': ['PascalVOC', 'IMAGENET'],
@@ -285,6 +286,8 @@ imagenet_weights = {
     'https://paddledet.bj.bcebos.com/models/pretrained/HRNet_W18_C_pretrained.pdparams',
     'YOLOv3_ResNet50_vd_dcn_IMAGENET':
     'https://paddledet.bj.bcebos.com/models/pretrained/ResNet50_vd_ssld_pretrained.pdparams',
+    'YOLOv3_ResNeXt50_32x4d_IMAGENET':
+    'https://paddledet.bj.bcebos.com/models/pretrained/ResNeXt50_32x4d_pretrained.pdparams',
     'YOLOv3_ResNet34_IMAGENET':
     'https://paddledet.bj.bcebos.com/models/pretrained/ResNet34_pretrained.pdparams',
     'YOLOv3_MobileNetV1_IMAGENET':

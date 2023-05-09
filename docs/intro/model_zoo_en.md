@@ -33,6 +33,7 @@ All models currently supported by PaddleRS are listed below (those marked \* are
 | Image Restoration | SwinIR | Yes |
 | Image Restoration | NAFNet | Yes |
 | Object Detection | Faster R-CNN | No |
+| Object Detection | FCOSR | No |
 | Object Detection | PP-YOLO | No |
 | Object Detection | PP-YOLO Tiny | No |
 | Object Detection | PP-YOLOv2 | No |

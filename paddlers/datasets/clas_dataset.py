@@ -42,9 +42,11 @@ class ClasDataset(BaseDataset):
                  transforms,
                  label_list=None,
                  num_workers='auto',
-                 shuffle=False):
+                 shuffle=False,
+                 batch_transforms=None):
         super(ClasDataset, self).__init__(data_dir, label_list, transforms,
-                                          num_workers, shuffle)
+                                          num_workers, shuffle,
+                                          batch_transforms)
         self.file_list = list()
         self.labels = list()
 

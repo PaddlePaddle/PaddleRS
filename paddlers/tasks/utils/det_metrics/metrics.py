@@ -16,16 +16,19 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import os
 import copy
 import sys
-from collections import OrderedDict
+import json
+from collections import OrderedDict, defaultdict
 import paddle
 import numpy as np
 from paddlers.models.ppdet.metrics.map_utils import prune_zero_padding, DetectionMAP
+from paddlers.models.ppdet.data.source.category import get_categories
 from .coco_utils import get_infer_results, cocoapi_eval
 import paddlers.utils.logging as logging
 
-__all__ = ['Metric', 'VOCMetric', 'COCOMetric']
+__all__ = ['Metric', 'VOCMetric', 'COCOMetric', 'RBoxMetric']
 
 
 class Metric(paddle.metric.Metric):
@@ -218,3 +221,130 @@ class COCOMetric(Metric):
                     [self.eval_stats['bbox'][0], self.eval_stats['mask'][0]]))
         else:
             return {'bbox_mmap': self.eval_stats['bbox'][0]}
+
+
+class RBoxMetric(Metric):
+    def __init__(self, anno_file, **kwargs):
+        self.anno_file = anno_file
+        self.clsid2catid, self.catid2name = get_categories('RBOX', anno_file)
+        self.catid2clsid = {v: k for k, v in self.clsid2catid.items()}
+        self.classwise = kwargs.get('classwise', False)
+        self.output_eval = kwargs.get('output_eval', None)
+        self.save_prediction_only = kwargs.get('save_prediction_only', False)
+        self.overlap_thresh = kwargs.get('overlap_thresh', 0.5)
+        self.map_type = kwargs.get('map_type', '11point')
+        self.evaluate_difficult = kwargs.get('evaluate_difficult', False)
+        self.imid2path = kwargs.get('imid2path', None)
+        class_num = len(self.catid2name)
+        self.detection_map = DetectionMAP(
+            class_num=class_num,
+            overlap_thresh=self.overlap_thresh,
+            map_type=self.map_type,
+            is_bbox_normalized=False,
+            evaluate_difficult=self.evaluate_difficult,
+            catid2name=self.catid2name,
+            classwise=self.classwise)
+
+        self.reset()
+
+    def reset(self):
+        self.details = []
+        self.detection_map.reset()
+
+    def update(self, inputs, outputs):
+        outs = {}
+        # outputs Tensor -> numpy.ndarray
+        for k, v in outputs.items():
+            outs[k] = v.numpy() if isinstance(v, paddle.Tensor) else v
+
+        im_id = inputs['im_id']
+        im_id = im_id.numpy() if isinstance(im_id, paddle.Tensor) else im_id
+        outs['im_id'] = im_id
+
+        infer_results = get_infer_results(outs, self.clsid2catid)
+        infer_results = infer_results['bbox'] if 'bbox' in infer_results else []
+        self.details += infer_results
+        if self.save_prediction_only:
+            return
+
+        gt_boxes = inputs['gt_poly']
+        gt_labels = inputs['gt_class']
+
+        if 'scale_factor' in inputs:
+            scale_factor = inputs['scale_factor'].numpy() if isinstance(
+                inputs['scale_factor'],
+                paddle.Tensor) else inputs['scale_factor']
+        else:
+            scale_factor = np.ones((gt_boxes.shape[0], 2)).astype('float32')
+
+        for i in range(len(gt_boxes)):
+            gt_box = gt_boxes[i].numpy() if isinstance(
+                gt_boxes[i], paddle.Tensor) else gt_boxes[i]
+            h, w = scale_factor[i]
+            gt_box = gt_box / np.array([w, h, w, h, w, h, w, h])
+            gt_label = gt_labels[i].numpy() if isinstance(
+                gt_labels[i], paddle.Tensor) else gt_labels[i]
+            gt_box, gt_label, _ = prune_zero_padding(gt_box, gt_label)
+            bbox = [
+                res['bbox'] for res in infer_results
+                if int(res['image_id']) == int(im_id[i])
+            ]
+            score = [
+                res['score'] for res in infer_results
+                if int(res['image_id']) == int(im_id[i])
+            ]
+            label = [
+                self.catid2clsid[int(res['category_id'])]
+                for res in infer_results
+                if int(res['image_id']) == int(im_id[i])
+            ]
+            self.detection_map.update(bbox, score, label, gt_box, gt_label)
+
+    def save_results(self, results, output_dir, imid2path):
+        if imid2path:
+            data_dicts = defaultdict(list)
+            for result in results:
+                image_id = result['image_id']
+                data_dicts[image_id].append(result)
+
+            for image_id, image_path in imid2path.items():
+                basename = os.path.splitext(os.path.split(image_path)[-1])[0]
+                output = os.path.join(output_dir, "{}.txt".format(basename))
+                dets = data_dicts.get(image_id, [])
+                with open(output, 'w') as f:
+                    for det in dets:
+                        catid, bbox, score = det['category_id'], det[
+                            'bbox'], det['score']
+                        bbox_pred = '{} {} '.format(self.catid2name[catid],
+                                                    score) + ' '.join(
+                                                        [str(e) for e in bbox])
+                        f.write(bbox_pred + '\n')
+
+            logging.info('The bbox result is saved to {}.'.format(output_dir))
+        else:
+            output = os.path.join(output_dir, "bbox.json")
+            with open(output, 'w') as f:
+                json.dump(results, f)
+
+            logging.info('The bbox result is saved to {}.'.format(output))
+
+    def accumulate(self):
+        if self.output_eval:
+            self.save_results(self.details, self.output_eval, self.imid2path)
+
+        if not self.save_prediction_only:
+            logging.info("Accumulating evaluatation results...")
+            self.detection_map.accumulate()
+
+    def log(self):
+        map_stat = 100. * self.detection_map.get_map()
+        logging.info("mAP({:.2f}, {}) = {:.2f}%".format(
+            self.overlap_thresh, self.map_type, map_stat))
+
+    def get(self):
+        map_stat = 100. * self.detection_map.get_map()
+        stats = {'mAP': map_stat}
+        return stats
+
+    def get_results(self):
+        return {'bbox': [self.detection_map.get_map()]}

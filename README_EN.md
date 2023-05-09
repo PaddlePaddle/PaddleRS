@@ -108,6 +108,7 @@ PaddleRS is an end-to-end high-efficent development toolkit for remote sensing a
         <details><summary><b>Object Detection</b></summary>
         <ul>
           <li><a href="./tutorials/train/object_detection/faster_rcnn.py">Faster R-CNN</a></li>
+          <li><a href="./tutorials/train/object_detection/fcosr.py">FCOSR</a></li>
           <li><a href="./tutorials/train/object_detection/ppyolo.py">PP-YOLO</a></li>
           <li><a href="./tutorials/train/object_detection/ppyolo_tiny.py">PP-YOLO Tiny</a></li>
           <li><a href="./tutorials/train/object_detection/ppyolov2.py">PP-YOLOv2</a></li>

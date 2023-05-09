@@ -57,13 +57,14 @@ The initialization parameter list is as follows:
 |-------|----|--------|-----|
 |`data_dir`|`str`|Directory that stores the dataset.||
 |`image_dir`|`str`|Directory of input images.||
-|`ann_path`|`str`|[COCO Format](https://cocodataset.org/#home)label file path.||
+|`anno_path`|`str`|[COCO Format](https://cocodataset.org/#home)label file path.||
 |`transforms`|`paddlers.transforms.Compose`|Data transformation operators applied to input data.||
 |`label_list`|`str` \| `None`|Label list path. Label list is a text file, in which each line contains the name of class.|`None`|
 |`num_workers`|`int` \| `str`|Number of auxiliary processes used when loading data. If it is set to `'auto'`, use the following rules to determine the number of processes to use: When the number of CPU cores is greater than 16, 8 data read auxiliary processes are used; otherwise, the number of auxiliary processes is set to half the counts of CPU cores.|`'auto'`|
 |`shuffle`|`bool`|Whether to randomly shuffle the samples in the dataset.|`False`|
 |`allow_empty`|`bool`|Whether to add negative samples to the dataset.|`False`|
 |`empty_ratio`|`float`|Negative sample ratio. Take effect only if `allow_empty` is `True`. If `empty_ratio` is negative or greater than or equal to 1, all negative samples generated are retained.|`1.0`|
+|`batch_transforms`|`paddlers.transforms.BatchCompose`|Data batch transformation operators applied to input data.||
 
 ### VOC Format Object Detection Dataset `VOCDetDataset`
 
@@ -81,6 +82,7 @@ The initialization parameter list is as follows:
 |`shuffle`|`bool`|Whether to randomly shuffle the samples in the dataset.|`False`|
 |`allow_empty`|`bool`|Whether to add negative samples to the dataset.|`False`|
 |`empty_ratio`|`float`|Negative sample ratio. Takes effect only if `allow_empty` is `True`. If `empty_ratio` is negative or greater than or equal to `1`, all negative samples generated will be retained.|`1.0`|
+|`batch_transforms`|`paddlers.transforms.BatchCompose`|Data batch transformation operators applied to input data.||
 
 The requirements of `VOCDetDataset` for the file list are as follows:
 

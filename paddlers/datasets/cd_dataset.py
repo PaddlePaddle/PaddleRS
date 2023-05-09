@@ -55,9 +55,10 @@ class CDDataset(BaseDataset):
                  num_workers='auto',
                  shuffle=False,
                  with_seg_labels=False,
-                 binarize_labels=False):
+                 binarize_labels=False,
+                 batch_transforms=None):
         super(CDDataset, self).__init__(data_dir, label_list, transforms,
-                                        num_workers, shuffle)
+                                        num_workers, shuffle, batch_transforms)
 
         DELIMETER = ' '
 

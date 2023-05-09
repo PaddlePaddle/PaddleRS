@@ -364,6 +364,24 @@ The Faster R-CNN implementation based on PaddlePaddle.
 | `test_post_nms_top_n (int)`   | Number of predicted boxes to keep after NMS operation at test time                                         | `1000` |
 
 
+## `FCOSR`
+
+The FCOSR implementation based on PaddlePaddle.
+
+| Parameter Name | Description                                                                                                                 | Default Value |
+| --- |-----------------------------------------------------------------------------------------------------------------------------| --- |
+| `num_classes (int)` | Number of target classes                                                                                                    | `80` |
+| `backbone (str)` | Backbone network to use                                                                                      | `'MobileNetV1'` |
+| `anchors (list[list[int]])` | Sizes of predefined anchor boxes                                                                                                   | `[[10, 13], [16, 30], [33, 23], [30, 61], [62, 45 ], [59, 119], [116, 90], [156, 198], [373, 326]]` |
+| `anchor_masks (list[list[int]])` | Masks of predefined anchor boxes                                                                         | `[[6, 7, 8], [3, 4, 5], [0, 1, 2]]` |
+| `ignore_threshold (float)` | IoU threshold used to assign predicted boxes to ground truth boxes | `0.7` |
+| `nms_score_threshold (float)` | NMS score threshold                                             | `0.01` |
+| `nms_topk (int)` | Maximum number of detections to keep before performing NMS             | `1000` |
+| `nms_keep_topk (int)` | Maximum number of prediction boxes to keep after NMS                                            | `100` |
+| `nms_iou_threshold (float)` | NMS IoU threshold                         | `0.45` |
+| `label_smooth (bool)` | Whether to use label smoothing when computing losses  
+
+
 ## `PPYOLO`
 
 The PP-YOLO implementation based on PaddlePaddle.
