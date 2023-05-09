@@ -514,9 +514,9 @@ def get_pretrain_weights(flag, class_name, save_dir, backbone_name=None):
 
 def is_without_backbone(state_dict):
     for k in state_dict.keys():
-        if k.startwith('backbone'):
-            return True
-    return False
+        if k.startswith('backbone'):
+            return False
+    return True
 
 
 def load_pretrain_weights(model, pretrain_weights=None, model_name=None):
@@ -530,7 +530,7 @@ def load_pretrain_weights(model, pretrain_weights=None, model_name=None):
             model_state_dict = model.state_dict()
 
             # Fit for CSPResNet
-            if is_without_backbone:
+            if is_without_backbone(param_state_dict):
                 param_state_dict = {
                     'backbone.' + k: v
                     for k, v in param_state_dict.items()
