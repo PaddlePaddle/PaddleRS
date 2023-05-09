@@ -198,6 +198,7 @@ def train(self,
 |`learning_rate`|`float`|训练时使用的学习率大小，适用于默认优化器。|`0.001`|
 |`warmup_steps`|`int`|默认优化器使用[warm-up策略](https://www.mdpi.com/2079-9292/10/16/2029/htm)的预热轮数。|`0`|
 |`warmup_start_lr`|`int`|默认优化器warm-up阶段使用的初始学习率。|`0`|
+|`scheduler`|`str`|训练时使用的学习率调度器，若为`None`，则使用默认定义的优化器。|`None`|
 |`lr_decay_epochs`|`list` \| `tuple`|默认优化器学习率衰减的milestones，以epoch计。即，在第几个epoch执行学习率的衰减。|`(216, 243)`|
 |`lr_decay_gamma`|`float`|学习率衰减系数，适用于默认优化器。|`0.1`|
 |`cosine_decay_num_epochs`|`int`|使用余弦退火学习率调度器时计算退火周期的参数。|`1000`|

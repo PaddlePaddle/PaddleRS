@@ -198,6 +198,7 @@ The meaning of each parameter is as follows:
 |`learning_rate`|`float`|Learning rate used during training, for default optimizer.|`0.001`|
 |`warmup_steps`|`int`|Number of [warm-up](https://www.mdpi.com/2079-9292/10/16/2029/htm) rounds used by the default optimizer.|`0`|
 |`warmup_start_lr`|`int`|Default initial learning rate used in the warm-up phase of the optimizer.|`0`|
+|`scheduler`|`str`|Learning rate scheduler used for training. If None, a default scheduler will be used.|`None`|
 |`lr_decay_epochs`|`list` \| `tuple`|Milestones of learning rate decline of the default optimizer, in terms of epochs. That is, which epoch the decay of the learning rate occurs.|`(216, 243)`|
 |`lr_decay_gamma`|`float`|Learning rate attenuation coefficient, for default optimizer.|`0.1`|
 |`cosine_decay_num_epochs`|`int`|Parameter to determine the annealing cycle when a cosine annealing learning rate scheduler is used.|`1000`|

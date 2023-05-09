@@ -295,6 +295,8 @@ class BaseDetector(BaseModel):
                 Defaults to 0.
             warmup_start_lr (float, optional): Start learning rate of warm-up training. 
                 Defaults to 0..
+            scheduler (str, optional): Learning rate scheduler used for training. If None,
+                a default scheduler will be used. Default to None.
             lr_decay_epochs (list|tuple, optional): Epoch milestones for learning 
                 rate decay. Defaults to (216, 243).
             lr_decay_gamma (float, optional): Gamma coefficient of learning rate decay. 
@@ -313,9 +315,9 @@ class BaseDetector(BaseModel):
             use_vdl(bool, optional): Whether to use VisualDL to monitor the training 
                 process. Defaults to True.
             clip_grad_by_norm (float, optional): Maximum global norm for gradient clipping. 
-                Default: None.
+                Default to None.
             reg_coeff (float, optional): Coefficient for L2 weight decay regularization.
-                Default: 1e-4.
+                Default to 1e-4.
             resume_checkpoint (str|None, optional): Path of the checkpoint to resume
                 training from. If None, no training checkpoint will be resumed. At most
                 Aone of `resume_checkpoint` and `pretrain_weights` can be set simultaneously.
