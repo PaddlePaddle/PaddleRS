@@ -93,9 +93,12 @@ eval_dataset = pdrs.datasets.COCODetDataset(
     batch_transforms=eval_batch_transforms)
 
 # 构建YOLOE-R模型
+# 使用如下方式查看PPYOLOE-R支持的backbone
+# print(pdrs.tasks.det.PPYOLOE_R.supported_backbones) 
+
 # 目前已支持的模型请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/intro/model_zoo.md
 model = pdrs.tasks.det.PPYOLOE_R(
-    backbone="CSPResNet",
+    backbone="CSPResNet_m",
     num_classes=15,
     nms_score_threshold=0.1,
     nms_topk=2000,

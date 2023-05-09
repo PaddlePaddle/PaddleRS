@@ -342,13 +342,13 @@ imagenet_weights = {
     'https://bj.bcebos.com/paddleseg/dygraph/hrnet_w48_ssld.tar.gz',
     'FCOSR_ResNeXt50_32x4d_IMAGENET':
     'https://paddledet.bj.bcebos.com/models/pretrained/ResNeXt50_32x4d_pretrained.pdparams',
-    'PPYOLOE_R_CSPResNet_l':
+    'PPYOLOE_R_CSPResNet_l_IMAGENET':
     'https://paddledet.bj.bcebos.com/models/pretrained/CSPResNetb_l_pretrained.pdparams',
-    'PPYOLOE_R_CSPResNet_m':
+    'PPYOLOE_R_CSPResNet_m_IMAGENET':
     'https://paddledet.bj.bcebos.com/models/pretrained/CSPResNetb_m_pretrained.pdparams',
-    'PPYOLOE_R_CSPResNet_s':
+    'PPYOLOE_R_CSPResNet_s_IMAGENET':
     'https://paddledet.bj.bcebos.com/models/pretrained/CSPResNetb_s_pretrained.pdparams',
-    'PPYOLOE_R_CSPResNet_x':
+    'PPYOLOE_R_CSPResNet_x_IMAGENET':
     'https://paddledet.bj.bcebos.com/models/pretrained/CSPResNetb_x_pretrained.pdparams',
 }
 
@@ -512,6 +512,13 @@ def get_pretrain_weights(flag, class_name, save_dir, backbone_name=None):
     return fname
 
 
+def is_without_backbone(state_dict):
+    for k in state_dict.keys():
+        if k.startwith('backbone'):
+            return True
+    return False
+
+
 def load_pretrain_weights(model, pretrain_weights=None, model_name=None):
     if pretrain_weights is not None:
         logging.info(
@@ -521,6 +528,13 @@ def load_pretrain_weights(model, pretrain_weights=None, model_name=None):
         if os.path.exists(pretrain_weights):
             param_state_dict = paddle.load(pretrain_weights)
             model_state_dict = model.state_dict()
+
+            # Fit for CSPResNet
+            if is_without_backbone:
+                param_state_dict = {
+                    'backbone.' + k: v
+                    for k, v in param_state_dict.items()
+                }
             # HACK: Fit for faster rcnn. Pretrain weights contain prefix of 'backbone'
             # while res5 module is located in bbox_head.head. Replace the prefix of
             # res5 with 'bbox_head.head' to load pretrain weights correctly.

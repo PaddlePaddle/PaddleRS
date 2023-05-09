@@ -1103,6 +1103,7 @@ class _YOLOv3(BaseDetector):
                     kwargs.update(dict(depth_mult=0.33, width_mult=0.5))
                 elif backbone == 'CSPResNet_x':
                     kwargs.update(dict(depth_mult=1.33, width_mult=1.25))
+                backbone = 'CSPResNet'
 
             elif backbone == 'DarkNet53':
                 backbone = 'DarkNet'
