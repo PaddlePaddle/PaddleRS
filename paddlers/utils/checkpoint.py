@@ -80,7 +80,10 @@ det_pretrain_weights_dict = {
     'MaskRCNN_ResNet101_fpn': ['COCO', 'IMAGENET'],
     'MaskRCNN_ResNet101_vd_fpn': ['COCO', 'IMAGENET'],
     'FCOSR_ResNeXt50_32x4d': ['IMAGENET'],
-    'PPYOLOE_R_CSPResNet': ['IMAGENET'],
+    'PPYOLOE_R_CSPResNet_l': ['IMAGENET'],
+    'PPYOLOE_R_CSPResNet_m': ['IMAGENET'],
+    'PPYOLOE_R_CSPResNet_s': ['IMAGENET'],
+    'PPYOLOE_R_CSPResNet_x': ['IMAGENET']
 }
 
 res_pretrain_weights_dict = {}
@@ -339,8 +342,14 @@ imagenet_weights = {
     'https://bj.bcebos.com/paddleseg/dygraph/hrnet_w48_ssld.tar.gz',
     'FCOSR_ResNeXt50_32x4d_IMAGENET':
     'https://paddledet.bj.bcebos.com/models/pretrained/ResNeXt50_32x4d_pretrained.pdparams',
-    'PPYOLOE_R_CSPResNet':
+    'PPYOLOE_R_CSPResNet_l':
     'https://paddledet.bj.bcebos.com/models/pretrained/CSPResNetb_l_pretrained.pdparams',
+    'PPYOLOE_R_CSPResNet_m':
+    'https://paddledet.bj.bcebos.com/models/pretrained/CSPResNetb_m_pretrained.pdparams',
+    'PPYOLOE_R_CSPResNet_s':
+    'https://paddledet.bj.bcebos.com/models/pretrained/CSPResNetb_s_pretrained.pdparams',
+    'PPYOLOE_R_CSPResNet_x':
+    'https://paddledet.bj.bcebos.com/models/pretrained/CSPResNetb_x_pretrained.pdparams',
 }
 
 pascalvoc_weights = {

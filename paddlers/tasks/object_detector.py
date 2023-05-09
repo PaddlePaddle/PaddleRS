@@ -58,6 +58,7 @@ class BaseDetector(BaseModel):
         'rbox':
         {'im_id', 'image_shape', 'image', 'gt_bbox', 'gt_class', 'gt_poly'},
     }
+    supported_backbones = None
 
     def __init__(self, model_name, num_classes=80, **params):
         self.init_params.update(locals())
@@ -102,6 +103,12 @@ class BaseDetector(BaseModel):
                 shape=[image_shape[0], 2], name='scale_factor', dtype='float32')
         }]
         return input_spec
+
+    def _check_backbone(self, backbone):
+        if backbone not in self.supported_backbones:
+            raise ValueError(
+                "backbone: {} is not supported. Please choose one of "
+                "{}.".format(backbone, self.supported_backbones))
 
     def _check_image_shape(self, image_shape):
         if len(image_shape) == 2:
@@ -798,6 +805,9 @@ class BaseDetector(BaseModel):
 
 
 class PicoDet(BaseDetector):
+    supported_backbones = ('ESNet_s', 'ESNet_m', 'ESNet_l', 'LCNet',
+                           'MobileNetV3', 'ResNet18_vd')
+
     def __init__(self,
                  num_classes=80,
                  backbone='ESNet_m',
@@ -807,14 +817,8 @@ class PicoDet(BaseDetector):
                  nms_iou_threshold=.6,
                  **params):
         self.init_params = locals()
-        if backbone not in {
-                'ESNet_s', 'ESNet_m', 'ESNet_l', 'LCNet', 'MobileNetV3',
-                'ResNet18_vd'
-        }:
-            raise ValueError(
-                "backbone: {} is not supported. Please choose one of "
-                "{'ESNet_s', 'ESNet_m', 'ESNet_l', 'LCNet', 'MobileNetV3', 'ResNet18_vd'}.".
-                format(backbone))
+        self._check_backbone(backbone)
+
         self.backbone_name = backbone
         if params.get('with_net', True):
             kwargs = {}
@@ -1025,6 +1029,10 @@ class PicoDet(BaseDetector):
 
 
 class _YOLOv3(BaseDetector):
+    supported_backbones = ('MobileNetV1', 'MobileNetV1_ssld', 'MobileNetV3',
+                           'MobileNetV3_ssld', 'DarkNet53', 'ResNet50_vd_dcn',
+                           'ResNet34')
+
     def __init__(self,
                  rotate=False,
                  num_classes=80,
@@ -1042,16 +1050,7 @@ class _YOLOv3(BaseDetector):
                  label_smooth=False,
                  **params):
         self.init_params = locals()
-        if backbone not in {
-                'MobileNetV1', 'MobileNetV1_ssld', 'MobileNetV3',
-                'MobileNetV3_ssld', 'DarkNet53', 'ResNet50_vd_dcn', 'ResNet34',
-                'ResNeXt50_32x4d', 'CSPResNet'
-        }:
-            raise ValueError(
-                "backbone: {} is not supported. Please choose one of "
-                "{'MobileNetV1', 'MobileNetV1_ssld', 'MobileNetV3', 'MobileNetV3_ssld', 'DarkNet53', "
-                "'ResNet50_vd_dcn', 'ResNet34', 'ResNeXt50_32x4d', 'CSPResNet'}.".
-                format(backbone))
+        self._check_backbone(backbone)
 
         self.backbone_name = backbone
         if params.get('with_net', True):
@@ -1086,7 +1085,7 @@ class _YOLOv3(BaseDetector):
                         base_width=4,
                         groups=32,
                         freeze_norm=False))
-            elif backbone == 'CSPResNet':
+            elif backbone.startswith('CSPResNet'):
                 kwargs.update(
                     dict(
                         layers=[3, 6, 6, 3],
@@ -1094,6 +1093,15 @@ class _YOLOv3(BaseDetector):
                         return_idx=[1, 2, 3],
                         use_large_stem=True,
                         use_alpha=True))
+                if backbone == 'CSPResNet_l':
+                    kwargs.update(dict(depth_mult=1.0, width_mult=1.0))
+                elif backbone == 'CSPResNet_m':
+                    kwargs.update(dict(depth_mult=0.67, width_mult=0.75))
+                elif backbone == 'CSPResNet_s':
+                    kwargs.update(dict(depth_mult=0.33, width_mult=0.5))
+                elif backbone == 'CSPResNet_x':
+                    kwargs.update(dict(depth_mult=1.33, width_mult=1.25))
+
             elif backbone == 'DarkNet53':
                 backbone = 'DarkNet'
 
@@ -1195,6 +1203,10 @@ class _YOLOv3(BaseDetector):
 
 
 class FasterRCNN(BaseDetector):
+    supported_backbones = ('ResNet50', 'ResNet50_vd', 'ResNet50_vd_ssld',
+                           'ResNet34', 'ResNet34_vd', 'ResNet101',
+                           'ResNet101_vd', 'HRNet_W18')
+
     def __init__(self,
                  num_classes=80,
                  backbone='ResNet50',
@@ -1212,14 +1224,8 @@ class FasterRCNN(BaseDetector):
                  test_post_nms_top_n=1000,
                  **params):
         self.init_params = locals()
-        if backbone not in {
-                'ResNet50', 'ResNet50_vd', 'ResNet50_vd_ssld', 'ResNet34',
-                'ResNet34_vd', 'ResNet101', 'ResNet101_vd', 'HRNet_W18'
-        }:
-            raise ValueError(
-                "backbone: {} is not supported. Please choose one of "
-                "{'ResNet50', 'ResNet50_vd', 'ResNet50_vd_ssld', 'ResNet34', 'ResNet34_vd', "
-                "'ResNet101', 'ResNet101_vd', 'HRNet_W18'}.".format(backbone))
+        self._check_backbone(backbone)
+
         self.backbone_name = backbone
 
         if params.get('with_net', True):
@@ -1455,6 +1461,9 @@ class FasterRCNN(BaseDetector):
 
 
 class PPYOLO(_YOLOv3):
+    supported_backbones = ('ResNet50_vd_dcn', 'ResNet18_vd',
+                           'MobileNetV3_large', 'MobileNetV3_small')
+
     def __init__(self,
                  num_classes=80,
                  backbone='ResNet50_vd_dcn',
@@ -1475,14 +1484,8 @@ class PPYOLO(_YOLOv3):
                  nms_iou_threshold=0.45,
                  **params):
         self.init_params = locals()
-        if backbone not in {
-                'ResNet50_vd_dcn', 'ResNet18_vd', 'MobileNetV3_large',
-                'MobileNetV3_small'
-        }:
-            raise ValueError(
-                "backbone: {} is not supported. Please choose one of "
-                "{'ResNet50_vd_dcn', 'ResNet18_vd', 'MobileNetV3_large', 'MobileNetV3_small'}.".
-                format(backbone))
+        self._check_backbone(backbone)
+
         self.backbone_name = backbone
         self.downsample_ratios = [
             32, 16, 8
@@ -1643,6 +1646,8 @@ class PPYOLO(_YOLOv3):
 
 
 class PPYOLOTiny(_YOLOv3):
+    supported_backbones = ('MobileNetV3', )
+
     def __init__(self,
                  num_classes=80,
                  backbone='MobileNetV3',
@@ -1667,6 +1672,7 @@ class PPYOLOTiny(_YOLOv3):
             logging.warning("PPYOLOTiny only supports MobileNetV3 as backbone. "
                             "Backbone is forcibly set to MobileNetV3.")
         self.backbone_name = 'MobileNetV3'
+
         self.downsample_ratios = [32, 16, 8]
         if params.get('with_net', True):
             if paddlers.env_info['place'] == 'gpu' and paddlers.env_info[
@@ -1771,6 +1777,8 @@ class PPYOLOTiny(_YOLOv3):
 
 
 class PPYOLOv2(_YOLOv3):
+    supported_backbones = ('ResNet50_vd_dcn', 'ResNet101_vd_dcn')
+
     def __init__(self,
                  num_classes=80,
                  backbone='ResNet50_vd_dcn',
@@ -1791,10 +1799,7 @@ class PPYOLOv2(_YOLOv3):
                  nms_iou_threshold=0.45,
                  **params):
         self.init_params = locals()
-        if backbone not in {'ResNet50_vd_dcn', 'ResNet101_vd_dcn'}:
-            raise ValueError(
-                "backbone: {} is not supported. Please choose one of "
-                "{'ResNet50_vd_dcn', 'ResNet101_vd_dcn'}.".format(backbone))
+        self._check_backbone(backbone)
         self.backbone_name = backbone
         self.downsample_ratios = [32, 16, 8]
 
@@ -1918,6 +1923,9 @@ class PPYOLOv2(_YOLOv3):
 
 
 class MaskRCNN(BaseDetector):
+    supported_backbones = ('ResNet50', 'ResNet50_vd', 'ResNet50_vd_ssld',
+                           'ResNet101', 'ResNet101_vd')
+
     def __init__(self,
                  num_classes=80,
                  backbone='ResNet50_vd',
@@ -1935,14 +1943,7 @@ class MaskRCNN(BaseDetector):
                  test_post_nms_top_n=1000,
                  **params):
         self.init_params = locals()
-        if backbone not in {
-                'ResNet50', 'ResNet50_vd', 'ResNet50_vd_ssld', 'ResNet101',
-                'ResNet101_vd'
-        }:
-            raise ValueError(
-                "backbone: {} is not supported. Please choose one of "
-                "{'ResNet50', 'ResNet50_vd', 'ResNet50_vd_ssld', 'ResNet101', 'ResNet101_vd'}.".
-                format(backbone))
+        self._check_backbone(backbone)
 
         self.backbone_name = backbone + '_fpn' if with_fpn else backbone
         dcn_v2_stages = [1, 2, 3] if with_dcn else [-1]
@@ -2187,6 +2188,8 @@ class MaskRCNN(BaseDetector):
 
 
 class FCOSR(_YOLOv3):
+    supported_backbones = {'ResNeXt50_32x4d'}
+
     def __init__(self,
                  num_classes=80,
                  backbone='ResNeXt50_32x4d',
@@ -2202,6 +2205,7 @@ class FCOSR(_YOLOv3):
                  nms_normalized=True,
                  label_smooth=False,
                  **params):
+        self._check_backbone(backbone)
         local = locals()
         local['rotate'] = True
         local.pop('self')
@@ -2242,6 +2246,9 @@ class FCOSR(_YOLOv3):
 
 
 class PPYOLOE_R(_YOLOv3):
+    supported_backbones = ('CSPResNet_m', 'CSPResNet_l', 'CSPResNet_s',
+                           'CSPResNet_x')
+
     def __init__(self,
                  num_classes=80,
                  backbone='CSPResNet',
@@ -2257,6 +2264,7 @@ class PPYOLOE_R(_YOLOv3):
                  nms_normalized=True,
                  label_smooth=False,
                  **params):
+        self._check_backbone(backbone)
         local = locals()
         local['rotate'] = True
         local.pop('self')
