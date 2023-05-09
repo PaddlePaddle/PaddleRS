@@ -43,6 +43,7 @@ __all__ = [
     "PPYOLOv2",
     "MaskRCNN",
     "FCOSR",
+    "PPYOLOE_R",
 ]
 
 # TODO: Prune and decoupling
@@ -254,6 +255,7 @@ class BaseDetector(BaseModel):
               early_stop_patience=5,
               use_vdl=True,
               clip_grad_by_norm=None,
+              reg_coeff=1e-4,
               resume_checkpoint=None,
               precision='fp32',
               amp_level='O1',
@@ -303,6 +305,10 @@ class BaseDetector(BaseModel):
             early_stop_patience (int, optional): Early stop patience. Defaults to 5.
             use_vdl(bool, optional): Whether to use VisualDL to monitor the training 
                 process. Defaults to True.
+            clip_grad_by_norm (float, optional): Maximum global norm for gradient clipping. 
+                Default: None.
+            reg_coeff (float, optional): Coefficient for L2 weight decay regularization.
+                Default: 1e-4.
             resume_checkpoint (str|None, optional): Path of the checkpoint to resume
                 training from. If None, no training checkpoint will be resumed. At most
                 Aone of `resume_checkpoint` and `pretrain_weights` can be set simultaneously.
@@ -330,14 +336,14 @@ class BaseDetector(BaseModel):
     def _pre_train(self, in_args):
         return in_args
 
-    def _real_train(self, num_epochs, train_dataset, train_batch_size,
-                    eval_dataset, optimizer, save_interval_epochs,
-                    log_interval_steps, save_dir, pretrain_weights,
-                    learning_rate, warmup_steps, warmup_start_lr,
-                    lr_decay_epochs, lr_decay_gamma, metric, use_ema,
-                    early_stop, early_stop_patience, use_vdl, resume_checkpoint,
-                    scheduler, cosine_decay_num_epochs, clip_grad_by_norm,
-                    precision, amp_level, custom_white_list, custom_black_list):
+    def _real_train(
+            self, num_epochs, train_dataset, train_batch_size, eval_dataset,
+            optimizer, save_interval_epochs, log_interval_steps, save_dir,
+            pretrain_weights, learning_rate, warmup_steps, warmup_start_lr,
+            lr_decay_epochs, lr_decay_gamma, metric, use_ema, early_stop,
+            early_stop_patience, use_vdl, resume_checkpoint, scheduler,
+            cosine_decay_num_epochs, clip_grad_by_norm, reg_coeff, precision,
+            amp_level, custom_white_list, custom_black_list):
         self.precision = precision
         self.amp_level = amp_level
         self.custom_white_list = custom_white_list
@@ -389,7 +395,8 @@ class BaseDetector(BaseModel):
                 num_steps_each_epoch=num_steps_each_epoch,
                 num_epochs=num_epochs,
                 clip_grad_by_norm=clip_grad_by_norm,
-                cosine_decay_num_epochs=cosine_decay_num_epochs)
+                cosine_decay_num_epochs=cosine_decay_num_epochs,
+                reg_coeff=reg_coeff, )
         else:
             self.optimizer = optimizer
 
@@ -1038,13 +1045,13 @@ class YOLOv3(BaseDetector):
         if backbone not in {
                 'MobileNetV1', 'MobileNetV1_ssld', 'MobileNetV3',
                 'MobileNetV3_ssld', 'DarkNet53', 'ResNet50_vd_dcn', 'ResNet34',
-                'ResNeXt50_32x4d'
+                'ResNeXt50_32x4d', 'CSPResNet'
         }:
             raise ValueError(
                 "backbone: {} is not supported. Please choose one of "
                 "{'MobileNetV1', 'MobileNetV1_ssld', 'MobileNetV3', 'MobileNetV3_ssld', 'DarkNet53', "
-                "'ResNet50_vd_dcn', 'ResNet34', 'ResNeXt50_32x4d'}.".format(
-                    backbone))
+                "'ResNet50_vd_dcn', 'ResNet34', 'ResNeXt50_32x4d', 'CSPResNet'}.".
+                format(backbone))
 
         self.backbone_name = backbone
         if params.get('with_net', True):
@@ -1079,6 +1086,14 @@ class YOLOv3(BaseDetector):
                         base_width=4,
                         groups=32,
                         freeze_norm=False))
+            elif backbone == 'CSPResNet':
+                kwargs.update(
+                    dict(
+                        layers=[3, 6, 6, 3],
+                        channels=[64, 128, 256, 512, 1024],
+                        return_idx=[1, 2, 3],
+                        use_large_stem=True,
+                        use_alpha=True))
 
             backbone = self._get_backbone(backbone, **kwargs)
             nms = ppdet.modeling.MultiClassNMS(
@@ -1088,29 +1103,8 @@ class YOLOv3(BaseDetector):
                 nms_threshold=nms_iou_threshold,
                 normalized=nms_normalized)
             if rotate:
-                neck = ppdet.modeling.FPN(
-                    in_channels=[i.channels for i in backbone.out_shape],
-                    out_channel=256,
-                    has_extra_convs=True,
-                    use_c5=False,
-                    relu_before_extra_convs=True)
-                assigner = ppdet.modeling.FCOSRAssigner(
-                    num_classes=num_classes,
-                    factor=12,
-                    threshold=0.23,
-                    boundary=[[-1, 64], [64, 128], [128, 256], [256, 512],
-                              [512, 100000000.0]])
-                yolo_head = ppdet.modeling.FCOSRHead(
-                    num_classes=num_classes,
-                    in_channels=[i.channels for i in neck.out_shape],
-                    feat_channels=256,
-                    fpn_strides=[8, 16, 32, 64, 128],
-                    stacked_convs=4,
-                    loss_weight={'class': 1.,
-                                 'probiou': 1.},
-                    assigner=assigner,
-                    nms=nms)
-                post_process = None
+                neck, yolo_head, post_process = self._build_rotated_modules(
+                    locals())
             else:
                 neck = ppdet.modeling.YOLOv3FPN(
                     norm_type=norm_type,
@@ -1146,6 +1140,9 @@ class YOLOv3(BaseDetector):
             model_name='YOLOv3', num_classes=num_classes, **params)
         self.anchors = anchors
         self.anchor_masks = anchor_masks
+
+    def _build_rotated_modules(self, params):
+        raise NotImplementedError()
 
     def _default_batch_transforms(self, mode='train'):
         if mode == 'train':
@@ -2187,4 +2184,118 @@ class MaskRCNN(BaseDetector):
         return self._define_input_spec(image_shape)
 
 
-FCOSR = functools.partial(YOLOv3, rotate=True)
+class FCOSR(YOLOv3):
+    def __init__(self,
+                 num_classes=80,
+                 backbone='ResNeXt50_32x4d',
+                 post_process=None,
+                 anchors=[[10, 13], [16, 30], [33, 23], [30, 61], [62, 45],
+                          [59, 119], [116, 90], [156, 198], [373, 326]],
+                 anchor_masks=[[6, 7, 8], [3, 4, 5], [0, 1, 2]],
+                 ignore_threshold=0.7,
+                 nms_score_threshold=0.01,
+                 nms_topk=1000,
+                 nms_keep_topk=100,
+                 nms_iou_threshold=0.45,
+                 nms_normalized=True,
+                 label_smooth=False,
+                 **params):
+        local = locals()
+        local['rotate'] = True
+        local.pop('self')
+        local.pop('__class__')
+        local.pop('params')
+        super(FCOSR, self).__init__(**local, **params)
+        self.model_name = 'FCOSR'
+
+    def _build_rotated_modules(self, params):
+        backbone = params['backbone']
+        num_classes = params['num_classes']
+        nms = params['nms']
+        neck = ppdet.modeling.FPN(
+            in_channels=[i.channels for i in backbone.out_shape],
+            out_channel=256,
+            has_extra_convs=True,
+            use_c5=False,
+            relu_before_extra_convs=True)
+        assigner = ppdet.modeling.FCOSRAssigner(
+            num_classes=num_classes,
+            factor=12,
+            threshold=0.23,
+            boundary=[[-1, 64], [64, 128], [128, 256], [256, 512],
+                      [512, 100000000.0]])
+        yolo_head = ppdet.modeling.FCOSRHead(
+            num_classes=num_classes,
+            in_channels=[i.channels for i in neck.out_shape],
+            feat_channels=256,
+            fpn_strides=[8, 16, 32, 64, 128],
+            stacked_convs=4,
+            loss_weight={'class': 1.,
+                         'probiou': 1.},
+            assigner=assigner,
+            nms=nms)
+        post_process = None
+
+        return neck, yolo_head, post_process
+
+
+class PPYOLOE_R(YOLOv3):
+    def __init__(self,
+                 num_classes=80,
+                 backbone='CSPResNet',
+                 post_process=None,
+                 anchors=[[10, 13], [16, 30], [33, 23], [30, 61], [62, 45],
+                          [59, 119], [116, 90], [156, 198], [373, 326]],
+                 anchor_masks=[[6, 7, 8], [3, 4, 5], [0, 1, 2]],
+                 ignore_threshold=0.7,
+                 nms_score_threshold=0.01,
+                 nms_topk=1000,
+                 nms_keep_topk=100,
+                 nms_iou_threshold=0.45,
+                 nms_normalized=True,
+                 label_smooth=False,
+                 **params):
+        local = locals()
+        local['rotate'] = True
+        local.pop('self')
+        local.pop('__class__')
+        local.pop('params')
+        super(PPYOLOE_R, self).__init__(**local, **params)
+        self.model_name = 'PPYOLOE_R'
+
+    def _build_rotated_modules(self, params):
+        backbone = params['backbone']
+        num_classes = params['num_classes']
+        nms = params['nms']
+        neck = ppdet.modeling.CustomCSPPAN(
+            in_channels=[i.channels for i in backbone.out_shape],
+            out_channels=[768, 384, 192],
+            stage_num=1,
+            block_num=3,
+            act='swish',
+            spp=True,
+            use_alpha=True)
+        static_assigner = ppdet.modeling.FCOSRAssigner(
+            num_classes=num_classes,
+            factor=12,
+            threshold=0.23,
+            boundary=[[512, 10000], [256, 512], [-1, 256]])
+        assigner = ppdet.modeling.RotatedTaskAlignedAssigner(
+            topk=13,
+            alpha=1.0,
+            beta=6.0, )
+        yolo_head = ppdet.modeling.PPYOLOEHead(
+            num_classes=num_classes,
+            in_channels=[i.channels for i in neck.out_shape],
+            fpn_strides=[32, 16, 8],
+            grid_cell_offset=0.5,
+            use_varifocal_loss=True,
+            loss_weight={'class': 1.,
+                         'iou': 2.5,
+                         'dfl': 0.05},
+            static_assigner=static_assigner,
+            assigner=assigner,
+            nms=nms)
+        post_process = None
+
+        return neck, yolo_head, post_process
