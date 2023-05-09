@@ -62,30 +62,7 @@ python setup.py install
 ```
 
 
-除了采用上述安装步骤以外，PaddleRS也提供Docker安装方式。具体步骤如下：
-
-1. 从dockerhub拉取镜像:
-
-```shell
-docker pull paddlepaddle/paddlers:1.0.0  # 暂无
-```
-
-或者，可以选择从头开始构建。通过修改`Dockerfile`文件中的`PPTAG`，可选择PaddlePaddle的多种基础镜像。
-
-```shell
-git clone https://github.com/PaddlePaddle/PaddleRS
-cd PaddleRS
-docker build -t <imageName> .  # 默认使用PaddlePaddle 2.4.1的CPU版本
-# docker build -t <imageName> . --build-arg PPTAG=2.4.1-gpu-cuda10.2-cudnn7.6-trt7.0  # 构建使用GPU版本PaddlePaddle的环境
-# 其余tag可以参考：https://hub.docker.com/r/paddlepaddle/paddle/tags
-```
-
-2. 启动容器
-
-```shell
-docker images  # 查看镜像的ID
-docker run -it <imageID>
-```
+除了采用上述安装步骤以外，PaddleRS也提供Docker安装方式。具体请参考[文档](../docker/README.md)。
 
 ## 模型训练
 
