@@ -62,7 +62,7 @@ python setup.py install
 ```
 
 
-除了采用上述安装步骤以外，PaddleRS也提供Docker安装方式。具体请参考[文档](../docker/README.md)。
+除了采用上述安装步骤以外，PaddleRS也提供Docker安装方式，具体请参考[文档](../docker/README.md)，以及[使用说明](docker_workflow.md)。
 
 ## 模型训练
 

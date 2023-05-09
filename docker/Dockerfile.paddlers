@@ -29,6 +29,8 @@ ARG EISEG
 RUN if [ "$EISEG" = "ON" ] ; then \
 	pip install --upgrade pip \
 	&& pip install eiseg rasterio -i https://mirror.baidu.com/pypi/simple \
+	&& pip uninstall -y opencv-python-headless \
+	&& pip install opencv-python==4.2.0.34 -i https://mirror.baidu.com/pypi/simple \
 	&& apt-get update \
 	&& apt-get install -y \
 	libgl1-mesa-glx libxcb-xinerama0 libxkbcommon-x11-0 \

@@ -24,4 +24,4 @@ WORKDIR /opt/GeoView/frontend
 RUN npm install
 
 # 5. finish
-WORKDIR /opt/GeoView/PaddleRS
+WORKDIR /opt/GeoView

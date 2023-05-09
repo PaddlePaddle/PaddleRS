@@ -47,7 +47,7 @@ docker images
 docker run -it -v <本机文件夹绝对路径:容器文件夹绝对路径> <imageID>
 ```
 
-- 若需要使用EISeg，则需要在本机安装和开启X11，用于接收Qt的GUI界面。Windows可使用[VcXsrv](https://sourceforge.net/projects/vcxsrv/)，Linux可使用[Xserver](https://blog.csdn.net/a806689294/article/details/111462627)。然后启动EISeg：
+- 若需要使用EISeg，则需要在本机安装和开启X11，用于接收Qt的GUI界面。Windows可使用[VcXsrv](https://sourceforge.net/projects/vcxsrv/)，Linux可使用[Xserver](https://blog.csdn.net/a806689294/article/details/111462627)。在相关工具启动之后，再启动EISeg：
 
 ```shell
 eiseg
@@ -55,10 +55,10 @@ eiseg
 
 - 若需要使用GeoView，则需要按照如下方式启动：
 
-  1. 新建一个终端，启动镜像加载后端：
+  1. 新建一个终端，启动镜像加载后端，将训练好的模型挂载到容器内：
 
   ```shell
-  docker run --name <containerName> -p 5008:5008 -p 3000:3000 -it <imageID>
+  docker run --name <containerName> -p 5008:5008 -p 3000:3000 -it -v <本机文件夹绝对路径:容器文件夹绝对路径> <imageID>
   ```
 
   2. 启动MySQL：
@@ -90,13 +90,14 @@ eiseg
   vim ../config.yaml
   ```
 
+  6. 参考GeoView的文档进行[模型准备](https://github.com/geoyee/GeoView/blob/develop/docs/dev.md)，将容器内的模型使用`cp -r <model_path> /opt/GeoView/backend/model/<task_type>/<model_path>`。
   6. 启动后端：
 
   ```shell
   python app.py
   ```
 
-  7. 新建一个终端，根据上面的`<containerName>`来启动前端：
+  8. 新建一个终端，根据上面的`<containerName>`来启动前端：
 
   ```shell
   docker exec -it <containerName> bash -c "cd frontend && npm run serve"
