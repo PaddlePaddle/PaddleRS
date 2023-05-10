@@ -55,30 +55,7 @@ cd paddlers/models/ppdet/ext_op
 python setup.py install
 ```
 
-We also provide a docker image for installation:
-
-1. Pull from dockerhub:
-
-```shell
-docker pull paddlepaddle/paddlers:1.0.0
-```
-
-Optionally, you can build the image from scratch. You can change the base images for different PaddlePaddle versions by setting `PPTAG` in `Dockerfile`.
-
-```shell
-git clone https://github.com/PaddlePaddle/PaddleRS
-cd PaddleRS
-docker build -t <imageName> .  # Default is PaddlePaddle-2.4.1-CPU
-# docker build -t <imageName> . --build-arg PPTAG=2.4.1-gpu-cuda10.2-cudnn7.6-trt7.0  # Use a GPU version of PaddlePaddle
-# For more tags, please refer to: https://hub.docker.com/r/paddlepaddle/paddle/tags
-```
-
-2. Start a container
-
-```shell
-docker images  # View the ID of the image
-docker run -it <imageID>
-```
+We also provide a docker image for installation, see [here](./docker_en.md).
 
 ## Model Training
 

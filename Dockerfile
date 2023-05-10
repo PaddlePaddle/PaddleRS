@@ -24,5 +24,24 @@ WORKDIR /usr/src
 RUN pip install git+https://github.com/lucasb-eyer/pydensecrf.git \
 	&& rm -rf /usr/src/pydensecrf
 
-# 6. finish
+# 6. (optional) install eiseg
+ARG EISEG
+RUN if [ "$EISEG" = "ON" ] ; then \
+	pip install --upgrade pip \
+	&& pip install eiseg rasterio -i https://mirror.baidu.com/pypi/simple \
+	&& pip uninstall -y opencv-python-headless \
+	&& pip install opencv-python==4.2.0.34 -i https://mirror.baidu.com/pypi/simple \
+	&& apt-get update \
+	&& apt-get install -y \
+	libgl1-mesa-glx libxcb-xinerama0 libxkbcommon-x11-0 \
+	libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 \
+	libxcb-render-util0 libxcb-shape0 libxcb-xfixes0 \
+	x11-xserver-utils x11-apps locales \
+	&& locale-gen zh_CN \
+	&& locale-gen zh_CN.utf8 \
+	&& apt-get install -y ttf-wqy-microhei ttf-wqy-zenhei xfonts-wqy ; \
+	fi
+ENV DISPLAY host.docker.internal:0
+
+# 7. finish
 WORKDIR /opt/PaddleRS
