@@ -78,7 +78,6 @@ model.train(
     save_interval_epochs=5,
     # 每多少次迭代记录一次日志
     log_interval_steps=4,
-    metric='rbox',
     save_dir=EXP_DIR,
     # 指定预训练权重
     pretrain_weights='COCO',

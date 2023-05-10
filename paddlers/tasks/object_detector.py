@@ -137,7 +137,7 @@ class BaseDetector(BaseModel):
             depth = name[0]
             fixed_kwargs['depth'] = int(depth[6:])
             if len(name) > 1:
-                fixed_kwargs['variant'] = name[1]
+                fixed_kwargs['variant'] = name[1][1]
             backbone = getattr(ppdet.modeling, 'ResNet')
             backbone = functools.partial(backbone, **fixed_kwargs)
         else:
@@ -1030,13 +1030,12 @@ class PicoDet(BaseDetector):
                 dataset, batch_size, mode, collate_fn)
 
 
-class _YOLOv3(BaseDetector):
+class YOLOv3(BaseDetector):
     supported_backbones = ('MobileNetV1', 'MobileNetV1_ssld', 'MobileNetV3',
                            'MobileNetV3_ssld', 'DarkNet53', 'ResNet50_vd_dcn',
                            'ResNet34')
 
     def __init__(self,
-                 rotate=False,
                  num_classes=80,
                  backbone='MobileNetV1',
                  post_process=None,
@@ -1079,32 +1078,6 @@ class _YOLOv3(BaseDetector):
                 kwargs.update(
                     dict(
                         return_idx=[1, 2, 3], freeze_at=-1, freeze_norm=False))
-            elif backbone == 'ResNeXt50_32x4d':
-                backbone = 'ResNet50'
-                kwargs.update(
-                    dict(
-                        return_idx=[1, 2, 3],
-                        base_width=4,
-                        groups=32,
-                        freeze_norm=False))
-            elif backbone.startswith('CSPResNet'):
-                kwargs.update(
-                    dict(
-                        layers=[3, 6, 6, 3],
-                        channels=[64, 128, 256, 512, 1024],
-                        return_idx=[1, 2, 3],
-                        use_large_stem=True,
-                        use_alpha=True))
-                if backbone == 'CSPResNet_l':
-                    kwargs.update(dict(depth_mult=1.0, width_mult=1.0))
-                elif backbone == 'CSPResNet_m':
-                    kwargs.update(dict(depth_mult=0.67, width_mult=0.75))
-                elif backbone == 'CSPResNet_s':
-                    kwargs.update(dict(depth_mult=0.33, width_mult=0.5))
-                elif backbone == 'CSPResNet_x':
-                    kwargs.update(dict(depth_mult=1.33, width_mult=1.25))
-                backbone = 'CSPResNet'
-
             elif backbone == 'DarkNet53':
                 backbone = 'DarkNet'
 
@@ -1115,41 +1088,36 @@ class _YOLOv3(BaseDetector):
                 keep_top_k=nms_keep_topk,
                 nms_threshold=nms_iou_threshold,
                 normalized=nms_normalized)
-            if rotate:
-                neck, yolo_head, post_process = self._build_rotated_modules(
-                    locals())
-            else:
-                neck = ppdet.modeling.YOLOv3FPN(
-                    norm_type=norm_type,
-                    in_channels=[i.channels for i in backbone.out_shape])
-                loss = ppdet.modeling.YOLOv3Loss(
-                    num_classes=num_classes,
-                    ignore_thresh=ignore_threshold,
-                    label_smooth=label_smooth)
-                yolo_head = ppdet.modeling.YOLOv3Head(
-                    in_channels=[i.channels for i in neck.out_shape],
-                    anchors=anchors,
-                    anchor_masks=anchor_masks,
-                    num_classes=num_classes,
-                    loss=loss)
-                post_process = ppdet.modeling.BBoxPostProcess(
-                    decode=ppdet.modeling.YOLOBox(num_classes=num_classes),
-                    nms=nms)
-                post_process = ppdet.modeling.BBoxPostProcess(
-                    decode=ppdet.modeling.YOLOBox(num_classes=num_classes),
-                    nms=ppdet.modeling.MultiClassNMS(
-                        score_threshold=nms_score_threshold,
-                        nms_top_k=nms_topk,
-                        keep_top_k=nms_keep_topk,
-                        nms_threshold=nms_iou_threshold,
-                        normalized=nms_normalized))
+            neck = ppdet.modeling.YOLOv3FPN(
+                norm_type=norm_type,
+                in_channels=[i.channels for i in backbone.out_shape])
+            loss = ppdet.modeling.YOLOv3Loss(
+                num_classes=num_classes,
+                ignore_thresh=ignore_threshold,
+                label_smooth=label_smooth)
+            yolo_head = ppdet.modeling.YOLOv3Head(
+                in_channels=[i.channels for i in neck.out_shape],
+                anchors=anchors,
+                anchor_masks=anchor_masks,
+                num_classes=num_classes,
+                loss=loss)
+            post_process = ppdet.modeling.BBoxPostProcess(
+                decode=ppdet.modeling.YOLOBox(num_classes=num_classes), nms=nms)
+            post_process = ppdet.modeling.BBoxPostProcess(
+                decode=ppdet.modeling.YOLOBox(num_classes=num_classes),
+                nms=ppdet.modeling.MultiClassNMS(
+                    score_threshold=nms_score_threshold,
+                    nms_top_k=nms_topk,
+                    keep_top_k=nms_keep_topk,
+                    nms_threshold=nms_iou_threshold,
+                    normalized=nms_normalized))
             params.update({
                 'backbone': backbone,
                 'neck': neck,
                 'yolo_head': yolo_head,
                 'post_process': post_process
             })
-        super(_YOLOv3, self).__init__(
+        super(YOLOv3, self).__init__(
             model_name='YOLOv3', num_classes=num_classes, **params)
         self.anchors = anchors
         self.anchor_masks = anchor_masks
@@ -1463,7 +1431,7 @@ class FasterRCNN(BaseDetector):
         return self._define_input_spec(image_shape)
 
 
-class PPYOLO(_YOLOv3):
+class PPYOLO(YOLOv3):
     supported_backbones = ('ResNet50_vd_dcn', 'ResNet18_vd',
                            'MobileNetV3_large', 'MobileNetV3_small')
 
@@ -1619,7 +1587,8 @@ class PPYOLO(_YOLOv3):
                 'post_process': post_process
             })
 
-        super(PPYOLO, self).__init__(
+        # NOTE: call BaseDetector.__init__ instead of YOLOv3.__init__
+        super(YOLOv3, self).__init__(
             model_name='YOLOv3', num_classes=num_classes, **params)
         self.anchors = anchors
         self.anchor_masks = anchor_masks
@@ -1648,7 +1617,7 @@ class PPYOLO(_YOLOv3):
         return self._define_input_spec(image_shape)
 
 
-class PPYOLOTiny(_YOLOv3):
+class PPYOLOTiny(YOLOv3):
     supported_backbones = ('MobileNetV3', )
 
     def __init__(self,
@@ -1749,7 +1718,8 @@ class PPYOLOTiny(_YOLOv3):
                 'post_process': post_process
             })
 
-        super(PPYOLOTiny, self).__init__(
+        # NOTE: call BaseDetector.__init__ instead of YOLOv3.__init__
+        super(YOLOv3, self).__init__(
             model_name='YOLOv3', num_classes=num_classes, **params)
         self.anchors = anchors
         self.anchor_masks = anchor_masks
@@ -1779,7 +1749,7 @@ class PPYOLOTiny(_YOLOv3):
         return self._define_input_spec(image_shape)
 
 
-class PPYOLOv2(_YOLOv3):
+class PPYOLOv2(YOLOv3):
     supported_backbones = ('ResNet50_vd_dcn', 'ResNet101_vd_dcn')
 
     def __init__(self,
@@ -1815,8 +1785,7 @@ class PPYOLOv2(_YOLOv3):
 
             if backbone == 'ResNet50_vd_dcn':
                 backbone = self._get_backbone(
-                    'ResNet',
-                    variant='d',
+                    backbone,
                     norm_type=norm_type,
                     return_idx=[1, 2, 3],
                     dcn_v2_stages=[3],
@@ -1826,9 +1795,7 @@ class PPYOLOv2(_YOLOv3):
 
             elif backbone == 'ResNet101_vd_dcn':
                 backbone = self._get_backbone(
-                    'ResNet',
-                    depth=101,
-                    variant='d',
+                    backbone,
                     norm_type=norm_type,
                     return_idx=[1, 2, 3],
                     dcn_v2_stages=[3],
@@ -1895,7 +1862,8 @@ class PPYOLOv2(_YOLOv3):
                 'post_process': post_process
             })
 
-        super(PPYOLOv2, self).__init__(
+        # NOTE: call BaseDetector.__init__ instead of YOLOv3.__init__
+        super(YOLOv3, self).__init__(
             model_name='YOLOv3', num_classes=num_classes, **params)
         self.anchors = anchors
         self.anchor_masks = anchor_masks
@@ -2190,7 +2158,7 @@ class MaskRCNN(BaseDetector):
         return self._define_input_spec(image_shape)
 
 
-class FCOSR(_YOLOv3):
+class FCOSR(YOLOv3):
     supported_backbones = {'ResNeXt50_32x4d'}
 
     def __init__(self,
@@ -2200,118 +2168,170 @@ class FCOSR(_YOLOv3):
                  anchors=[[10, 13], [16, 30], [33, 23], [30, 61], [62, 45],
                           [59, 119], [116, 90], [156, 198], [373, 326]],
                  anchor_masks=[[6, 7, 8], [3, 4, 5], [0, 1, 2]],
-                 ignore_threshold=0.7,
                  nms_score_threshold=0.01,
                  nms_topk=1000,
                  nms_keep_topk=100,
                  nms_iou_threshold=0.45,
                  nms_normalized=True,
-                 label_smooth=False,
                  **params):
+        self.init_params = locals()
         self._check_backbone(backbone)
-        local = locals()
-        local['rotate'] = True
-        local.pop('self')
-        local.pop('__class__')
-        local.pop('params')
-        super(FCOSR, self).__init__(**local, **params)
+
+        self.backbone_name = backbone
+        if params.get('with_net', True):
+            if paddlers.env_info['place'] == 'gpu' and paddlers.env_info[
+                    'num'] > 1 and not os.environ.get('PADDLERS_EXPORT_STAGE'):
+                norm_type = 'sync_bn'
+            else:
+                norm_type = 'bn'
+
+            kwargs = {}
+            kwargs['norm_type'] = norm_type
+
+            backbone = 'ResNet50'
+            kwargs.update(
+                dict(
+                    return_idx=[1, 2, 3],
+                    base_width=4,
+                    groups=32,
+                    freeze_norm=False))
+
+            backbone = self._get_backbone(backbone, **kwargs)
+            nms = ppdet.modeling.MultiClassNMS(
+                score_threshold=nms_score_threshold,
+                nms_top_k=nms_topk,
+                keep_top_k=nms_keep_topk,
+                nms_threshold=nms_iou_threshold,
+                normalized=nms_normalized)
+            neck = ppdet.modeling.FPN(
+                in_channels=[i.channels for i in backbone.out_shape],
+                out_channel=256,
+                has_extra_convs=True,
+                use_c5=False,
+                relu_before_extra_convs=True)
+            assigner = ppdet.modeling.FCOSRAssigner(
+                num_classes=num_classes,
+                factor=12,
+                threshold=0.23,
+                boundary=[[-1, 64], [64, 128], [128, 256], [256, 512],
+                          [512, 100000000.0]])
+            yolo_head = ppdet.modeling.FCOSRHead(
+                num_classes=num_classes,
+                in_channels=[i.channels for i in neck.out_shape],
+                feat_channels=256,
+                fpn_strides=[8, 16, 32, 64, 128],
+                stacked_convs=4,
+                loss_weight={'class': 1.,
+                             'probiou': 1.},
+                assigner=assigner,
+                nms=nms)
+            post_process = None
+            params.update({
+                'backbone': backbone,
+                'neck': neck,
+                'yolo_head': yolo_head,
+                'post_process': post_process
+            })
+        # NOTE: call BaseDetector.__init__ instead of YOLOv3.__init__
+        super(YOLOv3, self).__init__(
+            model_name='YOLOv3', num_classes=num_classes, **params)
         self.model_name = 'FCOSR'
-
-    def _build_rotated_modules(self, params):
-        backbone = params['backbone']
-        num_classes = params['num_classes']
-        nms = params['nms']
-        neck = ppdet.modeling.FPN(
-            in_channels=[i.channels for i in backbone.out_shape],
-            out_channel=256,
-            has_extra_convs=True,
-            use_c5=False,
-            relu_before_extra_convs=True)
-        assigner = ppdet.modeling.FCOSRAssigner(
-            num_classes=num_classes,
-            factor=12,
-            threshold=0.23,
-            boundary=[[-1, 64], [64, 128], [128, 256], [256, 512],
-                      [512, 100000000.0]])
-        yolo_head = ppdet.modeling.FCOSRHead(
-            num_classes=num_classes,
-            in_channels=[i.channels for i in neck.out_shape],
-            feat_channels=256,
-            fpn_strides=[8, 16, 32, 64, 128],
-            stacked_convs=4,
-            loss_weight={'class': 1.,
-                         'probiou': 1.},
-            assigner=assigner,
-            nms=nms)
-        post_process = None
-
-        return neck, yolo_head, post_process
+        self.anchors = anchors
+        self.anchor_masks = anchor_masks
 
 
-class PPYOLOE_R(_YOLOv3):
+class PPYOLOE_R(YOLOv3):
     supported_backbones = ('CSPResNet_m', 'CSPResNet_l', 'CSPResNet_s',
                            'CSPResNet_x')
 
     def __init__(self,
                  num_classes=80,
-                 backbone='CSPResNet',
+                 backbone='CSPResNet_l',
                  post_process=None,
                  anchors=[[10, 13], [16, 30], [33, 23], [30, 61], [62, 45],
                           [59, 119], [116, 90], [156, 198], [373, 326]],
                  anchor_masks=[[6, 7, 8], [3, 4, 5], [0, 1, 2]],
-                 ignore_threshold=0.7,
                  nms_score_threshold=0.01,
                  nms_topk=1000,
                  nms_keep_topk=100,
                  nms_iou_threshold=0.45,
                  nms_normalized=True,
-                 label_smooth=False,
                  **params):
+        self.init_params = locals()
         self._check_backbone(backbone)
-        local = locals()
-        local['rotate'] = True
-        local.pop('self')
-        local.pop('__class__')
-        local.pop('params')
-        super(PPYOLOE_R, self).__init__(**local, **params)
-        self.model_name = 'PPYOLOE_R'
 
-    def _build_rotated_modules(self, params):
-        backbone = params['backbone']
-        num_classes = params['num_classes']
-        nms = params['nms']
-        neck = ppdet.modeling.CustomCSPPAN(
-            in_channels=[i.channels for i in backbone.out_shape],
-            out_channels=[768, 384, 192],
-            stage_num=1,
-            block_num=3,
-            act='swish',
-            spp=True,
-            use_alpha=True)
-        static_assigner = ppdet.modeling.FCOSRAssigner(
-            num_classes=num_classes,
-            factor=12,
-            threshold=0.23,
-            boundary=[[512, 10000], [256, 512], [-1, 256]])
-        assigner = ppdet.modeling.RotatedTaskAlignedAssigner(
-            topk=13,
-            alpha=1.0,
-            beta=6.0, )
-        yolo_head = ppdet.modeling.PPYOLOERHead(
-            num_classes=num_classes,
-            in_channels=[i.channels for i in neck.out_shape],
-            fpn_strides=[32, 16, 8],
-            grid_cell_offset=0.5,
-            use_varifocal_loss=True,
-            loss_weight={'class': 1.,
-                         'iou': 2.5,
-                         'dfl': 0.05},
-            static_assigner=static_assigner,
-            assigner=assigner,
-            nms=nms)
-        post_process = None
+        self.backbone_name = backbone
+        if params.get('with_net', True):
+            if paddlers.env_info['place'] == 'gpu' and paddlers.env_info[
+                    'num'] > 1 and not os.environ.get('PADDLERS_EXPORT_STAGE'):
+                norm_type = 'sync_bn'
+            else:
+                norm_type = 'bn'
 
-        return neck, yolo_head, post_process
+            kwargs = {}
+            kwargs['norm_type'] = norm_type
+            kwargs.update(
+                dict(
+                    layers=[3, 6, 6, 3],
+                    channels=[64, 128, 256, 512, 1024],
+                    return_idx=[1, 2, 3],
+                    use_large_stem=True,
+                    use_alpha=True))
+            if backbone == 'CSPResNet_l':
+                kwargs.update(dict(depth_mult=1.0, width_mult=1.0))
+            elif backbone == 'CSPResNet_m':
+                kwargs.update(dict(depth_mult=0.67, width_mult=0.75))
+            elif backbone == 'CSPResNet_s':
+                kwargs.update(dict(depth_mult=0.33, width_mult=0.5))
+            elif backbone == 'CSPResNet_x':
+                kwargs.update(dict(depth_mult=1.33, width_mult=1.25))
+            backbone = 'CSPResNet'
 
-
-YOLOv3 = functools.partial(_YOLOv3, rotate=False)
+            backbone = self._get_backbone(backbone, **kwargs)
+            nms = ppdet.modeling.MultiClassNMS(
+                score_threshold=nms_score_threshold,
+                nms_top_k=nms_topk,
+                keep_top_k=nms_keep_topk,
+                nms_threshold=nms_iou_threshold,
+                normalized=nms_normalized)
+            neck = ppdet.modeling.CustomCSPPAN(
+                in_channels=[i.channels for i in backbone.out_shape],
+                out_channels=[768, 384, 192],
+                stage_num=1,
+                block_num=3,
+                act='swish',
+                spp=True,
+                use_alpha=True)
+            static_assigner = ppdet.modeling.FCOSRAssigner(
+                num_classes=num_classes,
+                factor=12,
+                threshold=0.23,
+                boundary=[[512, 10000], [256, 512], [-1, 256]])
+            assigner = ppdet.modeling.RotatedTaskAlignedAssigner(
+                topk=13,
+                alpha=1.0,
+                beta=6.0, )
+            yolo_head = ppdet.modeling.PPYOLOERHead(
+                num_classes=num_classes,
+                in_channels=[i.channels for i in neck.out_shape],
+                fpn_strides=[32, 16, 8],
+                grid_cell_offset=0.5,
+                use_varifocal_loss=True,
+                loss_weight={'class': 1.,
+                             'iou': 2.5,
+                             'dfl': 0.05},
+                static_assigner=static_assigner,
+                assigner=assigner,
+                nms=nms)
+            params.update({
+                'backbone': backbone,
+                'neck': neck,
+                'yolo_head': yolo_head,
+                'post_process': post_process
+            })
+        # NOTE: call BaseDetector.__init__ instead of YOLOv3.__init__
+        super(YOLOv3, self).__init__(
+            model_name='YOLOv3', num_classes=num_classes, **params)
+        self.model_name = "PPYOLOE_R"
+        self.anchors = anchors
+        self.anchor_masks = anchor_masks
