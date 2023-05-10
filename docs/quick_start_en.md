@@ -55,7 +55,7 @@ cd paddlers/models/ppdet/ext_op
 python setup.py install
 ```
 
-We also provide a docker image for installation, see [here](./docker_en.md).
+We also provide a Docker image for installation. Please see [here](./docker_en.md) for more details.
 
 ## Model Training
 

@@ -260,9 +260,9 @@ PaddleRS具有以下五大特色：
       <td>
       <details><summary><b>官方案例</b></summary>
       <ul>
-        <li><a href="https://github.com/PaddleCV-SIG/GeoView">遥感影像智能解译工具GeoView</a></li>
         <li><a href="./examples/rs_research/README.md">PaddleRS科研实战：设计深度学习变化检测模型</a></li>
         <li><a href="./examples/c2fnet/README.md">基于PaddleRS的遥感图像小目标语义分割优化方法</a></li>
+        <li><a href="./examples/building_extraction/README.md">建筑物提取全流程案例</a></li>
       </ul>
       </details>
       <details><summary><b>社区案例</b></summary>
@@ -293,6 +293,7 @@ PaddleRS具有以下五大特色：
 * 模型部署
   * [模型导出](./deploy/export/README.md)
   * [Python部署](./deploy/README.md)
+  * [遥感影像智能解译工具GeoView](https://github.com/PaddleCV-SIG/GeoView)
 * 代码贡献
   * [贡献指南](./docs/CONTRIBUTING_CN.md)
   * [开发指南](./docs/dev/dev_guide_cn.md)
@@ -302,7 +303,6 @@ PaddleRS具有以下五大特色：
 
 ## <img src="./docs/images/anli.png" width="30"/> 实践案例
 
-* [遥感影像智能解译工具GeoView](https://github.com/PaddleCV-SIG/GeoView)
 * [PaddleRS科研实战：设计深度学习变化检测模型](./examples/rs_research/README.md)
 * [基于PaddleRS的遥感图像小目标语义分割优化方法](./examples/c2fnet/README.md)
 
