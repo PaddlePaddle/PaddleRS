@@ -4,7 +4,7 @@
 
 ## 〇、准备
 
-- 拉取镜像（或构建镜像）并运行镜像，详细过程可以参考[文档](../docker/README.md)。这里使用的容器文件夹绝对路径为`/usr/qingdao`。
+- 拉取镜像（或构建镜像）并运行镜像，详细过程可以参考[文档](../../docker/README.md)。这里使用的容器文件夹绝对路径为`/usr/qingdao`。
 
 ## 一、数据标注
 
@@ -35,7 +35,7 @@ python split.py --image_path /usr/qingdao.tif --block_size 512 --save_dir /usr/
 
 ## 二、模型训练
 
-- 标注完成后可参考PaddleRS的[训练文档](../tutorials/train/README.md)进行训练。对于标注好的数据，在EISeg的保存目录中为如下格式：
+- 标注完成后可参考PaddleRS的[训练文档](../../tutorials/train/README.md)进行训练。对于标注好的数据，在EISeg的保存目录中为如下格式：
 
 ```
 image
@@ -79,7 +79,7 @@ if __name__ == "__main__":
                     tf.write(img_path + " " + lab_path + "\n")
 ```
 
-- 完成后得到标准的数据集结构，以Farseg为例，可以参照[Farseg的训练文件](../tutorials/train/segmentation/farseg.py)进行训练。进入路径`../tutorials/train/segmentation`修改`farseg.py`中的数据集路径，并把数据下载和选择前三个波段进行注释：
+- 完成后得到标准的数据集结构，以Farseg为例，可以参照[Farseg的训练文件](../../tutorials/train/segmentation/farseg.py)进行训练。进入路径`../tutorials/train/segmentation`修改`farseg.py`中的数据集路径，并把数据下载和选择前三个波段进行注释：
 
 ```python
 # 数据集存放目录
@@ -117,7 +117,7 @@ python farseg.py
 
 ## 三、可视化
 
-- 参考[文档](../docker/README.md)中有关GeoView的配置方法，打开前后端。
+- 参考[文档](../../docker/README.md)中有关GeoView的配置方法，打开前后端。
 - 进入到`http://localhost:3000/`，这里我们已经按照要求将训练好的模型放到了`backend/model/semantic_segmentation`文件夹下，可以看到在`地物分类`的可选模型中，已经有了我们放过去的模型。
 - 模型导出为部署模型可以使用以下脚本：
 
