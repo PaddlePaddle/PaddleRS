@@ -1,63 +1,69 @@
 # Basic configurations of LEVIR-CD dataset
 
 datasets:
-  train: !Node
-    type: CDDataset
-    args:
-      data_dir: ./data/levircd/
-      file_list: ./data/levircd/train.txt
-      label_list: null
-      num_workers: 2
-      shuffle: True
-      with_seg_labels: False
-      binarize_labels: True
-  eval: !Node
-    type: CDDataset
-    args:
-      data_dir: ./data/levircd/
-      file_list: ./data/levircd/val.txt
-      label_list: null
-      num_workers: 0
-      shuffle: False
-      with_seg_labels: False
-      binarize_labels: True
+    train: !Node
+        type: CDDataset
+        args: 
+            data_dir: ./data/levircd/
+            file_list: ./data/levircd/train.txt
+            label_list: null
+            num_workers: 2
+            shuffle: True
+            with_seg_labels: False
+            binarize_labels: True
+    eval: !Node
+        type: CDDataset
+        args:
+            data_dir: ./data/levircd/
+            file_list: ./data/levircd/val.txt
+            label_list: null
+            num_workers: 0
+            shuffle: False
+            with_seg_labels: False
+            binarize_labels: True
 transforms:
-  train:
-    - !Node
-      type: DecodeImg
-    - !Node
-      type: RandomFlipOrRotate
-      args:
-        probs: [0.35, 0.35]
-        probsf: [0.5, 0.5, 0, 0, 0]
-        probsr: [0.33, 0.34, 0.33]
-    - !Node
-      type: Normalize
-      args:
-        mean: [0.5, 0.5, 0.5]
-        std: [0.5, 0.5, 0.5]
-  eval:
-    - !Node
-      type: DecodeImg
-    - !Node
-      type: Normalize
-      args:
-        mean: [0.5, 0.5, 0.5]
-        std: [0.5, 0.5, 0.5]
+    train:
+        - !Node
+          type: DecodeImg
+        - !Node
+          type: RandomFlipOrRotate
+          args:
+            probs: [0.35, 0.35]
+            probsf: [0.5, 0.5, 0, 0, 0]
+            probsr: [0.33, 0.34, 0.33]
+        - !Node
+          type: Normalize
+          args:
+            mean: [0.5, 0.5, 0.5]
+            std: [0.5, 0.5, 0.5]
+        - !Node
+          type: ArrangeChangeDetector
+          args: ['train']
+    eval:
+        - !Node
+          type: DecodeImg
+        - !Node
+          type: Normalize
+          args:
+            mean: [0.5, 0.5, 0.5]
+            std: [0.5, 0.5, 0.5]
+        - !Node
+          type: ArrangeChangeDetector
+          args: ['eval']
 download_on: False
 
 num_epochs: 50
 train_batch_size: 8
 optimizer: !Node
-  type: Adam
-  args:
-    learning_rate: !Node
-      type: StepDecay
-      module: paddle.optimizer.lr
-      args:
-        learning_rate: 0.002
-        step_size: 35000
-        gamma: 0.2
+    type: Adam
+    args:
+        learning_rate: !Node
+            type: StepDecay
+            module: paddle.optimizer.lr
+            args:
+                learning_rate: 0.002
+                step_size: 35000
+                gamma: 0.2
 save_interval_epochs: 5
 log_interval_steps: 50
 save_dir: ./exp/levircd/

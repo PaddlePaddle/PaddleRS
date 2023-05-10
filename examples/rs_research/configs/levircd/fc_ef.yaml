@@ -3,4 +3,4 @@ _base_: ./levircd.yaml
 save_dir: ./exp/levircd/fc_ef/
 
 model: !Node
-  type: FCEarlyFusion
+    type: FCEarlyFusion

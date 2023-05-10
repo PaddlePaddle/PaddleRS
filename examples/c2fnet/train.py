@@ -24,20 +24,25 @@ NUM_BANDS = 3
 # 使用Compose组合多种变换方式。Compose中包含的变换将按顺序串行执行
 # API说明：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/data.md
 train_transforms = T.Compose([
+    # 读取影像
+    T.DecodeImg(),
     # 将影像缩放到512x512大小
     T.Resize(target_size=512),
     # 以50%的概率实施随机水平翻转
     T.RandomHorizontalFlip(prob=0.5),
     # 将数据归一化到[-1,1]
     T.Normalize(
-        mean=[0.5] * NUM_BANDS, std=[0.5] * NUM_BANDS)
+        mean=[0.5] * NUM_BANDS, std=[0.5] * NUM_BANDS),
+    T.ArrangeSegmenter('train')
 ])
 
 eval_transforms = T.Compose([
+    T.DecodeImg(),
     # 验证阶段与训练阶段的数据归一化方式必须相同
     T.Normalize(
         mean=[0.5] * NUM_BANDS, std=[0.5] * NUM_BANDS),
-    T.ReloadMask()
+    T.ReloadMask(),
+    T.ArrangeSegmenter('eval')
 ])
 
 # 分别构建训练和验证所用的数据集

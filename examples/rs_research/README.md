@@ -4,7 +4,7 @@
 
 ## 1 环境配置
 
-根据[教程](https://github.com/PaddlePaddle/PaddleRS/tree/develop/tutorials/train#环境准备)安装PaddleRS及相关依赖。在本案例中，GDAL库并不是必需的。
+根据[教程](https://github.com/PaddlePaddle/PaddleRS/tree/develop/tutorials/train#环境准备)安装PaddleRS **1.0**及相关依赖。在本案例中，GDAL库并不是必需的。
 
 配置好环境后，在PaddleRS仓库根目录中执行如下指令切换到本案例所在目录：
 

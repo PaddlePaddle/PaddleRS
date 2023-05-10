@@ -3,4 +3,4 @@ _base_: ./levircd.yaml
 save_dir: ./exp/levircd/custom_model/
 
 model: !Node
-  type: CustomTrainer
+    type: CustomTrainer
