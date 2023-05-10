@@ -140,6 +140,3 @@ dmypy.json
 /log
 
 /playground/
-
-# setup config
-setup.cfg

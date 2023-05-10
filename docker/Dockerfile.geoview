@@ -1,4 +1,4 @@
-# 0. from base paddlers iamge
+# 0. from base paddlers image
 FROM paddlers:latest
 
 # 1. install mysql and nodejs
@@ -14,12 +14,12 @@ RUN git clone https://github.com/PaddleCV-SIG/GeoView.git \
 	&& mv PaddleRS GeoView
 ENV PYTHONPATH /opt/GeoView/PaddleRS
 
-# 3. install requirements about backend
+# 3. install backend requirements 
 WORKDIR /opt/GeoView/backend
 RUN pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple \
 	&& mv .flaskenv_template .flaskenv
 
-# 4. install requirements about frontend
+# 4. install frontend requirements 
 WORKDIR /opt/GeoView/frontend
 RUN npm install
 
