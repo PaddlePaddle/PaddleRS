@@ -48,7 +48,7 @@ pip install GDAL‑3.3.3‑cp39‑cp39‑win_amd64.whl
 
 4. (Optional) Install ext_op
 
-PaddleRS supports rotated object detection, which requires the installation of the `ext_op` external custom library before use. you need ti install ext_op as follows:
+PaddleRS supports rotated object detection, which requires the installation of the `ext_op` library before use. you need ti install ext_op as follows:
 
 ```shell
 cd paddlers/models/ppdet/ext_op

@@ -21,7 +21,7 @@ IMAGE_SIZE = [1024, 1024]
 pdrs.utils.download_and_decompress(
     "https://paddlers.bj.bcebos.com/datasets/dota.zip", path="./data/")
 
-# 对于旋转目标检测，我们需要安装ppdet的外部自定义算子，安装方式如下：
+# 对于旋转目标检测任务，需要安装自定义外部算子库，安装方式如下：
 # cd paddlers/models/ppdet/ext_op
 # python setup.py install
 
@@ -131,7 +131,7 @@ model.train(
     lr_decay_epochs=[24, 33],
     # 学习率衰减的参数
     lr_decay_gamma=0.1,
-    # L2权重衰减的系数
+    # L2正则化系数
     reg_coeff=0.0005,
     # 梯度裁剪策略的参数
     clip_grad_by_norm=35.,

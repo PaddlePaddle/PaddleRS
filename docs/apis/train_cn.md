@@ -207,8 +207,8 @@ def train(self,
 |`early_stop`|`bool`|训练过程是否启用早停策略。|`False`|
 |`early_stop_patience`|`int`|启用早停策略时的`patience`参数（参见[`EarlyStop`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/utils/utils.py)）。|`5`|
 |`use_vdl`|`bool`|是否启用VisualDL日志。|`True`|
-|`clip_grad_by_norm`|`float`|权重裁剪所允许的最大值。|`None`|
-|`reg_coeff`|`float`|L2权重衰减的正则化系数。|`1e-5`|
+|`clip_grad_by_norm`|`float`|梯度裁剪所允许的最大值。|`None`|
+|`reg_coeff`|`float`|L2正则化系数。|`1e-5`|
 |`resume_checkpoint`|`str` \| `None`|检查点路径。PaddleRS支持从检查点（包含先前训练过程中存储的模型权重和优化器权重）继续训练，但需注意`resume_checkpoint`与`pretrain_weights`不得同时设置为`None`以外的值。|`None`|
 |`precision`|`str`|当设定为`'fp16'`时，启用自动混合精度训练。|`'fp32'`|
 |`amp_level`|`str`|自动混合精度训练模式。在O1模式下，基于白名单和黑名单确定每个算子使用FP16还是FP32精度计算。在O2模式下，除自定义黑名单中指定的算子以及部分不支持FP16精度的算子以外，全部使用FP16精度计算。|`'O1'`|

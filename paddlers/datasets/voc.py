@@ -80,7 +80,6 @@ class VOCDetDataset(BaseDataset):
                     self.num_max_boxes *= 2
                     break
 
-        self.batch_transforms = None
         self.allow_empty = allow_empty
         self.empty_ratio = empty_ratio
         self.file_list = list()

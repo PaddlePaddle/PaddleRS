@@ -115,7 +115,7 @@ class BaseModel(metaclass=ModelMeta):
                 backbone_name = getattr(self, 'backbone_name', None)
                 pretrain_weights = get_pretrain_weights(
                     pretrain_weights,
-                    self.__class__.__name__,
+                    self.model_name,
                     save_dir,
                     backbone_name=backbone_name)
         if pretrain_weights is not None:
@@ -332,7 +332,7 @@ class BaseModel(metaclass=ModelMeta):
                     save_dtype='float32')
 
         # XXX: Hard-coding
-        if self.model_type == 'detector' and 'RCNN' in self.__class__.__name__ and train_dataset.pos_num < len(
+        if self.model_type == 'detector' and 'RCNN' in self.model_name and train_dataset.pos_num < len(
                 train_dataset.file_list):
             nranks = 1
         else:
@@ -501,9 +501,9 @@ class BaseModel(metaclass=ModelMeta):
                 Defaults to 'output'.
         """
 
-        if self.__class__.__name__ in {'FasterRCNN', 'MaskRCNN', 'PicoDet'}:
+        if self.model_name in {'FasterRCNN', 'MaskRCNN', 'PicoDet'}:
             raise ValueError("{} does not support pruning currently!".format(
-                self.__class__.__name__))
+                self.model_name))
 
         assert criterion in {'l1_norm', 'fpgm'}, \
             "Pruning criterion {} is not supported. Please choose from {'l1_norm', 'fpgm'}."
