@@ -28,7 +28,7 @@ pdrs.utils.download_and_decompress(
 # 定义训练和验证时使用的数据变换（数据增强、预处理等）
 # 使用Compose组合多种变换方式。Compose中包含的变换将按顺序串行执行
 # API说明：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/data.md
-train_transforms = T.Compose([
+train_transforms = [
     # 读取影像
     T.DecodeImg(),
     # 将标签转换为numpy array
@@ -47,21 +47,9 @@ train_transforms = T.Compose([
     # 将标签转换为rotated box的格式
     T.Poly2RBox(
         filter_threshold=2, filter_mode='edge', rbox_type="oc"),
-])
+]
 
-# 定义作用在一个批次数据上的变换
-# 使用BatchCompose组合
-train_batch_transforms = T.BatchCompose([
-    # 归一化图像
-    T.BatchNormalizeImage(
-        mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-    # 用0填充标签
-    T.BatchPadRGT(),
-    # 填充图像
-    T._BatchPad(pad_to_stride=32)
-])
-
-eval_transforms = T.Compose([
+eval_transforms = [
     T.DecodeImg(),
     # 将标签转换为numpy array
     T.Poly2Array(),
@@ -71,9 +59,7 @@ eval_transforms = T.Compose([
     # 归一化图像
     T.Normalize(
         mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-])
-
-eval_batch_transforms = T.BatchCompose([T._BatchPad(pad_to_stride=32)])
+]
 
 # 分别构建训练和验证所用的数据集
 train_dataset = pdrs.datasets.COCODetDataset(
@@ -81,16 +67,14 @@ train_dataset = pdrs.datasets.COCODetDataset(
     image_dir=IMAGE_DIR,
     anno_path=ANNO_PATH,
     transforms=train_transforms,
-    shuffle=True,
-    batch_transforms=train_batch_transforms)
+    shuffle=True)
 
 eval_dataset = pdrs.datasets.COCODetDataset(
     data_dir=DATA_DIR,
     image_dir=IMAGE_DIR,
     anno_path=ANNO_PATH,
     transforms=eval_transforms,
-    shuffle=False,
-    batch_transforms=eval_batch_transforms)
+    shuffle=False)
 
 # 构建FCOSR模型
 # 目前已支持的模型请参考：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/intro/model_zoo.md

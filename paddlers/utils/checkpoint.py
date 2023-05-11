@@ -512,13 +512,6 @@ def get_pretrain_weights(flag, class_name, save_dir, backbone_name=None):
     return fname
 
 
-def is_without_backbone(state_dict):
-    for k in state_dict.keys():
-        if k.startswith('backbone'):
-            return False
-    return True
-
-
 def load_pretrain_weights(model, pretrain_weights=None, model_name=None):
     if pretrain_weights is not None:
         logging.info(
@@ -529,12 +522,6 @@ def load_pretrain_weights(model, pretrain_weights=None, model_name=None):
             param_state_dict = paddle.load(pretrain_weights)
             model_state_dict = model.state_dict()
 
-            # Fit for CSPResNet
-            if is_without_backbone(param_state_dict):
-                param_state_dict = {
-                    'backbone.' + k: v
-                    for k, v in param_state_dict.items()
-                }
             # HACK: Fit for faster rcnn. Pretrain weights contain prefix of 'backbone'
             # while res5 module is located in bbox_head.head. Replace the prefix of
             # res5 with 'bbox_head.head' to load pretrain weights correctly.

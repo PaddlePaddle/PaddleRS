@@ -44,8 +44,9 @@ class BaseDataset(Dataset):
 
         self.num_workers = get_num_workers(num_workers)
         self.shuffle = shuffle
-        self.batch_transforms = None
-        self.build_collate_fn(batch_transforms)
+        if isinstance(batch_transforms, list):
+            batch_transforms = BatchCompose(batch_transforms)
+        self.batch_transforms = batch_transforms
 
     def __getitem__(self, idx):
         sample = construct_sample_from_dict(self.file_list[idx])

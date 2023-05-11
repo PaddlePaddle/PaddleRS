@@ -28,7 +28,7 @@ import paddlers.models.ppdet as ppdet
 from paddlers.models.ppdet.modeling.proposal_generator.target_layer import BBoxAssigner, MaskAssigner
 from paddlers.transforms import decode_image, construct_sample
 from paddlers.transforms.operators import _NormalizeBox, _PadBox, _BboxXYXY2XYWH, Resize, Pad
-from paddlers.transforms.batch_operators import BatchCompose, _BatchPad, _Gt2YoloTarget
+from paddlers.transforms.batch_operators import BatchCompose, _BatchPad, _Gt2YoloTarget, BatchPadRGT, BatchNormalizeImage
 from paddlers.models.ppdet.optimizer import ModelEMA
 import paddlers.utils.logging as logging
 from paddlers.utils.checkpoint import det_pretrain_weights_dict
@@ -84,6 +84,13 @@ class BaseDetector(BaseModel):
     @classmethod
     def set_data_fields(cls, data_name, data_fields):
         cls.data_fields[data_name] = data_fields
+
+    def _is_backbone_weight(self):
+        target_backbone = ['ESNET_', 'CSPResNet_']
+        for b in target_backbone:
+            if b in self.backbone_name:
+                return True
+        return False
 
     def _build_inference_net(self):
         infer_net = self.net
@@ -381,14 +388,12 @@ class BaseDetector(BaseModel):
 
         self.labels = train_dataset.labels
         self.num_max_boxes = train_dataset.num_max_boxes
-        train_batch_transforms = self._default_batch_transforms(
-            'train') if train_dataset.batch_transforms is None else None
-        eval_batch_transforms = self._default_batch_transforms(
-            'eval') if eval_dataset.batch_transforms is None else None
+
+        train_batch_transforms = self._compose_batch_transforms(
+            'train', train_dataset.batch_transforms)
+
         train_dataset.build_collate_fn(train_batch_transforms,
                                        self._default_collate_fn)
-        eval_dataset.build_collate_fn(eval_batch_transforms,
-                                      self._default_collate_fn)
 
         # Build optimizer if not defined
         if optimizer is None:
@@ -438,8 +443,8 @@ class BaseDetector(BaseModel):
             pretrain_weights=pretrain_weights,
             save_dir=pretrained_dir,
             resume_checkpoint=resume_checkpoint,
-            is_backbone_weights=(pretrain_weights == 'IMAGENET' and
-                                 'ESNet_' in self.backbone_name))
+            is_backbone_weights=pretrain_weights == 'IMAGENET' and
+            self._is_backbone_weight())
 
         if use_ema:
             ema = ModelEMA(model=self.net, decay=.9998, use_thres_step=True)
@@ -469,6 +474,16 @@ class BaseDetector(BaseModel):
 
     def _default_batch_transforms(self, mode):
         raise NotImplementedError
+
+    def _compose_batch_transforms(self, mode, batch_transforms):
+        default_batch_transforms = self._default_batch_transforms(mode)
+        out = []
+        if batch_transforms is not None:
+            out.extend(batch_transforms)
+        out.extend(default_batch_transforms.batch_transforms)
+
+        return BatchCompose(
+            out, collate_batch=default_batch_transforms.collate_batch)
 
     def quant_aware_train(self,
                           num_epochs,
@@ -596,9 +611,12 @@ class BaseDetector(BaseModel):
                 "Evaluation metric {} is not supported. Please choose from 'COCO' and 'VOC'."
 
         eval_dataset.data_fields = self.data_fields[self.metric]
-        eval_batch_transforms = self._default_batch_transforms(
-            'eval') if eval_dataset.batch_transforms is None else None
-        eval_dataset.build_collate_fn(eval_batch_transforms)
+
+        eval_batch_transforms = self._compose_batch_transforms(
+            'eval', eval_dataset.batch_transforms)
+        eval_dataset.build_collate_fn(eval_batch_transforms,
+                                      self._default_collate_fn)
+
         self._check_transforms(eval_dataset.transforms)
 
         self.net.eval()
@@ -1122,9 +1140,6 @@ class YOLOv3(BaseDetector):
         self.anchors = anchors
         self.anchor_masks = anchor_masks
 
-    def _build_rotated_modules(self, params):
-        raise NotImplementedError()
-
     def _default_batch_transforms(self, mode='train'):
         if mode == 'train':
             batch_transforms = [
@@ -1202,13 +1217,16 @@ class FasterRCNN(BaseDetector):
         if params.get('with_net', True):
             dcn_v2_stages = [1, 2, 3] if with_dcn else [-1]
             kwargs = {}
-            kwargs['dcn_v2_stages'] = dcn_v2_stages
             if backbone == 'HRNet_W18':
                 if not with_fpn:
                     logging.warning(
                         "Backbone {} should be used along with fpn enabled, 'with_fpn' is forcibly set to True".
                         format(backbone))
                     with_fpn = True
+                kwargs.update(
+                    dict(
+                        width=18, freeze_at=0, return_idx=[0, 1, 2, 3]))
+                backbone = 'HRNet'
                 if with_dcn:
                     logging.warning(
                         "Backbone {} should be used along with dcn disabled, 'with_dcn' is forcibly set to False".
@@ -1220,13 +1238,13 @@ class FasterRCNN(BaseDetector):
                         format(backbone))
                     with_fpn = True
                 kwargs['lr_mult_list'] = [0.05, 0.05, 0.1, 0.15]
+                kwargs['dcn_v2_stages'] = dcn_v2_stages
             elif 'ResNet50' in backbone:
                 if not with_fpn and with_dcn:
                     logging.warning(
                         "Backbone {} without fpn should be used along with dcn disabled, 'with_dcn' is forcibly set to False".
                         format(backbone))
-                kwargs.update(dict(return_idx=[2], num_stages=3))
-                kwargs.pop('dcn_v2_stages')
+                    kwargs.update(dict(return_idx=[2], num_stages=3))
             elif 'ResNet34' in backbone:
                 if not with_fpn:
                     logging.warning(
@@ -1487,7 +1505,7 @@ class PPYOLO(YOLOv3):
 
             if backbone == 'ResNet50_vd_dcn':
                 backbone = self._get_backbone(
-                    'ResNet',
+                    backbone,
                     variant='d',
                     norm_type=norm_type,
                     return_idx=[1, 2, 3],
@@ -1498,7 +1516,7 @@ class PPYOLO(YOLOv3):
 
             elif backbone == 'ResNet18_vd':
                 backbone = self._get_backbone(
-                    'ResNet',
+                    backbone,
                     depth=18,
                     variant='d',
                     norm_type=norm_type,
@@ -2239,6 +2257,26 @@ class FCOSR(YOLOv3):
         self.anchors = anchors
         self.anchor_masks = anchor_masks
 
+    def _default_batch_transforms(self, mode='train'):
+        if mode == 'train':
+            batch_transforms = [
+                BatchNormalizeImage(
+                    mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+                BatchPadRGT(), _BatchPad(pad_to_stride=32)
+            ]
+        else:
+            batch_transforms = [_BatchPad(pad_to_stride=32)]
+
+        if mode == 'eval' and self.metric == 'voc':
+            collate_batch = False
+        else:
+            collate_batch = True
+
+        batch_transforms = BatchCompose(
+            batch_transforms, collate_batch=collate_batch)
+
+        return batch_transforms
+
 
 class PPYOLOE_R(YOLOv3):
     supported_backbones = ('CSPResNet_m', 'CSPResNet_l', 'CSPResNet_s',
@@ -2335,3 +2373,23 @@ class PPYOLOE_R(YOLOv3):
         self.model_name = "PPYOLOE_R"
         self.anchors = anchors
         self.anchor_masks = anchor_masks
+
+    def _default_batch_transforms(self, mode='train'):
+        if mode == 'train':
+            batch_transforms = [
+                BatchNormalizeImage(
+                    mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+                BatchPadRGT(), _BatchPad(pad_to_stride=32)
+            ]
+        else:
+            batch_transforms = [_BatchPad(pad_to_stride=32)]
+
+        if mode == 'eval' and self.metric == 'voc':
+            collate_batch = False
+        else:
+            collate_batch = True
+
+        batch_transforms = BatchCompose(
+            batch_transforms, collate_batch=collate_batch)
+
+        return batch_transforms

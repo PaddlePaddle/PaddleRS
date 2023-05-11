@@ -386,6 +386,8 @@ class BaseModel(metaclass=ModelMeta):
             step_time_tic = time.time()
 
             for step, data in enumerate(self.train_data_loader()):
+                # `PicoDet` and `PPYOLOE_R` need to switch label assinger according to epoch_id
+                # TODO: refactor this
                 if self.model_name in ['PicoDet', 'PPYOLOE_R']:
                     data['epoch_id'] = i
                 if nranks > 1:
