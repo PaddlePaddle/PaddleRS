@@ -3,8 +3,6 @@
 # 目标检测模型PP-YOLO Tiny训练示例脚本
 # 执行此脚本前，请确认已正确安装PaddleRS库
 
-import os
-
 import paddlers as pdrs
 from paddlers import transforms as T
 

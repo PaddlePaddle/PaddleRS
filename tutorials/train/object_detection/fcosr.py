@@ -9,9 +9,9 @@ from paddlers import transforms as T
 # 数据集存放目录
 DATA_DIR = "./data/dota/"
 # 数据集标签文件路径
-ANNO_PATH = "./data/dota/DOTA_trainval1024.json"
+ANNO_PATH = "trainval1024/DOTA_trainval1024.json"
 # 数据集图像目录
-IMAGE_DIR = "./data/dota/images"
+IMAGE_DIR = "trainval1024/images"
 # 实验目录，保存输出的模型权重和结果
 EXP_DIR = "./output/fcosr/"
 
