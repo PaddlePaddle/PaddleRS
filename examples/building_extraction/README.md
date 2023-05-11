@@ -19,7 +19,12 @@ docker run -it -v <本机文件夹绝对路径>:<容器文件夹绝对路径> [-
 
 `-v`选项指定的`<本机文件夹绝对路径>`可用于在Docker容器和宿主机之间共享文件。
 
-为便于说明，本案例在Docker容器中使用的工作目录为`/usr/qingdao`，该目录包含一幅青岛地区的tif影像`qingdao.tif`。
+为便于说明，本案例提供一幅青岛地区tif影像作为示例数据。在Docker容器中执行如下指令下载数据并解压到`/usr/qingdao`目录：
+
+```shell
+wget https://paddlers.bj.bcebos.com/datasets/qingdao.zip
+unzip -d /usr/qingdao qingdao.zip
+```
 
 ## 一、数据标注
 
@@ -103,7 +108,7 @@ background
 building
 ```
 
-- 上述步骤完成后，数据集已被处理为PaddleRS要求的格式。接下来需要编写训练脚本，或者可以选择对PaddleRS提供的示例脚本进行修改。以FarSeg模型为例，可对[FarSeg训练示例脚本](https://github.com/PaddlePaddle/PaddleRS/blob/release/1.0/tutorials/train/semantic_segmentation/farseg.py)进行修改，调整路径参数，并注释或去除数据下载部分。若影像波段数量大于3，可以使用波段选择算子（`T.SelectBand`）挑选作为模型输入的波段，否则可去除之。
+- 上述步骤完成后，数据集已被处理为PaddleRS要求的格式。接下来需要编写训练脚本，或者可以选择对PaddleRS提供的示例脚本进行修改。以FarSeg模型为例，可对FarSeg训练示例脚本（位于`/opt/GeoView/PaddleRS/tutorials/train/semantic_segmentation/farseg.py`）进行修改，调整路径参数，并注释或去除数据下载部分。本案例使用的示例影像波段数量等于3，故无需使用波段选择算子（`T.SelectBand`），去除之。对于波段数量大于3的情况，可以使用该算子挑选作为模型输入的波段。
 
 ```python
 # 数据集存放目录
