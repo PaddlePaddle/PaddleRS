@@ -479,7 +479,7 @@ class BaseDetector(BaseModel):
         default_batch_transforms = self._default_batch_transforms(mode)
         out = []
         if batch_transforms is not None:
-            out.extend(batch_transforms)
+            out.extend(batch_transforms.batch_transforms)
         out.extend(default_batch_transforms.batch_transforms)
 
         return BatchCompose(
@@ -1083,6 +1083,7 @@ class YOLOv3(BaseDetector):
             kwargs['norm_type'] = norm_type
 
             if 'MobileNetV3' in backbone:
+                backbone = 'MobileNetV3'
                 kwargs['feature_maps'] = [7, 13, 16]
             elif backbone == 'ResNet50_vd_dcn':
                 kwargs.update(
@@ -1098,6 +1099,8 @@ class YOLOv3(BaseDetector):
                         return_idx=[1, 2, 3], freeze_at=-1, freeze_norm=False))
             elif backbone == 'DarkNet53':
                 backbone = 'DarkNet'
+            elif 'MobileNet' in backbone:
+                backbone = 'MobileNet'
 
             backbone = self._get_backbone(backbone, **kwargs)
             nms = ppdet.modeling.MultiClassNMS(
