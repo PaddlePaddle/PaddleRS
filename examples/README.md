@@ -6,6 +6,7 @@ PaddleRS提供从科学研究到产业应用的丰富示例，希望帮助遥感
 
 - [PaddleRS科研实战：设计深度学习变化检测模型](./rs_research/)
 - [基于PaddleRS的遥感图像小目标语义分割优化方法](./c2fnet/)
+- [建筑物提取全流程案例](./building_extraction/)
 
 ## 2 社区贡献案例
 

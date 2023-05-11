@@ -10,8 +10,7 @@ RUN apt-get update \
 
 # 2. clone geoview
 WORKDIR /opt
-RUN git clone https://github.com/PaddleCV-SIG/GeoView.git \
-	&& mv PaddleRS GeoView
+RUN git clone --recursive -b release/0.1 https://github.com/PaddleCV-SIG/GeoView.git \
 ENV PYTHONPATH /opt/GeoView/PaddleRS
 
 # 3. install backend requirements 
@@ -23,5 +22,5 @@ RUN pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple 
 WORKDIR /opt/GeoView/frontend
 RUN npm install
 
-# 5. finish
+# 5. set working directory
 WORKDIR /opt/GeoView

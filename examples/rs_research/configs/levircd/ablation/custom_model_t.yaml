@@ -3,6 +3,6 @@ _base_: ../levircd.yaml
 save_dir: ./exp/levircd/ablation/att_t/
 
 model: !Node
-  type: CustomTrainer
-  args:
-    att_types: t
+    type: CustomTrainer
+    args:
+        att_types: t

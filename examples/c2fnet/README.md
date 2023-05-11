@@ -1,5 +1,5 @@
 # 基于PaddleRS的遥感图像小目标语义分割优化方法
-本项目为C2FNet基于PaddleRS的官方实现代码。本方法实现了一个从粗到细的模型，对现有的任意语义分割方法进行优化，实现对小目标的准确分割。
+本案例为C2FNet基于PaddleRS的官方实现代码。本方法实现了一个从粗到细的模型，对现有的任意语义分割方法进行优化，实现对小目标的准确分割。
 
 ## 安装说明
 ### 环境依赖
@@ -10,22 +10,23 @@ PaddleRS: 1.0
 ```
 
 ### 安装过程
-a. 创建并激活一个conda虚拟环境。
+
+a. （可选）创建并激活一个conda虚拟环境。
 ```bash
 conda create -n paddlers python=3.8
 conda activate paddlers
 ```
+
 b. 安装PaddlePaddle [详见官方网址](https://www.paddlepaddle.org.cn/en/install/quick?docurl=/documentation/docs/en/install/pip/linux-pip_en.html) (PaddlePaddle版本需要 >= 2.3)。
 
 c. 克隆PaddleRS代码库。
 ```bash
-git clone https://github.com/PaddlePaddle/PaddleRS
+git clone -b release/1.0 https://github.com/PaddlePaddle/PaddleRS
 ```
 
 d. 安装PaddleRS环境依赖。
 ```bash
 cd PaddleRS
-git checkout develop
 pip install -r requirements.txt
 ```
 

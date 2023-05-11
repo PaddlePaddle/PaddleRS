@@ -55,7 +55,7 @@ res = predictor.predict(("demo_data/A.png", "demo_data/B.png"))
 cm_1024x1024 = res['label_map']
 ```
 
-请注意，**`predictor.predict()`方法接受的影像列表长度与导出模型时指定的batch size必须一致**（若指定的batch size不为-1），这是因为`Predictor`对象将所有输入影像拼接成一个batch执行预测。您可以在[模型推理API说明](https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/infer_cn.md)中了解关于`predictor.predict()`方法返回结果格式的更多信息。
+请注意，**`predictor.predict()`方法接受的影像列表长度与导出模型时指定的batch size必须一致**（若指定的batch size不为-1），这是因为`Predictor`对象将所有输入影像拼接成一个batch执行预测。您可以在[模型推理API说明](../docs/apis/infer_cn.md)中了解关于`predictor.predict()`方法返回结果格式的更多信息。
 
 ### 2.2 指定预热轮数与重复次数
 

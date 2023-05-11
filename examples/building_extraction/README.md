@@ -1,32 +1,47 @@
-# 基于Docker环境的PaddleRS全流程建筑物提取
+# 建筑物提取全流程案例
 
-PaddleRS提供了对遥感影像的训练和推理能力，那么结合EISeg提供的标注能力和GeoView提供的部署和展示能力就能全流程的完成遥感的语义分割任务了，此说明将基于docker环境完成使用上述工具对卫星影像中的建筑物从标注到训练再到部署的全流程。
+PaddleRS提供遥感模型训练和推理能力，结合EISeg提供的标注能力和GeoView提供的部署与展示能力，即可全流程地完成遥感图像分割任务。本案例基于Docker环境，在Windows 10系统使用上述工具实现对卫星影像建筑物提取任务从标注到训练再到部署的全流程开发。
 
 ## 〇、准备
 
-- 构建镜像并运行镜像，详细过程请参考PaddleRS关于Docker构建的[文档](../../docs/docker_cn.md)。这里使用的容器文件夹绝对路径为`/usr/qingdao`。该路径包含一张青岛的tif影像。
-- 使用[GeoView](https://github.com/PaddleCV-SIG/GeoView/tree/develop)提供的智能遥感影像解译功能，可在完成PaddleRS镜像的基础上安装该文件夹内提供的镜像。若PaddleRS的基本镜像名称自定义为`<imageName>`，需要编辑该文件夹下的`Dockerfile`，将`From paddlers:latest`改为`From <imageName>`，然后构建镜像：
+- 构建PaddleRS基础Docker镜像，详细过程请参考PaddleRS关于Docker镜像构建的[文档](https://github.com/PaddlePaddle/PaddleRS/blob/release/1.1/docs/docker_cn.md)。
+- 为使用[GeoView](https://github.com/PaddleCV-SIG/GeoView)提供的遥感影像智能解译功能，可在PaddleRS基础镜像基础上使用本案例提供的`Dockerfile`构建GeoView镜像。若PaddleRS基础镜像名称为`<imageName>`，需要将`Dockerfile`中的`FROM paddlers:latest`改为`FROM <imageName>`，然后构建镜像：
 
 ```shell
 docker build -t geoview:latest -f Dockerfile .
 ```
 
+基于构建的镜像创建并运行Docker容器。
+
+```shell
+docker run -it -v <本机文件夹绝对路径>:<容器文件夹绝对路径> [--gpus all -e NVIDIA_DRIVER_CAPABILITIES=compute,utility -e NVIDIA_VISIBLE_DEVICES=all] geoview:latest /bin/bash
+```
+
+`-v`选项指定的`<本机文件夹绝对路径>`可用于在Docker容器和宿主机之间共享文件。
+
+为便于说明，本案例提供一幅青岛地区tif影像作为示例数据。在Docker容器中执行如下指令下载数据并解压到`/usr/qingdao`目录：
+
+```shell
+wget https://paddlers.bj.bcebos.com/datasets/qingdao.zip
+unzip -d /usr/qingdao qingdao.zip
+```
+
 ## 一、数据标注
 
-- 安装paddlers。
+- 切换到`/opt/GeoView/PaddleRS`目录，安装PaddleRS。
 
 ```shell
 python setup.py install
 ```
 
-- 首先进行切分图像，虽然EISeg可以直接读取大图进行分块标注和保存，但为了控制标注的数量，可以先使用PaddleRS提供的切分工具。
+- 切分图像。虽然EISeg可以直接读取大图并进行分块标注和保存，但为了控制标注的数量，可以先使用PaddleRS提供的工具预先对图像进行切分。
 
 ```shell
 cd tools/
 python split.py --image_path /usr/qingdao/qingdao.tif --block_size 512 --save_dir /usr/qingdao/dataset/
 ```
 
-- 等待进度条完成后则数据划分完毕。此时将建筑交互式模型参数[下载](https://paddleseg.bj.bcebos.com/eiseg/0.4/static_hrnet18_ocr48_rsbuilding_instance.zip)到共享文件夹中，打开[VcXsrv](https://sourceforge.net/projects/vcxsrv/)（宿主机系统为Windows10），准备使用EISeg进行标注。具体操作参考PaddleRS关于Docker构建的[文档](../docker/README.md)中关于EISeg的使用部分。
+- 等待进度条完成后数据划分完毕。将[适用于建筑物提取的交互式分割模型参数](https://paddleseg.bj.bcebos.com/eiseg/0.4/static_hrnet18_ocr48_rsbuilding_instance.zip)下载到共享文件夹中，打开[VcXsrv](https://sourceforge.net/projects/vcxsrv/)（宿主机系统为Windows 10），准备使用EISeg进行标注。具体操作请参考PaddleRS [Docker镜像构建与使用文档](https://github.com/PaddlePaddle/PaddleRS/blob/release/1.1/docs/docker_cn.md#2-%E9%95%9C%E5%83%8F%E4%BD%BF%E7%94%A8)中关于EISeg使用的部分。
 
 ![eiseg](https://user-images.githubusercontent.com/71769312/222040539-34a369f3-6da8-4047-a3a5-ebf9b831d175.png)
 
@@ -40,18 +55,20 @@ python split.py --image_path /usr/qingdao/qingdao.tif --block_size 512 --save_di
 
 ## 二、模型训练
 
-- 标注完成后可参考PaddleRS的[训练文档](../../tutorials/train/README.md)进行训练。对于标注好的数据，在EISeg的保存目录中为如下格式：
+标注完成后，可参考PaddleRS的[训练文档](https://github.com/PaddlePaddle/PaddleRS/blob/release/1.0/tutorials/train/README.md)进行模型训练。
 
-```
+- 对于标注好的数据，在EISeg的保存目录中存储为如下结构：
+
+```plaintext
 dataset
   ├- label
   |    └- A.tif
   └- A.tif
 ```
 
-- 因此需要将数据移动为下列格式：
+需要变更为如下结构：
 
-```
+```plaintext
 dataset
   ├- label
   |    └- A.tif
@@ -59,7 +76,7 @@ dataset
        └- A.tif
 ```
 
-- 然后生成对应的数据列表，可以在`dataset`中新建如下脚本文件并运行：
+- 接着，生成对应的列表文件。可以创建一个Python脚本文件，填充如下内容并执行：
 
 ```python
 import os
@@ -84,7 +101,14 @@ if __name__ == "__main__":
                     tf.write(img_path + " " + lab_path + "\n")
 ```
 
-- 完成后得到标准的数据集结构，以Farseg为例，可以参照[Farseg的训练文件](../../tutorials/train/segmentation/farseg.py)进行训练。进入路径`../tutorials/train/segmentation`修改`farseg.py`中的数据集路径，并把数据下载和选择前三个波段进行注释：
+在`/usr/qingdao/dataset`中创建`labels.txt`文件，填入如下内容：
+
+```plaintext
+background
+building
+```
+
+- 上述步骤完成后，数据集已被处理为PaddleRS要求的格式。接下来需要编写训练脚本，或者可以选择对PaddleRS提供的示例脚本进行修改。以FarSeg模型为例，可对FarSeg训练示例脚本（位于`/opt/GeoView/PaddleRS/tutorials/train/semantic_segmentation/farseg.py`）进行修改，调整路径参数，并注释或去除数据下载部分。本案例使用的示例影像波段数量等于3，故无需使用波段选择算子（`T.SelectBand`），去除之。对于波段数量大于3的情况，可以使用该算子挑选作为模型输入的波段。
 
 ```python
 # 数据集存放目录
@@ -105,14 +129,9 @@ EXP_DIR = '/usr/qingdao/output/farseg/'
 # T.SelectBand([1, 2, 3]),
 ```
 
-- 其中`labels.txt`可以手动创建，里面为：
+除上述修改外，也可以根据实际需求对模型训练使用的超参数、数据变换算子等进行修改。
 
-```
-background
-building
-```
-
-- 然后可以对下面的超参数进行调整，调整完成后保存退出，使用下列命令进行训练：
+- 切换到训练脚本所在目录，使用下列命令执行脚本：
 
 ```shell
 python farseg.py
@@ -122,10 +141,10 @@ python farseg.py
 
 ## 三、可视化
 
-- 新建一个终端，启动镜像加载后端，将训练好的模型挂载到容器内：
+- 在另一个终端中启动Docker容器，将训练好的模型存放路径挂载到容器内：
 
 ```shell
-docker run --name <containerName> -p 5008:5008 -p 3000:3000 -it -v <本机文件夹绝对路径:容器文件夹绝对路径> [--gpus all -e NVIDIA_DRIVER_CAPABILITIES=compute,utility -e NVIDIA_VISIBLE_DEVICES=all] <imageID>
+docker run --name <containerName> -p 5008:5008 -p 3000:3000 -it -v <本机模型存放路径>:<容器内挂载绝对路径> [--gpus all -e NVIDIA_DRIVER_CAPABILITIES=compute,utility -e NVIDIA_VISIBLE_DEVICES=all] geoview:latest /bin/bash
 ```
 
 - 启动MySQL：
@@ -135,7 +154,7 @@ service mysql start
 mysql -u root
 ```
 
-- 注册MySQL的用户并赋予权限：
+- 创建MySQL用户并赋予权限：
 
 ```shell
 CREATE USER 'paddle_rs'@'localhost' IDENTIFIED BY '123456';
@@ -144,20 +163,19 @@ FLUSH PRIVILEGES;
 quit;
 ```
 
-- 进入后端，根据实际修改flaskenv：
+- 切换到`backend`目录，根据实际情况修改`.flaskenv`：
 
 ```shell
-cd backend
 vim .flaskenv
 ```
 
-- 设置百度地图Access Key，百度地图的Access Key可在[百度地图开放平台](http://lbsyun.baidu.com/apiconsole/key?application=key)申请：
+- 设置百度地图Access Key。百度地图的Access Key可在[百度地图开放平台](http://lbsyun.baidu.com/apiconsole/key?application=key)申请。
 
 ```shell
 vim ../config.yaml
 ```
 
-- 参考GeoView的文档进行[模型准备](https://github.com/geoyee/GeoView/blob/develop/docs/dev.md)，将模型导出为部署模型，使用以下脚本：
+- 参考GeoView文档进行[模型准备](https://github.com/PaddleCV-SIG/GeoView/blob/release/0.1/docs/dev.md)，将模型导出为部署格式。具体而言，执行如下命令：
 
 ```shell
 cd /opt/GeoView/
@@ -172,14 +190,14 @@ python deploy/export/export_model.py --model_dir=/usr/qingdao/output/farseg/best
 python app.py
 ```
 
-- 新建一个终端，根据上面的`<containerName>`来启动前端：
+- 在另一个终端中根据`<containerName>`启动前端：
 
 ```shell
 docker exec -it <containerName> bash -c "cd frontend && npm run serve"
 ```
 
-- 进入到`http://localhost:3000/`，这里我们已经按照要求将训练好的模型放到了`backend/model/semantic_segmentation`文件夹下，可以看到在`地物分类`的可选模型中，已经有了我们放过去的模型。
+- 在浏览器打开`http://localhost:3000/`，如果在`地物分类`的可选模型中未包含先前训练的模型，需要确认是否已将模型存放在`backend/model/semantic_segmentation`。
 
 ![geoview](https://github.com/geoyee/img-bed/assets/71769312/7228c87c-5d2a-4e4a-bd98-b76a6a791b68)
 
-- 上传图像，开始处理，就能得到可视化的结果了。
+- 根据[GeoView文档](https://github.com/PaddleCV-SIG/GeoView/blob/release/0.1/docs/semantic_segmentation.md)上传图像，得到建筑物提取结果。

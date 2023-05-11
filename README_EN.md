@@ -260,9 +260,9 @@ PaddleRS is an end-to-end high-efficent development toolkit for remote sensing a
       <td>
       <details><summary><b>Official Examples</b></summary>
       <ul>
-        <li><a href="https://github.com/PaddleCV-SIG/GeoView">GeoView</a></li>
         <li><a href="./examples/rs_research/README.md">change detection research</a></li>
         <li><a href="./examples/c2fnet/README.md">small object optimization</a></li>
+        <li><a href="./examples/building_extraction/README.md">building extraction</a></li>
       </ul>
       </details>
       <details><summary><b>Community Examples</b></summary>
@@ -292,6 +292,7 @@ PaddleRS is an end-to-end high-efficent development toolkit for remote sensing a
 * Model Deployment
   * [Model export](./deploy/export/README.md)
   * [Paddle Inference (Python)](./deploy/README.md)
+  * [Interactive intelligent interprementation tool GeoView](https://github.com/PaddleCV-SIG/GeoView)
 * Development and Contribution
   * [Contributing guides](./docs/CONTRIBUTING_EN.md)
   * [Development manual](./docs/dev/dev_guide_en.md)
@@ -301,7 +302,6 @@ PaddleRS is an end-to-end high-efficent development toolkit for remote sensing a
 
 ## <img src="./docs/images/anli.png" width="30"/> Application Examples
 
-* [Interactive intelligent interprementation tool GeoView](https://github.com/PaddleCV-SIG/GeoView)
 * [Scientific research based on PaddleRS: designing a deep learning change detection model](./examples/rs_research/README.md)
 * [Optimization method for semantic segmentation of small objects in remote sensing images based on PaddleRS](./examples/c2fnet/README.md)
 

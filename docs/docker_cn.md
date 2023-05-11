@@ -1,46 +1,40 @@
-# PaddleRS镜像构建与使用
+# Docker镜像构建与使用
 
 ## 1. 镜像构建
 
-首先需要拉取仓库：
+PaddleRS提供`Dockerfile`，可构建基础镜像用于开发或部署。在镜像构建过程中，默认将拉取PaddleRS develop分支内容，并存放在`/opt/PaddleRS`。在构建镜像时可以通过`PPTAG`参数指定要使用的PaddlePaddle版本，例如：
 
-```shell
-git clone https://github.com/PaddlePaddle/PaddleRS
-```
-
-- 安装CPU版本，默认为2.4.1：
+- 安装CPU版本的PaddlePaddle-2.4.1，未指定`PPTAG`的情况下将默认安装此版本：
 
 ```shell
 docker build -t paddlers:latest -f Dockerfile .
 ```
 
-- （可选）安装GPU版本，若要使用PaddleRS进行训练，最好使用GPU版本，请确保Docker版本大于19，其他环境的`PPTAG`可以参考[https://hub.docker.com/r/paddlepaddle/paddle/tags](https://hub.docker.com/r/paddlepaddle/paddle/tags)：
+- 安装GPU版本PaddlePaddle-2.4.1，使用CUDA 11.7、cuDNN 8.4以及TensorRT 8.4：
 
 ```shell
 docker build -t paddlers:latest -f Dockerfile . --build-arg PPTAG=2.4.1-gpu-cuda11.7-cudnn8.4-trt8.4
 ```
 
-- （可选）若需要使用[EISeg](https://github.com/PaddlePaddle/PaddleSeg/tree/develop/EISeg)提供的交互式分割标注功能，可设置`EISEG="ON"`，默认只安装了支持遥感标注的扩展：
+其他环境的`PPTAG`可以参考[此处](https://hub.docker.com/r/paddlepaddle/paddle/tags)。请注意，如果需要安装GPU版本的PaddlePaddle，请确保Docker版本>=19。
+
+PaddleRS基础镜像中可选地集成[EISeg](https://github.com/PaddlePaddle/PaddleSeg/tree/develop/EISeg)标注工具。若需要使用EISeg提供的交互式分割标注功能，可设置`EISEG="ON"`：
 
 ```shell
 docker build -t paddlers:latest -f Dockerfile . --build-arg EISEG="ON"
 ```
 
+镜像中的EISeg默认只安装了支持遥感标注的扩展。
+
 ## 2. 镜像使用
 
-- 查看当前构建好的镜像，记住需要启动的镜像的`<imageID>`：
+通过如下指令创建新的容器。`-v`选项可用于将本机目录挂载到Docker容器中。若需要在容器中使用GPU，对于Docker 19及之后的版本，可以使用`[`、`]`内的参数：
 
 ```shell
-docker images
+docker run -it -v <本机文件夹绝对路径>:<容器文件夹绝对路径> [--gpus all -e NVIDIA_DRIVER_CAPABILITIES=compute,utility -e NVIDIA_VISIBLE_DEVICES=all] paddlers:latest /bin/bash
 ```
 
-- 仅使用PaddleRS（包括EISeg），可直接启动镜像，将本机存放模型参数的文件夹挂载到docker中，若要使用GPU，在docker 19之后，可以添加中括号内的参数启用GPU：
-
-```shell
-docker run -it -v <本机文件夹绝对路径:容器文件夹绝对路径> [--gpus all -e NVIDIA_DRIVER_CAPABILITIES=compute,utility -e NVIDIA_VISIBLE_DEVICES=all] <imageID>
-```
-
-- （可选）若需要使用EISeg，则需要在本机安装和开启X11，用于接收Qt的GUI界面。Windows可使用[VcXsrv](https://sourceforge.net/projects/vcxsrv/)，Linux可使用[Xserver](https://blog.csdn.net/a806689294/article/details/111462627)。在相关工具启动之后，再启动EISeg：
+若需要使用EISeg，则需要在本机安装和开启X11。Windows用户可使用[VcXsrv](https://sourceforge.net/projects/vcxsrv/)，Linux用户可使用[Xserver](https://blog.csdn.net/a806689294/article/details/111462627)。在相关工具启动之后，再启动EISeg：
 
 ```shell
 eiseg

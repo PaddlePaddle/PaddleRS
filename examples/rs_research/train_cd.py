@@ -18,6 +18,8 @@ EXP_DIR = 'exp/levircd/custom_model/'
 # 使用Compose组合多种变换方式。Compose中包含的变换将按顺序串行执行
 # API说明：https://github.com/PaddlePaddle/PaddleRS/blob/develop/docs/apis/data.md
 train_transforms = T.Compose([
+    # 读取影像
+    T.DecodeImg(),
     # 随机翻转和旋转
     T.RandomFlipOrRotate(
         # 以0.35的概率执行随机翻转，0.35的概率执行随机旋转
@@ -28,13 +30,16 @@ train_transforms = T.Compose([
         probsr=[0.33, 0.34, 0.33]),
     # 将数据归一化到[-1,1]
     T.Normalize(
-        mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
+        mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
+    T.ArrangeChangeDetector('train')
 ])
 
 eval_transforms = T.Compose([
+    T.DecodeImg(),
     # 验证阶段与训练阶段的数据归一化方式必须相同
     T.Normalize(
-        mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
+        mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
+    T.ArrangeChangeDetector('eval')
 ])
 
 # 分别构建训练、验证和测试所用的数据集
