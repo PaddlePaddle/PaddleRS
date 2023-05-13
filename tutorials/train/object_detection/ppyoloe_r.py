@@ -49,6 +49,12 @@ train_transforms = [
         filter_threshold=2, filter_mode='edge', rbox_type="oc"),
 ]
 
+train_batch_transforms = [
+    # 归一化图像
+    T.BatchNormalizeImage(
+        mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+]
+
 eval_transforms = [
     T.DecodeImg(),
     # 将标签转换为numpy array
@@ -67,6 +73,7 @@ train_dataset = pdrs.datasets.COCODetDataset(
     image_dir=IMAGE_DIR,
     anno_path=ANNO_PATH,
     transforms=train_transforms,
+    batch_transforms=train_batch_transforms,
     shuffle=True)
 
 eval_dataset = pdrs.datasets.COCODetDataset(
@@ -100,6 +107,7 @@ model.train(
     save_interval_epochs=5,
     # 每多少次迭代记录一次日志
     log_interval_steps=4,
+    metric='rbox',
     save_dir=EXP_DIR,
     # 使用余弦退火学习率调度器
     scheduler='Cosine',
@@ -108,7 +116,7 @@ model.train(
     # 初始学习率大小，请根据此公式适当调整learning_rate：(train_batch_size * gpu_nums) / (2 * 4) * 0.01
     learning_rate=0.008,
     # 学习率预热（learning rate warm-up）步数
-    warmup_steps=1000,
+    warmup_steps=100,
     # 初始学习率大小
     warmup_start_lr=0.,
     # 学习率衰减的epoch节点

@@ -475,15 +475,25 @@ class BaseDetector(BaseModel):
     def _default_batch_transforms(self, mode):
         raise NotImplementedError
 
-    def _compose_batch_transforms(self, mode, batch_transforms):
-        default_batch_transforms = self._default_batch_transforms(mode)
-        out = []
-        if batch_transforms is not None:
-            out.extend(batch_transforms.batch_transforms)
-        out.extend(default_batch_transforms.batch_transforms)
+    def _filter_batch_transforms(self, defaults, targets):
+        if targets is None:
+            return defaults
+        target_types = [type(i) for i in targets]
+        filtered = [i for i in defaults if type(i) not in target_types]
+        return filtered
 
-        return BatchCompose(
-            out, collate_batch=default_batch_transforms.collate_batch)
+    def _compose_batch_transforms(self, mode, batch_transforms):
+        defaults = self._default_batch_transforms(mode)
+        out = []
+        if isinstance(batch_transforms, BatchCompose):
+            batch_transforms = batch_transforms.batch_transforms
+        if batch_transforms is not None:
+            out.extend(batch_transforms)
+        filtered = self._filter_batch_transforms(defaults.batch_transforms,
+                                                 batch_transforms)
+        out.extend(filtered)
+
+        return BatchCompose(out, collate_batch=defaults.collate_batch)
 
     def quant_aware_train(self,
                           num_epochs,
@@ -2262,11 +2272,7 @@ class FCOSR(YOLOv3):
 
     def _default_batch_transforms(self, mode='train'):
         if mode == 'train':
-            batch_transforms = [
-                BatchNormalizeImage(
-                    mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-                BatchPadRGT(), _BatchPad(pad_to_stride=32)
-            ]
+            batch_transforms = [BatchPadRGT(), _BatchPad(pad_to_stride=32)]
         else:
             batch_transforms = [_BatchPad(pad_to_stride=32)]
 
@@ -2379,11 +2385,7 @@ class PPYOLOE_R(YOLOv3):
 
     def _default_batch_transforms(self, mode='train'):
         if mode == 'train':
-            batch_transforms = [
-                BatchNormalizeImage(
-                    mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-                BatchPadRGT(), _BatchPad(pad_to_stride=32)
-            ]
+            batch_transforms = [BatchPadRGT(), _BatchPad(pad_to_stride=32)]
         else:
             batch_transforms = [_BatchPad(pad_to_stride=32)]
 
