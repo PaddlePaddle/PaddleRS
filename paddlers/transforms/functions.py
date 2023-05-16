@@ -427,23 +427,25 @@ def to_uint8(im, norm=True, stretch=False):
         if len(image.shape) == 3:
             for b in range(image.shape[-1]):
                 stretched = exposure.equalize_hist(image[:, :, b])
+                assert np.min(stretched) >= 0
                 stretched /= float(np.max(stretched)) + EPS
                 stretches.append(stretched)
             stretched_img = np.stack(stretches, axis=2)
         else:  # if len(image.shape) == 2
             stretched_img = exposure.equalize_hist(image)
+            assert np.min(stretched_img) >= 0
             stretched_img /= float(np.max(stretched_img)) + EPS
         return stretched_img
 
     dtype = im.dtype.name
-    if dtype == 'uint8' and not stretch:
+    if dtype == 'uint8':
         return im
     if stretch:
         im = _two_percent_linear(im)
-    else:
-        im = _minmax_norm(im)
     if norm:
         im = _equalize_hist(im)
+    if not norm and not stretch:
+        im = _minmax_norm(im)
     im = np.uint8(im * 255)
     return im
 

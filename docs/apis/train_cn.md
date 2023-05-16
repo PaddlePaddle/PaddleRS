@@ -164,6 +164,7 @@ def train(self,
           learning_rate=.001,
           warmup_steps=0,
           warmup_start_lr=0.0,
+          scheduler='Piecewise',
           lr_decay_epochs=(216, 243),
           lr_decay_gamma=0.1,
           cosine_decay_num_epochs=1000,
@@ -172,6 +173,8 @@ def train(self,
           early_stop=False,
           early_stop_patience=5,
           use_vdl=True,
+          clip_grad_by_norm=None,
+          reg_coeff=1e-4,
           resume_checkpoint=None,
           precision='fp32',
           amp_level='O1',
@@ -195,6 +198,7 @@ def train(self,
 |`learning_rate`|`float`|训练时使用的学习率大小，适用于默认优化器。|`0.001`|
 |`warmup_steps`|`int`|默认优化器使用[warm-up策略](https://www.mdpi.com/2079-9292/10/16/2029/htm)的预热轮数。|`0`|
 |`warmup_start_lr`|`int`|默认优化器warm-up阶段使用的初始学习率。|`0`|
+|`scheduler`|`str`|训练时使用的学习率调度器，若为`None`，则使用默认定义的优化器。|`None`|
 |`lr_decay_epochs`|`list` \| `tuple`|默认优化器学习率衰减的milestones，以epoch计。即，在第几个epoch执行学习率的衰减。|`(216, 243)`|
 |`lr_decay_gamma`|`float`|学习率衰减系数，适用于默认优化器。|`0.1`|
 |`cosine_decay_num_epochs`|`int`|使用余弦退火学习率调度器时计算退火周期的参数。|`1000`|
@@ -203,6 +207,8 @@ def train(self,
 |`early_stop`|`bool`|训练过程是否启用早停策略。|`False`|
 |`early_stop_patience`|`int`|启用早停策略时的`patience`参数（参见[`EarlyStop`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/utils/utils.py)）。|`5`|
 |`use_vdl`|`bool`|是否启用VisualDL日志。|`True`|
+|`clip_grad_by_norm`|`float`|梯度裁剪所允许的最大值。|`None`|
+|`reg_coeff`|`float`|L2正则化系数。|`1e-5`|
 |`resume_checkpoint`|`str` \| `None`|检查点路径。PaddleRS支持从检查点（包含先前训练过程中存储的模型权重和优化器权重）继续训练，但需注意`resume_checkpoint`与`pretrain_weights`不得同时设置为`None`以外的值。|`None`|
 |`precision`|`str`|当设定为`'fp16'`时，启用自动混合精度训练。|`'fp32'`|
 |`amp_level`|`str`|自动混合精度训练模式。在O1模式下，基于白名单和黑名单确定每个算子使用FP16还是FP32精度计算。在O2模式下，除自定义黑名单中指定的算子以及部分不支持FP16精度的算子以外，全部使用FP16精度计算。|`'O1'`|

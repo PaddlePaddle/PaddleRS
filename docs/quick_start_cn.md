@@ -55,7 +55,8 @@ pip install GDAL‑3.3.3‑cp39‑cp39‑win_amd64.whl
 
 4. （可选）安装ext_op
 
-PaddleRS支持旋转目标检测，在使用之前需要安装`ext_op`外部自定义库，安装方式如下：
+PaddleRS支持旋转目标检测，在使用之前需要安装自定义外部算子库`ext_op`，安装方式如下：
+
 ```shell
 cd paddlers/models/ppdet/ext_op
 python setup.py install

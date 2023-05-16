@@ -3,8 +3,6 @@
 # 目标检测模型PP-YOLO训练示例脚本
 # 执行此脚本前，请确认已正确安装PaddleRS库
 
-import os
-
 import paddlers as pdrs
 from paddlers import transforms as T
 
@@ -31,12 +29,16 @@ train_transforms = [
     T.RandomCrop(),
     # 随机水平翻转
     T.RandomHorizontalFlip(),
-    # 对batch进行随机缩放，随机选择插值方式
-    T.BatchRandomResize(
-        target_sizes=[512, 544, 576, 608], interp='RANDOM'),
     # 影像归一化
     T.Normalize(
         mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+]
+
+# 定义作用在一个批次数据上的变换
+train_batch_transforms = [
+    # 对batch进行随机缩放，随机选择插值方式
+    T.BatchRandomResize(
+        target_sizes=[512, 544, 576, 608], interp='RANDOM'),
 ]
 
 eval_transforms = [
@@ -54,6 +56,7 @@ train_dataset = pdrs.datasets.VOCDetDataset(
     file_list=TRAIN_FILE_LIST_PATH,
     label_list=LABEL_LIST_PATH,
     transforms=train_transforms,
+    batch_transforms=train_batch_transforms,
     shuffle=True)
 
 eval_dataset = pdrs.datasets.VOCDetDataset(

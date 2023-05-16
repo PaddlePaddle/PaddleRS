@@ -164,6 +164,7 @@ def train(self,
           learning_rate=.001,
           warmup_steps=0,
           warmup_start_lr=0.0,
+          scheduler='Piecewise',
           lr_decay_epochs=(216, 243),
           lr_decay_gamma=0.1,
           cosine_decay_num_epochs=1000,
@@ -172,6 +173,8 @@ def train(self,
           early_stop=False,
           early_stop_patience=5,
           use_vdl=True,
+          clip_grad_by_norm=None,
+          reg_coeff=1e-4,
           resume_checkpoint=None,
           precision='fp32',
           amp_level='O1',
@@ -195,6 +198,7 @@ The meaning of each parameter is as follows:
 |`learning_rate`|`float`|Learning rate used during training, for default optimizer.|`0.001`|
 |`warmup_steps`|`int`|Number of [warm-up](https://www.mdpi.com/2079-9292/10/16/2029/htm) rounds used by the default optimizer.|`0`|
 |`warmup_start_lr`|`int`|Default initial learning rate used in the warm-up phase of the optimizer.|`0`|
+|`scheduler`|`str`|Learning rate scheduler used for training. If None, a default scheduler will be used.|`None`|
 |`lr_decay_epochs`|`list` \| `tuple`|Milestones of learning rate decline of the default optimizer, in terms of epochs. That is, which epoch the decay of the learning rate occurs.|`(216, 243)`|
 |`lr_decay_gamma`|`float`|Learning rate attenuation coefficient, for default optimizer.|`0.1`|
 |`cosine_decay_num_epochs`|`int`|Parameter to determine the annealing cycle when a cosine annealing learning rate scheduler is used.|`1000`|
@@ -203,6 +207,8 @@ The meaning of each parameter is as follows:
 |`early_stop`|`bool`|Whether to enable the early stopping policy during training.|`False`|
 |`early_stop_patience`|`int`|`patience` parameter when the early stopping policy is enabled. Please refer to [`EarlyStop`](https://github.com/PaddlePaddle/PaddleRS/blob/develop/paddlers/utils/utils.py) for more details.|`5`|
 |`use_vdl`|`bool`|Whether to enable VisualDL.|`True`|
+|`clip_grad_by_norm`|`float`|Maximum global norm for gradient clipping.|`None`|
+|`reg_coeff`|`float`|Coefficient for L2 regularization.|`1e-4`|
 |`resume_checkpoint`|`str` \| `None`|Checkpoint path. PaddleRS supports resuming training from checkpoints (including model weights and optimizer weights stored during previous training), but note that `resume_checkpoint` and `pretrain_weights` must not be set to values other than `None` at the same time.|`None`|
 |`precision`|`str`|Use AMP (auto mixed precision) training if `precision` is set to `'fp16'`.|`'fp32'`|
 |`amp_level`|`str`|Auto mixed precision level. Accepted values are 'O1' and 'O2': At O1 level, the input data type of each operator will be casted according to a white list and a black list. At O2 level, all parameters and input data will be casted to FP16, except those for the operators in the black list, those without the support for FP16 kernel, and those for the batchnorm layers.|`'O1'`|

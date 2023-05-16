@@ -115,7 +115,7 @@ class BaseModel(metaclass=ModelMeta):
                 backbone_name = getattr(self, 'backbone_name', None)
                 pretrain_weights = get_pretrain_weights(
                     pretrain_weights,
-                    self.__class__.__name__,
+                    self.model_name,
                     save_dir,
                     backbone_name=backbone_name)
         if pretrain_weights is not None:
@@ -332,7 +332,7 @@ class BaseModel(metaclass=ModelMeta):
                     save_dtype='float32')
 
         # XXX: Hard-coding
-        if self.model_type == 'detector' and 'RCNN' in self.__class__.__name__ and train_dataset.pos_num < len(
+        if self.model_type == 'detector' and 'RCNN' in self.model_name and train_dataset.pos_num < len(
                 train_dataset.file_list):
             nranks = 1
         else:
@@ -386,6 +386,10 @@ class BaseModel(metaclass=ModelMeta):
             step_time_tic = time.time()
 
             for step, data in enumerate(self.train_data_loader()):
+                # `PicoDet` and `PPYOLOE_R` need to switch label assinger according to epoch_id
+                # TODO: refactor this
+                if self.model_name in ['PicoDet', 'PPYOLOE_R']:
+                    data['epoch_id'] = i
                 if nranks > 1:
                     outputs = self.train_step(step, data, ddp_net, optimizer)
                 else:
@@ -499,9 +503,9 @@ class BaseModel(metaclass=ModelMeta):
                 Defaults to 'output'.
         """
 
-        if self.__class__.__name__ in {'FasterRCNN', 'MaskRCNN', 'PicoDet'}:
+        if self.model_name in {'FasterRCNN', 'MaskRCNN', 'PicoDet'}:
             raise ValueError("{} does not support pruning currently!".format(
-                self.__class__.__name__))
+                self.model_name))
 
         assert criterion in {'l1_norm', 'fpgm'}, \
             "Pruning criterion {} is not supported. Please choose from {'l1_norm', 'fpgm'}."
