@@ -476,6 +476,7 @@ class BaseDetector(BaseModel):
         raise NotImplementedError
 
     def _filter_batch_transforms(self, defaults, targets):
+        # TODO: Warning message
         if targets is None:
             return defaults
         target_types = [type(i) for i in targets]
