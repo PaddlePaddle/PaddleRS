@@ -172,7 +172,7 @@ def slider_predict(self,
 |`img_file`|`str`|输入影像路径。||
 |`save_dir`|`str`|预测结果输出路径。||
 |`block_size`|`list[int]` \| `tuple[int]` \| `int`|滑窗的窗口大小（以列表或元组指定宽度、高度或以一个整数指定相同的宽高）。||
-|`overlap`|`list[int]` \| `tuple[int]` \| `int`|滑窗的滑动步长（以列表或元组指定宽度、高度或以一个整数指定相同的宽高）。|`36`|
+|`overlap`|`list[int]` \| `tuple[int]` \| `int`|相邻滑窗的重叠像素数（以列表或元组指定宽度、高度或以一个整数指定相同的宽高）。|`36`|
 |`transforms`|`paddlers.transforms.Compose` \| `None`|对输入数据应用的数据变换算子。若为`None`，则使用训练器在验证阶段使用的数据变换算子。|`None`|
 |`invalid_value`|`int`|输出影像中用于标记无效像素的数值。|`255`|
 |`merge_strategy`|`str`|合并滑窗重叠区域使用的策略。`'keep_first'`表示保留遍历顺序（从左至右，从上往下，列优先）最靠前的窗口的预测类别；`'keep_last'`表示保留遍历顺序最靠后的窗口的预测类别；`'accum'`表示通过将各窗口在重叠区域给出的预测概率累加，计算最终预测类别。需要注意的是，在对大尺寸影像进行`overlap`较大的密集推理时，使用`'accum'`策略可能导致较长的推理时间，但一般能够在窗口交界部分取得更好的表现。|`'keep_last'`|

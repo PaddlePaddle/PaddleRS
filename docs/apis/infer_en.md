@@ -171,8 +171,8 @@ Input parameter list:
 |-------|----|--------|-----|
 |`img_file`|`str`|Input image path.||
 |`save_dir`|`str`|Directory to store predicted results.||
-|`block_size`|`list[int]` \| `tuple[int]` \| `int`|Size of the sliding window (specifying the width and height in a list or tuple, or the same width and height in an integer).||
-|`overlap`|`list[int]` \| `tuple[int]` \| `int`|Sliding step size of the sliding window (specifying the width and height in a list or tuple, or the same width and height in an integer).|`36`|
+|`block_size`|`list[int]` \| `tuple[int]` \| `int`|Size of the sliding window. Specify the width and height in a list or tuple, or the same width and height in an integer.||
+|`overlap`|`list[int]` \| `tuple[int]` \| `int`|Overlap of adjacent windows in pixels. Specify the width and height in a list or tuple, or the same width and height in an integer).|`36`|
 |`transforms`|`paddlers.transforms.Compose` \| `None`|Apply data transformation operators to input data. If `None`, the data transformation operators of trainer in the validation phase is used.|`None`|
 |`invalid_value`|`int`|Value used to mark invalid pixels in the output image.|`255`|
 |`merge_strategy`|`str`|Strategies used to merge sliding window overlapping areas.`'keep_first'` means retaining the prediction category of the first window in the traversal order (left to right, top to bottom, column first); `'keep_last'` stands for keeping the prediction category of the last window in the traversal order; `'accum'` means determining the final prediction categories in the overlapping area by summing the prediction probabilities given by each window. It should be noted that when dense inference with large `overlap` is carried out for large size images, using `'accum'` strategy may lead to longer inference time, but generally it can achieve better performance at the window boundary.|`'keep_last'`|
