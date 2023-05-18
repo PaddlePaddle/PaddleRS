@@ -82,7 +82,7 @@ def match(image1_path,
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="input parameters")
+    parser = argparse.ArgumentParser()
     parser.add_argument('--image1_path', type=str, required=True, \
                         help="Path of time1 image (with geoinfo).")
     parser.add_argument('--image2_path', type=str, required=True, \
