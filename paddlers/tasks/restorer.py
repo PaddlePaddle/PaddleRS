@@ -30,6 +30,7 @@ from paddlers.models import res_losses
 from paddlers.models.ppgan.modules.init import init_weights
 from paddlers.transforms import Resize, decode_image, construct_sample
 from paddlers.transforms.functions import calc_hr_shape
+from paddlers.utils import to_data_parallel
 from paddlers.utils.checkpoint import res_pretrain_weights_dict
 from .base import BaseModel
 from .utils.res_adapters import GANAdapter, OptimizerAdapter
@@ -414,58 +415,56 @@ class BaseRestorer(BaseModel):
         """
 
         self._check_transforms(eval_dataset.transforms)
+        net = self.net
+        net.eval()
 
-        self.net.eval()
+        # XXX: Hard-coding
         nranks = paddle.distributed.get_world_size()
-        local_rank = paddle.distributed.get_rank()
         if nranks > 1:
             # Initialize parallel environment if not done.
             if not paddle.distributed.parallel.parallel_helper._is_parallel_ctx_initialized(
             ):
                 paddle.distributed.init_parallel_env()
+                net = to_data_parallel(
+                    net, find_unused_parameters=self.find_unused_parameters)
+            else:
+                net = to_data_parallel(
+                    net, find_unused_parameters=self.find_unused_parameters)
 
-        # TODO: Distributed evaluation
-        if batch_size > 1:
-            logging.warning(
-                "Restorer only supports single card evaluation with batch_size=1 "
-                "during evaluation, so batch_size is forcibly set to 1.")
-            batch_size = 1
+        self.eval_data_loader = self.build_data_loader(
+            eval_dataset, batch_size=batch_size, mode='eval')
+        # XXX: Hard-code crop_border and test_y_channel
+        psnr = metrics.PSNR(crop_border=4, test_y_channel=True)
+        ssim = metrics.SSIM(crop_border=4, test_y_channel=True)
+        logging.info("Start to evaluate (total_samples={}, total_steps={})...".
+                     format(eval_dataset.num_samples, eval_dataset.num_samples))
+        with paddle.no_grad():
+            for step, data in enumerate(self.eval_data_loader):
+                if self.precision == 'fp16':
+                    with paddle.amp.auto_cast(
+                            level=self.amp_level,
+                            enable=True,
+                            custom_white_list=self.custom_white_list,
+                            custom_black_list=self.custom_black_list):
+                        outputs = self.run(net, data, 'eval')
+                else:
+                    outputs = self.run(net, data, 'eval')
+                for i in range(batch_size):
+                    psnr.update(outputs['pred'][i], outputs['tar'][i])
+                    ssim.update(outputs['pred'][i], outputs['tar'][i])
 
-        if nranks < 2 or local_rank == 0:
-            self.eval_data_loader = self.build_data_loader(
-                eval_dataset, batch_size=batch_size, mode='eval')
-            # XXX: Hard-code crop_border and test_y_channel
-            psnr = metrics.PSNR(crop_border=4, test_y_channel=True)
-            ssim = metrics.SSIM(crop_border=4, test_y_channel=True)
-            logging.info(
-                "Start to evaluate (total_samples={}, total_steps={})...".
-                format(eval_dataset.num_samples, eval_dataset.num_samples))
-            with paddle.no_grad():
-                for step, data in enumerate(self.eval_data_loader):
-                    if self.precision == 'fp16':
-                        with paddle.amp.auto_cast(
-                                level=self.amp_level,
-                                enable=True,
-                                custom_white_list=self.custom_white_list,
-                                custom_black_list=self.custom_black_list):
-                            outputs = self.run(self.net, data, 'eval')
-                    else:
-                        outputs = self.run(self.net, data, 'eval')
-                    psnr.update(outputs['pred'], outputs['tar'])
-                    ssim.update(outputs['pred'], outputs['tar'])
+        # DO NOT use psnr.accumulate() here, otherwise the program hangs in multi-card training.
+        assert len(psnr.results) > 0
+        assert len(ssim.results) > 0
+        eval_metrics = OrderedDict(
+            zip(['psnr', 'ssim'],
+                [np.mean(psnr.results), np.mean(ssim.results)]))
 
-            # DO NOT use psnr.accumulate() here, otherwise the program hangs in multi-card training.
-            assert len(psnr.results) > 0
-            assert len(ssim.results) > 0
-            eval_metrics = OrderedDict(
-                zip(['psnr', 'ssim'],
-                    [np.mean(psnr.results), np.mean(ssim.results)]))
+        if return_details:
+            # TODO: Add details
+            return eval_metrics, None
 
-            if return_details:
-                # TODO: Add details
-                return eval_metrics, None
-
-            return eval_metrics
+        return eval_metrics
 
     @paddle.no_grad()
     def predict(self, img_file, transforms=None):
@@ -553,6 +552,8 @@ class BaseRestorer(BaseModel):
                 else:
                     pass
             results.append(pred)
+        if len(results) > 1:
+            results = [paddle.concat(results, axis=0)]
         return results
 
     def _infer_postprocess(self, batch_res_map, batch_restore_list):

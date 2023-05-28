@@ -31,6 +31,7 @@ from paddlers.transforms.operators import _NormalizeBox, _PadBox, _BboxXYXY2XYWH
 from paddlers.transforms.batch_operators import BatchCompose, _BatchPad, _Gt2YoloTarget, BatchPadRGT, BatchNormalizeImage
 from paddlers.models.ppdet.optimizer import ModelEMA
 import paddlers.utils.logging as logging
+from paddlers.utils import to_data_parallel
 from paddlers.utils.checkpoint import det_pretrain_weights_dict
 from .base import BaseModel
 from .utils.det_metrics import VOCMetric, COCOMetric, RBoxMetric
@@ -629,71 +630,93 @@ class BaseDetector(BaseModel):
                                       self._default_collate_fn)
 
         self._check_transforms(eval_dataset.transforms)
+        net = self.net
+        net.eval()
 
-        self.net.eval()
+        # XXX: Hard-coding
         nranks = paddle.distributed.get_world_size()
-        local_rank = paddle.distributed.get_rank()
         if nranks > 1:
             # Initialize parallel environment if not done.
             if not paddle.distributed.parallel.parallel_helper._is_parallel_ctx_initialized(
             ):
                 paddle.distributed.init_parallel_env()
-
-        if batch_size > 1:
-            logging.warning(
-                "Detector only supports single card evaluation with batch_size=1 "
-                "during evaluation, so batch_size is forcibly set to 1.")
-            batch_size = 1
-
-        if nranks < 2 or local_rank == 0:
-            self.eval_data_loader = self.build_data_loader(
-                eval_dataset,
-                batch_size=batch_size,
-                mode='eval',
-                collate_fn=eval_dataset.collate_fn)
-            is_bbox_normalized = False
-            if hasattr(eval_dataset, 'batch_transforms'):
-                is_bbox_normalized = any(
-                    isinstance(t, _NormalizeBox)
-                    for t in eval_dataset.batch_transforms.batch_transforms)
-            if self.metric == 'voc':
-                eval_metric = VOCMetric(
-                    labels=eval_dataset.labels,
-                    coco_gt=copy.deepcopy(eval_dataset.coco_gt),
-                    is_bbox_normalized=is_bbox_normalized,
-                    classwise=False)
-            elif self.metric == 'coco':
-                eval_metric = COCOMetric(
-                    coco_gt=copy.deepcopy(eval_dataset.coco_gt),
-                    classwise=False)
+                net = to_data_parallel(
+                    net, find_unused_parameters=self.find_unused_parameters)
             else:
-                assert hasattr(eval_dataset, 'get_anno_path')
-                eval_metric = RBoxMetric(
-                    anno_file=eval_dataset.get_anno_path(), classwise=False)
-            scores = collections.OrderedDict()
-            logging.info(
-                "Start to evaluate (total_samples={}, total_steps={})...".
-                format(eval_dataset.num_samples, eval_dataset.num_samples))
-            with paddle.no_grad():
-                for step, data in enumerate(self.eval_data_loader):
-                    if self.precision == 'fp16':
-                        with paddle.amp.auto_cast(
-                                level=self.amp_level,
-                                enable=True,
-                                custom_white_list=self.custom_white_list,
-                                custom_black_list=self.custom_black_list):
-                            outputs = self.run(self.net, data, 'eval')
-                    else:
-                        outputs = self.run(self.net, data, 'eval')
-                    eval_metric.update(data, outputs)
-                eval_metric.accumulate()
-                self.eval_details = eval_metric.details
-                scores.update(eval_metric.get())
-                eval_metric.reset()
+                net = to_data_parallel(
+                    net, find_unused_parameters=self.find_unused_parameters)
 
-            if return_details:
-                return scores, self.eval_details
-            return scores
+        self.eval_data_loader = self.build_data_loader(
+            eval_dataset,
+            batch_size=batch_size,
+            mode='eval',
+            collate_fn=eval_dataset.collate_fn)
+        is_bbox_normalized = False
+        if hasattr(eval_dataset, 'batch_transforms'):
+            is_bbox_normalized = any(
+                isinstance(t, _NormalizeBox)
+                for t in eval_dataset.batch_transforms.batch_transforms)
+        if self.metric == 'voc':
+            eval_metric = VOCMetric(
+                labels=eval_dataset.labels,
+                coco_gt=copy.deepcopy(eval_dataset.coco_gt),
+                is_bbox_normalized=is_bbox_normalized,
+                classwise=False)
+        elif self.metric == 'coco':
+            eval_metric = COCOMetric(
+                coco_gt=copy.deepcopy(eval_dataset.coco_gt), classwise=False)
+        else:
+            assert hasattr(eval_dataset, 'get_anno_path')
+            eval_metric = RBoxMetric(
+                anno_file=eval_dataset.get_anno_path(), classwise=False)
+        scores = collections.OrderedDict()
+        logging.info("Start to evaluate (total_samples={}, total_steps={})...".
+                     format(eval_dataset.num_samples, eval_dataset.num_samples))
+        with paddle.no_grad():
+            for step, data in enumerate(self.eval_data_loader):
+                if self.precision == 'fp16':
+                    with paddle.amp.auto_cast(
+                            level=self.amp_level,
+                            enable=True,
+                            custom_white_list=self.custom_white_list,
+                            custom_black_list=self.custom_black_list):
+                        outputs = self.run(net, data, 'eval')
+                else:
+                    outputs = self.run(net, data, 'eval')
+
+                sum_num = 0
+                for i in range(outputs['bbox_num'].shape[0]):
+                    output = {}
+                    output['bbox_num'] = outputs['bbox_num'][i:i + 1]
+
+                    start_id = sum_num
+                    sum_num += int(output['bbox_num'])
+                    end_id = sum_num
+                    output['bbox'] = outputs['bbox'][start_id:end_id + 1]
+
+                    data_single = {}
+                    data_single['im_id'] = data['im_id'][i].unsqueeze(0)
+                    data_single['image'] = data['image'][i].unsqueeze(0)
+                    data_single['image_shape'] = data['image_shape'][
+                        i].unsqueeze(0)
+                    data_single['im_shape'] = data['im_shape'][i].unsqueeze(0)
+                    data_single['scale_factor'] = data['scale_factor'][
+                        i].unsqueeze(0)
+                    data_single['permuted'] = data['permuted'][i]
+                    data_single['gt_bbox'] = [data['gt_bbox'][i]]
+                    data_single['difficult'] = [data['difficult'][i]]
+                    data_single['gt_class'] = [data['gt_class'][i]]
+
+                    eval_metric.update(data_single, output)
+
+            eval_metric.accumulate()
+            self.eval_details = eval_metric.details
+            scores.update(eval_metric.get())
+            eval_metric.reset()
+
+        if return_details:
+            return scores, self.eval_details
+        return scores
 
     @paddle.no_grad()
     def predict(self, img_file, transforms=None):
