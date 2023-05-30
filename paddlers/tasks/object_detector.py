@@ -770,13 +770,22 @@ class BaseDetector(BaseModel):
                 for j in range(det_nums):
                     dt = bboxes[k]
                     k = k + 1
-                    num_id, score, xmin, ymin, xmax, ymax = dt.tolist()
+                    dt = dt.tolist()
+                    if len(dt) == 8:
+                        # Generic object detection
+                        num_id, score, xmin, ymin, xmax, ymax = dt
+                        w = xmax - xmin
+                        h = ymax - ymin
+                        bbox = [xmin, ymin, w, h]
+                    elif len(dt) == 10:
+                        # Rotated object detection
+                        num_id, score, *pts = dt
+                        bbox = list(pts)
+                    else:
+                        raise AssertionError
                     if int(num_id) < 0:
                         continue
                     category = self.labels[int(num_id)]
-                    w = xmax - xmin
-                    h = ymax - ymin
-                    bbox = [xmin, ymin, w, h]
                     dt_res = {
                         'category_id': int(num_id),
                         'category': category,
@@ -2287,6 +2296,10 @@ class FCOSR(YOLOv3):
 
         return batch_transforms
 
+    def export_inference_model(self, save_dir, image_shape=None):
+        raise RuntimeError("Currently, {} model cannot be exported.".format(
+            self.__class__.__name__))
+
 
 class PPYOLOE_R(YOLOv3):
     supported_backbones = ('CSPResNet_m', 'CSPResNet_l', 'CSPResNet_s',
@@ -2399,3 +2412,7 @@ class PPYOLOE_R(YOLOv3):
             batch_transforms, collate_batch=collate_batch)
 
         return batch_transforms
+
+    def export_inference_model(self, save_dir, image_shape=None):
+        raise RuntimeError("Currently, {} model cannot be exported.".format(
+            self.__class__.__name__))

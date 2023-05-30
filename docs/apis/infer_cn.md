@@ -82,7 +82,7 @@ def predict(self, img_file, transforms=None):
 ```
 {"category_id": 类别ID,
  "category": 类别名称,
- "bbox": 目标框位置信息，依次包含目标框左上角的横、纵坐标以及目标框的宽度和长度,  
+ "bbox": 目标框位置信息，对于水平目标框依次包含目标框左上角的横、纵坐标以及目标框的宽度和高度，对于旋转框依次包含目标框的四个角点的横、纵坐标,  
  "score": 类别置信度,
  "mask": [RLE格式](https://baike.baidu.com/item/rle/366352)的掩模图（mask），仅实例分割模型预测结果包含此键值对}
 ```

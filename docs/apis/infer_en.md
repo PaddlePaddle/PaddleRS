@@ -82,7 +82,7 @@ If `img_file` is a string or NumPy array, returns a list with a predicted target
 ```
 {"category_id": Category ID,
  "category": Category name,
- "bbox": Bounding box position information, including the horizontal and vertical coordinates of the upper left corner of the box and the width and length of the box,  
+ "bbox": Bounding box position information, including the horizontal and vertical coordinates of the upper left corner of the box and the width and height of the box (for horizontal bounding boxes), or the horizontal and vertical coordinates of the four corners of the box (for rotated bounding boxes),  
  "score": Category confidence score,
  "mask": [RLE Format](https://baike.baidu.com/item/rle/366352) mask, only instance segmentation model prediction results contain this key-value pair}
 ```
