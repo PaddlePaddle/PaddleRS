@@ -771,7 +771,7 @@ class BaseDetector(BaseModel):
                     dt = bboxes[k]
                     k = k + 1
                     dt = dt.tolist()
-                    if len(dt) == 8:
+                    if len(dt) == 6:
                         # Generic object detection
                         num_id, score, xmin, ymin, xmax, ymax = dt
                         w = xmax - xmin
