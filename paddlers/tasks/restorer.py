@@ -449,10 +449,13 @@ class BaseRestorer(BaseModel):
                         outputs = self.run(net, data, 'eval')
                 else:
                     outputs = self.run(net, data, 'eval')
-                for i in range(batch_size):
-                    psnr.update(outputs['pred'][i], outputs['tar'][i])
-                    ssim.update(outputs['pred'][i], outputs['tar'][i])
-
+                if len(outputs['pred'].shape) > 3:
+                    for i in range(batch_size):
+                        psnr.update(outputs['pred'][i], outputs['tar'][i])
+                        ssim.update(outputs['pred'][i], outputs['tar'][i])
+                else:
+                    psnr.update(outputs['pred'], outputs['tar'])
+                    ssim.update(outputs['pred'], outputs['tar'])
         # DO NOT use psnr.accumulate() here, otherwise the program hangs in multi-card training.
         assert len(psnr.results) > 0
         assert len(ssim.results) > 0
