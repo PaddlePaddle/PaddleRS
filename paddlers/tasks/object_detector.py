@@ -447,7 +447,7 @@ class BaseDetector(BaseModel):
             self._is_backbone_weight())
 
         if use_ema:
-            ema = ModelEMA(model=self.net, decay=.9998, use_thres_step=True)
+            ema = ModelEMA(model=self.net, decay=.9998)
         else:
             ema = None
         # Start train loop
