@@ -685,29 +685,159 @@ class BaseDetector(BaseModel):
                     outputs = self.run(net, data, 'eval')
 
                 sum_num = 0
-                for i in range(outputs['bbox_num'].shape[0]):
-                    output = {}
-                    output['bbox_num'] = outputs['bbox_num'][i:i + 1]
+                if nranks > 1:
+                    for i in range(outputs['bbox_num'].shape[0]):
+                        output_bbox_num = outputs['bbox_num'][i:i + 1].cuda()
 
-                    start_id = sum_num
-                    sum_num += int(output['bbox_num'])
-                    end_id = sum_num
-                    output['bbox'] = outputs['bbox'][start_id:end_id + 1]
+                        start_id = sum_num
+                        sum_num += int(output_bbox_num)
+                        end_id = sum_num
+                        output_bbox = outputs['bbox'][start_id:end_id + 1].cuda(
+                        )
 
-                    data_single = {}
-                    data_single['im_id'] = data['im_id'][i].unsqueeze(0)
-                    data_single['image'] = data['image'][i].unsqueeze(0)
-                    data_single['image_shape'] = data['image_shape'][
-                        i].unsqueeze(0)
-                    data_single['im_shape'] = data['im_shape'][i].unsqueeze(0)
-                    data_single['scale_factor'] = data['scale_factor'][
-                        i].unsqueeze(0)
-                    data_single['permuted'] = data['permuted'][i]
-                    data_single['gt_bbox'] = [data['gt_bbox'][i]]
-                    data_single['difficult'] = [data['difficult'][i]]
-                    data_single['gt_class'] = [data['gt_class'][i]]
+                        data_single_im_id = data['im_id'][i].unsqueeze(0)
+                        data_single_image = data['image'][i].unsqueeze(0)
+                        data_single_image_shape = data['image_shape'][
+                            i].unsqueeze(0)
+                        data_single_im_shape = data['im_shape'][i].unsqueeze(0)
+                        data_single_scale_factor = data['scale_factor'][
+                            i].unsqueeze(0)
+                        data_single_permuted = data['permuted'][i]
+                        data_single_gt_bbox = data['gt_bbox'][i]
+                        data_single_gt_bbox_num = paddle.to_tensor(
+                            data_single_gt_bbox.shape[0])
+                        data_single_difficult = data['difficult'][i]
+                        data_single_gt_class = data['gt_class'][i]
 
-                    eval_metric.update(data_single, output)
+                        output_bbox_num_list = []
+                        paddle.distributed.all_gather(output_bbox_num_list,
+                                                      output_bbox_num)
+                        max_num = paddle.max(
+                            paddle.concat(output_bbox_num_list))
+                        if len(output_bbox) < max_num:
+                            tp_box = output_bbox[0:1].clone()
+                            pad_box = tp_box.tile(
+                                (max_num - len(output_bbox), 1))
+                            output_bbox_pad = paddle.concat(
+                                [output_bbox, pad_box], axis=0)
+                        else:
+                            output_bbox_pad = output_bbox
+                        output_bbox_list = []
+                        paddle.distributed.all_gather(output_bbox_list,
+                                                      output_bbox_pad)
+                        data_single_im_id_list = []
+                        paddle.distributed.all_gather(data_single_im_id_list,
+                                                      data_single_im_id)
+                        data_single_image_list = []
+                        paddle.distributed.all_gather(data_single_image_list,
+                                                      data_single_image)
+                        data_single_image_shape_list = []
+                        paddle.distributed.all_gather(
+                            data_single_image_shape_list,
+                            data_single_image_shape)
+                        data_single_im_shape_list = []
+                        paddle.distributed.all_gather(data_single_im_shape_list,
+                                                      data_single_im_shape)
+                        data_single_scale_factor_list = []
+                        paddle.distributed.all_gather(
+                            data_single_scale_factor_list,
+                            data_single_scale_factor)
+                        data_single_permuted_list = []
+                        paddle.distributed.all_gather(data_single_permuted_list,
+                                                      data_single_permuted)
+                        data_single_gt_bbox_num_list = []
+                        paddle.distributed.all_gather(
+                            data_single_gt_bbox_num_list,
+                            data_single_gt_bbox_num)
+                        max_num = paddle.max(
+                            paddle.concat(output_bbox_num_list))
+                        if data_single_gt_bbox.shape[0] < max_num:
+                            tp_box = data_single_gt_bbox[0:1].clone()
+                            pad_box = tp_box.tile(
+                                (max_num - data_single_gt_bbox.shape[0], 1))
+                            data_single_gt_bbox_pad = paddle.concat(
+                                [data_single_gt_bbox, pad_box], axis=0)
+                            tp_diff = data_single_difficult[0:1].clone()
+                            pad_diff = tp_diff.tile(
+                                (max_num - data_single_gt_bbox.shape[0], 1))
+                            data_single_difficult_pad = paddle.concat(
+                                [data_single_difficult, pad_diff], axis=0)
+                            tp_glass = data_single_gt_class[0:1].clone()
+                            pad_glass = tp_glass.tile(
+                                (max_num - data_single_gt_bbox.shape[0], 1))
+                            data_single_gt_class_pad = paddle.concat(
+                                [data_single_gt_class, pad_glass], axis=0)
+                        else:
+                            data_single_gt_bbox_pad = data_single_gt_bbox_pad
+                        data_single_gt_bbox_list = []
+                        paddle.distributed.all_gather(data_single_gt_bbox_list,
+                                                      data_single_gt_bbox_pad)
+                        data_single_difficult_list = []
+                        paddle.distributed.all_gather(
+                            data_single_difficult_list,
+                            data_single_difficult_pad)
+                        data_single_gt_class_list = []
+                        paddle.distributed.all_gather(data_single_gt_class_list,
+                                                      data_single_gt_class_pad)
+
+                        for rank_id in range(nranks):
+                            output = {}
+                            data_single = {}
+                            output['bbox_num'] = output_bbox_num_list[rank_id]
+                            output['bbox'] = output_bbox_list[
+                                rank_id][:output_bbox_num_list[rank_id]]
+
+                            data_single['im_id'] = data_single_im_id_list[
+                                rank_id]
+                            data_single['image'] = data_single_image_list[
+                                rank_id]
+                            data_single[
+                                'image_shape'] = data_single_image_shape_list[
+                                    rank_id]
+                            data_single['im_shape'] = data_single_im_shape_list[
+                                rank_id]
+                            data_single[
+                                'scale_factor'] = data_single_scale_factor_list[
+                                    rank_id]
+                            data_single['permuted'] = data_single_permuted_list[
+                                rank_id]
+                            box_num = data_single_gt_bbox_num_list[rank_id]
+                            data_single['gt_bbox'] = [
+                                data_single_gt_bbox_list[rank_id][:box_num]
+                            ]
+                            data_single['difficult'] = [
+                                data_single_difficult_list[rank_id][:box_num]
+                            ]
+                            data_single['gt_class'] = [
+                                data_single_gt_class_list[rank_id][:box_num]
+                            ]
+
+                            eval_metric.update(data_single, output)
+                else:
+                    for i in range(outputs['bbox_num'].shape[0]):
+                        output = {}
+                        output['bbox_num'] = outputs['bbox_num'][i:i + 1]
+
+                        start_id = sum_num
+                        sum_num += int(output['bbox_num'])
+                        end_id = sum_num
+                        output['bbox'] = outputs['bbox'][start_id:end_id + 1]
+
+                        data_single = {}
+                        data_single['im_id'] = data['im_id'][i].unsqueeze(0)
+                        data_single['image'] = data['image'][i].unsqueeze(0)
+                        data_single['image_shape'] = data['image_shape'][
+                            i].unsqueeze(0)
+                        data_single['im_shape'] = data['im_shape'][i].unsqueeze(
+                            0)
+                        data_single['scale_factor'] = data['scale_factor'][
+                            i].unsqueeze(0)
+                        data_single['permuted'] = data['permuted'][i]
+                        data_single['gt_bbox'] = [data['gt_bbox'][i]]
+                        data_single['difficult'] = [data['difficult'][i]]
+                        data_single['gt_class'] = [data['gt_class'][i]]
+
+                        eval_metric.update(data_single, output)
 
             eval_metric.accumulate()
             self.eval_details = eval_metric.details

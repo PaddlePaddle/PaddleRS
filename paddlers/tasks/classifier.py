@@ -437,8 +437,23 @@ class BaseClassifier(BaseModel):
                         outputs = self.run(net, data, 'eval')
                 else:
                     outputs = self.run(net, data, 'eval')
-                top1s.append(outputs["top1"])
-                top5s.append(outputs["top5"])
+                if nranks > 1:
+                    t1 = outputs["top1"]
+                    t5 = outputs["top5"]
+                    t1s = []
+                    t5s = []
+                    paddle.distributed.all_gather(t1s, t1)
+                    paddle.distributed.all_gather(t5s, t5)
+                    for rank_id in range(nranks):
+                        top1 = t1s[rank_id]
+                        top5 = t5s[rank_id]
+                        for i in range(data['image'].shape[0]):
+                            top1s.append(top1)
+                            top5s.append(top5)
+                else:
+                    for i in range(data['image'].shape[0]):
+                        top1s.append(outputs["top1"])
+                        top5s.append(outputs["top5"])
 
         top1 = np.mean(top1s)
         top5 = np.mean(top5s)
