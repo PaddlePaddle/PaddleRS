@@ -29,7 +29,7 @@ import paddlers.rs_models.cd as cmcd
 import paddlers.utils.logging as logging
 from paddlers.models import seg_losses
 from paddlers.transforms import Resize, decode_image, construct_sample
-from paddlers.utils import get_single_card_bs
+from paddlers.utils import to_data_parallel
 from paddlers.utils.checkpoint import cd_pretrain_weights_dict
 from .base import BaseModel
 from .utils import seg_metrics as metrics
@@ -447,25 +447,22 @@ class BaseChangeDetector(BaseModel):
         """
 
         self._check_transforms(eval_dataset.transforms)
+        net = self.net
+        net.eval()
 
-        self.net.eval()
+        # XXX: Hard-coding
         nranks = paddle.distributed.get_world_size()
-        local_rank = paddle.distributed.get_rank()
         if nranks > 1:
             # Initialize parallel environment if not done.
-            if not (paddle.distributed.parallel.parallel_helper.
-                    _is_parallel_ctx_initialized()):
+            if not paddle.distributed.parallel.parallel_helper._is_parallel_ctx_initialized(
+            ):
                 paddle.distributed.init_parallel_env()
+                net = to_data_parallel(
+                    net, find_unused_parameters=self.find_unused_parameters)
+            else:
+                net = to_data_parallel(
+                    net, find_unused_parameters=self.find_unused_parameters)
 
-        batch_size_each_card = get_single_card_bs(batch_size)
-        if batch_size_each_card > 1:
-            batch_size_each_card = 1
-            batch_size = batch_size_each_card * paddlers.env_info['num']
-            logging.warning(
-                "ChangeDetector only supports batch_size=1 for each gpu/cpu card " \
-                "during evaluation, so batch_size " \
-                "is forcibly set to {}.".format(batch_size)
-            )
         self.eval_data_loader = self.build_data_loader(
             eval_dataset, batch_size=batch_size, mode='eval')
 
@@ -485,9 +482,9 @@ class BaseChangeDetector(BaseModel):
                             enable=True,
                             custom_white_list=self.custom_white_list,
                             custom_black_list=self.custom_black_list):
-                        outputs = self.run(self.net, data, 'eval')
+                        outputs = self.run(net, data, 'eval')
                 else:
-                    outputs = self.run(self.net, data, 'eval')
+                    outputs = self.run(net, data, 'eval')
                 pred_area = outputs['pred_area']
                 label_area = outputs['label_area']
                 intersect_area = outputs['intersect_area']
@@ -694,6 +691,8 @@ class BaseChangeDetector(BaseModel):
                 else:
                     raise RuntimeError
             results.append(pred)
+        if len(results) > 1:
+            results = [paddle.concat(results, axis=0)]
         return results
 
     def _infer_postprocess(self, batch_label_map, batch_score_map,
