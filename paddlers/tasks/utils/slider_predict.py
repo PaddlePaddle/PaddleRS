@@ -512,21 +512,10 @@ def slider_predict(predict_func,
                 batch_out = predict_func(batch_data, transforms=transforms)
 
                 for out, (xoff_, yoff_) in zip(batch_out, batch_offsets):
-                    if len(out['label_map'].shape) == 3:
-                        for i in range(out['label_map'].shape[0]):
-                            out_single = {}
-                            out_single['label_map'] = out['label_map'][i]
-                            out_single['score_map'] = out['score_map'][i]
-                            # Get processed result
-                            pred = overlap_processor.process_pred(out_single,
-                                                                  xoff_, yoff_)
-                            # Write to file
-                            band.WriteArray(pred, xoff_, yoff_)
-                    else:
-                        # Get processed result
-                        pred = overlap_processor.process_pred(out, xoff_, yoff_)
-                        # Write to file
-                        band.WriteArray(pred, xoff_, yoff_)
+                    # Get processed result
+                    pred = overlap_processor.process_pred(out, xoff_, yoff_)
+                    # Write to file
+                    band.WriteArray(pred, xoff_, yoff_)
 
                 batch_data.clear()
                 batch_offsets.clear()
