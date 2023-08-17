@@ -39,6 +39,8 @@ class ADE20K(Dataset):
         edge (bool, optional): Whether to compute edge while training. Default: False
     """
     NUM_CLASSES = 150
+    IGNORE_INDEX = 255
+    IMG_CHANNELS = 3
 
     def __init__(self, transforms, dataset_root=None, mode='train', edge=False):
         self.dataset_root = dataset_root
@@ -47,7 +49,7 @@ class ADE20K(Dataset):
         self.mode = mode
         self.file_list = list()
         self.num_classes = self.NUM_CLASSES
-        self.ignore_index = 255
+        self.ignore_index = self.IGNORE_INDEX
         self.edge = edge
 
         if mode not in ['train', 'val']:
@@ -97,21 +99,19 @@ class ADE20K(Dataset):
         ]  # If key in gt_fields, the data[key] have transforms synchronous.
 
         if self.mode == 'val':
-            data = self.transforms(data)
             label = np.asarray(Image.open(label_path))
             # The class 0 is ignored. And it will equal to 255 after
             # subtracted 1, because the dtype of label is uint8.
             label = label - 1
+            data = self.transforms(data)
             label = label[np.newaxis, :, :]
             data['label'] = label
             return data
         else:
-            data['label'] = label_path
+            data['label'] = np.asarray(Image.open(label_path))
             data['gt_fields'].append('label')
-            data = self.transforms(data)
             data['label'] = data['label'] - 1
-            # Recover the ignore pixels adding by transform
-            data['label'][data['label'] == 254] = 255
+            data = self.transforms(data)
             if self.edge:
                 edge_mask = F.mask_to_binary_edge(
                     label, radius=2, num_classes=self.num_classes)

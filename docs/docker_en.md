@@ -4,16 +4,16 @@
 
 PaddleRS provides `Dockerfile` to build a base Docker image for development/deployment. By default the develop branch of PaddleRS is fetched and stored in `/opts/PaddleRS` during image build. The `PPTAG` argument can be specified to the PaddlePaddle version you want to install. For example,
 
-- To install CPU version of PaddlePaddle-2.4.1 (which is installed when `docker build` does not receive a `PPTAG` argument), run:
+- To install CPU version of PaddlePaddle-2.5.1 (which is installed when `docker build` does not receive a `PPTAG` argument), run:
 
 ```shell
 docker build -t paddlers:latest -f Dockerfile .
 ```
 
-- To install GPU version of PaddlePaddle-2.4.1, with CUDA 11.8, cuDNN 8.4, and TensorRT 8.4, run:
+- To install GPU version of PaddlePaddle-2.5.1, with CUDA 11.8, cuDNN 8.4, and TensorRT 8.4, run:
 
 ```shell
-docker build -t paddlers:latest -f Dockerfile . --build-arg PPTAG=2.4.1-gpu-cuda11.7-cudnn8.4-trt8.4
+docker build -t paddlers:latest -f Dockerfile . --build-arg PPTAG=2.5.1-gpu-cuda11.7-cudnn8.4-trt8.4
 ```
 
 You can find a full list of available PaddlePaddle versions [here](https://hub.docker.com/r/paddlepaddle/paddle/tags). Please note that if a GPU version of PaddlePaddle is to be used, the version of Docker should >=19.

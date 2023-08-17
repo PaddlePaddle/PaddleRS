@@ -159,4 +159,4 @@ class FasterRCNN(BaseArch):
             this_class = probabilities[labels == i]
             average = np.mean(this_class, axis=0, keepdims=True)
             conditional.append(average)
-        return np.concatenate(conditional) 
+        return np.concatenate(conditional)

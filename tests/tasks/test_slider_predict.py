@@ -213,7 +213,7 @@ class _TestSliderPredictNamespace:
                 self.check_output_equal(pred_bs4, pred_bs1)
 
                 # batch_size = 8
-                save_dir = osp.join(td, 'bs4')
+                save_dir = osp.join(td, 'bs8')
                 self.model.slider_predict(
                     self.image_path,
                     save_dir,

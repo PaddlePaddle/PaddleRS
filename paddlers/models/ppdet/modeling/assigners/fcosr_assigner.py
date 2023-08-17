@@ -224,4 +224,4 @@ class FCOSRAssigner(nn.Layer):
                     (-1, 5))).reshape((b, l, 1))
             assigned_scores = assigned_scores * iou_score
 
-        return assigned_labels, assigned_rboxes, assigned_scores 
+        return assigned_labels, assigned_rboxes, assigned_scores

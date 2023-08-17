@@ -5,7 +5,7 @@
 ## Prerequisites
 
 1. [Install PaddlePaddle](https://www.paddlepaddle.org.cn/install/quick)
-  - Version requirements: PaddlePaddle>=2.2.0
+  - Version requirements: PaddlePaddle>=2.5.0
 
 2. Install PaddleRS
 

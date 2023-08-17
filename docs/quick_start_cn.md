@@ -5,14 +5,13 @@
 ## 环境准备
 
 1. [安装PaddlePaddle](https://www.paddlepaddle.org.cn/install/quick)
-  - 版本要求：PaddlePaddle>=2.2.0
+  - 版本要求：PaddlePaddle>=2.5.0
 
 2. 安装PaddleRS
 
 如果希望获取更加稳定的体验，请下载安装[PaddleRS发行版](https://github.com/PaddlePaddle/PaddleRS/releases)。
 
 ```shell
-pip install -r requirements.txt
 pip install .
 ```
 
@@ -22,7 +21,6 @@ PaddleRS代码会跟随开发进度不断更新，如果希望使用最新功能
 git clone https://github.com/PaddlePaddle/PaddleRS
 cd PaddleRS
 git checkout develop
-pip install -r requirements.txt
 pip install .
 ```
 

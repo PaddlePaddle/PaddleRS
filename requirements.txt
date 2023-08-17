@@ -13,11 +13,11 @@ natsort
 numba >= 0.56.2
 opencv-contrib-python <= 4.3.0.28
 openpyxl
-# paddlepaddle >= 2.2.0
-# paddlepaddle-gpu >= 2.2.0
-paddleslim >= 2.2.1, < 2.3.5
+# paddlepaddle >= 2.5.0
+# paddlepaddle-gpu >= 2.5.0
+paddleslim
 pandas
-protobuf >= 3.1.0, <= 3.20.3
+protobuf >= 3.1.0
 pycocotools
 # pydensecrf
 scikit-learn

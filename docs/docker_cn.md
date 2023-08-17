@@ -4,16 +4,16 @@
 
 PaddleRS提供`Dockerfile`，可构建基础镜像用于开发或部署。在镜像构建过程中，默认将拉取PaddleRS develop分支内容，并存放在`/opt/PaddleRS`。在构建镜像时可以通过`PPTAG`参数指定要使用的PaddlePaddle版本，例如：
 
-- 安装CPU版本的PaddlePaddle-2.4.1，未指定`PPTAG`的情况下将默认安装此版本：
+- 安装CPU版本的PaddlePaddle-2.5.1，未指定`PPTAG`的情况下将默认安装此版本：
 
 ```shell
 docker build -t paddlers:latest -f Dockerfile .
 ```
 
-- 安装GPU版本PaddlePaddle-2.4.1，使用CUDA 11.7、cuDNN 8.4以及TensorRT 8.4：
+- 安装GPU版本PaddlePaddle-2.5.1，使用CUDA 11.7、cuDNN 8.4以及TensorRT 8.4：
 
 ```shell
-docker build -t paddlers:latest -f Dockerfile . --build-arg PPTAG=2.4.1-gpu-cuda11.7-cudnn8.4-trt8.4
+docker build -t paddlers:latest -f Dockerfile . --build-arg PPTAG=2.5.1-gpu-cuda11.7-cudnn8.4-trt8.4
 ```
 
 其他环境的`PPTAG`可以参考[此处](https://hub.docker.com/r/paddlepaddle/paddle/tags)。请注意，如果需要安装GPU版本的PaddlePaddle，请确保Docker版本>=19。

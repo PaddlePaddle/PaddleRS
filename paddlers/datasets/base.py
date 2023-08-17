@@ -15,7 +15,7 @@
 import copy
 
 from paddle.io import Dataset
-from paddle.fluid.dataloader.collate import default_collate_fn
+from paddle.io.dataloader.collate import default_collate_fn
 
 from paddlers.utils import get_num_workers
 import paddlers.utils.logging as logging

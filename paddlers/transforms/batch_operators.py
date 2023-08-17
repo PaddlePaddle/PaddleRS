@@ -16,7 +16,7 @@ import traceback
 import random
 
 import numpy as np
-from paddle.fluid.dataloader.collate import default_collate_fn
+from paddle.io.dataloader.collate import default_collate_fn
 
 from .operators import Transform, Resize, ResizeByShort, _Permute, interp_dict
 from .box_utils import jaccard_overlap

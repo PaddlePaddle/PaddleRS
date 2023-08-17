@@ -80,4 +80,4 @@ class SupContrast(nn.Layer):
         per_label_log_prob = per_label_log_prob[keep]
         loss = -per_label_log_prob
 
-        return loss.mean() 
+        return loss.mean()
