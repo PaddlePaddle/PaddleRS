@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
+
 from testing_utils import run_script
 
 if __name__ == '__main__':
     run_script(
-        f"python generate_file_lists.py --data_dir ../tests/data/levircd_crop --save_dir ../tests/data/levircd_crop --subsets train val test --subdirs A B label --glob_pattern '*' --store_abs_path",
+        f"{sys.executable} generate_file_lists.py --data_dir ../tests/data/levircd_crop --save_dir ../tests/data/levircd_crop --subsets train val test --subdirs A B label --glob_pattern '*' --store_abs_path",
         wd="../tools")

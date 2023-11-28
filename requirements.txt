@@ -15,7 +15,7 @@ opencv-contrib-python <= 4.3.0.28
 openpyxl
 # paddlepaddle >= 2.5.0
 # paddlepaddle-gpu >= 2.5.0
-paddleslim
+paddleslim @ git+https://github.com/PaddlePaddle/PaddleSlim.git@release/2.5
 pandas
 protobuf >= 3.1.0
 pycocotools

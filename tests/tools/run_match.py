@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 import tempfile
 
 from testing_utils import run_script
@@ -19,5 +20,5 @@ from testing_utils import run_script
 if __name__ == '__main__':
     with tempfile.TemporaryDirectory() as td:
         run_script(
-            f"python match.py --image1_path ../tests/data/ssmt/multispectral_t1.tif --image2_path ../tests/data/ssmt/multispectral_t1.tif --save_path {td}/out.tiff",
+            f"{sys.executable} match.py --image1_path ../tests/data/ssmt/multispectral_t1.tif --image2_path ../tests/data/ssmt/multispectral_t1.tif --save_path {td}/out.tiff",
             wd="../tools")

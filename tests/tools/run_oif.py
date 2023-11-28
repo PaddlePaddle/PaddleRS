@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
+
 from testing_utils import run_script
 
 if __name__ == '__main__':
     run_script(
-        f"python oif.py --image_path ../tests/data/ssst/multispectral.tif",
+        f"{sys.executable} oif.py --image_path ../tests/data/ssst/multispectral.tif",
         wd="../tools")

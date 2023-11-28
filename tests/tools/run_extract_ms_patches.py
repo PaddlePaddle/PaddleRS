@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 import tempfile
 
 from testing_utils import run_script
@@ -19,5 +20,5 @@ from testing_utils import run_script
 if __name__ == '__main__':
     with tempfile.TemporaryDirectory() as td:
         run_script(
-            f"python extract_ms_patches.py --image_paths ../tests/data/ssst/multispectral.tif --mask_path ../tests/data/ssst/multiclass_gt2.png --min_patch_size 32 --save_dir {td}",
+            f"{sys.executable} extract_ms_patches.py --image_paths ../tests/data/ssst/multispectral.tif --mask_path ../tests/data/ssst/multiclass_gt2.png --min_patch_size 32 --save_dir {td}",
             wd="../tools")
