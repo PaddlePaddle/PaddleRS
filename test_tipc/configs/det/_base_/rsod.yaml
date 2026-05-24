@@ -1,0 +1,69 @@
+# Basic configurations of RSOD dataset
+
+seed: 1024
+
+datasets:
+  train: !Node
+    type: VOCDetDataset
+    args:
+      data_dir: ./test_tipc/data/rsod/
+      file_list: ./test_tipc/data/rsod/train.txt
+      label_list: ./test_tipc/data/rsod/labels.txt
+      shuffle: True
+  eval: !Node
+    type: VOCDetDataset
+    args:
+      data_dir: ./test_tipc/data/rsod/
+      file_list: ./test_tipc/data/rsod/val.txt
+      label_list: ./test_tipc/data/rsod/labels.txt
+      shuffle: False
+transforms:
+  train:
+    - !Node
+      type: DecodeImg
+    - !Node
+      type: RandomDistort
+    - !Node
+      type: RandomExpand
+    - !Node
+      type: RandomCrop
+    - !Node
+      type: RandomHorizontalFlip
+    - !Node
+      type: Normalize
+      args:
+        mean: [0.485, 0.456, 0.406]
+        std: [0.229, 0.224, 0.225]
+  train_batch:
+    - !Node
+      type: BatchRandomResize
+      args:
+        target_sizes: [320, 352, 384, 416, 448, 480, 512, 544, 576, 608]
+        interp: RANDOM
+  eval:
+    - !Node
+      type: DecodeImg
+    - !Node
+      type: Resize
+      args:
+        target_size: 608
+        interp: CUBIC
+    - !Node
+      type: Normalize
+      args:
+        mean: [0.485, 0.456, 0.406]
+        std: [0.229, 0.224, 0.225]
+download_on: False
+
+num_epochs: 10
+train_batch_size: 4
+save_interval_epochs: 10
+log_interval_steps: 4
+save_dir: ./test_tipc/output/det/
+learning_rate: 0.0001
+use_vdl: False
+resume_checkpoint: ''
+train:
+  pretrain_weights: COCO
+  warmup_steps: 0
+  warmup_start_lr: 0.0

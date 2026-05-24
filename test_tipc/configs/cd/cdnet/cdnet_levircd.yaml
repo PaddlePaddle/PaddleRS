@@ -1,0 +1,8 @@
+# Configurations of cdnet with LEVIR-CD dataset
+
+_base_: ../_base_/levircd.yaml
+
+save_dir: ./test_tipc/output/cd/cdnet/
+
+model: !Node
+  type: CDNet

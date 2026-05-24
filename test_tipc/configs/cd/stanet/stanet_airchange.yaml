@@ -1,0 +1,8 @@
+# Configurations of STANet with AirChange dataset
+
+_base_: ../_base_/airchange.yaml
+
+save_dir: ./test_tipc/output/cd/stanet/
+
+model: !Node
+  type: STANet

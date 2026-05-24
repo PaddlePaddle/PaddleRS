@@ -1,0 +1,8 @@
+# Configurations of DRN with RSSR dataset
+
+_base_: ../_base_/rssr.yaml
+
+save_dir: ./test_tipc/output/res/drn/
+
+model: !Node
+  type: DRN

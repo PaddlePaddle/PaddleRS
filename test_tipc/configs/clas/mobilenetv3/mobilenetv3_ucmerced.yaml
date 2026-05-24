@@ -1,0 +1,10 @@
+# Configurations of MobileNetV3 with UCMerced dataset
+
+_base_: ../_base_/ucmerced.yaml
+
+save_dir: ./test_tipc/output/clas/mobilenetv3/
+
+model: !Node
+  type: MobileNetV3
+  args:
+    num_classes: 21

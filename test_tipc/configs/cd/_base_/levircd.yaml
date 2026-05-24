@@ -1,0 +1,58 @@
+# Basic configurations of LEVIR-CD dataset
+
+seed: 1024
+
+datasets:
+  train: !Node
+    type: CDDataset
+    args:
+      data_dir: ./test_tipc/data/levircd/
+      file_list: ./test_tipc/data/levircd/train.txt
+      label_list: null
+      num_workers: 0
+      shuffle: True
+      with_seg_labels: False
+      binarize_labels: True
+  eval: !Node
+    type: CDDataset
+    args:
+      data_dir: ./test_tipc/data/levircd/
+      file_list: ./test_tipc/data/levircd/val.txt
+      label_list: null
+      num_workers: 0
+      shuffle: False
+      with_seg_labels: False
+      binarize_labels: True
+transforms:
+  train:
+    - !Node
+      type: DecodeImg
+    - !Node
+      type: RandomHorizontalFlip
+      args:
+        prob: 0.5
+    - !Node
+      type: Normalize
+      args:
+        mean: [0.5, 0.5, 0.5]
+        std: [0.5, 0.5, 0.5]
+  eval:
+    - !Node
+      type: DecodeImg
+    - !Node
+      type: Normalize
+      args:
+        mean: [0.5, 0.5, 0.5]
+        std: [0.5, 0.5, 0.5]
+download_on: False
+
+num_epochs: 10
+train_batch_size: 8
+save_interval_epochs: 5
+log_interval_steps: 50
+save_dir: ./test_tipc/output/cd/
+learning_rate: 0.002
+early_stop: False
+early_stop_patience: 5
+use_vdl: False
+resume_checkpoint: ''

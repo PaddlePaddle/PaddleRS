@@ -1,0 +1,66 @@
+# Basic configurations of AirChange dataset
+
+seed: 1024
+
+datasets:
+  train: !Node
+    type: CDDataset
+    args:
+      data_dir: ./test_tipc/data/airchange/
+      file_list: ./test_tipc/data/airchange/train.txt
+      label_list: null
+      num_workers: 0
+      shuffle: True
+      with_seg_labels: False
+      binarize_labels: True
+  eval: !Node
+    type: CDDataset
+    args:
+      data_dir: ./test_tipc/data/airchange/
+      file_list: ./test_tipc/data/airchange/eval.txt
+      label_list: null
+      num_workers: 0
+      shuffle: False
+      with_seg_labels: False
+      binarize_labels: True
+transforms:
+  train:
+    - !Node
+      type: DecodeImg
+    - !Node
+      type: RandomCrop
+      args:
+        crop_size: 256
+        aspect_ratio: [0.5, 2.0]
+        scaling: [0.2, 1.0]
+    - !Node
+      type: RandomHorizontalFlip
+      args:
+        prob: 0.5
+    - !Node
+      type: Normalize
+      args:
+        mean: [0.5, 0.5, 0.5]
+        std: [0.5, 0.5, 0.5]
+  eval:
+    - !Node
+      type: DecodeImg
+    - !Node
+      type: Normalize
+      args:
+        mean: [0.5, 0.5, 0.5]
+        std: [0.5, 0.5, 0.5]
+download_on: False
+download_url: https://paddlers.bj.bcebos.com/datasets/airchange.zip
+download_path: ./test_tipc/data/
+
+num_epochs: 5
+train_batch_size: 4
+save_interval_epochs: 5
+log_interval_steps: 50
+save_dir: ./test_tipc/output/cd/
+learning_rate: 0.01
+early_stop: False
+early_stop_patience: 5
+use_vdl: False
+resume_checkpoint: ''

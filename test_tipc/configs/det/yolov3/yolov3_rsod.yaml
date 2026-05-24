@@ -1,0 +1,10 @@
+# Configurations of YOLOv3 with RSOD dataset
+
+_base_: ../_base_/rsod.yaml
+
+save_dir: ./test_tipc/output/det/yolov3/
+
+model: !Node
+  type: YOLOv3
+  args:
+    num_classes: 4

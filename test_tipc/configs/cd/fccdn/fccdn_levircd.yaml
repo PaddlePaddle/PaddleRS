@@ -1,0 +1,10 @@
+# Configurations of FCCDN with LEVIR-CD dataset
+
+_base_: ../_base_/levircd.yaml
+
+save_dir: ./test_tipc/output/cd/fccdn/
+
+model: !Node
+  type: FCCDN
+
+learning_rate: 0.001

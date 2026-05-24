@@ -1,0 +1,8 @@
+# Configurations of P2V-CD with LEVIR-CD dataset
+
+_base_: ../_base_/levircd.yaml
+
+save_dir: ./test_tipc/output/cd/p2v/
+
+model: !Node
+  type: P2V

@@ -1,0 +1,11 @@
+# Configurations of HRNet with RSSeg dataset
+
+_base_: ../_base_/rsseg.yaml
+
+save_dir: ./test_tipc/output/seg/hrnet/
+
+model: !Node
+  type: HRNet
+  args:
+    in_channels: 3
+    num_classes: 5

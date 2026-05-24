@@ -1,0 +1,10 @@
+# Configurations of PP-YOLO with RSOD dataset
+
+_base_: ../_base_/rsod.yaml
+
+save_dir: ./test_tipc/output/det/ppyolo/
+
+model: !Node
+  type: PPYOLO
+  args:
+    num_classes: 4

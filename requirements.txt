@@ -1,0 +1,28 @@
+chardet
+colorama
+cython
+easydict
+filelock
+foliume
+# GDAL >= 3.1.3
+geojson
+lap
+motmetrics
+munch
+natsort
+numba >= 0.56.2
+opencv-contrib-python <= 4.3.0.28
+openpyxl
+# paddlepaddle >= 2.5.0
+# paddlepaddle-gpu >= 2.5.0
+paddleslim @ git+https://github.com/PaddlePaddle/PaddleSlim.git@release/2.5
+pandas
+protobuf >= 3.1.0
+pycocotools
+# pydensecrf
+scikit-learn
+scikit-image >= 0.14.0
+scipy
+shapely
+spyndex >= 0.4.0
+visualdl >= 2.1.1

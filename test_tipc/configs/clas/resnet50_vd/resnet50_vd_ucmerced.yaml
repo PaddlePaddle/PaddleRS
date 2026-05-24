@@ -1,0 +1,10 @@
+# Configurations of ResNet50-vd with UCMerced dataset
+
+_base_: ../_base_/ucmerced.yaml
+
+save_dir: ./test_tipc/output/clas/resnet50_vd/
+
+model: !Node
+  type: ResNet50_vd
+  args:
+    num_classes: 21

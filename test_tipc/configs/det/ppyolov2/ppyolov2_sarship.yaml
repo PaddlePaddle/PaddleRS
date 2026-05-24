@@ -1,0 +1,10 @@
+# Configurations of PP-YOLOv2 with SARShip dataset
+
+_base_: ../_base_/sarship.yaml
+
+save_dir: ./test_tipc/output/det/ppyolov2/
+
+model: !Node
+  type: PPYOLOv2
+  args:
+    num_classes: 1

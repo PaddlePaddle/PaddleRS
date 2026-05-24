@@ -1,0 +1,11 @@
+# Configurations of FactSeg with RSSeg dataset
+
+_base_: ../_base_/rsseg.yaml
+
+save_dir: ./test_tipc/output/seg/factseg/
+
+model: !Node
+  type: FactSeg
+  args:
+    in_channels: 3
+    num_classes: 5

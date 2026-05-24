@@ -1,0 +1,10 @@
+# Configurations of CondenseNet V2 with UCMerced dataset
+
+_base_: ../_base_/ucmerced.yaml
+
+save_dir: ./test_tipc/output/clas/condensenetv2/
+
+model: !Node
+  type: CondenseNetV2
+  args:
+    num_classes: 21

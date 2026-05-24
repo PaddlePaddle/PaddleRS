@@ -1,0 +1,8 @@
+# Configurations of ChangeFormer with LEVIR-CD dataset
+
+_base_: ../_base_/levircd.yaml
+
+save_dir: ./test_tipc/output/cd/changeformer/
+
+model: !Node
+  type: ChangeFormer

@@ -1,0 +1,13 @@
+# Configurations of FCCDN with AirChange dataset
+
+_base_: ../_base_/airchange.yaml
+
+save_dir: ./test_tipc/output/cd/fccdn/
+
+model: !Node
+  type: FCCDN
+
+learning_rate: 0.07
+lr_decay_power: 0.6
+log_interval_steps: 100
+save_interval_epochs: 3
