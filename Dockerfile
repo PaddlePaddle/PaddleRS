@@ -45,3 +45,4 @@ ENV DISPLAY host.docker.internal:0
 
 # 7. set working directory
 WORKDIR /opt/PaddleRS
+ 
